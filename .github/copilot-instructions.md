@@ -4,6 +4,7 @@
 - Types that are specific to a single file should be located in a .types.ts file next to the source file.
 - Package global types should be stored in a top level "types" folder, broken into domain specific files.
 - Split apart complex logic into small, pure functions with descriptive names
+- all new functions and files added should be covered by tests.
 - Use `test` (not `it`) in tests, and write descriptions that read naturally without implying an `it` prefix.
 - When adding dependencies to `package.json`, always prefer pinning a specific version over fuzzy version matching.
 - When adding endpoints to services written in Express, extract each handler into its own file in a `handlers` directory within the Turborepo application.
