@@ -7,7 +7,7 @@ This repository is a Turborepo monorepo with this structure:
 
 ## Current app
 
-- `apps/notes-api`: Express-based Node service with a `GET /health` endpoint and request logging via `morgan`
+- `apps/notes-api`: Express-based Node service with `GET /health` and `GET /notes` endpoints and request logging via `morgan` (`GET /notes` reads markdown files from `NOTES_DIRECTORY`)
 
 ## Scripts
 
