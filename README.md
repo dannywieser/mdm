@@ -13,7 +13,9 @@ This repository is a Turborepo monorepo with this structure:
 
 Run from repository root:
 
-- `npm run lint` - run ESLint across workspaces through Turborepo
-- `npm run lint:fix` - run ESLint with auto-fixes where possible
-- `npm run build` - build workspace packages/apps
-- `npm test` - run workspace tests
+- `turbo run lint` - run ESLint across workspaces
+- `turbo run lint -- --fix` - run ESLint with auto-fixes where possible
+- `turbo run build` - build workspace packages/apps
+- `turbo run test` - run workspace tests
+
+Equivalent npm script aliases are available: `npm run lint`, `npm run lint:fix`, `npm run build`, and `npm test`.
