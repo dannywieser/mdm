@@ -1,57 +1,91 @@
-import { promises as fs } from "node:fs"
-import os from "node:os"
-import path from "node:path"
+import express from "express"
+import request from "supertest"
 
+import { notesHandler } from "./notes"
 import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
 
-describe("notes handler helpers", () => {
-  let notesRoot: string
+jest.mock("./notes.util", () => ({
+  collectMarkdownFiles: jest.fn(),
+  parseMarkdownFile: jest.fn()
+}))
 
-  beforeEach(async () => {
-    notesRoot = await fs.mkdtemp(path.join(os.tmpdir(), "notes-handler-test-"))
+const collectMarkdownFilesMock = jest.mocked(collectMarkdownFiles)
+const parseMarkdownFileMock = jest.mocked(parseMarkdownFile)
+
+describe("notes handler interface", () => {
+  const originalNotesDirectory = process.env.NOTES_DIRECTORY
+
+  afterEach(() => {
+    if (originalNotesDirectory === undefined) {
+      delete process.env.NOTES_DIRECTORY
+    } else {
+      process.env.NOTES_DIRECTORY = originalNotesDirectory
+    }
+
+    jest.clearAllMocks()
   })
 
-  afterEach(async () => {
-    await fs.rm(notesRoot, { recursive: true, force: true })
+  test("returns an error when notes directory env var is missing", async () => {
+    delete process.env.NOTES_DIRECTORY
+    const app = express()
+    app.get("/notes", notesHandler)
+
+    const response = await request(app).get("/notes")
+
+    expect(response.status).toBe(500)
+    expect(response.body).toEqual({
+      error: "NOTES_DIRECTORY environment variable is required"
+    })
+    expect(collectMarkdownFilesMock).not.toHaveBeenCalled()
+    expect(parseMarkdownFileMock).not.toHaveBeenCalled()
   })
 
-  test("collectMarkdownFiles finds markdown files recursively", async () => {
-    const nestedDirectory = path.join(notesRoot, "nested")
-    const deepDirectory = path.join(nestedDirectory, "deep")
-    const expectedMarkdownPaths = [
-      path.join(notesRoot, "root.md"),
-      path.join(nestedDirectory, "child.markdown"),
-      path.join(deepDirectory, "upper.MD")
-    ]
+  test("returns notes and delegates file processing to util functions", async () => {
+    process.env.NOTES_DIRECTORY = "/notes"
+    collectMarkdownFilesMock.mockResolvedValue(["/notes/b.md", "/notes/a.md"])
+    parseMarkdownFileMock.mockImplementation((filePath) =>
+      Promise.resolve({
+        basename: filePath.split("/").pop() ?? "note.md",
+        createdDate: "2026-05-26T00:00:00.000Z",
+        folder: "notes",
+        fullPath: filePath,
+        html: "<h1>Note</h1>",
+        id: pathToId(filePath),
+        modifiedDate: "2026-05-26T00:00:00.000Z"
+      })
+    )
+    const app = express()
+    app.get("/notes", notesHandler)
 
-    await fs.mkdir(deepDirectory, { recursive: true })
-    await Promise.all([
-      fs.writeFile(expectedMarkdownPaths[0], "# Root"),
-      fs.writeFile(expectedMarkdownPaths[1], "## Child"),
-      fs.writeFile(expectedMarkdownPaths[2], "### Upper"),
-      fs.writeFile(path.join(notesRoot, "ignore.txt"), "ignore")
+    const response = await request(app).get("/notes")
+    const body = response.body as { notes: unknown[] }
+
+    expect(response.status).toBe(200)
+    expect(body.notes).toHaveLength(2)
+    expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
+    expect(parseMarkdownFileMock.mock.calls.map(([filePath]) => filePath)).toEqual([
+      "/notes/a.md",
+      "/notes/b.md"
     ])
-
-    const markdownFiles = await collectMarkdownFiles(notesRoot)
-
-    expect(markdownFiles.sort()).toEqual(expectedMarkdownPaths.sort())
   })
 
-  test("parseMarkdownFile returns rendered html and metadata", async () => {
-    const topicDirectory = path.join(notesRoot, "topic")
-    const markdownPath = path.join(topicDirectory, "welcome.md")
+  test("returns an error when util loading fails", async () => {
+    process.env.NOTES_DIRECTORY = "/notes"
+    collectMarkdownFilesMock.mockRejectedValue(new Error("boom"))
+    const errorSpy = jest.spyOn(console, "error").mockImplementation()
+    const app = express()
+    app.get("/notes", notesHandler)
 
-    await fs.mkdir(topicDirectory)
-    await fs.writeFile(markdownPath, "# Welcome\n\nThis is a note.")
+    const response = await request(app).get("/notes")
 
-    const note = await parseMarkdownFile(markdownPath)
+    expect(response.status).toBe(500)
+    expect(response.body).toEqual({ error: "Unable to load notes" })
+    expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
+    expect(parseMarkdownFileMock).not.toHaveBeenCalled()
 
-    expect(note.basename).toBe("welcome.md")
-    expect(note.id).toBe("welcome")
-    expect(note.folder).toBe("topic")
-    expect(note.fullPath).toBe(markdownPath)
-    expect(note.html).toContain("<h1>Welcome</h1>")
-    expect(Number.isFinite(Date.parse(note.createdDate))).toBe(true)
-    expect(Number.isFinite(Date.parse(note.modifiedDate))).toBe(true)
+    errorSpy.mockRestore()
   })
 })
+
+const pathToId = (filePath: string): string =>
+  filePath.replace(/\\/g, "/").split("/").pop()?.replace(/\.[^.]+$/, "") ?? "note"
