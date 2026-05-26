@@ -9,3 +9,4 @@
 - Use `test` (not `it`) in tests, and write descriptions that read naturally without implying an `it` prefix.
 - When adding dependencies to `package.json`, always prefer pinning a specific version over fuzzy version matching.
 - When adding endpoints to services written in Express, place each handler in its own folder under `handlers/<handler-name>`, with the handler in `<handler-name>.ts`, tests in `<handler-name>.test.ts`, and helper functions in `<handler-name>.util.ts`.
+- after every change made, review the README file for the application or package and update it if necessary to reflect the changes made or remove any outdated information.
