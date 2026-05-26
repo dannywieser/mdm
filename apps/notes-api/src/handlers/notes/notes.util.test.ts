@@ -22,10 +22,6 @@ const createDirent = (name: string, type: "file" | "directory"): Dirent =>
   }) as Dirent
 
 describe("notes util helpers", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
   test("collectMarkdownFiles finds markdown files recursively", async () => {
     readdirMock
       .mockResolvedValueOnce([

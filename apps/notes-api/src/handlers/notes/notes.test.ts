@@ -21,8 +21,6 @@ describe("notes handler interface", () => {
     } else {
       process.env.NOTES_DIRECTORY = originalNotesDirectory
     }
-
-    jest.clearAllMocks()
   })
 
   test("returns an error when notes directory env var is missing", async () => {
