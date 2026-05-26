@@ -6,6 +6,7 @@
 - Split apart complex logic into small, pure functions with descriptive names
 - all new functions and files added should be covered by tests.
 - For handler folders (`handlers/<name>/`), test utility logic in `<name>.util.test.ts`, and keep `<name>.test.ts` focused on handler interface behavior by mocking util functions.
+- Use the global Jest config (`clearMocks: true`) for mock cleanup; never call `jest.clearAllMocks()` manually in individual tests.
 - Use `test` (not `it`) in tests, and write descriptions that read naturally without implying an `it` prefix.
 - When adding dependencies to `package.json`, always prefer pinning a specific version over fuzzy version matching.
 - When adding endpoints to services written in Express, place each handler in its own folder under `handlers/<handler-name>`, with the handler in `<handler-name>.ts`, tests in `<handler-name>.test.ts`, and helper functions in `<handler-name>.util.ts`.
