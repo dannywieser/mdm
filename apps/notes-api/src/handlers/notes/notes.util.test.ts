@@ -69,6 +69,7 @@ describe("notes util helpers", () => {
       basename: "welcome.md",
       createdDate: "2026-05-26T00:00:00.000Z",
       folder: "topic",
+      frontmatter: null,
       fullPath: "/notes/topic/welcome.md",
       id: "welcome",
       modifiedDate: "2026-05-26T01:00:00.000Z"
@@ -76,5 +77,51 @@ describe("notes util helpers", () => {
     expect(note.html).toContain("<h1>Welcome</h1>")
     expect(readFileMock).toHaveBeenCalledWith("/notes/topic/welcome.md", "utf8")
     expect(statMock).toHaveBeenCalledWith("/notes/topic/welcome.md")
+  })
+
+  test("parseMarkdownFile extracts frontmatter and removes it from html", async () => {
+    const createdDate = new Date("2026-05-26T00:00:00.000Z")
+    const modifiedDate = new Date("2026-05-26T01:00:00.000Z")
+
+    readFileMock.mockResolvedValue(`---
+topic:
+  - AI
+  - Notes
+created: 2026.05.26
+---
+# Welcome
+
+This is a note.`)
+    statMock.mockResolvedValue({
+      birthtime: createdDate,
+      mtime: modifiedDate
+    })
+
+    const note = await parseMarkdownFile("/notes/topic/frontmatter.md")
+
+    expect(note.frontmatter).toEqual({
+      created: "2026.05.26",
+      topic: ["AI", "Notes"]
+    })
+    expect(note.html).toContain("<h1>Welcome</h1>")
+    expect(note.html).toContain("<p>This is a note.</p>")
+    expect(note.html).not.toContain("created: 2026.05.26")
+    expect(note.html).not.toContain("topic:")
+  })
+
+  test("parseMarkdownFile supports frontmatter with crlf line endings", async () => {
+    readFileMock.mockResolvedValue(
+      "---\r\ntopic:\r\n  - AI\r\n---\r\n# Welcome\r\n\r\nBody."
+    )
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z")
+    })
+
+    const note = await parseMarkdownFile("/notes/topic/crlf.md")
+
+    expect(note.frontmatter).toEqual({ topic: ["AI"] })
+    expect(note.html).toContain("<h1>Welcome</h1>")
+    expect(note.html).toContain("<p>Body.</p>")
   })
 })

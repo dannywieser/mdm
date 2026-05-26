@@ -46,6 +46,7 @@ describe("notes handler interface", () => {
         basename: filePath.split("/").pop() ?? "note.md",
         createdDate: "2026-05-26T00:00:00.000Z",
         folder: "notes",
+        frontmatter: null,
         fullPath: filePath,
         html: "<h1>Note</h1>",
         id: pathToId(filePath),

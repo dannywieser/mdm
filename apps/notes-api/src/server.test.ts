@@ -19,6 +19,7 @@ describe("notes-api health endpoint", () => {
 describe("notes-api notes endpoint", () => {
   type Note = {
     createdDate: string
+    frontmatter: Record<string, string | string[]> | null
     html: string
     modifiedDate: string
   }
@@ -47,7 +48,17 @@ describe("notes-api notes endpoint", () => {
 
     await fs.mkdir(nestedFolder)
     await Promise.all([
-      fs.writeFile(rootMarkdownPath, "# Welcome\n\nRoot note."),
+      fs.writeFile(
+        rootMarkdownPath,
+        `---
+topic:
+  - AI
+created: 2026.05.26
+---
+# Welcome
+
+Root note.`
+      ),
       fs.writeFile(nestedMarkdownPath, "## Guide\n\nNested note."),
       fs.writeFile(path.join(notesRoot, "ignore.txt"), "ignore")
     ])
@@ -66,12 +77,17 @@ describe("notes-api notes endpoint", () => {
       expect.arrayContaining([
         expect.objectContaining({
           basename: "welcome.md",
+          frontmatter: {
+            created: "2026.05.26",
+            topic: ["AI"]
+          },
           id: "welcome",
           folder: path.basename(notesRoot),
           fullPath: rootMarkdownPath
         }),
         expect.objectContaining({
           basename: "guide.markdown",
+          frontmatter: null,
           id: "guide",
           folder: "nested",
           fullPath: nestedMarkdownPath
