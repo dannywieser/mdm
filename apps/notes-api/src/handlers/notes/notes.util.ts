@@ -92,7 +92,7 @@ const parseFrontmatter = (lines: string[]): NoteFrontmatter => {
     if (currentArrayKey && trimmedLine.startsWith("-")) {
       frontmatter[currentArrayKey] = [
         ...(frontmatter[currentArrayKey] as string[]),
-        trimmedLine.replace(/^-+\s*/, "")
+        trimmedLine.replace(/^-\s*/, "")
       ]
       continue
     }
