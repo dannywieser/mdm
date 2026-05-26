@@ -1,9 +1,9 @@
+import type { RequestHandler } from "express"
+
 import { promises as fs } from "node:fs"
 import path from "node:path"
-
-import type { RequestHandler } from "express"
+import remark from "remark"
 import remarkHtml from "remark-html"
-import { remark } from "remark"
 
 const NOTES_DIRECTORY_ENV = "NOTES_DIRECTORY"
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
