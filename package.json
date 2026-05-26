@@ -11,6 +11,7 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint -- --fix",
+    "dev": "turbo run dev",
     "test": "turbo run test"
   },
   "devDependencies": {
@@ -27,6 +28,7 @@
     "supertest": "7.2.2",
     "ts-jest": "29.4.11",
     "turbo": "2.9.14",
+    "tsx": "4.22.3",
     "typescript": "5.9.3",
     "typescript-eslint": "8.60.0"
   }
