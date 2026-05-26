@@ -2,7 +2,7 @@ import { promises as fs } from "node:fs"
 import os from "node:os"
 import path from "node:path"
 
-import { collectMarkdownFiles, parseMarkdownFile } from "./notes"
+import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
 
 describe("notes handler helpers", () => {
   let notesRoot: string

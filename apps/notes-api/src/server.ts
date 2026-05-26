@@ -2,7 +2,7 @@ import express from 'express'
 import morgan from 'morgan'
 
 import { healthHandler } from './handlers/health'
-import { notesHandler } from './handlers/notes'
+import { notesHandler } from './handlers/notes/notes'
 
 export const createApp = () => {
   const app = express()
