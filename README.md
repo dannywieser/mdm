@@ -7,7 +7,38 @@ This repository is a Turborepo monorepo with this structure:
 
 ## Current app
 
-- `apps/notes-api`: Express-based Node service with a `GET /health` endpoint and request logging via `morgan`
+- `apps/notes-api`: Express-based Node service with request logging via `morgan`.
+  - `GET /health`
+    - Purpose: basic service health check
+    - Success response: `200`
+      ```json
+      { "status": "ok" }
+      ```
+  - `GET /notes`
+    - Purpose: recursively load `*.md` and `*.markdown` files from `NOTES_DIRECTORY`, render markdown to HTML, and return note metadata
+    - Success response: `200`
+      ```json
+      {
+        "notes": [
+          {
+            "createdDate": "2026-05-26T00:00:00.000Z",
+            "modifiedDate": "2026-05-26T00:00:00.000Z",
+            "fullPath": "/absolute/path/to/notes/welcome.md",
+            "basename": "welcome.md",
+            "id": "welcome",
+            "folder": "notes",
+            "html": "<h1>Welcome</h1>"
+          }
+        ]
+      }
+      ```
+    - Error responses: `500`
+      ```json
+      { "error": "NOTES_DIRECTORY environment variable is required" }
+      ```
+      ```json
+      { "error": "Unable to load notes" }
+      ```
 
 ## Scripts
 

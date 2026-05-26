@@ -1,14 +1,16 @@
-import express from 'express'
-import morgan from 'morgan'
+import express from "express"
+import morgan from "morgan"
 
-import { healthHandler } from './handlers/health'
+import { healthHandler } from "./handlers/health/health"
+import { notesHandler } from "./handlers/notes/notes"
 
 export const createApp = () => {
   const app = express()
 
-  app.use(morgan('combined'))
+  app.use(morgan("combined"))
 
-  app.get('/health', healthHandler)
+  app.get("/health", healthHandler)
+  app.get("/notes", notesHandler)
 
   return app
 }
