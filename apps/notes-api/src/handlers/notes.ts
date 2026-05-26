@@ -73,7 +73,8 @@ export const notesHandler: RequestHandler = async (_request, response) => {
     const notes = await Promise.all(markdownFiles.map(parseMarkdownFile))
 
     response.status(200).json({ notes })
-  } catch {
+  } catch (error) {
+    console.error("Unable to load notes", error)
     response.status(500).json({ error: "Unable to load notes" })
   }
 }
