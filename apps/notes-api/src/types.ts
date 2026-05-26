@@ -1,8 +1,6 @@
-export type FrontmatterValue = string | string[]
+import type { NoteFrontmatter } from "markdown"
 
-export interface NoteFrontmatter {
-  [key: string]: FrontmatterValue
-}
+export type { FrontmatterValue, NoteFrontmatter } from "markdown"
 
 export interface Note {
   basename: string
