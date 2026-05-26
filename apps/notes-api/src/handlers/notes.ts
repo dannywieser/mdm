@@ -1,3 +1,4 @@
+import type { Note } from "../types"
 import type { RequestHandler } from "express"
 
 import { promises as fs } from "node:fs"
@@ -7,16 +8,6 @@ import remarkHtml from "remark-html"
 
 const NOTES_DIRECTORY_ENV = "NOTES_DIRECTORY"
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
-
-export type Note = {
-  basename: string
-  createdDate: string
-  folder: string
-  fullPath: string
-  html: string
-  id: string
-  modifiedDate: string
-}
 
 export const collectMarkdownFiles = async (
   directory: string
