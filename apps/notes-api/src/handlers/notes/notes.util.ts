@@ -1,10 +1,8 @@
-import { parseFrontMatter } from "markdown"
+import { parseFrontMatter, type Note } from "markdown"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
 import remarkHtml from "remark-html"
-
-import type { Note } from "../../types"
 
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
 
