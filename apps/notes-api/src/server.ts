@@ -1,14 +1,14 @@
 import express from 'express'
 import morgan from 'morgan'
 
+import { healthHandler } from './handlers/health'
+
 export const createApp = () => {
   const app = express()
 
   app.use(morgan('combined'))
 
-  app.get('/health', (_request, response) => {
-    response.status(200).json({ status: 'ok' })
-  })
+  app.get('/health', healthHandler)
 
   return app
 }
