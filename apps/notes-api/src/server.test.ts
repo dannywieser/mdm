@@ -14,7 +14,7 @@ jest.mock("./handlers/notes/notes", () => ({
 const healthHandlerMock = jest.mocked(healthHandler)
 const notesHandlerMock = jest.mocked(notesHandler)
 
-describe("createApp", () => {
+describe("notes-api server interface", () => {
   test("wires GET /health to the health handler", async () => {
     healthHandlerMock.mockImplementation((_request, response) => {
       response.status(200).json({ status: "ok" })
