@@ -18,7 +18,9 @@ export type Note = {
   modifiedDate: string
 }
 
-const collectMarkdownFiles = async (directory: string): Promise<string[]> => {
+export const collectMarkdownFiles = async (
+  directory: string
+): Promise<string[]> => {
   const entries = await fs.readdir(directory, { withFileTypes: true })
   const nestedPaths = await Promise.all(
     entries.map(async (entry) => {
@@ -39,7 +41,7 @@ const collectMarkdownFiles = async (directory: string): Promise<string[]> => {
   return nestedPaths.flat()
 }
 
-const parseMarkdownFile = async (filePath: string): Promise<Note> => {
+export const parseMarkdownFile = async (filePath: string): Promise<Note> => {
   const [source, stats] = await Promise.all([
     fs.readFile(filePath, "utf8"),
     fs.stat(filePath)
