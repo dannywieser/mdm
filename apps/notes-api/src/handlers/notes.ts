@@ -5,18 +5,10 @@ import path from "node:path"
 import remark from "remark"
 import remarkHtml from "remark-html"
 
+import type { Note } from "../types"
+
 const NOTES_DIRECTORY_ENV = "NOTES_DIRECTORY"
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
-
-export type Note = {
-  basename: string
-  createdDate: string
-  folder: string
-  fullPath: string
-  html: string
-  id: string
-  modifiedDate: string
-}
 
 export const collectMarkdownFiles = async (
   directory: string
