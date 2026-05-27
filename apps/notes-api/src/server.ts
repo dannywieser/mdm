@@ -1,7 +1,7 @@
+import { resolveNotesConfig } from "app-config"
 import express from "express"
 import morgan from "morgan"
 
-import { resolveNotesConfig } from "./config"
 import { healthHandler } from "./handlers/health/health"
 import { notesHandler } from "./handlers/notes/notes"
 import { toLoggableError } from "./logging"

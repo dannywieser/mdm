@@ -6,7 +6,7 @@ import {
   clearConfigCache,
   resolveNotesConfig,
   resolveNotesDirectory
-} from "./config"
+} from "./index"
 
 jest.mock("node:fs", () => ({
   promises: {

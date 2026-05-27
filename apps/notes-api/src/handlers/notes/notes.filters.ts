@@ -1,6 +1,5 @@
+import type { NotesView } from "app-config"
 import type { Note } from "markdown"
-
-import type { NotesView } from "../../config"
 
 const getObjectValue = (value: unknown, key: string): unknown => {
   if (!value || typeof value !== "object") {

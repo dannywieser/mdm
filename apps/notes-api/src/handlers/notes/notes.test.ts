@@ -1,14 +1,14 @@
+import { AppConfigError, resolveNotesConfig } from "app-config"
 import express from "express"
 import request from "supertest"
 
-import { AppConfigError, resolveNotesConfig } from "../../config"
 import { notesHandler } from "./notes"
 import { applyViewFilter } from "./notes.filters"
 import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
 
-jest.mock("../../config", () => {
+jest.mock("app-config", () => {
   const actualConfig =
-    jest.requireActual<typeof import("../../config")>("../../config")
+    jest.requireActual<typeof import("app-config")>("app-config")
 
   return {
     ...actualConfig,

@@ -1,6 +1,10 @@
 import { promises as fs } from "node:fs"
 import path from "node:path"
 
+import type { ResolvedNotesConfig } from "./types"
+
+export type { NotesView, ResolvedNotesConfig } from "./types"
+
 const APP_CONFIG_FILENAME = "app.config.json"
 
 interface AppConfig {
@@ -13,18 +17,6 @@ interface AppConfig {
 interface AppConfigView {
   filters: Record<string, string>
   name: string
-}
-
-export interface NotesView {
-  filters: Record<string, string>
-  name: string
-}
-
-export interface ResolvedNotesConfig {
-  dateFormats: string[]
-  notesDirectory: string
-  obsidianVault: string
-  views: NotesView[]
 }
 
 export class AppConfigError extends Error {}

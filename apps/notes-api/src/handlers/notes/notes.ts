@@ -1,8 +1,8 @@
+import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler } from "express"
 
-import type { ResolvedNotesConfig } from "../../config"
+import { AppConfigError, resolveNotesConfig } from "app-config"
 
-import { AppConfigError, resolveNotesConfig } from "../../config"
 import { toLoggableError } from "../../logging"
 import { applyViewFilter } from "./notes.filters"
 import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"

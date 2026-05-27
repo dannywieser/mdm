@@ -1,11 +1,11 @@
+import { resolveNotesConfig } from "app-config"
 import request from "supertest"
 
-import { resolveNotesConfig } from "./config"
 import { healthHandler } from "./handlers/health/health"
 import { notesHandler } from "./handlers/notes/notes"
 import { createApp, logStartupConfig } from "./server"
 
-jest.mock("./config", () => ({
+jest.mock("app-config", () => ({
   resolveNotesConfig: jest.fn()
 }))
 
