@@ -4,11 +4,8 @@ import type { ResolvedNotesConfig } from "../../config"
 
 import { AppConfigError, resolveNotesConfig } from "../../config"
 import { toLoggableError } from "../../logging"
-import {
-  applyViewFilter,
-  collectMarkdownFiles,
-  parseMarkdownFile
-} from "./notes.util"
+import { applyViewFilter } from "./notes.filters"
+import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
 
 export const notesHandler: RequestHandler = async (request, response) => {
   let notesConfig: ResolvedNotesConfig | undefined

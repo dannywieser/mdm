@@ -2,12 +2,9 @@ import express from "express"
 import request from "supertest"
 
 import { AppConfigError, resolveNotesConfig } from "../../config"
+import { applyViewFilter } from "./notes.filters"
 import { notesHandler } from "./notes"
-import {
-  applyViewFilter,
-  collectMarkdownFiles,
-  parseMarkdownFile
-} from "./notes.util"
+import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
 
 jest.mock("../../config", () => {
   const actualConfig =
@@ -19,8 +16,11 @@ jest.mock("../../config", () => {
   }
 })
 
-jest.mock("./notes.util", () => ({
+jest.mock("./notes.filters", () => ({
   applyViewFilter: jest.fn(),
+}))
+
+jest.mock("./notes.util", () => ({
   collectMarkdownFiles: jest.fn(),
   parseMarkdownFile: jest.fn()
 }))
@@ -129,7 +129,7 @@ describe("notes handler interface", () => {
     )
   })
 
-  test("passes requested view to util filter function", async () => {
+  test("passes requested view to filter function", async () => {
     resolveNotesConfigMock.mockResolvedValue({
       dateFormats: [],
       notesDirectory: "/notes",
