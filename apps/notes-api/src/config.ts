@@ -38,15 +38,15 @@ const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every(isNonEmptyString)
 
 const isStringRecord = (value: unknown): value is Record<string, string> =>
-  Boolean(value) &&
+  value !== null &&
   typeof value === "object" &&
   !Array.isArray(value) &&
-  Object.entries(value).every(
+  Object.entries(value as Record<string, unknown>).every(
     ([key, entryValue]) => isNonEmptyString(key) && isNonEmptyString(entryValue)
   )
 
 const isAppConfigView = (value: unknown): value is AppConfigView =>
-  Boolean(value) &&
+  value !== null &&
   typeof value === "object" &&
   !Array.isArray(value) &&
   isNonEmptyString((value as Record<string, unknown>)["name"]) &&

@@ -152,33 +152,33 @@ describe("config", () => {
         noteRootDirectory: "/notes-root",
         obsidianVault: "vault"
       })
-
-      test("throws when views is invalid", async () => {
-        readFileMock.mockResolvedValue(
-          JSON.stringify({
-            noteRootDirectory: "/notes-root",
-            obsidianVault: "vault",
-            views: [
-              {
-                filters: {
-                  folder: "downtime"
-                }
-              }
-            ]
-          })
-        )
-
-        await expect(resolveNotesDirectory()).rejects.toEqual(
-          new AppConfigError(
-            "app.config.json views must be an array of objects with non-empty name and string filters"
-          )
-        )
-      })
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
         "app.config.json dateFormats must be an array of non-empty strings"
+      )
+    )
+  })
+
+  test("throws when views is invalid", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault",
+        views: [
+          {
+            filters: {
+              folder: "downtime"
+            }
+          }
+        ]
+      })
+    )
+
+    await expect(resolveNotesDirectory()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json views must be an array of objects with non-empty name and string filters"
       )
     )
   })
