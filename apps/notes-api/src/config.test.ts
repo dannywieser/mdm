@@ -56,4 +56,18 @@ describe("config", () => {
       )
     )
   })
+
+  test("throws when noteRootDirectory is missing", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        obsidianVault: "vault"
+      })
+    )
+
+    await expect(resolveNotesDirectory()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json requires a non-empty noteRootDirectory value"
+      )
+    )
+  })
 })
