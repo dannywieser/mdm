@@ -27,6 +27,7 @@ describe("config", () => {
   test("resolves notes directory from noteRootDirectory and obsidianVault", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
+        dateFormats: ["YYYY.MM.DD"],
         noteRootDirectory: "/notes-root",
         obsidianVault: "vault"
       })
@@ -40,12 +41,29 @@ describe("config", () => {
   test("resolves notes config with directory and obsidian vault", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
+        dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
         noteRootDirectory: "/notes-root",
         obsidianVault: "vault"
       })
     )
 
     await expect(resolveNotesConfig()).resolves.toEqual({
+      dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
+      notesDirectory: path.resolve("/notes-root", "vault"),
+      obsidianVault: "vault"
+    })
+  })
+
+  test("defaults date formats to an empty array when omitted", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault"
+      })
+    )
+
+    await expect(resolveNotesConfig()).resolves.toEqual({
+      dateFormats: [],
       notesDirectory: path.resolve("/notes-root", "vault"),
       obsidianVault: "vault"
     })
@@ -91,6 +109,22 @@ describe("config", () => {
     )
   })
 
+  test("throws when dateFormats is invalid", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        dateFormats: ["YYYY.MM.DD", ""],
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault"
+      })
+    )
+
+    await expect(resolveNotesDirectory()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json dateFormats must be an array of non-empty strings"
+      )
+    )
+  })
+
   test("throws when noteRootDirectory is missing", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
@@ -108,6 +142,7 @@ describe("config", () => {
   test("caches resolved notes directory after first load", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
+        dateFormats: ["YYYY.MM.DD"],
         noteRootDirectory: "/notes-root",
         obsidianVault: "vault"
       })

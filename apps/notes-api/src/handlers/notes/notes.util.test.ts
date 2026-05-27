@@ -1,4 +1,4 @@
-import { parseFrontMatter } from "markdown"
+import { parseFrontMatter, parseMarkdownBodyDates } from "markdown"
 import { promises as fs, type Dirent } from "node:fs"
 
 import {
@@ -15,13 +15,15 @@ jest.mock("node:fs", () => ({
   }
 }))
 jest.mock("markdown", () => ({
-  parseFrontMatter: jest.fn()
+  parseFrontMatter: jest.fn(),
+  parseMarkdownBodyDates: jest.fn()
 }))
 
 const readdirMock = fs.readdir as jest.Mock
 const readFileMock = fs.readFile as jest.Mock
 const statMock = fs.stat as jest.Mock
 const parseFrontMatterMock = jest.mocked(parseFrontMatter)
+const parseMarkdownBodyDatesMock = jest.mocked(parseMarkdownBodyDates)
 
 const createDirent = (name: string, type: "file" | "directory"): Dirent =>
   ({
@@ -71,15 +73,19 @@ describe("notes util helpers", () => {
       body: "# Welcome\n\nThis is a note.",
       frontmatter: null
     })
+    parseMarkdownBodyDatesMock.mockReturnValue(["2026.05.26"])
     statMock.mockResolvedValue({
       birthtime: createdDate,
       mtime: modifiedDate
     })
 
-    const note = await parseMarkdownFile("/notes/topic/welcome.md")
+    const note = await parseMarkdownFile("/notes/topic/welcome.md", [
+      "YYYY.MM.DD"
+    ])
 
     expect(note).toMatchObject({
       basename: "welcome.md",
+      bodyDates: ["2026.05.26"],
       createdDate: "2026-05-26T00:00:00.000Z",
       folder: "topic",
       frontmatter: null,
@@ -91,6 +97,10 @@ describe("notes util helpers", () => {
     expect(note.html).toContain("<h1>Welcome</h1>")
     expect(readFileMock).toHaveBeenCalledWith("/notes/topic/welcome.md", "utf8")
     expect(parseFrontMatterMock).toHaveBeenCalledWith("# Welcome\n\nThis is a note.")
+    expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith(
+      "# Welcome\n\nThis is a note.",
+      ["YYYY.MM.DD"]
+    )
     expect(statMock).toHaveBeenCalledWith("/notes/topic/welcome.md")
   })
 
@@ -114,13 +124,18 @@ This is a note.`)
         topic: ["AI", "Notes"]
       }
     })
+    parseMarkdownBodyDatesMock.mockReturnValue(["2026.05.26", "26/05/27"])
     statMock.mockResolvedValue({
       birthtime: createdDate,
       mtime: modifiedDate
     })
 
-    const note = await parseMarkdownFile("/notes/topic/frontmatter.md")
+    const note = await parseMarkdownFile("/notes/topic/frontmatter.md", [
+      "YYYY.MM.DD",
+      "YY/MM/DD"
+    ])
 
+    expect(note.bodyDates).toEqual(["2026.05.26", "26/05/27"])
     expect(note.frontmatter).toEqual({
       created: "2026.05.26",
       topic: ["AI", "Notes"]
@@ -136,5 +151,9 @@ created: 2026.05.26
 # Welcome
 
 This is a note.`)
+    expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith(
+      "# Welcome\n\nThis is a note.",
+      ["YYYY.MM.DD", "YY/MM/DD"]
+    )
   })
 })

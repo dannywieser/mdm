@@ -5,9 +5,12 @@ import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
 
 export const notesHandler: RequestHandler = async (_request, response) => {
   try {
-    const { notesDirectory, obsidianVault } = await resolveNotesConfig()
+    const { dateFormats, notesDirectory, obsidianVault } =
+      await resolveNotesConfig()
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).sort()
-    const notes = await Promise.all(markdownFiles.map(parseMarkdownFile))
+    const notes = await Promise.all(
+      markdownFiles.map((filePath) => parseMarkdownFile(filePath, dateFormats))
+    )
 
     response.status(200).json({ notes, notesDirectory, obsidianVault })
   } catch (error) {
