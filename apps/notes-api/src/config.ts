@@ -7,12 +7,24 @@ interface AppConfig {
   dateFormats?: string[]
   noteRootDirectory: string
   obsidianVault: string
+  views?: AppConfigView[]
+}
+
+interface AppConfigView {
+  filters: Record<string, string>
+  name: string
+}
+
+export interface NotesView {
+  filters: Record<string, string>
+  name: string
 }
 
 export interface ResolvedNotesConfig {
   dateFormats: string[]
   notesDirectory: string
   obsidianVault: string
+  views: NotesView[]
 }
 
 export class AppConfigError extends Error {}
@@ -25,6 +37,21 @@ const isNonEmptyString = (value: unknown): value is string =>
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every(isNonEmptyString)
 
+const isStringRecord = (value: unknown): value is Record<string, string> =>
+  Boolean(value) &&
+  typeof value === "object" &&
+  !Array.isArray(value) &&
+  Object.entries(value).every(
+    ([key, entryValue]) => isNonEmptyString(key) && isNonEmptyString(entryValue)
+  )
+
+const isAppConfigView = (value: unknown): value is AppConfigView =>
+  Boolean(value) &&
+  typeof value === "object" &&
+  !Array.isArray(value) &&
+  isNonEmptyString((value as Record<string, unknown>)["name"]) &&
+  isStringRecord((value as Record<string, unknown>)["filters"])
+
 const validateAppConfig = (appConfig: unknown): AppConfig => {
   if (!appConfig || typeof appConfig !== "object") {
     throw new AppConfigError("app.config.json must be a JSON object")
@@ -34,6 +61,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   const dateFormats = parsedConfig["dateFormats"]
   const noteRootDirectory = parsedConfig["noteRootDirectory"]
   const obsidianVault = parsedConfig["obsidianVault"]
+  const views = parsedConfig["views"]
 
   if (!isNonEmptyString(noteRootDirectory)) {
     throw new AppConfigError(
@@ -53,7 +81,13 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
     )
   }
 
-  return { dateFormats, noteRootDirectory, obsidianVault }
+  if (views !== undefined && (!Array.isArray(views) || !views.every(isAppConfigView))) {
+    throw new AppConfigError(
+      "app.config.json views must be an array of objects with non-empty name and string filters"
+    )
+  }
+
+  return { dateFormats, noteRootDirectory, obsidianVault, views }
 }
 
 export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
@@ -86,7 +120,8 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
       appConfig.noteRootDirectory,
       appConfig.obsidianVault
     ),
-    obsidianVault: appConfig.obsidianVault
+    obsidianVault: appConfig.obsidianVault,
+    views: appConfig.views ?? []
   }
 
   return cachedNotesConfig

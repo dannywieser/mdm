@@ -1,5 +1,14 @@
 {
   "dateFormats": ["YYYY.MM.DD", "YY/MM/DD"],
   "noteRootDirectory": "/absolute/path/to/notes",
-  "obsidianVault": "vault-name"
+  "obsidianVault": "vault-name",
+  "views": [
+    {
+      "name": "books",
+      "filters": {
+        "folder": "downtime",
+        "frontmatter.type": "book"
+      }
+    }
+  ]
 }

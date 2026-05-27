@@ -3,7 +3,11 @@ import request from "supertest"
 
 import { AppConfigError, resolveNotesConfig } from "../../config"
 import { notesHandler } from "./notes"
-import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
+import {
+  applyViewFilter,
+  collectMarkdownFiles,
+  parseMarkdownFile
+} from "./notes.util"
 
 jest.mock("../../config", () => {
   const actualConfig =
@@ -16,11 +20,13 @@ jest.mock("../../config", () => {
 })
 
 jest.mock("./notes.util", () => ({
+  applyViewFilter: jest.fn(),
   collectMarkdownFiles: jest.fn(),
   parseMarkdownFile: jest.fn()
 }))
 
 const resolveNotesConfigMock = jest.mocked(resolveNotesConfig)
+const applyViewFilterMock = jest.mocked(applyViewFilter)
 const collectMarkdownFilesMock = jest.mocked(collectMarkdownFiles)
 const parseMarkdownFileMock = jest.mocked(parseMarkdownFile)
 
@@ -42,6 +48,7 @@ describe("notes handler interface", () => {
         "app.config.json is required. Copy app.config.example.json to app.config.json."
     })
     expect(resolveNotesConfigMock).toHaveBeenCalled()
+    expect(applyViewFilterMock).not.toHaveBeenCalled()
     expect(collectMarkdownFilesMock).not.toHaveBeenCalled()
     expect(parseMarkdownFileMock).not.toHaveBeenCalled()
   })
@@ -50,7 +57,15 @@ describe("notes handler interface", () => {
     resolveNotesConfigMock.mockResolvedValue({
       dateFormats: ["YYYY.MM.DD"],
       notesDirectory: "/notes",
-      obsidianVault: "vault"
+      obsidianVault: "vault",
+      views: [
+        {
+          filters: {
+            folder: "notes"
+          },
+          name: "notes-only"
+        }
+      ]
     })
     collectMarkdownFilesMock.mockResolvedValue(["/notes/b.md", "/notes/a.md"])
     parseMarkdownFileMock.mockImplementation((filePath) =>
@@ -66,6 +81,7 @@ describe("notes handler interface", () => {
         modifiedDate: "2026-05-26T00:00:00.000Z"
       })
     )
+    applyViewFilterMock.mockImplementation((notes) => [...notes])
     const app = express()
     app.get("/notes", notesHandler)
 
@@ -96,13 +112,80 @@ describe("notes handler interface", () => {
       ["/notes/a.md", ["YYYY.MM.DD"]],
       ["/notes/b.md", ["YYYY.MM.DD"]]
     ])
+    expect(applyViewFilterMock).toHaveBeenCalledWith(
+      [
+        expect.objectContaining({ basename: "a.md" }),
+        expect.objectContaining({ basename: "b.md" })
+      ],
+      [
+        {
+          filters: {
+            folder: "notes"
+          },
+          name: "notes-only"
+        }
+      ],
+      undefined
+    )
+  })
+
+  test("passes requested view to util filter function", async () => {
+    resolveNotesConfigMock.mockResolvedValue({
+      dateFormats: [],
+      notesDirectory: "/notes",
+      obsidianVault: "vault",
+      views: [
+        {
+          filters: {
+            "frontmatter.type": "book",
+            folder: "downtime"
+          },
+          name: "books"
+        }
+      ]
+    })
+    collectMarkdownFilesMock.mockResolvedValue(["/notes/a.md"])
+    parseMarkdownFileMock.mockResolvedValue({
+      basename: "a.md",
+      bodyDates: [],
+      createdDate: "2026-05-26T00:00:00.000Z",
+      folder: "downtime",
+      frontmatter: {
+        type: "book"
+      },
+      fullPath: "/notes/a.md",
+      html: "<h1>A</h1>",
+      id: "a",
+      modifiedDate: "2026-05-26T00:00:00.000Z"
+    })
+    applyViewFilterMock.mockImplementation((notes) => [...notes])
+    const app = express()
+    app.get("/notes", notesHandler)
+
+    const response = await request(app).get("/notes?view=books")
+
+    expect(response.status).toBe(200)
+    expect(applyViewFilterMock).toHaveBeenCalledWith(
+      expect.any(Array),
+      [
+        {
+          filters: {
+            "frontmatter.type": "book",
+            folder: "downtime"
+          },
+          name: "books"
+        }
+      ],
+      "books"
+    )
   })
 
   test("returns an error when util loading fails", async () => {
     resolveNotesConfigMock.mockResolvedValue({
       dateFormats: [],
       notesDirectory: "/notes",
-      obsidianVault: "vault"
+      obsidianVault: "vault",
+      views: []
     })
     collectMarkdownFilesMock.mockRejectedValue(new Error("boom"))
     const errorSpy = jest.spyOn(console, "error").mockImplementation()
@@ -128,6 +211,7 @@ describe("notes handler interface", () => {
           dateFormats: string[]
           notesDirectory: string
           obsidianVault: string
+          views: unknown[]
         }
       }
     ]
@@ -136,7 +220,8 @@ describe("notes handler interface", () => {
     expect(loggedPayload.notesConfig).toEqual({
       dateFormats: [],
       notesDirectory: "/notes",
-      obsidianVault: "vault"
+      obsidianVault: "vault",
+      views: []
     })
 
     errorSpy.mockRestore()

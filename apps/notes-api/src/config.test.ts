@@ -43,14 +43,32 @@ describe("config", () => {
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
         noteRootDirectory: "/notes-root",
-        obsidianVault: "vault"
+        obsidianVault: "vault",
+        views: [
+          {
+            filters: {
+              folder: "downtime",
+              "frontmatter.type": "book"
+            },
+            name: "books"
+          }
+        ]
       })
     )
 
     await expect(resolveNotesConfig()).resolves.toEqual({
       dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
       notesDirectory: path.resolve("/notes-root", "vault"),
-      obsidianVault: "vault"
+      obsidianVault: "vault",
+      views: [
+        {
+          filters: {
+            folder: "downtime",
+            "frontmatter.type": "book"
+          },
+          name: "books"
+        }
+      ]
     })
   })
 
@@ -65,7 +83,25 @@ describe("config", () => {
     await expect(resolveNotesConfig()).resolves.toEqual({
       dateFormats: [],
       notesDirectory: path.resolve("/notes-root", "vault"),
-      obsidianVault: "vault"
+      obsidianVault: "vault",
+      views: []
+    })
+  })
+
+  test("defaults views to an empty array when omitted", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        dateFormats: ["YYYY.MM.DD"],
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault"
+      })
+    )
+
+    await expect(resolveNotesConfig()).resolves.toEqual({
+      dateFormats: ["YYYY.MM.DD"],
+      notesDirectory: path.resolve("/notes-root", "vault"),
+      obsidianVault: "vault",
+      views: []
     })
   })
 
@@ -115,6 +151,28 @@ describe("config", () => {
         dateFormats: ["YYYY.MM.DD", ""],
         noteRootDirectory: "/notes-root",
         obsidianVault: "vault"
+      })
+
+      test("throws when views is invalid", async () => {
+        readFileMock.mockResolvedValue(
+          JSON.stringify({
+            noteRootDirectory: "/notes-root",
+            obsidianVault: "vault",
+            views: [
+              {
+                filters: {
+                  folder: "downtime"
+                }
+              }
+            ]
+          })
+        )
+
+        await expect(resolveNotesDirectory()).rejects.toEqual(
+          new AppConfigError(
+            "app.config.json views must be an array of objects with non-empty name and string filters"
+          )
+        )
       })
     )
 
