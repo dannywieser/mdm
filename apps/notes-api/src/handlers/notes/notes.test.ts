@@ -6,7 +6,8 @@ import { notesHandler } from "./notes"
 import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
 
 jest.mock("../../config", () => {
-  const actualConfig = jest.requireActual("../../config")
+  const actualConfig =
+    jest.requireActual<typeof import("../../config")>("../../config")
 
   return {
     ...actualConfig,

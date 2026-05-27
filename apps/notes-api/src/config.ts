@@ -42,7 +42,7 @@ export const resolveNotesDirectory = async (): Promise<string> => {
 
   try {
     appConfigSource = await fs.readFile(APP_CONFIG_PATH, "utf8")
-  } catch (error) {
+  } catch {
     throw new AppConfigError(
       "app.config.json is required. Copy app.config.example.json to app.config.json."
     )
@@ -52,7 +52,7 @@ export const resolveNotesDirectory = async (): Promise<string> => {
 
   try {
     parsedAppConfig = JSON.parse(appConfigSource)
-  } catch (error) {
+  } catch {
     throw new AppConfigError("app.config.json must contain valid JSON")
   }
 
