@@ -1,10 +1,10 @@
 import type { Note } from "markdown"
 
-import { getDateComponents } from "util"
+import { getDateComponents } from "mdm-util"
 
 import { applyViewFilter } from "./notes.filters"
 
-jest.mock("util", () => ({
+jest.mock("mdm-util", () => ({
   getDateComponents: jest.fn(),
 }))
 

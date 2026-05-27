@@ -21,11 +21,11 @@ export const logStartupConfig = async (): Promise<void> => {
   try {
     const notesConfig = await resolveNotesConfig()
 
-    console.log("Resolved notes config", notesConfig)
+    console.log("Resolved notes config", JSON.stringify(notesConfig, null, 2))
   } catch (error) {
     console.error(
       "Unable to resolve notes config on startup",
-      toLoggableError(error)
+      toLoggableError(error),
     )
   }
 }

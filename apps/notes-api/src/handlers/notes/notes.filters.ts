@@ -1,7 +1,7 @@
 import type { NotesView } from "app-config"
 import type { Note } from "markdown"
 import { parseDateFromFormats } from "markdown"
-import { getDateComponents } from "util"
+import { getDateComponents } from "mdm-util"
 
 import type { ViewFilterContext } from "./notes.filters.types"
 
