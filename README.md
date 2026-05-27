@@ -15,10 +15,12 @@ This repository is a Turborepo monorepo with this structure:
       { "status": "ok" }
       ```
   - `GET /notes`
-    - Purpose: recursively load `*.md` and `*.markdown` files from `NOTES_DIRECTORY`, extract optional frontmatter metadata, render markdown to HTML, and return note metadata
+    - Purpose: recursively load `*.md` and `*.markdown` files from the directory resolved by `noteRootDirectory` + `obsidianVault` in `app.config.json`, extract optional frontmatter metadata, render markdown to HTML, and return note metadata
     - Success response: `200`
       ```json
       {
+        "notesDirectory": "/absolute/path/to/notes/vault-name",
+        "obsidianVault": "vault-name",
         "notes": [
           {
             "createdDate": "2026-05-26T00:00:00.000Z",
@@ -39,11 +41,20 @@ This repository is a Turborepo monorepo with this structure:
     - Notes without frontmatter return `"frontmatter": null`
     - Error responses: `500`
       ```json
-      { "error": "NOTES_DIRECTORY environment variable is required" }
+      {
+        "error": "app.config.json is required. Copy app.config.example.json to app.config.json."
+      }
       ```
       ```json
       { "error": "Unable to load notes" }
       ```
+
+## Configuration
+
+- Copy `app.config.example.json` to `app.config.json` at repository root.
+- Set:
+  - `noteRootDirectory`: absolute path to your notes root directory.
+  - `obsidianVault`: vault folder name under `noteRootDirectory`.
 
 ## Scripts
 

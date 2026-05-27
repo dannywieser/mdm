@@ -1,25 +1,21 @@
 import type { RequestHandler } from "express"
 
+import { AppConfigError, resolveNotesConfig } from "../../config"
 import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
 
-const NOTES_DIRECTORY_ENV = "NOTES_DIRECTORY"
-
 export const notesHandler: RequestHandler = async (_request, response) => {
-  const notesDirectory = process.env[NOTES_DIRECTORY_ENV]
-
-  if (!notesDirectory) {
-    response
-      .status(500)
-      .json({ error: `${NOTES_DIRECTORY_ENV} environment variable is required` })
-    return
-  }
-
   try {
+    const { notesDirectory, obsidianVault } = await resolveNotesConfig()
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).sort()
     const notes = await Promise.all(markdownFiles.map(parseMarkdownFile))
 
-    response.status(200).json({ notes })
+    response.status(200).json({ notes, notesDirectory, obsidianVault })
   } catch (error) {
+    if (error instanceof AppConfigError) {
+      response.status(500).json({ error: error.message })
+      return
+    }
+
     console.error("Unable to load notes", error)
     response.status(500).json({ error: "Unable to load notes" })
   }
