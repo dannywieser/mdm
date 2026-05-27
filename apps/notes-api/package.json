@@ -4,9 +4,9 @@
   "private": true,
   "main": "dist/server.js",
   "scripts": {
-    "prebuild": "npm --prefix ../../ run build --workspace markdown && npm --prefix ../../ run build --workspace app-config && npm --prefix ../../ run build --workspace mdm-util",
-    "predev": "npm --prefix ../../ run build --workspace markdown && npm --prefix ../../ run build --workspace app-config && npm --prefix ../../ run build --workspace mdm-util",
-    "pretest": "npm --prefix ../../ run build --workspace markdown && npm --prefix ../../ run build --workspace app-config && npm --prefix ../../ run build --workspace mdm-util",
+    "prebuild": "turbo run build --filter=notes-api^...",
+    "predev": "turbo run build --filter=notes-api^...",
+    "pretest": "turbo run build --filter=notes-api^...",
     "dev": "tsx watch --env-file=../../.env src/server.ts",
     "build": "tsc -p tsconfig.build.json",
     "lint": "eslint src --ext .ts",
