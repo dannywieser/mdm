@@ -1,3 +1,4 @@
+import { parseFrontMatter } from "markdown"
 import { promises as fs, type Dirent } from "node:fs"
 
 import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
@@ -9,10 +10,14 @@ jest.mock("node:fs", () => ({
     stat: jest.fn()
   }
 }))
+jest.mock("markdown", () => ({
+  parseFrontMatter: jest.fn()
+}))
 
 const readdirMock = fs.readdir as jest.Mock
 const readFileMock = fs.readFile as jest.Mock
 const statMock = fs.stat as jest.Mock
+const parseFrontMatterMock = jest.mocked(parseFrontMatter)
 
 const createDirent = (name: string, type: "file" | "directory"): Dirent =>
   ({
@@ -58,6 +63,10 @@ describe("notes util helpers", () => {
     const modifiedDate = new Date("2026-05-26T01:00:00.000Z")
 
     readFileMock.mockResolvedValue("# Welcome\n\nThis is a note.")
+    parseFrontMatterMock.mockReturnValue({
+      body: "# Welcome\n\nThis is a note.",
+      frontmatter: null
+    })
     statMock.mockResolvedValue({
       birthtime: createdDate,
       mtime: modifiedDate
@@ -69,12 +78,58 @@ describe("notes util helpers", () => {
       basename: "welcome.md",
       createdDate: "2026-05-26T00:00:00.000Z",
       folder: "topic",
+      frontmatter: null,
       fullPath: "/notes/topic/welcome.md",
       id: "welcome",
       modifiedDate: "2026-05-26T01:00:00.000Z"
     })
     expect(note.html).toContain("<h1>Welcome</h1>")
     expect(readFileMock).toHaveBeenCalledWith("/notes/topic/welcome.md", "utf8")
+    expect(parseFrontMatterMock).toHaveBeenCalledWith("# Welcome\n\nThis is a note.")
     expect(statMock).toHaveBeenCalledWith("/notes/topic/welcome.md")
+  })
+
+  test("parseMarkdownFile uses parsed frontmatter and stripped markdown body", async () => {
+    const createdDate = new Date("2026-05-26T00:00:00.000Z")
+    const modifiedDate = new Date("2026-05-26T01:00:00.000Z")
+
+    readFileMock.mockResolvedValue(`---
+topic:
+  - AI
+  - Notes
+created: 2026.05.26
+---
+# Welcome
+
+This is a note.`)
+    parseFrontMatterMock.mockReturnValue({
+      body: "# Welcome\n\nThis is a note.",
+      frontmatter: {
+        created: "2026.05.26",
+        topic: ["AI", "Notes"]
+      }
+    })
+    statMock.mockResolvedValue({
+      birthtime: createdDate,
+      mtime: modifiedDate
+    })
+
+    const note = await parseMarkdownFile("/notes/topic/frontmatter.md")
+
+    expect(note.frontmatter).toEqual({
+      created: "2026.05.26",
+      topic: ["AI", "Notes"]
+    })
+    expect(note.html).toContain("<h1>Welcome</h1>")
+    expect(note.html).toContain("<p>This is a note.</p>")
+    expect(parseFrontMatterMock).toHaveBeenCalledWith(`---
+topic:
+  - AI
+  - Notes
+created: 2026.05.26
+---
+# Welcome
+
+This is a note.`)
   })
 })

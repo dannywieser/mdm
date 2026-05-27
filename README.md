@@ -15,7 +15,7 @@ This repository is a Turborepo monorepo with this structure:
       { "status": "ok" }
       ```
   - `GET /notes`
-    - Purpose: recursively load `*.md` and `*.markdown` files from `NOTES_DIRECTORY`, render markdown to HTML, and return note metadata
+    - Purpose: recursively load `*.md` and `*.markdown` files from `NOTES_DIRECTORY`, extract optional frontmatter metadata, render markdown to HTML, and return note metadata
     - Success response: `200`
       ```json
       {
@@ -27,11 +27,16 @@ This repository is a Turborepo monorepo with this structure:
             "basename": "welcome.md",
             "id": "welcome",
             "folder": "notes",
+            "frontmatter": {
+              "topic": ["AI"],
+              "created": "2026.05.26"
+            },
             "html": "<h1>Welcome</h1>"
           }
         ]
       }
       ```
+    - Notes without frontmatter return `"frontmatter": null`
     - Error responses: `500`
       ```json
       { "error": "NOTES_DIRECTORY environment variable is required" }

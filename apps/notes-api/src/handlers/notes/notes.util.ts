@@ -1,9 +1,8 @@
+import { parseFrontMatter, type Note } from "markdown"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
 import remarkHtml from "remark-html"
-
-import type { Note } from "../../types"
 
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
 
@@ -35,11 +34,13 @@ export const parseMarkdownFile = async (filePath: string): Promise<Note> => {
     fs.readFile(filePath, "utf8"),
     fs.stat(filePath)
   ])
-  const html = await remark().use(remarkHtml).process(source)
+  const { body, frontmatter } = parseFrontMatter(source)
+  const html = await remark().use(remarkHtml).process(body)
   const basename = path.basename(filePath)
 
   return {
     createdDate: stats.birthtime.toISOString(),
+    frontmatter,
     modifiedDate: stats.mtime.toISOString(),
     fullPath: filePath,
     basename,
