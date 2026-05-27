@@ -5,7 +5,7 @@ This repository is a Turborepo monorepo with this structure:
 - `apps/` for runnable applications
 - `packages/` for shared packages
 
-## Current app
+## Current apps
 
 - `apps/notes-api`: Express-based Node service with request logging via `morgan`.
   - `GET /health`
@@ -50,6 +50,11 @@ This repository is a Turborepo monorepo with this structure:
       ```json
       { "error": "Unable to load notes" }
       ```
+
+- `apps/web`: React + TypeScript client using Chakra UI, TanStack Query, and React Router.
+  - Single route: `/`
+  - Renders notes from `GET /notes` using `NotesList` and `NotesCard`
+  - Configure the API base URL with `VITE_API_BASE_URL` (defaults to `http://localhost:3000`)
 
 ## Configuration
 
