@@ -1,0 +1,4 @@
+{
+  "noteRootDirectory": "/absolute/path/to/notes",
+  "obsidianVault": "vault-name"
+}
