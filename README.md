@@ -16,6 +16,7 @@ This repository is a Turborepo monorepo with this structure:
       ```
   - `GET /notes`
       - Purpose: recursively load `*.md` and `*.markdown` files from the directory resolved by `noteRootDirectory` + `obsidianVault` in `app.config.json`, extract optional frontmatter metadata, extract body dates using configured `dateFormats`, render markdown to HTML, and return note metadata
+      - Optional query: `view=<name>` to apply a configured notes view filter
     - Success response: `200`
       ```json
       {
@@ -57,6 +58,7 @@ This repository is a Turborepo monorepo with this structure:
   - `dateFormats`: array of expected date patterns to extract from note bodies, such as `["YYYY.MM.DD", "YY/MM/DD"]`.
   - `noteRootDirectory`: absolute path to your notes root directory.
   - `obsidianVault`: vault folder name under `noteRootDirectory`.
+  - `views` (optional): array of named views. Each view has `name` and `filters` where filters match note fields (for example `"folder": "downtime"` and `"frontmatter.type": "book"`). All filters are applied inclusively.
 
 ## Scripts
 
