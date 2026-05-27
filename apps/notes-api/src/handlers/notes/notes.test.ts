@@ -1,7 +1,7 @@
 import express from "express"
 import request from "supertest"
 
-import { AppConfigError, resolveNotesDirectory } from "../../config"
+import { AppConfigError, resolveNotesConfig } from "../../config"
 import { notesHandler } from "./notes"
 import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
 
@@ -11,7 +11,7 @@ jest.mock("../../config", () => {
 
   return {
     ...actualConfig,
-    resolveNotesDirectory: jest.fn()
+    resolveNotesConfig: jest.fn()
   }
 })
 
@@ -20,13 +20,13 @@ jest.mock("./notes.util", () => ({
   parseMarkdownFile: jest.fn()
 }))
 
-const resolveNotesDirectoryMock = jest.mocked(resolveNotesDirectory)
+const resolveNotesConfigMock = jest.mocked(resolveNotesConfig)
 const collectMarkdownFilesMock = jest.mocked(collectMarkdownFiles)
 const parseMarkdownFileMock = jest.mocked(parseMarkdownFile)
 
 describe("notes handler interface", () => {
   test("returns an error when notes directory config cannot be resolved", async () => {
-    resolveNotesDirectoryMock.mockRejectedValue(
+    resolveNotesConfigMock.mockRejectedValue(
       new AppConfigError(
         "app.config.json is required. Copy app.config.example.json to app.config.json."
       )
@@ -41,13 +41,16 @@ describe("notes handler interface", () => {
       error:
         "app.config.json is required. Copy app.config.example.json to app.config.json."
     })
-    expect(resolveNotesDirectoryMock).toHaveBeenCalled()
+    expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).not.toHaveBeenCalled()
     expect(parseMarkdownFileMock).not.toHaveBeenCalled()
   })
 
   test("returns notes and delegates file processing to util functions", async () => {
-    resolveNotesDirectoryMock.mockResolvedValue("/notes")
+    resolveNotesConfigMock.mockResolvedValue({
+      notesDirectory: "/notes",
+      obsidianVault: "vault"
+    })
     collectMarkdownFilesMock.mockResolvedValue(["/notes/b.md", "/notes/a.md"])
     parseMarkdownFileMock.mockImplementation((filePath) =>
       Promise.resolve({
@@ -65,11 +68,17 @@ describe("notes handler interface", () => {
     app.get("/notes", notesHandler)
 
     const response = await request(app).get("/notes")
-    const body = response.body as { notes: unknown[] }
+    const body = response.body as {
+      notes: unknown[]
+      notesDirectory: string
+      obsidianVault: string
+    }
 
     expect(response.status).toBe(200)
     expect(body.notes).toHaveLength(2)
-    expect(resolveNotesDirectoryMock).toHaveBeenCalled()
+    expect(body.notesDirectory).toBe("/notes")
+    expect(body.obsidianVault).toBe("vault")
+    expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(parseMarkdownFileMock.mock.calls.map(([filePath]) => filePath)).toEqual([
       "/notes/a.md",
@@ -78,7 +87,10 @@ describe("notes handler interface", () => {
   })
 
   test("returns an error when util loading fails", async () => {
-    resolveNotesDirectoryMock.mockResolvedValue("/notes")
+    resolveNotesConfigMock.mockResolvedValue({
+      notesDirectory: "/notes",
+      obsidianVault: "vault"
+    })
     collectMarkdownFilesMock.mockRejectedValue(new Error("boom"))
     const errorSpy = jest.spyOn(console, "error").mockImplementation()
     const app = express()
@@ -88,7 +100,7 @@ describe("notes handler interface", () => {
 
     expect(response.status).toBe(500)
     expect(response.body).toEqual({ error: "Unable to load notes" })
-    expect(resolveNotesDirectoryMock).toHaveBeenCalled()
+    expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(parseMarkdownFileMock).not.toHaveBeenCalled()
 

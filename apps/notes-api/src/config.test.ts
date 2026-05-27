@@ -4,6 +4,7 @@ import path from "node:path"
 import {
   AppConfigError,
   clearConfigCache,
+  resolveNotesConfig,
   resolveNotesDirectory
 } from "./config"
 
@@ -34,6 +35,20 @@ describe("config", () => {
     await expect(resolveNotesDirectory()).resolves.toBe(
       path.resolve("/notes-root", "vault")
     )
+  })
+
+  test("resolves notes config with directory and obsidian vault", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault"
+      })
+    )
+
+    await expect(resolveNotesConfig()).resolves.toEqual({
+      notesDirectory: path.resolve("/notes-root", "vault"),
+      obsidianVault: "vault"
+    })
   })
 
   test("throws when config file is missing", async () => {

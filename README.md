@@ -19,6 +19,8 @@ This repository is a Turborepo monorepo with this structure:
     - Success response: `200`
       ```json
       {
+        "notesDirectory": "/absolute/path/to/notes/vault-name",
+        "obsidianVault": "vault-name",
         "notes": [
           {
             "createdDate": "2026-05-26T00:00:00.000Z",

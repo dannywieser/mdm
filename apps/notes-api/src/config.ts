@@ -8,9 +8,14 @@ interface AppConfig {
   obsidianVault: string
 }
 
+export interface ResolvedNotesConfig {
+  notesDirectory: string
+  obsidianVault: string
+}
+
 export class AppConfigError extends Error {}
 
-let cachedNotesDirectory: string | undefined
+let cachedNotesConfig: ResolvedNotesConfig | undefined
 
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.trim().length > 0
@@ -39,9 +44,9 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   return { noteRootDirectory, obsidianVault }
 }
 
-export const resolveNotesDirectory = async (): Promise<string> => {
-  if (cachedNotesDirectory) {
-    return cachedNotesDirectory
+export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
+  if (cachedNotesConfig) {
+    return cachedNotesConfig
   }
 
   const appConfigPath = await findAppConfigPath()
@@ -63,13 +68,19 @@ export const resolveNotesDirectory = async (): Promise<string> => {
 
   const appConfig = validateAppConfig(parsedAppConfig)
 
-  cachedNotesDirectory = path.resolve(
-    appConfig.noteRootDirectory,
-    appConfig.obsidianVault
-  )
+  cachedNotesConfig = {
+    notesDirectory: path.resolve(
+      appConfig.noteRootDirectory,
+      appConfig.obsidianVault
+    ),
+    obsidianVault: appConfig.obsidianVault
+  }
 
-  return cachedNotesDirectory
+  return cachedNotesConfig
 }
+
+export const resolveNotesDirectory = async (): Promise<string> =>
+  (await resolveNotesConfig()).notesDirectory
 
 const findAppConfigPath = async (): Promise<string> => {
   let currentDirectory = process.cwd()
@@ -98,5 +109,5 @@ const findAppConfigPath = async (): Promise<string> => {
 }
 
 export const clearConfigCache = (): void => {
-  cachedNotesDirectory = undefined
+  cachedNotesConfig = undefined
 }
