@@ -6,7 +6,7 @@ const TOKEN_PATTERNS: Record<string, string> = {
 }
 
 const DATE_TOKENS = Object.keys(TOKEN_PATTERNS).sort(
-  (left, right) => right.length - left.length
+  (tokenA, tokenB) => tokenB.length - tokenA.length
 )
 
 const escapeRegex = (value: string): string =>
@@ -66,7 +66,7 @@ export const parseMarkdownBodyDates = (
   }
 
   return matches
-    .sort((left, right) => left.index - right.index)
+    .sort((matchA, matchB) => matchA.index - matchB.index)
     .filter(
       (match, index, values) =>
         index === 0 ||
