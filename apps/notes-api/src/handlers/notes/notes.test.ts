@@ -1,14 +1,14 @@
+import { AppConfigError, resolveNotesConfig } from "app-config"
 import express from "express"
 import request from "supertest"
 
-import { AppConfigError, resolveNotesConfig } from "../../config"
 import { notesHandler } from "./notes"
 import { applyViewFilter } from "./notes.filters"
 import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
 
-jest.mock("../../config", () => {
+jest.mock("app-config", () => {
   const actualConfig =
-    jest.requireActual<typeof import("../../config")>("../../config")
+    jest.requireActual<typeof import("app-config")>("app-config")
 
   return {
     ...actualConfig,
@@ -58,6 +58,7 @@ describe("notes handler interface", () => {
       dateFormats: ["YYYY.MM.DD"],
       notesDirectory: "/notes",
       obsidianVault: "vault",
+      timezone: "UTC",
       views: [
         {
           filters: {
@@ -125,7 +126,8 @@ describe("notes handler interface", () => {
           name: "notes-only"
         }
       ],
-      undefined
+      undefined,
+      { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" }
     )
   })
 
@@ -134,6 +136,7 @@ describe("notes handler interface", () => {
       dateFormats: [],
       notesDirectory: "/notes",
       obsidianVault: "vault",
+      timezone: "UTC",
       views: [
         {
           filters: {
@@ -176,7 +179,8 @@ describe("notes handler interface", () => {
           name: "books"
         }
       ],
-      "books"
+      "books",
+      { dateFormats: [], timezone: "UTC" }
     )
   })
 
@@ -185,6 +189,7 @@ describe("notes handler interface", () => {
       dateFormats: [],
       notesDirectory: "/notes",
       obsidianVault: "vault",
+      timezone: "UTC",
       views: []
     })
     collectMarkdownFilesMock.mockRejectedValue(new Error("boom"))
@@ -221,6 +226,7 @@ describe("notes handler interface", () => {
       dateFormats: [],
       notesDirectory: "/notes",
       obsidianVault: "vault",
+      timezone: "UTC",
       views: []
     })
 

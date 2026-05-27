@@ -1,7 +1,7 @@
+import { resolveNotesConfig } from "app-config"
 import express from "express"
 import morgan from "morgan"
 
-import { resolveNotesConfig } from "./config"
 import { healthHandler } from "./handlers/health/health"
 import { notesHandler } from "./handlers/notes/notes"
 import { toLoggableError } from "./logging"
@@ -21,11 +21,11 @@ export const logStartupConfig = async (): Promise<void> => {
   try {
     const notesConfig = await resolveNotesConfig()
 
-    console.log("Resolved notes config", notesConfig)
+    console.log("Resolved notes config", JSON.stringify(notesConfig, null, 2))
   } catch (error) {
     console.error(
       "Unable to resolve notes config on startup",
-      toLoggableError(error)
+      toLoggableError(error),
     )
   }
 }
