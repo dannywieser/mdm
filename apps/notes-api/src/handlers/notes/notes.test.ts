@@ -116,15 +116,27 @@ describe("notes handler interface", () => {
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(parseMarkdownFileMock).not.toHaveBeenCalled()
-    expect(errorSpy).toHaveBeenCalledWith("Unable to load notes", {
-      error: expect.objectContaining({
-        message: "boom"
-      }),
-      notesConfig: {
-        dateFormats: [],
-        notesDirectory: "/notes",
-        obsidianVault: "vault"
+    expect(errorSpy).toHaveBeenCalledTimes(1)
+
+    const [, loggedPayload] = errorSpy.mock.calls[0] as [
+      string,
+      {
+        error: {
+          message: string
+        }
+        notesConfig: {
+          dateFormats: string[]
+          notesDirectory: string
+          obsidianVault: string
+        }
       }
+    ]
+
+    expect(loggedPayload.error.message).toBe("boom")
+    expect(loggedPayload.notesConfig).toEqual({
+      dateFormats: [],
+      notesDirectory: "/notes",
+      obsidianVault: "vault"
     })
 
     errorSpy.mockRestore()
