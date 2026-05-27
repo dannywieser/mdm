@@ -6,7 +6,7 @@ import remarkHtml from "remark-html"
 import { v5 as uuidv5 } from "uuid"
 
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
-const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
+export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 
 const normalizeFilePathForId = (filePath: string): string =>
   path.normalize(filePath).replace(/\\/g, "/")
