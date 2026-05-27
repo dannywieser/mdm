@@ -54,6 +54,14 @@ describe("config", () => {
     )
   })
 
+  test("throws when config file cannot be read", async () => {
+    readFileMock.mockRejectedValue(new Error("EACCES"))
+
+    await expect(resolveNotesDirectory()).rejects.toEqual(
+      new AppConfigError("app.config.json must be readable")
+    )
+  })
+
   test("throws when required config fields are missing", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
@@ -80,5 +88,20 @@ describe("config", () => {
         "app.config.json requires a non-empty noteRootDirectory value"
       )
     )
+  })
+
+  test("caches resolved notes directory after first load", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault"
+      })
+    )
+
+    await resolveNotesDirectory()
+    await resolveNotesDirectory()
+
+    expect(accessMock).toHaveBeenCalledTimes(1)
+    expect(readFileMock).toHaveBeenCalledTimes(1)
   })
 })

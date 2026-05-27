@@ -74,7 +74,7 @@ export const resolveNotesDirectory = async (): Promise<string> => {
 const findAppConfigPath = async (): Promise<string> => {
   let currentDirectory = process.cwd()
 
-  while (true) {
+  while (currentDirectory) {
     const appConfigPath = path.join(currentDirectory, APP_CONFIG_FILENAME)
     const hasAppConfig = await fs
       .access(appConfigPath)
@@ -86,13 +86,15 @@ const findAppConfigPath = async (): Promise<string> => {
 
     const parentDirectory = path.dirname(currentDirectory)
     if (parentDirectory === currentDirectory) {
-      throw new AppConfigError(
-        "app.config.json is required. Copy app.config.example.json to app.config.json."
-      )
+      break
     }
 
     currentDirectory = parentDirectory
   }
+
+  throw new AppConfigError(
+    "app.config.json is required. Copy app.config.example.json to app.config.json."
+  )
 }
 
 export const clearConfigCache = (): void => {
