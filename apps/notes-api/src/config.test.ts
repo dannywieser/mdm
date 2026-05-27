@@ -1,17 +1,28 @@
 import { promises as fs } from "node:fs"
 import path from "node:path"
 
-import { AppConfigError, resolveNotesDirectory } from "./config"
+import {
+  AppConfigError,
+  clearConfigCache,
+  resolveNotesDirectory
+} from "./config"
 
 jest.mock("node:fs", () => ({
   promises: {
+    access: jest.fn(),
     readFile: jest.fn()
   }
 }))
 
+const accessMock = jest.mocked(fs.access)
 const readFileMock = jest.mocked(fs.readFile)
 
 describe("config", () => {
+  beforeEach(() => {
+    accessMock.mockResolvedValue(undefined)
+    clearConfigCache()
+  })
+
   test("resolves notes directory from noteRootDirectory and obsidianVault", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
@@ -26,7 +37,7 @@ describe("config", () => {
   })
 
   test("throws when config file is missing", async () => {
-    readFileMock.mockRejectedValue(new Error("ENOENT"))
+    accessMock.mockRejectedValue(new Error("ENOENT"))
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
