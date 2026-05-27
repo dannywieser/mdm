@@ -12,7 +12,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { dateFormats, notesDirectory, obsidianVault, views } = notesConfig
+    const { dateFormats, notesDirectory, obsidianVault, timezone, views } = notesConfig
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).sort()
     const notes = await Promise.all(
       markdownFiles.map((filePath) => parseMarkdownFile(filePath, dateFormats))
@@ -21,7 +21,10 @@ export const notesHandler: RequestHandler = async (request, response) => {
       typeof request.query["view"] === "string"
         ? request.query["view"]
         : undefined
-    const filteredNotes = applyViewFilter(notes, views, requestedView)
+    const filteredNotes = applyViewFilter(notes, views, requestedView, {
+      dateFormats,
+      timezone
+    })
 
     response
       .status(200)

@@ -42,3 +42,10 @@
 - Use the global Jest config (`clearMocks: true`) for mock cleanup; never call `jest.clearAllMocks()` manually in individual tests.
 - Prefer mocking for all dependencies external to the file/unit being tested.
 - In particular always mock platform libraries like `fs` and `path` when testing file handling logic, to avoid unintended side effects and ensure test reliability.
+
+## util package guidelines
+
+- The `util` package should only contain pure functions that are widely reusable across the codebase. It should not contain any functions that are specific to a particular domain or feature.
+- When adding functions to the `util` package, ensure that they are well-documented with JSDoc comments that describe their purpose, parameters, and return values. This will help other developers understand how to use the functions and what to expect from them.
+- Avoid adding functions to the `util` package that have dependencies on other parts of the codebase. If a function requires dependencies, it may be a sign that it belongs in a different package or module that is more closely related to its functionality.
+- Example candidates for util: dates, strings, arrays, objects, validation, formatting, etc. Anything that is a pure function with no side effects and is not specific to the domain of notes or markdown parsing.

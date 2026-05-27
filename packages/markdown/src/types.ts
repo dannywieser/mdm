@@ -20,3 +20,9 @@ export interface ParsedFrontMatter {
   body: string
   frontmatter: NoteFrontmatter | null
 }
+
+export interface ParsedDate {
+  day: number
+  month: number
+  year: number
+}

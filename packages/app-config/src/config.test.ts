@@ -60,6 +60,7 @@ describe("config", () => {
       dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
       notesDirectory: path.resolve("/notes-root", "vault"),
       obsidianVault: "vault",
+      timezone: "UTC",
       views: [
         {
           filters: {
@@ -84,6 +85,7 @@ describe("config", () => {
       dateFormats: [],
       notesDirectory: path.resolve("/notes-root", "vault"),
       obsidianVault: "vault",
+      timezone: "UTC",
       views: []
     })
   })
@@ -101,8 +103,52 @@ describe("config", () => {
       dateFormats: ["YYYY.MM.DD"],
       notesDirectory: path.resolve("/notes-root", "vault"),
       obsidianVault: "vault",
+      timezone: "UTC",
       views: []
     })
+  })
+
+  test("includes the configured timezone in resolved config", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault",
+        timezone: "America/Toronto"
+      })
+    )
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      timezone: "America/Toronto"
+    })
+  })
+
+  test("defaults timezone to UTC when omitted", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault"
+      })
+    )
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      timezone: "UTC"
+    })
+  })
+
+  test("throws when timezone is not a valid IANA identifier", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault",
+        timezone: "Not/A/Timezone"
+      })
+    )
+
+    await expect(resolveNotesConfig()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json timezone must be a valid IANA timezone identifier"
+      )
+    )
   })
 
   test("throws when config file is missing", async () => {

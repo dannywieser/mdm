@@ -22,6 +22,15 @@ const isNonEmptyString = (value: unknown): value is string =>
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every(isNonEmptyString)
 
+const isValidTimezone = (value: string): boolean => {
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone: value })
+    return true
+  } catch {
+    return false
+  }
+}
+
 const isStringRecord = (value: unknown): value is Record<string, string> =>
   value !== null &&
   typeof value === "object" &&
@@ -47,6 +56,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   const dateFormats = parsedConfig["dateFormats"]
   const noteRootDirectory = parsedConfig["noteRootDirectory"]
   const obsidianVault = parsedConfig["obsidianVault"]
+  const timezone = parsedConfig["timezone"]
   const views = parsedConfig["views"]
 
   if (!isNonEmptyString(noteRootDirectory)) {
@@ -68,6 +78,15 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   }
 
   if (
+    timezone !== undefined &&
+    (!isNonEmptyString(timezone) || !isValidTimezone(timezone))
+  ) {
+    throw new AppConfigError(
+      "app.config.json timezone must be a valid IANA timezone identifier",
+    )
+  }
+
+  if (
     views !== undefined &&
     (!Array.isArray(views) || !views.every(isAppConfigView))
   ) {
@@ -76,7 +95,13 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
     )
   }
 
-  return { dateFormats, noteRootDirectory, obsidianVault, views }
+  return {
+    dateFormats,
+    noteRootDirectory,
+    obsidianVault,
+    timezone: isNonEmptyString(timezone) ? timezone : undefined,
+    views,
+  }
 }
 
 export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
@@ -110,6 +135,7 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
       appConfig.obsidianVault,
     ),
     obsidianVault: appConfig.obsidianVault,
+    timezone: appConfig.timezone ?? "UTC",
     views: appConfig.views ?? [],
   }
 

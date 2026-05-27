@@ -7,6 +7,7 @@ export interface ResolvedNotesConfig {
   dateFormats: string[]
   notesDirectory: string
   obsidianVault: string
+  timezone: string
   views: NotesView[]
 }
 
@@ -14,6 +15,7 @@ export interface AppConfig {
   dateFormats?: string[]
   noteRootDirectory: string
   obsidianVault: string
+  timezone?: string
   views?: AppConfigView[]
 }
 

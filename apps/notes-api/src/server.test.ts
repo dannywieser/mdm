@@ -53,7 +53,9 @@ describe("notes-api server interface", () => {
     resolveNotesConfigMock.mockResolvedValue({
       dateFormats: ["YYYY.MM.DD"],
       notesDirectory: "/notes",
-      obsidianVault: "vault"
+      obsidianVault: "vault",
+      timezone: "UTC",
+      views: []
     })
 
     await logStartupConfig()
@@ -61,7 +63,9 @@ describe("notes-api server interface", () => {
     expect(logSpy).toHaveBeenCalledWith("Resolved notes config", {
       dateFormats: ["YYYY.MM.DD"],
       notesDirectory: "/notes",
-      obsidianVault: "vault"
+      obsidianVault: "vault",
+      timezone: "UTC",
+      views: []
     })
 
     logSpy.mockRestore()
