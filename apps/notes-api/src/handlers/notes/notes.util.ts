@@ -3,8 +3,16 @@ import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
 import remarkHtml from "remark-html"
+import { v5 as uuidv5 } from "uuid"
 
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
+const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
+
+const normalizeFilePathForId = (filePath: string): string =>
+  path.normalize(filePath).replace(/\\/g, "/")
+
+const createNoteId = (filePath: string): string =>
+  uuidv5(normalizeFilePathForId(filePath), FILE_ID_NAMESPACE)
 
 export const collectMarkdownFiles = async (
   directory: string
@@ -44,7 +52,7 @@ export const parseMarkdownFile = async (filePath: string): Promise<Note> => {
     modifiedDate: stats.mtime.toISOString(),
     fullPath: filePath,
     basename,
-    id: path.basename(filePath, path.extname(filePath)),
+    id: createNoteId(filePath),
     folder: path.basename(path.dirname(filePath)),
     html: String(html)
   }
