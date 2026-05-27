@@ -4,11 +4,7 @@ import morgan from "morgan"
 import { resolveNotesConfig } from "./config"
 import { healthHandler } from "./handlers/health/health"
 import { notesHandler } from "./handlers/notes/notes"
-
-const toLoggableError = (error: unknown): unknown =>
-  error instanceof Error
-    ? { message: error.message, stack: error.stack }
-    : error
+import { toLoggableError } from "./logging"
 
 export const createApp = () => {
   const app = express()
