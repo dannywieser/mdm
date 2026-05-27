@@ -26,7 +26,7 @@ export const buildCapturingPattern = (format: string): CapturingPattern => {
   let index = 0
 
   while (index < format.length) {
-    const token = DATE_TOKENS.find((candidate) => format.startsWith(candidate, index))
+    const token = DATE_TOKENS.find((dateToken) => format.startsWith(dateToken, index))
 
     if (token) {
       source += TOKEN_PATTERNS[token]
