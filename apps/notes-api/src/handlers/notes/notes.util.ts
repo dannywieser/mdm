@@ -1,21 +1,15 @@
 import { parseFrontMatter, parseMarkdownBodyDates, type Note } from "markdown"
+import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
 import remarkHtml from "remark-html"
-import { v5 as uuidv5 } from "uuid"
 
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
 export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 
-const normalizeFilePathForId = (filePath: string): string =>
-  path.normalize(filePath).replace(/\\/g, "/")
-
-const createNoteId = (filePath: string): string =>
-  uuidv5(normalizeFilePathForId(filePath), FILE_ID_NAMESPACE)
-
 export const collectMarkdownFiles = async (
-  directory: string
+  directory: string,
 ): Promise<string[]> => {
   const entries = await fs.readdir(directory, { withFileTypes: true })
   const nestedPaths = await Promise.all(
@@ -31,7 +25,7 @@ export const collectMarkdownFiles = async (
       }
 
       return []
-    })
+    }),
   )
 
   return nestedPaths.flat()
@@ -39,11 +33,11 @@ export const collectMarkdownFiles = async (
 
 export const parseMarkdownFile = async (
   filePath: string,
-  dateFormats: readonly string[] = []
+  dateFormats: readonly string[] = [],
 ): Promise<Note> => {
   const [source, stats] = await Promise.all([
     fs.readFile(filePath, "utf8"),
-    fs.stat(filePath)
+    fs.stat(filePath),
   ])
   const { body, frontmatter } = parseFrontMatter(source)
   const bodyDates = parseMarkdownBodyDates(body, dateFormats)
@@ -57,8 +51,8 @@ export const parseMarkdownFile = async (
     modifiedDate: stats.mtime.toISOString(),
     fullPath: filePath,
     basename,
-    id: createNoteId(filePath),
+    id: createFileID(filePath, FILE_ID_NAMESPACE),
     folder: path.basename(path.dirname(filePath)),
-    html: String(html)
+    html: String(html),
   }
 }

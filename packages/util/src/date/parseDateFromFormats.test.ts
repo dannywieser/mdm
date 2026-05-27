@@ -5,7 +5,7 @@ describe("parseDateFromFormats", () => {
     expect(parseDateFromFormats("2024.05.27", ["YYYY.MM.DD"])).toEqual({
       day: 27,
       month: 5,
-      year: 2024
+      year: 2024,
     })
   })
 
@@ -13,14 +13,16 @@ describe("parseDateFromFormats", () => {
     expect(parseDateFromFormats("24/05/27", ["YY/MM/DD"])).toEqual({
       day: 27,
       month: 5,
-      year: 2024
+      year: 2024,
     })
   })
 
   test("tries each format in order and returns the first match", () => {
-    expect(
-      parseDateFromFormats("2024.05.27", ["YY/MM/DD", "YYYY.MM.DD"])
-    ).toEqual({ day: 27, month: 5, year: 2024 })
+    expect(parseDateFromFormats("2024.05.27", ["YY/MM/DD", "YYYY.MM.DD"])).toEqual({
+      day: 27,
+      month: 5,
+      year: 2024,
+    })
   })
 
   test("returns null when no format matches", () => {

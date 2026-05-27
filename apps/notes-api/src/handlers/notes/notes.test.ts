@@ -1,5 +1,6 @@
 import { AppConfigError, resolveNotesConfig } from "app-config"
 import express from "express"
+import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
 import { notesHandler } from "./notes"
@@ -12,9 +13,13 @@ jest.mock("app-config", () => {
 
   return {
     ...actualConfig,
-    resolveNotesConfig: jest.fn()
+    resolveNotesConfig: jest.fn(),
   }
 })
+
+jest.mock("mdm-util", () => ({
+  toLoggableError: jest.fn(),
+}))
 
 jest.mock("./notes.filters", () => ({
   applyViewFilter: jest.fn(),
@@ -22,10 +27,11 @@ jest.mock("./notes.filters", () => ({
 
 jest.mock("./notes.util", () => ({
   collectMarkdownFiles: jest.fn(),
-  parseMarkdownFile: jest.fn()
+  parseMarkdownFile: jest.fn(),
 }))
 
 const resolveNotesConfigMock = jest.mocked(resolveNotesConfig)
+const toLoggableErrorMock = jest.mocked(toLoggableError)
 const applyViewFilterMock = jest.mocked(applyViewFilter)
 const collectMarkdownFilesMock = jest.mocked(collectMarkdownFiles)
 const parseMarkdownFileMock = jest.mocked(parseMarkdownFile)
@@ -34,8 +40,8 @@ describe("notes handler interface", () => {
   test("returns an error when notes directory config cannot be resolved", async () => {
     resolveNotesConfigMock.mockRejectedValue(
       new AppConfigError(
-        "app.config.json is required. Copy app.config.example.json to app.config.json."
-      )
+        "app.config.json is required. Copy app.config.example.json to app.config.json.",
+      ),
     )
     const app = express()
     app.get("/notes", notesHandler)
@@ -45,7 +51,7 @@ describe("notes handler interface", () => {
     expect(response.status).toBe(500)
     expect(response.body).toEqual({
       error:
-        "app.config.json is required. Copy app.config.example.json to app.config.json."
+        "app.config.json is required. Copy app.config.example.json to app.config.json.",
     })
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(applyViewFilterMock).not.toHaveBeenCalled()
@@ -62,11 +68,11 @@ describe("notes handler interface", () => {
       views: [
         {
           filters: {
-            folder: "notes"
+            folder: "notes",
           },
-          name: "notes-only"
-        }
-      ]
+          name: "notes-only",
+        },
+      ],
     })
     collectMarkdownFilesMock.mockResolvedValue(["/notes/b.md", "/notes/a.md"])
     parseMarkdownFileMock.mockImplementation((filePath) =>
@@ -79,8 +85,8 @@ describe("notes handler interface", () => {
         fullPath: filePath,
         html: "<h1>Note</h1>",
         id: pathToId(filePath),
-        modifiedDate: "2026-05-26T00:00:00.000Z"
-      })
+        modifiedDate: "2026-05-26T00:00:00.000Z",
+      }),
     )
     applyViewFilterMock.mockImplementation((notes) => [...notes])
     const app = express()
@@ -100,34 +106,34 @@ describe("notes handler interface", () => {
     expect(body.notes).toEqual([
       expect.objectContaining({
         basename: "a.md",
-        bodyDates: ["2026.05.26"]
+        bodyDates: ["2026.05.26"],
       }),
       expect.objectContaining({
         basename: "b.md",
-        bodyDates: []
-      })
+        bodyDates: [],
+      }),
     ])
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(parseMarkdownFileMock.mock.calls).toEqual([
       ["/notes/a.md", ["YYYY.MM.DD"]],
-      ["/notes/b.md", ["YYYY.MM.DD"]]
+      ["/notes/b.md", ["YYYY.MM.DD"]],
     ])
     expect(applyViewFilterMock).toHaveBeenCalledWith(
       [
         expect.objectContaining({ basename: "a.md" }),
-        expect.objectContaining({ basename: "b.md" })
+        expect.objectContaining({ basename: "b.md" }),
       ],
       [
         {
           filters: {
-            folder: "notes"
+            folder: "notes",
           },
-          name: "notes-only"
-        }
+          name: "notes-only",
+        },
       ],
       undefined,
-      { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" }
+      { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" },
     )
   })
 
@@ -141,11 +147,11 @@ describe("notes handler interface", () => {
         {
           filters: {
             "frontmatter.type": "book",
-            folder: "downtime"
+            folder: "downtime",
           },
-          name: "books"
-        }
-      ]
+          name: "books",
+        },
+      ],
     })
     collectMarkdownFilesMock.mockResolvedValue(["/notes/a.md"])
     parseMarkdownFileMock.mockResolvedValue({
@@ -154,12 +160,12 @@ describe("notes handler interface", () => {
       createdDate: "2026-05-26T00:00:00.000Z",
       folder: "downtime",
       frontmatter: {
-        type: "book"
+        type: "book",
       },
       fullPath: "/notes/a.md",
       html: "<h1>A</h1>",
       id: "a",
-      modifiedDate: "2026-05-26T00:00:00.000Z"
+      modifiedDate: "2026-05-26T00:00:00.000Z",
     })
     applyViewFilterMock.mockImplementation((notes) => [...notes])
     const app = express()
@@ -174,13 +180,13 @@ describe("notes handler interface", () => {
         {
           filters: {
             "frontmatter.type": "book",
-            folder: "downtime"
+            folder: "downtime",
           },
-          name: "books"
-        }
+          name: "books",
+        },
       ],
       "books",
-      { dateFormats: [], timezone: "UTC" }
+      { dateFormats: [], timezone: "UTC" },
     )
   })
 
@@ -190,9 +196,10 @@ describe("notes handler interface", () => {
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
-      views: []
+      views: [],
     })
     collectMarkdownFilesMock.mockRejectedValue(new Error("boom"))
+    toLoggableErrorMock.mockReturnValue({ message: "boom", stack: "stack" })
     const errorSpy = jest.spyOn(console, "error").mockImplementation()
     const app = express()
     app.get("/notes", notesHandler)
@@ -204,6 +211,7 @@ describe("notes handler interface", () => {
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(parseMarkdownFileMock).not.toHaveBeenCalled()
+    expect(toLoggableErrorMock).toHaveBeenCalledWith(expect.any(Error))
     expect(errorSpy).toHaveBeenCalledTimes(1)
 
     const [, loggedPayload] = errorSpy.mock.calls[0] as [
@@ -218,7 +226,7 @@ describe("notes handler interface", () => {
           obsidianVault: string
           views: unknown[]
         }
-      }
+      },
     ]
 
     expect(loggedPayload.error.message).toBe("boom")
@@ -227,7 +235,7 @@ describe("notes handler interface", () => {
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
-      views: []
+      views: [],
     })
 
     errorSpy.mockRestore()
@@ -235,4 +243,5 @@ describe("notes handler interface", () => {
 })
 
 const pathToId = (filePath: string): string =>
-  filePath.replace(/\\/g, "/").split("/").pop()?.replace(/\.[^.]+$/, "") ?? "note"
+  filePath.replace(/\\/g, "/").split("/").pop()?.replace(/\.[^.]+$/, "") ??
+  "note"

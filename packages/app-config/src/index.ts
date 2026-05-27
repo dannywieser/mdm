@@ -1,3 +1,9 @@
+import {
+  isNonEmptyString,
+  isStringArray,
+  isStringRecord,
+  isValidTimezone,
+} from "mdm-util"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 
@@ -15,30 +21,6 @@ const APP_CONFIG_FILENAME = "app.config.json"
 export class AppConfigError extends Error {}
 
 let cachedNotesConfig: ResolvedNotesConfig | undefined
-
-const isNonEmptyString = (value: unknown): value is string =>
-  typeof value === "string" && value.trim().length > 0
-
-const isStringArray = (value: unknown): value is string[] =>
-  Array.isArray(value) && value.every(isNonEmptyString)
-
-const isValidTimezone = (value: string): boolean => {
-  try {
-    Intl.DateTimeFormat(undefined, { timeZone: value })
-    return true
-  } catch {
-    return false
-  }
-}
-
-const isStringRecord = (value: unknown): value is Record<string, string> =>
-  value !== null &&
-  typeof value === "object" &&
-  !Array.isArray(value) &&
-  Object.entries(value as Record<string, unknown>).every(
-    ([key, entryValue]) =>
-      isNonEmptyString(key) && isNonEmptyString(entryValue),
-  )
 
 const isAppConfigView = (value: unknown): value is AppConfigView =>
   value !== null &&
@@ -154,11 +136,13 @@ const findAppConfigPath = async (): Promise<string> => {
       .access(appConfigPath)
       .then(() => true)
       .catch(() => false)
+
     if (hasAppConfig) {
       return appConfigPath
     }
 
     const parentDirectory = path.dirname(currentDirectory)
+
     if (parentDirectory === currentDirectory) {
       break
     }
