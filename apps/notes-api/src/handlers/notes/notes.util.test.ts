@@ -1,7 +1,11 @@
 import { parseFrontMatter } from "markdown"
 import { promises as fs, type Dirent } from "node:fs"
 
-import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
+import {
+  collectMarkdownFiles,
+  FILE_ID_NAMESPACE,
+  parseMarkdownFile
+} from "./notes.util"
 
 jest.mock("node:fs", () => ({
   promises: {
@@ -80,9 +84,10 @@ describe("notes util helpers", () => {
       folder: "topic",
       frontmatter: null,
       fullPath: "/notes/topic/welcome.md",
-      id: "welcome",
       modifiedDate: "2026-05-26T01:00:00.000Z"
     })
+    expect(FILE_ID_NAMESPACE).toBe("6ba7b811-9dad-11d1-80b4-00c04fd430c8")
+    expect(note.id).toBe("17e3771f-2773-5c87-8f66-6a455a878763")
     expect(note.html).toContain("<h1>Welcome</h1>")
     expect(readFileMock).toHaveBeenCalledWith("/notes/topic/welcome.md", "utf8")
     expect(parseFrontMatterMock).toHaveBeenCalledWith("# Welcome\n\nThis is a note.")
