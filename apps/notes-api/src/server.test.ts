@@ -60,13 +60,20 @@ describe("notes-api server interface", () => {
 
     await logStartupConfig()
 
-    expect(logSpy).toHaveBeenCalledWith("Resolved notes config", {
-      dateFormats: ["YYYY.MM.DD"],
-      notesDirectory: "/notes",
-      obsidianVault: "vault",
-      timezone: "UTC",
-      views: []
-    })
+    expect(logSpy).toHaveBeenCalledWith(
+      "Resolved notes config",
+      JSON.stringify(
+        {
+          dateFormats: ["YYYY.MM.DD"],
+          notesDirectory: "/notes",
+          obsidianVault: "vault",
+          timezone: "UTC",
+          views: []
+        },
+        null,
+        2
+      )
+    )
 
     logSpy.mockRestore()
   })
