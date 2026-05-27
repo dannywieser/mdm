@@ -1,14 +1,6 @@
-export interface Note {
-  basename: string
-  bodyDates: string[]
-  createdDate: string
-  folder: string
-  frontmatter: Record<string, string | string[]> | null
-  fullPath: string
-  html: string
-  id: string
-  modifiedDate: string
-}
+import type { Note } from 'markdown'
+
+export type { Note }
 
 export interface NotesResponse {
   notes: Note[]
