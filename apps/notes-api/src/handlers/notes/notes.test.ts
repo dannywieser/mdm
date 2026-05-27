@@ -2,8 +2,8 @@ import express from "express"
 import request from "supertest"
 
 import { AppConfigError, resolveNotesConfig } from "../../config"
-import { applyViewFilter } from "./notes.filters"
 import { notesHandler } from "./notes"
+import { applyViewFilter } from "./notes.filters"
 import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
 
 jest.mock("../../config", () => {
