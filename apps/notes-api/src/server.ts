@@ -1,8 +1,14 @@
 import express from "express"
 import morgan from "morgan"
 
+import { resolveNotesConfig } from "./config"
 import { healthHandler } from "./handlers/health/health"
 import { notesHandler } from "./handlers/notes/notes"
+
+const toLoggableError = (error: unknown): unknown =>
+  error instanceof Error
+    ? { message: error.message, stack: error.stack }
+    : error
 
 export const createApp = () => {
   const app = express()
@@ -15,11 +21,25 @@ export const createApp = () => {
   return app
 }
 
+export const logStartupConfig = async (): Promise<void> => {
+  try {
+    const notesConfig = await resolveNotesConfig()
+
+    console.log("Resolved notes config", notesConfig)
+  } catch (error) {
+    console.error(
+      "Unable to resolve notes config on startup",
+      toLoggableError(error)
+    )
+  }
+}
+
 if (require.main === module) {
   const app = createApp()
   const port = Number(process.env.PORT ?? 3000)
 
   app.listen(port, () => {
     console.log(`notes-api listening on ${port}`)
+    void logStartupConfig()
   })
 }

@@ -116,6 +116,16 @@ describe("notes handler interface", () => {
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(parseMarkdownFileMock).not.toHaveBeenCalled()
+    expect(errorSpy).toHaveBeenCalledWith("Unable to load notes", {
+      error: expect.objectContaining({
+        message: "boom"
+      }),
+      notesConfig: {
+        dateFormats: [],
+        notesDirectory: "/notes",
+        obsidianVault: "vault"
+      }
+    })
 
     errorSpy.mockRestore()
   })
