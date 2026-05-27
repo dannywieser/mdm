@@ -51,7 +51,7 @@ export const parseDateFromFormats = (
     let day: number | undefined
 
     tokens.forEach((token, i) => {
-      const value = parseInt(match[i + 1]!, 10)
+      const value = parseInt(match[i + 1], 10)
       if (token === "YYYY") year = value
       else if (token === "YY") year = 2000 + value
       else if (token === "MM") month = value

@@ -1,5 +1,6 @@
 import type { NotesView } from "app-config"
 import type { Note } from "markdown"
+
 import { parseDateFromFormats } from "markdown"
 import { getDateComponents } from "mdm-util"
 
