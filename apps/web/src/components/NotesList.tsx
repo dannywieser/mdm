@@ -2,7 +2,6 @@ import {
   Alert,
   Box,
   Heading,
-  SimpleGrid,
   Spinner,
   Text,
   VStack
@@ -41,11 +40,11 @@ export const NotesList = () => {
       <Text color="fg.muted">
         Vault: {data?.obsidianVault} · Directory: {data?.notesDirectory}
       </Text>
-      <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
+      <VStack align="stretch" gap="4">
         {data?.notes.map((note) => (
           <NotesCard key={note.id} note={note} />
         ))}
-      </SimpleGrid>
+      </VStack>
     </VStack>
   )
 }
