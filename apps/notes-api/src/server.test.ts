@@ -1,11 +1,11 @@
+import { resolveNotesConfig } from "app-config"
 import request from "supertest"
 
-import { resolveNotesConfig } from "./config"
 import { healthHandler } from "./handlers/health/health"
 import { notesHandler } from "./handlers/notes/notes"
 import { createApp, logStartupConfig } from "./server"
 
-jest.mock("./config", () => ({
+jest.mock("app-config", () => ({
   resolveNotesConfig: jest.fn()
 }))
 
@@ -53,16 +53,27 @@ describe("notes-api server interface", () => {
     resolveNotesConfigMock.mockResolvedValue({
       dateFormats: ["YYYY.MM.DD"],
       notesDirectory: "/notes",
-      obsidianVault: "vault"
+      obsidianVault: "vault",
+      timezone: "UTC",
+      views: []
     })
 
     await logStartupConfig()
 
-    expect(logSpy).toHaveBeenCalledWith("Resolved notes config", {
-      dateFormats: ["YYYY.MM.DD"],
-      notesDirectory: "/notes",
-      obsidianVault: "vault"
-    })
+    expect(logSpy).toHaveBeenCalledWith(
+      "Resolved notes config",
+      JSON.stringify(
+        {
+          dateFormats: ["YYYY.MM.DD"],
+          notesDirectory: "/notes",
+          obsidianVault: "vault",
+          timezone: "UTC",
+          views: []
+        },
+        null,
+        2
+      )
+    )
 
     logSpy.mockRestore()
   })
