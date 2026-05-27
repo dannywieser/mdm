@@ -1,8 +1,11 @@
 import type { NotesView } from "app-config"
 import type { Note } from "markdown"
 
-import { parseDateFromFormats } from "markdown"
-import { getDateComponents } from "mdm-util"
+import {
+  getDateComponents,
+  getValueByPath,
+  parseDateFromFormats,
+} from "mdm-util"
 
 import type { ViewFilterContext } from "./notes.filters.types"
 
@@ -16,16 +19,28 @@ const matchesOnThisDay = (
 
   if (typeof noteValue === "string") {
     const date = new Date(noteValue)
-    if (isNaN(date.getTime())) return false
+
+    if (isNaN(date.getTime())) {
+      return false
+    }
+
     const { day, month, year } = getDateComponents(date, context.timezone)
+
     return month === today.month && day === today.day && year < today.year
   }
 
   if (Array.isArray(noteValue)) {
     return (noteValue as unknown[]).some((entry) => {
-      if (typeof entry !== "string") return false
+      if (typeof entry !== "string") {
+        return false
+      }
+
       const parsed = parseDateFromFormats(entry, context.dateFormats)
-      if (!parsed) return false
+
+      if (!parsed) {
+        return false
+      }
+
       return (
         parsed.month === today.month &&
         parsed.day === today.day &&
@@ -36,20 +51,6 @@ const matchesOnThisDay = (
 
   return false
 }
-
-const getObjectValue = (value: unknown, key: string): unknown => {
-  if (!value || typeof value !== "object") {
-    return undefined
-  }
-
-  return (value as Record<string, unknown>)[key]
-}
-
-const getValueByPath = (note: Note, filterPath: string): unknown =>
-  filterPath
-    .split(".")
-    .filter((segment) => segment.length > 0)
-    .reduce<unknown>((value, segment) => getObjectValue(value, segment), note)
 
 const isMatchingFilterValue = (
   noteValue: unknown,

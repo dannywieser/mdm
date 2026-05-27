@@ -1,3 +1,9 @@
+import {
+  isNonEmptyString,
+  isStringArray,
+  isStringRecord,
+  isValidTimezone,
+} from "mdm-util"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 
@@ -5,23 +11,66 @@ import {
   AppConfigError,
   clearConfigCache,
   resolveNotesConfig,
-  resolveNotesDirectory
+  resolveNotesDirectory,
 } from "./index"
 
 jest.mock("node:fs", () => ({
   promises: {
     access: jest.fn(),
-    readFile: jest.fn()
-  }
+    readFile: jest.fn(),
+  },
+}))
+
+jest.mock("mdm-util", () => ({
+  isNonEmptyString: jest.fn(),
+  isStringArray: jest.fn(),
+  isStringRecord: jest.fn(),
+  isValidTimezone: jest.fn(),
 }))
 
 const accessMock = jest.mocked(fs.access)
+const isNonEmptyStringMock = jest.mocked(isNonEmptyString)
+const isStringArrayMock = jest.mocked(isStringArray)
+const isStringRecordMock = jest.mocked(isStringRecord)
+const isValidTimezoneMock = jest.mocked(isValidTimezone)
 const readFileMock = jest.mocked(fs.readFile)
 
 describe("config", () => {
   beforeEach(() => {
     accessMock.mockResolvedValue(undefined)
     clearConfigCache()
+
+    isNonEmptyStringMock.mockImplementation(
+      (value): value is string =>
+        typeof value === "string" && value.trim().length > 0,
+    )
+
+    isStringArrayMock.mockImplementation(
+      (value): value is string[] =>
+        Array.isArray(value) &&
+        value.every(
+          (entry): entry is string =>
+            typeof entry === "string" && entry.trim().length > 0,
+        ),
+    )
+
+    isStringRecordMock.mockImplementation(
+      (value): value is Record<string, string> =>
+        value !== null &&
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        Object.entries(value as Record<string, unknown>).every(
+          ([key, entryValue]) =>
+            typeof key === "string" &&
+            key.trim().length > 0 &&
+            typeof entryValue === "string" &&
+            entryValue.trim().length > 0,
+        ),
+    )
+
+    isValidTimezoneMock.mockImplementation((value) =>
+      ["UTC", "America/Toronto"].includes(value),
+    )
   })
 
   test("resolves notes directory from noteRootDirectory and obsidianVault", async () => {
@@ -29,12 +78,12 @@ describe("config", () => {
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD"],
         noteRootDirectory: "/notes-root",
-        obsidianVault: "vault"
-      })
+        obsidianVault: "vault",
+      }),
     )
 
     await expect(resolveNotesDirectory()).resolves.toBe(
-      path.resolve("/notes-root", "vault")
+      path.resolve("/notes-root", "vault"),
     )
   })
 
@@ -48,12 +97,12 @@ describe("config", () => {
           {
             filters: {
               folder: "downtime",
-              "frontmatter.type": "book"
+              "frontmatter.type": "book",
             },
-            name: "books"
-          }
-        ]
-      })
+            name: "books",
+          },
+        ],
+      }),
     )
 
     await expect(resolveNotesConfig()).resolves.toEqual({
@@ -65,11 +114,11 @@ describe("config", () => {
         {
           filters: {
             folder: "downtime",
-            "frontmatter.type": "book"
+            "frontmatter.type": "book",
           },
-          name: "books"
-        }
-      ]
+          name: "books",
+        },
+      ],
     })
   })
 
@@ -77,8 +126,8 @@ describe("config", () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
         noteRootDirectory: "/notes-root",
-        obsidianVault: "vault"
-      })
+        obsidianVault: "vault",
+      }),
     )
 
     await expect(resolveNotesConfig()).resolves.toEqual({
@@ -86,7 +135,7 @@ describe("config", () => {
       notesDirectory: path.resolve("/notes-root", "vault"),
       obsidianVault: "vault",
       timezone: "UTC",
-      views: []
+      views: [],
     })
   })
 
@@ -95,8 +144,8 @@ describe("config", () => {
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD"],
         noteRootDirectory: "/notes-root",
-        obsidianVault: "vault"
-      })
+        obsidianVault: "vault",
+      }),
     )
 
     await expect(resolveNotesConfig()).resolves.toEqual({
@@ -104,7 +153,7 @@ describe("config", () => {
       notesDirectory: path.resolve("/notes-root", "vault"),
       obsidianVault: "vault",
       timezone: "UTC",
-      views: []
+      views: [],
     })
   })
 
@@ -113,12 +162,12 @@ describe("config", () => {
       JSON.stringify({
         noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
-        timezone: "America/Toronto"
-      })
+        timezone: "America/Toronto",
+      }),
     )
 
     await expect(resolveNotesConfig()).resolves.toMatchObject({
-      timezone: "America/Toronto"
+      timezone: "America/Toronto",
     })
   })
 
@@ -126,12 +175,12 @@ describe("config", () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
         noteRootDirectory: "/notes-root",
-        obsidianVault: "vault"
-      })
+        obsidianVault: "vault",
+      }),
     )
 
     await expect(resolveNotesConfig()).resolves.toMatchObject({
-      timezone: "UTC"
+      timezone: "UTC",
     })
   })
 
@@ -140,14 +189,14 @@ describe("config", () => {
       JSON.stringify({
         noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
-        timezone: "Not/A/Timezone"
-      })
+        timezone: "Not/A/Timezone",
+      }),
     )
 
     await expect(resolveNotesConfig()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json timezone must be a valid IANA timezone identifier"
-      )
+        "app.config.json timezone must be a valid IANA timezone identifier",
+      ),
     )
   })
 
@@ -156,8 +205,8 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json is required. Copy app.config.example.json to app.config.json."
-      )
+        "app.config.json is required. Copy app.config.example.json to app.config.json.",
+      ),
     )
   })
 
@@ -165,7 +214,7 @@ describe("config", () => {
     readFileMock.mockResolvedValue("{broken")
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError("app.config.json must contain valid JSON")
+      new AppConfigError("app.config.json must contain valid JSON"),
     )
   })
 
@@ -173,21 +222,21 @@ describe("config", () => {
     readFileMock.mockRejectedValue(new Error("EACCES"))
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError("app.config.json must be readable")
+      new AppConfigError("app.config.json must be readable"),
     )
   })
 
   test("throws when required config fields are missing", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
-        noteRootDirectory: "/notes-root"
-      })
+        noteRootDirectory: "/notes-root",
+      }),
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json requires a non-empty obsidianVault value"
-      )
+        "app.config.json requires a non-empty obsidianVault value",
+      ),
     )
   })
 
@@ -196,14 +245,14 @@ describe("config", () => {
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD", ""],
         noteRootDirectory: "/notes-root",
-        obsidianVault: "vault"
-      })
+        obsidianVault: "vault",
+      }),
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json dateFormats must be an array of non-empty strings"
-      )
+        "app.config.json dateFormats must be an array of non-empty strings",
+      ),
     )
   })
 
@@ -215,31 +264,31 @@ describe("config", () => {
         views: [
           {
             filters: {
-              folder: "downtime"
-            }
-          }
-        ]
-      })
+              folder: "downtime",
+            },
+          },
+        ],
+      }),
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json views must be an array of objects with non-empty name and string filters"
-      )
+        "app.config.json views must be an array of objects with non-empty name and string filters",
+      ),
     )
   })
 
   test("throws when noteRootDirectory is missing", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
-        obsidianVault: "vault"
-      })
+        obsidianVault: "vault",
+      }),
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json requires a non-empty noteRootDirectory value"
-      )
+        "app.config.json requires a non-empty noteRootDirectory value",
+      ),
     )
   })
 
@@ -248,8 +297,8 @@ describe("config", () => {
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD"],
         noteRootDirectory: "/notes-root",
-        obsidianVault: "vault"
-      })
+        obsidianVault: "vault",
+      }),
     )
 
     await resolveNotesDirectory()

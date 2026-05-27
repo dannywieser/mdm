@@ -1,10 +1,10 @@
 import { resolveNotesConfig } from "app-config"
 import express from "express"
+import { toLoggableError } from "mdm-util"
 import morgan from "morgan"
 
 import { healthHandler } from "./handlers/health/health"
 import { notesHandler } from "./handlers/notes/notes"
-import { toLoggableError } from "./logging"
 
 export const createApp = () => {
   const app = express()

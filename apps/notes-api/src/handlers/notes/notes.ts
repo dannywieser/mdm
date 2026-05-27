@@ -2,8 +2,8 @@ import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler } from "express"
 
 import { AppConfigError, resolveNotesConfig } from "app-config"
+import { toLoggableError } from "mdm-util"
 
-import { toLoggableError } from "../../logging"
 import { applyViewFilter } from "./notes.filters"
 import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
 
@@ -12,10 +12,11 @@ export const notesHandler: RequestHandler = async (request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { dateFormats, notesDirectory, obsidianVault, timezone, views } = notesConfig
+    const { dateFormats, notesDirectory, obsidianVault, timezone, views } =
+      notesConfig
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).sort()
     const notes = await Promise.all(
-      markdownFiles.map((filePath) => parseMarkdownFile(filePath, dateFormats))
+      markdownFiles.map((filePath) => parseMarkdownFile(filePath, dateFormats)),
     )
     const requestedView =
       typeof request.query["view"] === "string"
@@ -23,7 +24,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
         : undefined
     const filteredNotes = applyViewFilter(notes, views, requestedView, {
       dateFormats,
-      timezone
+      timezone,
     })
 
     response
@@ -37,7 +38,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
 
     console.error("Unable to load notes", {
       error: toLoggableError(error),
-      notesConfig: notesConfig ?? null
+      notesConfig: notesConfig ?? null,
     })
     response.status(500).json({ error: "Unable to load notes" })
   }

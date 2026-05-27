@@ -1,4 +1,5 @@
 import { resolveNotesConfig } from "app-config"
+import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
 import { healthHandler } from "./handlers/health/health"
@@ -6,19 +7,24 @@ import { notesHandler } from "./handlers/notes/notes"
 import { createApp, logStartupConfig } from "./server"
 
 jest.mock("app-config", () => ({
-  resolveNotesConfig: jest.fn()
+  resolveNotesConfig: jest.fn(),
+}))
+
+jest.mock("mdm-util", () => ({
+  toLoggableError: jest.fn(),
 }))
 
 jest.mock("./handlers/health/health", () => ({
-  healthHandler: jest.fn()
+  healthHandler: jest.fn(),
 }))
 jest.mock("./handlers/notes/notes", () => ({
-  notesHandler: jest.fn()
+  notesHandler: jest.fn(),
 }))
 
 const healthHandlerMock = jest.mocked(healthHandler)
 const notesHandlerMock = jest.mocked(notesHandler)
 const resolveNotesConfigMock = jest.mocked(resolveNotesConfig)
+const toLoggableErrorMock = jest.mocked(toLoggableError)
 
 describe("notes-api server interface", () => {
   test("wires GET /health to the health handler", async () => {
@@ -55,7 +61,7 @@ describe("notes-api server interface", () => {
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
-      views: []
+      views: [],
     })
 
     await logStartupConfig()
@@ -68,11 +74,11 @@ describe("notes-api server interface", () => {
           notesDirectory: "/notes",
           obsidianVault: "vault",
           timezone: "UTC",
-          views: []
+          views: [],
         },
         null,
-        2
-      )
+        2,
+      ),
     )
 
     logSpy.mockRestore()
@@ -82,15 +88,15 @@ describe("notes-api server interface", () => {
     const errorSpy = jest.spyOn(console, "error").mockImplementation()
 
     resolveNotesConfigMock.mockRejectedValue(new Error("boom"))
+    toLoggableErrorMock.mockReturnValue({ message: "boom", stack: "stack" })
 
     await logStartupConfig()
 
     expect(resolveNotesConfigMock).toHaveBeenCalled()
+    expect(toLoggableErrorMock).toHaveBeenCalledWith(expect.any(Error))
     expect(errorSpy).toHaveBeenCalledWith(
       "Unable to resolve notes config on startup",
-      expect.objectContaining({
-        message: "boom"
-      })
+      { message: "boom", stack: "stack" },
     )
 
     errorSpy.mockRestore()

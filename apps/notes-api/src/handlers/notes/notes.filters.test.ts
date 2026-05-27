@@ -1,22 +1,60 @@
 import type { Note } from "markdown"
 
-import { getDateComponents } from "mdm-util"
+import {
+  getDateComponents,
+  getValueByPath,
+  parseDateFromFormats,
+} from "mdm-util"
 
 import { applyViewFilter } from "./notes.filters"
 
 jest.mock("mdm-util", () => ({
   getDateComponents: jest.fn(),
+  getValueByPath: jest.fn(),
+  parseDateFromFormats: jest.fn(),
 }))
 
 const getDateComponentsMock = jest.mocked(getDateComponents)
+const getValueByPathMock = jest.mocked(getValueByPath)
+const parseDateFromFormatsMock = jest.mocked(parseDateFromFormats)
 
 describe("notes filter helpers", () => {
+  beforeEach(() => {
+    getValueByPathMock.mockImplementation((value, valuePath) =>
+      String(valuePath)
+        .split(".")
+        .filter((segment) => segment.length > 0)
+        .reduce<unknown>((currentValue, segment) => {
+          if (!currentValue || typeof currentValue !== "object") {
+            return undefined
+          }
+
+          return (currentValue as Record<string, unknown>)[segment]
+        }, value),
+    )
+
+    parseDateFromFormatsMock.mockImplementation((dateValue) => {
+      const match = String(dateValue).match(/^(\d{4})\.(\d{2})\.(\d{2})$/)
+
+      if (!match) {
+        return null
+      }
+
+      return {
+        day: parseInt(match[3], 10),
+        month: parseInt(match[2], 10),
+        year: parseInt(match[1], 10),
+      }
+    })
+  })
+
   test("applyViewFilter returns all notes when no view is requested", () => {
     const notes = [createMockNote("book.md"), createMockNote("movie.md")]
 
     const filtered = applyViewFilter(notes, [], undefined)
 
     expect(filtered).toEqual(notes)
+    expect(getValueByPathMock).not.toHaveBeenCalled()
   })
 
   test("applyViewFilter filters notes using configured view filters", () => {
@@ -57,6 +95,7 @@ describe("notes filter helpers", () => {
     )
 
     expect(filtered).toEqual([notes[0]])
+    expect(getValueByPathMock).toHaveBeenCalled()
   })
 
   test("applyViewFilter supports array frontmatter values", () => {
@@ -87,6 +126,7 @@ describe("notes filter helpers", () => {
     )
 
     expect(filtered).toEqual([notes[0]])
+    expect(getValueByPathMock).toHaveBeenCalledWith(notes[0], "frontmatter.topic")
   })
 
   test("applyViewFilter returns all notes when view name is not configured", () => {
@@ -106,6 +146,7 @@ describe("notes filter helpers", () => {
     )
 
     expect(filtered).toEqual(notes)
+    expect(getValueByPathMock).not.toHaveBeenCalled()
   })
 
   describe("$onThisDay keyword", () => {
@@ -121,12 +162,12 @@ describe("notes filter helpers", () => {
       ]
 
       getDateComponentsMock
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 }) // today — note 1
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2024 }) // note 1 date — same day, past year ✓
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 }) // today — note 2
-        .mockReturnValueOnce({ day: 26, month: 5, year: 2024 }) // note 2 date — different day ✗
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 }) // today — note 3
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 }) // note 3 date — same year ✗
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2024 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 26, month: 5, year: 2024 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
 
       const filtered = applyViewFilter(
         notes,
@@ -147,10 +188,10 @@ describe("notes filter helpers", () => {
       ]
 
       getDateComponentsMock
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 }) // today — note 1
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2023 }) // note 1 date — same day, past year ✓
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 }) // today — note 2
-        .mockReturnValueOnce({ day: 27, month: 6, year: 2023 }) // note 2 date — different month ✗
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2023 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 6, year: 2023 })
 
       const filtered = applyViewFilter(
         notes,
@@ -171,12 +212,10 @@ describe("notes filter helpers", () => {
         createMockNote("this-year.md", { bodyDates: ["2026.05.27"] }),
       ]
 
-      // bodyDates uses parseDateFromFormats (not getDateComponents) for the note date,
-      // so only one call per note — for today
       getDateComponentsMock
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 }) // today — note 1
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 }) // today — note 2
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 }) // today — note 3
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
 
       const filtered = applyViewFilter(
         notes,
@@ -186,6 +225,9 @@ describe("notes filter helpers", () => {
       )
 
       expect(filtered).toEqual([notes[0]])
+      expect(parseDateFromFormatsMock).toHaveBeenCalledWith("2024.05.27", [
+        "YYYY.MM.DD",
+      ])
     })
 
     test("applies the configured timezone when determining today's date", () => {
@@ -198,12 +240,11 @@ describe("notes filter helpers", () => {
         }),
       ]
 
-      // Simulates "today" being May 26 in America/Toronto (e.g. 2026-05-27T03:00Z in UTC)
       getDateComponentsMock
-        .mockReturnValueOnce({ day: 26, month: 5, year: 2026 }) // today in Toronto — note 1
-        .mockReturnValueOnce({ day: 26, month: 5, year: 2025 }) // note 1 date in Toronto ✓
-        .mockReturnValueOnce({ day: 26, month: 5, year: 2026 }) // today in Toronto — note 2
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2025 }) // note 2 date in Toronto ✗
+        .mockReturnValueOnce({ day: 26, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 26, month: 5, year: 2025 })
+        .mockReturnValueOnce({ day: 26, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2025 })
 
       const filtered = applyViewFilter(
         notes,
@@ -226,10 +267,10 @@ describe("notes filter helpers", () => {
       ]
 
       getDateComponentsMock
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 }) // today — note 1
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 }) // note 1 date — same year ✗
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 }) // today — note 2
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2025 }) // note 2 date — past year ✓
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2025 })
 
       const filtered = applyViewFilter(
         notes,
