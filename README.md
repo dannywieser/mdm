@@ -15,7 +15,7 @@ This repository is a Turborepo monorepo with this structure:
       { "status": "ok" }
       ```
   - `GET /notes`
-    - Purpose: recursively load `*.md` and `*.markdown` files from the directory resolved by `noteRootDirectory` + `obsidianVault` in `app.config.json`, extract optional frontmatter metadata, render markdown to HTML, and return note metadata
+      - Purpose: recursively load `*.md` and `*.markdown` files from the directory resolved by `noteRootDirectory` + `obsidianVault` in `app.config.json`, extract optional frontmatter metadata, extract body dates using configured `dateFormats`, render markdown to HTML, and return note metadata
     - Success response: `200`
       ```json
       {
@@ -27,6 +27,7 @@ This repository is a Turborepo monorepo with this structure:
             "modifiedDate": "2026-05-26T00:00:00.000Z",
             "fullPath": "/absolute/path/to/notes/welcome.md",
             "basename": "welcome.md",
+            "bodyDates": ["2026.05.26"],
             "id": "welcome",
             "folder": "notes",
             "frontmatter": {
@@ -53,6 +54,7 @@ This repository is a Turborepo monorepo with this structure:
 
 - Copy `app.config.example.json` to `app.config.json` at repository root.
 - Set:
+  - `dateFormats`: array of expected date patterns to extract from note bodies, such as `["YYYY.MM.DD", "YY/MM/DD"]`.
   - `noteRootDirectory`: absolute path to your notes root directory.
   - `obsidianVault`: vault folder name under `noteRootDirectory`.
 

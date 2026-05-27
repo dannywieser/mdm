@@ -1,4 +1,4 @@
-import { parseFrontMatter, type Note } from "markdown"
+import { parseFrontMatter, parseMarkdownBodyDates, type Note } from "markdown"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
@@ -37,17 +37,22 @@ export const collectMarkdownFiles = async (
   return nestedPaths.flat()
 }
 
-export const parseMarkdownFile = async (filePath: string): Promise<Note> => {
+export const parseMarkdownFile = async (
+  filePath: string,
+  dateFormats: readonly string[] = []
+): Promise<Note> => {
   const [source, stats] = await Promise.all([
     fs.readFile(filePath, "utf8"),
     fs.stat(filePath)
   ])
   const { body, frontmatter } = parseFrontMatter(source)
+  const bodyDates = parseMarkdownBodyDates(body, dateFormats)
   const html = await remark().use(remarkHtml).process(body)
   const basename = path.basename(filePath)
 
   return {
     createdDate: stats.birthtime.toISOString(),
+    bodyDates,
     frontmatter,
     modifiedDate: stats.mtime.toISOString(),
     fullPath: filePath,

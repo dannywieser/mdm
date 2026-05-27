@@ -6,6 +6,7 @@ export interface NoteFrontmatter {
 
 export interface Note {
   basename: string
+  bodyDates: string[]
   createdDate: string
   frontmatter: NoteFrontmatter | null
   folder: string

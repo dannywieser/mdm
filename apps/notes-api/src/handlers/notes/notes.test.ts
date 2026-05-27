@@ -48,6 +48,7 @@ describe("notes handler interface", () => {
 
   test("returns notes and delegates file processing to util functions", async () => {
     resolveNotesConfigMock.mockResolvedValue({
+      dateFormats: ["YYYY.MM.DD"],
       notesDirectory: "/notes",
       obsidianVault: "vault"
     })
@@ -55,6 +56,7 @@ describe("notes handler interface", () => {
     parseMarkdownFileMock.mockImplementation((filePath) =>
       Promise.resolve({
         basename: filePath.split("/").pop() ?? "note.md",
+        bodyDates: filePath.endsWith("a.md") ? ["2026.05.26"] : [],
         createdDate: "2026-05-26T00:00:00.000Z",
         folder: "notes",
         frontmatter: null,
@@ -78,16 +80,27 @@ describe("notes handler interface", () => {
     expect(body.notes).toHaveLength(2)
     expect(body.notesDirectory).toBe("/notes")
     expect(body.obsidianVault).toBe("vault")
+    expect(body.notes).toEqual([
+      expect.objectContaining({
+        basename: "a.md",
+        bodyDates: ["2026.05.26"]
+      }),
+      expect.objectContaining({
+        basename: "b.md",
+        bodyDates: []
+      })
+    ])
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
-    expect(parseMarkdownFileMock.mock.calls.map(([filePath]) => filePath)).toEqual([
-      "/notes/a.md",
-      "/notes/b.md"
+    expect(parseMarkdownFileMock.mock.calls).toEqual([
+      ["/notes/a.md", ["YYYY.MM.DD"]],
+      ["/notes/b.md", ["YYYY.MM.DD"]]
     ])
   })
 
   test("returns an error when util loading fails", async () => {
     resolveNotesConfigMock.mockResolvedValue({
+      dateFormats: [],
       notesDirectory: "/notes",
       obsidianVault: "vault"
     })
@@ -103,6 +116,28 @@ describe("notes handler interface", () => {
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(parseMarkdownFileMock).not.toHaveBeenCalled()
+    expect(errorSpy).toHaveBeenCalledTimes(1)
+
+    const [, loggedPayload] = errorSpy.mock.calls[0] as [
+      string,
+      {
+        error: {
+          message: string
+        }
+        notesConfig: {
+          dateFormats: string[]
+          notesDirectory: string
+          obsidianVault: string
+        }
+      }
+    ]
+
+    expect(loggedPayload.error.message).toBe("boom")
+    expect(loggedPayload.notesConfig).toEqual({
+      dateFormats: [],
+      notesDirectory: "/notes",
+      obsidianVault: "vault"
+    })
 
     errorSpy.mockRestore()
   })

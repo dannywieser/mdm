@@ -4,11 +4,13 @@ import path from "node:path"
 const APP_CONFIG_FILENAME = "app.config.json"
 
 interface AppConfig {
+  dateFormats?: string[]
   noteRootDirectory: string
   obsidianVault: string
 }
 
 export interface ResolvedNotesConfig {
+  dateFormats: string[]
   notesDirectory: string
   obsidianVault: string
 }
@@ -20,12 +22,16 @@ let cachedNotesConfig: ResolvedNotesConfig | undefined
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.trim().length > 0
 
+const isStringArray = (value: unknown): value is string[] =>
+  Array.isArray(value) && value.every(isNonEmptyString)
+
 const validateAppConfig = (appConfig: unknown): AppConfig => {
   if (!appConfig || typeof appConfig !== "object") {
     throw new AppConfigError("app.config.json must be a JSON object")
   }
 
   const parsedConfig = appConfig as Record<string, unknown>
+  const dateFormats = parsedConfig["dateFormats"]
   const noteRootDirectory = parsedConfig["noteRootDirectory"]
   const obsidianVault = parsedConfig["obsidianVault"]
 
@@ -41,7 +47,13 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
     )
   }
 
-  return { noteRootDirectory, obsidianVault }
+  if (dateFormats !== undefined && !isStringArray(dateFormats)) {
+    throw new AppConfigError(
+      "app.config.json dateFormats must be an array of non-empty strings"
+    )
+  }
+
+  return { dateFormats, noteRootDirectory, obsidianVault }
 }
 
 export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
@@ -69,6 +81,7 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
   const appConfig = validateAppConfig(parsedAppConfig)
 
   cachedNotesConfig = {
+    dateFormats: appConfig.dateFormats ?? [],
     notesDirectory: path.resolve(
       appConfig.noteRootDirectory,
       appConfig.obsidianVault
