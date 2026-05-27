@@ -1,35 +1,40 @@
 import type { CapturingPattern } from "./buildCapturingPattern.types"
 
-const TOKEN_PATTERNS: Record<string, string> = {
+const DATE_TOKEN_PATTERNS: Record<string, string> = {
   YYYY: "(\\d{4})",
   YY: "(\\d{2})",
   MM: "(0[1-9]|1[0-2])",
   DD: "(0[1-9]|[12]\\d|3[01])",
 }
 
-const DATE_TOKENS = Object.keys(TOKEN_PATTERNS).sort(
-  (tokenA, tokenB) => tokenB.length - tokenA.length,
-)
-
 const escapeRegex = (value: string): string =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 
 /**
- * Builds a full-string regex and token list from a date format pattern.
+ * Builds a full-string regex and token list from a tokenized format pattern.
  *
- * @param format Date format string using YYYY, YY, MM, and DD tokens.
- * @returns Regex metadata used to parse date values.
+ * @param format Format string containing token placeholders.
+ * @param tokenPatterns Map of token placeholders to capturing regex snippets.
+ * @returns Regex metadata used to parse values by token order.
  */
-export const buildCapturingPattern = (format: string): CapturingPattern => {
+export const buildCapturingPattern = (
+  format: string,
+  tokenPatterns: Record<string, string> = DATE_TOKEN_PATTERNS,
+): CapturingPattern => {
+  const tokensByLength = Object.keys(tokenPatterns).sort(
+    (tokenA, tokenB) => tokenB.length - tokenA.length,
+  )
   let source = "^"
   const tokens: string[] = []
   let index = 0
 
   while (index < format.length) {
-    const token = DATE_TOKENS.find((dateToken) => format.startsWith(dateToken, index))
+    const token = tokensByLength.find((formatToken) =>
+      format.startsWith(formatToken, index),
+    )
 
     if (token) {
-      source += TOKEN_PATTERNS[token]
+      source += tokenPatterns[token]
       tokens.push(token)
       index += token.length
       continue

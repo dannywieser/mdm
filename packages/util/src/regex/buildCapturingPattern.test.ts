@@ -14,4 +14,14 @@ describe("buildCapturingPattern", () => {
     expect(regex.test("2024[05]27")).toBe(true)
     expect(regex.test("2024x05x27")).toBe(false)
   })
+
+  test("supports custom token patterns", () => {
+    const { regex, tokens } = buildCapturingPattern("AA-BB", {
+      AA: "([A-Z]{2})",
+      BB: "(\\d{2})",
+    })
+
+    expect(tokens).toEqual(["AA", "BB"])
+    expect(regex.exec("AB-12")?.slice(1)).toEqual(["AB", "12"])
+  })
 })
