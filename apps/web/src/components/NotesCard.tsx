@@ -1,7 +1,7 @@
 import { Box, Card, Heading } from '@chakra-ui/react'
 import DOMPurify from 'dompurify'
+import type { Note } from 'markdown'
 
-import type { Note } from '../types/notes'
 import { noteContentStyles } from './NotesCard.styles'
 
 interface NotesCardProps {
