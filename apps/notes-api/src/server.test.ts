@@ -74,6 +74,7 @@ describe("notes-api server interface", () => {
 
     await logStartupConfig()
 
+    expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(errorSpy).toHaveBeenCalledWith(
       "Unable to resolve notes config on startup",
       expect.objectContaining({
