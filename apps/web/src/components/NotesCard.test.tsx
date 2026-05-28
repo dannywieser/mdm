@@ -7,7 +7,7 @@ import { NotesCard } from './NotesCard'
 
 const noteFixture: Note = {
   basename: 'My Note',
-  bodyDates: [],
+  titleOrBodyDates: [],
   createdDate: '2026-01-01',
   folder: 'daily',
   frontmatter: null,

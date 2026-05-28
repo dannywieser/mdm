@@ -46,9 +46,15 @@ export const parseMarkdownFile = async (
     fs.stat(filePath),
   ])
   const { body, frontmatter } = parseFrontMatter(source)
-  const bodyDates = parseMarkdownBodyDates(body, dateFormats)
   const basename = path.basename(filePath)
   const title = basename.endsWith(".md") ? basename.slice(0, -3) : basename
+  const titleOrBodyDates = Array.from(
+    new Set([
+      ...parseMarkdownBodyDates(title, dateFormats),
+      ...parseMarkdownBodyDates(body, dateFormats),
+    ]),
+  )
+
   const relativePath = path.relative(notesDirectory, filePath)
   const normalizedRelativePath = relativePath.split(path.sep).join("/")
   const markdownBody = rewriteMarkdownImageUrls(body, normalizedRelativePath)
@@ -65,7 +71,7 @@ export const parseMarkdownFile = async (
 
   return {
     createdDate: stats.birthtime.toISOString(),
-    bodyDates,
+    titleOrBodyDates,
     frontmatter,
     modifiedDate: stats.mtime.toISOString(),
     fullPath: filePath,
@@ -107,7 +113,10 @@ const resolveLocalImagePath = (
 ): string | null => {
   const sanitizedImagePath = rawImagePath.trim()
 
-  if (!sanitizedImagePath || EXTERNAL_IMAGE_URL_PATTERN.test(sanitizedImagePath)) {
+  if (
+    !sanitizedImagePath ||
+    EXTERNAL_IMAGE_URL_PATTERN.test(sanitizedImagePath)
+  ) {
     return null
   }
 

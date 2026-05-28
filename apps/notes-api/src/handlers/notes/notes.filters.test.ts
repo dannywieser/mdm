@@ -203,13 +203,13 @@ describe("notes filter helpers", () => {
       expect(filtered).toEqual([notes[0]])
     })
 
-    test("matches notes where any bodyDate falls on the same month and day in a previous year", () => {
+    test("matches notes where any titleOrBodyDate falls on the same month and day in a previous year", () => {
       const notes = [
         createMockNote("has-match.md", {
-          bodyDates: ["2024.05.27", "2024.06.01"],
+          titleOrBodyDates: ["2024.05.27", "2024.06.01"],
         }),
-        createMockNote("no-match.md", { bodyDates: ["2024.05.26"] }),
-        createMockNote("this-year.md", { bodyDates: ["2026.05.27"] }),
+        createMockNote("no-match.md", { titleOrBodyDates: ["2024.05.26"] }),
+        createMockNote("this-year.md", { titleOrBodyDates: ["2026.05.27"] }),
       ]
 
       getDateComponentsMock
@@ -219,7 +219,7 @@ describe("notes filter helpers", () => {
 
       const filtered = applyViewFilter(
         notes,
-        [{ filters: { bodyDates: "$onThisDay" }, name: "memories" }],
+        [{ filters: { titleOrBodyDates: "$onThisDay" }, name: "memories" }],
         "memories",
         { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" },
       )
@@ -294,7 +294,7 @@ const createMockNote = (
 
 const defaultMockNote = (basename: string): Note => ({
   basename,
-  bodyDates: [],
+  titleOrBodyDates: [],
   createdDate: "2026-05-26T00:00:00.000Z",
   folder: "notes",
   frontmatter: null,
