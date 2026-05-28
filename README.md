@@ -65,6 +65,26 @@ This repository is a Turborepo monorepo with this structure:
   - `obsidianVault`: vault folder name under `noteRootDirectory`.
   - `views` (optional): array of named views. Each view has `name` and `filters` where filters match note fields (for example `"folder": "downtime"` and `"frontmatter.type": "book"`). All filters are applied inclusively.
 
+## Docker Compose deployment
+
+- `docker-compose.yml` runs:
+  - `web` (nginx) on `http://localhost` for static web hosting + `/api` proxy
+  - `notes-api` as an internal service on port `3000`
+- `app.config.json` is mounted into the API container as `/app/app.config.json` (read-only).
+- Configure `noteRootDirectory` in `app.config.json` using a path valid inside the container (for example `/data/notes`).
+- Host notes are mounted into the API container with `NOTES_ROOT`:
+  - default: `./notes` on the host maps to `/data/notes`
+  - override: `NOTES_ROOT=/absolute/path/on/host docker compose up --build`
+- If local and container config values differ, create a separate Docker-specific config file and mount it to `/app/app.config.json`.
+
+Start services:
+
+```bash
+docker compose up --build
+```
+
+Optional future placeholder services are defined as `svc-x` and `svc-y` under the `future-services` profile.
+
 ## Scripts
 
 Run from repository root:
