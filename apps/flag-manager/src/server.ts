@@ -2,17 +2,14 @@ import express from "express"
 import morgan from "morgan"
 import { createClient } from "redis"
 
+import type { FlagRedisClient } from "./handlers/flags/flags.types"
+
 import { createFlagsHandler } from "./handlers/flags/flags"
 import { healthHandler } from "./handlers/health/health"
 
 type RuntimeRedisClient = FlagRedisClient & {
   connect: () => Promise<void>
   on: (event: "error", listener: (error: unknown) => void) => void
-}
-
-export type FlagRedisClient = {
-  get: (key: string) => Promise<string | null>
-  set: (key: string, value: string) => Promise<unknown>
 }
 
 export const createApp = (redisClient: FlagRedisClient) => {
