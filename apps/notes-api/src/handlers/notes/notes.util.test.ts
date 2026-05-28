@@ -82,7 +82,9 @@ describe("notes util helpers", () => {
       body: "# Welcome\n\nThis is a note.",
       frontmatter: null,
     })
-    parseMarkdownBodyDatesMock.mockReturnValue(["2026.05.26"])
+    parseMarkdownBodyDatesMock
+      .mockReturnValueOnce([])
+      .mockReturnValueOnce(["2026.05.26"])
     createFileIDMock.mockReturnValue("17e3771f-2773-5c87-8f66-6a455a878763")
     statMock.mockResolvedValue({
       birthtime: createdDate,
@@ -98,7 +100,7 @@ describe("notes util helpers", () => {
 
     expect(note).toMatchObject({
       basename: "welcome.md",
-      bodyDates: ["2026.05.26"],
+      titleOrBodyDates: ["2026.05.26"],
       createdDate: "2026-05-26T00:00:00.000Z",
       folder: "topic",
       frontmatter: null,
@@ -112,6 +114,10 @@ describe("notes util helpers", () => {
     expect(note.html).toContain("<h1>Welcome</h1>")
     expect(readFileMock).toHaveBeenCalledWith("/notes/topic/welcome.md", "utf8")
     expect(parseFrontMatterMock).toHaveBeenCalledWith("# Welcome\n\nThis is a note.")
+    expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith(
+      "welcome",
+      ["YYYY.MM.DD"],
+    )
     expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith(
       "# Welcome\n\nThis is a note.",
       ["YYYY.MM.DD"],
@@ -143,7 +149,9 @@ This is a note.`)
         topic: ["AI", "Notes"],
       },
     })
-    parseMarkdownBodyDatesMock.mockReturnValue(["2026.05.26", "26/05/27"])
+    parseMarkdownBodyDatesMock
+      .mockReturnValueOnce(["2026.05.26"])
+      .mockReturnValueOnce(["2026.05.26", "26/05/27"])
     createFileIDMock.mockReturnValue("frontmatter-id")
     statMock.mockResolvedValue({
       birthtime: createdDate,
@@ -157,7 +165,7 @@ This is a note.`)
       ["YYYY.MM.DD", "YY/MM/DD"],
     )
 
-    expect(note.bodyDates).toEqual(["2026.05.26", "26/05/27"])
+    expect(note.titleOrBodyDates).toEqual(["2026.05.26", "26/05/27"])
     expect(note.frontmatter).toEqual({
       created: "2026.05.26",
       topic: ["AI", "Notes"],
@@ -178,6 +186,10 @@ created: 2026.05.26
 # Welcome
 
 This is a note.`)
+    expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith(
+      "frontmatter",
+      ["YYYY.MM.DD", "YY/MM/DD"],
+    )
     expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith(
       "# Welcome\n\nThis is a note.",
       ["YYYY.MM.DD", "YY/MM/DD"],

@@ -78,7 +78,7 @@ describe("notes handler interface", () => {
     parseMarkdownFileMock.mockImplementation((filePath) =>
       Promise.resolve({
         basename: filePath.split("/").pop() ?? "note.md",
-        bodyDates: filePath.endsWith("a.md") ? ["2026.05.26"] : [],
+        titleOrBodyDates: filePath.endsWith("a.md") ? ["2026.05.26"] : [],
         createdDate: "2026-05-26T00:00:00.000Z",
         folder: "notes",
         frontmatter: null,
@@ -108,11 +108,11 @@ describe("notes handler interface", () => {
     expect(body.notes).toEqual([
       expect.objectContaining({
         basename: "a.md",
-        bodyDates: ["2026.05.26"],
+        titleOrBodyDates: ["2026.05.26"],
       }),
       expect.objectContaining({
         basename: "b.md",
-        bodyDates: [],
+        titleOrBodyDates: [],
       }),
     ])
     expect(resolveNotesConfigMock).toHaveBeenCalled()
@@ -158,7 +158,7 @@ describe("notes handler interface", () => {
     collectMarkdownFilesMock.mockResolvedValue(["/notes/a.md"])
     parseMarkdownFileMock.mockResolvedValue({
       basename: "a.md",
-      bodyDates: [],
+      titleOrBodyDates: [],
       createdDate: "2026-05-26T00:00:00.000Z",
       folder: "downtime",
       frontmatter: {
