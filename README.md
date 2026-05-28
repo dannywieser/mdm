@@ -52,6 +52,55 @@ This repository is a Turborepo monorepo with this structure:
       { "error": "Unable to load notes" }
       ```
 
+- `apps/flag-manager`: Express-based Redis-backed API for per-ID feature flags.
+  - `GET /health`
+    - Purpose: basic service health check
+    - Success response: `200`
+      ```json
+      { "status": "ok" }
+      ```
+  - `GET /flags/:id/:flag`
+    - Purpose: retrieve the current value of the named flag for the given ID
+    - Success response: `200`
+      ```json
+      { "id": "note-1", "flag": "read", "value": false }
+      ```
+    - Error responses: `400`, `500`
+      ```json
+      { "error": "Both id and flag path params are required" }
+      ```
+      ```json
+      { "error": "Flag \"read\" is not configured" }
+      ```
+      ```json
+      { "error": "Unable to retrieve flag" }
+      ```
+  - `POST /flags/:id/:flag` and `PATCH /flags/:id/:flag`
+    - Purpose: toggle the current value of the named flag for the given ID
+    - Flags must be pre-configured in `app.config.json` (`flags` object)
+    - Redis storage key format: `<flag>:<id>` (for example `read:note-1`)
+    - Optional per-flag expiry: set `expiresInSeconds` to apply Redis TTL on each toggle
+    - Success response: `200`
+      ```json
+      { "id": "note-1", "flag": "read", "value": true }
+      ```
+    - Error responses: `400`, `500`
+      ```json
+      { "error": "Both id and flag path params are required" }
+      ```
+      ```json
+      { "error": "Flag \"read\" is not configured" }
+      ```
+      ```json
+      { "error": "Unable to toggle flag" }
+      ```
+  - Sample curl commands:
+    ```bash
+    curl -X POST http://localhost/flags/note-1/read
+    curl -X PATCH http://localhost/flags/note-1/read
+    curl http://localhost/flags/note-1/read
+    ```
+
 - `apps/web`: React + TypeScript client using Chakra UI, TanStack Query, and React Router.
   - Single route: `/`
   - Renders notes from `GET /notes` using `NotesList` and `NotesCard`
@@ -65,12 +114,18 @@ This repository is a Turborepo monorepo with this structure:
   - `noteRootDirectory`: absolute path to your notes root directory.
   - `obsidianVault`: vault folder name under `noteRootDirectory`.
   - `views` (optional): array of named views. Each view has `name` and `filters` where filters match note fields (for example `"folder": "downtime"` and `"frontmatter.type": "book"`). All filters are applied inclusively.
+  - `flags`: object keyed by allowed flag names. Each flag definition supports optional `expiresInSeconds` (positive integer) to set Redis TTL, or omit it for non-expiring flags.
 
 ## Docker Compose deployment
 
 - `docker-compose.yml` runs:
   - `web` (nginx) on `http://localhost` for static web hosting + `/api` proxy
   - `notes-api` as an internal service on port `3000`
+  - `flag-manager` as an internal service on port `3001`
+  - `redis` as internal data storage for `flag-manager`
+- nginx routes:
+  - `/api/*` → `notes-api:3000/*`
+  - `/flags/*` → `flag-manager:3001/flags/*`
 - `app.config.json` is mounted into the API container as `/app/app.config.json` (read-only).
 - Configure `noteRootDirectory` in `app.config.json` using a path valid inside the container (for example `/data/notes`).
 - Host notes are mounted into the API container with `NOTES_ROOT`:
