@@ -12,9 +12,12 @@
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint -- --fix",
     "dev": "turbo run dev",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "changeset": "changeset",
+    "changeset:version": "changeset version"
   },
   "devDependencies": {
+    "@changesets/cli": "2.31.0",
     "@eslint/js": "9.39.4",
     "@types/express": "5.0.6",
     "@types/jest": "30.0.0",
@@ -27,8 +30,8 @@
     "prettier": "3.8.3",
     "supertest": "7.2.2",
     "ts-jest": "29.4.11",
-    "turbo": "2.9.14",
     "tsx": "4.22.3",
+    "turbo": "2.9.14",
     "typescript": "5.9.3",
     "typescript-eslint": "8.60.0"
   }
