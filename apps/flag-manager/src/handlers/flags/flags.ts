@@ -24,6 +24,7 @@ export const createFlagsHandler = (
     const normalizedFlag = flag.trim()
     const normalizedId = id.trim()
     const flagDefinition = flagDefinitions[normalizedFlag]
+    const isGetRequest = request.method === "GET"
 
     if (!flagDefinition) {
       response
@@ -37,19 +38,20 @@ export const createFlagsHandler = (
         id: normalizedId,
         flag: normalizedFlag,
       }
-      const result = request.method === "GET"
-        ? await getFlag(redisClient, input)
-        : await toggleFlag(redisClient, input, flagDefinition)
-
-      response.status(200).json(result)
-    } catch (error) {
-      if (request.method === "GET") {
-        console.error("Unable to retrieve flag", toLoggableError(error))
-        response.status(500).json({ error: "Unable to retrieve flag" })
+      if (isGetRequest) {
+        const result = await getFlag(redisClient, input)
+        response.status(200).json(result)
         return
       }
 
-      console.error("Unable to toggle flag", toLoggableError(error))
-      response.status(500).json({ error: "Unable to toggle flag" })
+      const result = await toggleFlag(redisClient, input, flagDefinition)
+      response.status(200).json(result)
+    } catch (error) {
+      const errorMessage = isGetRequest
+        ? "Unable to retrieve flag"
+        : "Unable to toggle flag"
+
+      console.error(errorMessage, toLoggableError(error))
+      response.status(500).json({ error: errorMessage })
     }
   }
