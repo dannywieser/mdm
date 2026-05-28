@@ -14,7 +14,7 @@ export const NotesCard = ({ note }: NotesCardProps) => {
   return (
     <Card.Root>
       <Card.Body gap="4">
-        <Heading size="md">{note.basename}</Heading>
+        <Heading size="md">{note.title}</Heading>
         <Box css={noteContentStyles} dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />
       </Card.Body>
     </Card.Root>

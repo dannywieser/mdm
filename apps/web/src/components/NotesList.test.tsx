@@ -11,7 +11,7 @@ vi.mock('../hooks/useNotesQuery', () => ({
 }))
 
 vi.mock('./NotesCard', () => ({
-  NotesCard: ({ note }: { note: { basename: string } }) => <div>{note.basename}</div>
+  NotesCard: ({ note }: { note: { title: string } }) => <div>{note.title}</div>
 }))
 
 describe('NotesList', () => {
@@ -36,8 +36,8 @@ describe('NotesList', () => {
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [
-          { id: '1', basename: 'Note 1' },
-          { id: '2', basename: 'Note 2' }
+          { id: '1', title: 'Note 1' },
+          { id: '2', title: 'Note 2' }
         ],
         notesDirectory: '/notes',
         obsidianVault: 'vault'
