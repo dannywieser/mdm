@@ -13,6 +13,9 @@
     "lint:fix": "turbo run lint -- --fix",
     "dev": "turbo run dev",
     "test": "turbo run test",
+    "docker:start": "docker compose up --build -d",
+    "docker:update": "docker compose pull && docker compose up --build -d",
+    "docker:stop": "docker compose down",
     "changeset": "changeset",
     "changeset:version": "changeset version"
   },

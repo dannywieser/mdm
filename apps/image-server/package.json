@@ -1,0 +1,20 @@
+{
+  "name": "image-server",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/server.js",
+  "scripts": {
+    "prebuild": "turbo run build --filter=image-server^...",
+    "predev": "turbo run build --filter=image-server^...",
+    "pretest": "turbo run build --filter=image-server^...",
+    "dev": "tsx watch --env-file=../../.env src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint src --ext .ts",
+    "test": "jest --config jest.config.cjs"
+  },
+  "dependencies": {
+    "express": "5.2.1",
+    "mdm-util": "1.0.0",
+    "morgan": "1.10.1"
+  }
+}

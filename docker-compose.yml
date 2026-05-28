@@ -6,6 +6,7 @@ services:
     depends_on:
       - notes-api
       - flag-manager
+      - image-server
     ports:
       - "80:80"
 
@@ -32,6 +33,32 @@ services:
       REDIS_URL: "redis://redis:6379"
     expose:
       - "3001"
+
+  image-server:
+    build:
+      context: .
+      dockerfile: infra/docker/image-server.Dockerfile
+    depends_on:
+      - imgproxy
+    environment:
+      PORT: "3002"
+      IMGPROXY_PATH_PREFIX: "/imgproxy"
+      IMAGES_ROOT: "/data/images"
+    expose:
+      - "3002"
+    volumes:
+      - ${IMAGES_ROOT:-./notes}:/data/images:ro
+
+  imgproxy:
+    image: darthsim/imgproxy:v3.31.0
+    environment:
+      IMGPROXY_BIND: ":8080"
+      IMGPROXY_LOCAL_FILESYSTEM_ROOT: "/"
+      IMGPROXY_USE_ETAG: "true"
+    expose:
+      - "8080"
+    volumes:
+      - ${IMAGES_ROOT:-./notes}:/data/images:ro
 
   redis:
     image: redis:8.2.1-alpine3.22

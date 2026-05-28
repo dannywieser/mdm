@@ -5,7 +5,11 @@ import path from "node:path"
 import remark from "remark"
 import remarkHtml from "remark-html"
 
+import type { MarkdownNode } from "./notes.util.types"
+
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
+const IMAGE_SERVER_PATH = "/images"
+const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
 export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 
 export const collectMarkdownFiles = async (
@@ -50,9 +54,11 @@ export const parseMarkdownFile = async (
       ...parseMarkdownBodyDates(body, dateFormats),
     ]),
   )
-  const html = await remark().use(remarkHtml).process(body)
+
   const relativePath = path.relative(notesDirectory, filePath)
   const normalizedRelativePath = relativePath.split(path.sep).join("/")
+  const markdownBody = rewriteMarkdownImageUrls(body, normalizedRelativePath)
+  const html = await remark().use(remarkHtml).process(markdownBody)
   const relativePathWithoutExtension = normalizedRelativePath.replace(
     /\.[^.]+$/,
     "",
@@ -75,5 +81,91 @@ export const parseMarkdownFile = async (
     html: String(html),
     title,
     obsidianUrl,
+  }
+}
+
+const rewriteMarkdownImageUrls = (
+  markdownBody: string,
+  noteRelativePath: string,
+): string => {
+  const markdownTree = remark().parse(markdownBody)
+
+  visitMarkdownTree(markdownTree, (node) => {
+    if (node.type !== "image" || typeof node.url !== "string") {
+      return
+    }
+
+    const imagePath = resolveLocalImagePath(node.url, noteRelativePath)
+
+    if (!imagePath) {
+      return
+    }
+
+    node.url = `${IMAGE_SERVER_PATH}?path=${encodeURIComponent(imagePath)}`
+  })
+
+  return String(remark().stringify(markdownTree))
+}
+
+const resolveLocalImagePath = (
+  rawImagePath: string,
+  noteRelativePath: string,
+): string | null => {
+  const sanitizedImagePath = rawImagePath.trim()
+
+  if (
+    !sanitizedImagePath ||
+    EXTERNAL_IMAGE_URL_PATTERN.test(sanitizedImagePath)
+  ) {
+    return null
+  }
+
+  const baseImagePath = sanitizedImagePath.split(/[?#]/)[0] ?? ""
+
+  if (!baseImagePath) {
+    return null
+  }
+
+  const decodedImagePath = safeDecodeURIComponent(baseImagePath)
+  const normalizedImagePath = path.posix.normalize(
+    decodedImagePath.startsWith("/")
+      ? decodedImagePath.replace(/^\/+/, "")
+      : path.posix.join(path.posix.dirname(noteRelativePath), decodedImagePath),
+  )
+
+  if (
+    normalizedImagePath === "" ||
+    normalizedImagePath === "." ||
+    normalizedImagePath === ".." ||
+    normalizedImagePath.startsWith("../")
+  ) {
+    return null
+  }
+
+  return normalizedImagePath
+}
+
+const visitMarkdownTree = (
+  node: MarkdownNode | undefined,
+  visitor: (node: MarkdownNode) => void,
+): void => {
+  if (!node) {
+    return
+  }
+
+  visitor(node)
+
+  if (!Array.isArray(node.children)) {
+    return
+  }
+
+  node.children.forEach((childNode) => visitMarkdownTree(childNode, visitor))
+}
+
+const safeDecodeURIComponent = (value: string): string => {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
   }
 }
