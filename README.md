@@ -60,7 +60,9 @@ This repository is a Turborepo monorepo with this structure:
       ```
   - `POST /flags/:id/:flag` and `PATCH /flags/:id/:flag`
     - Purpose: toggle the named flag for the given ID
+    - Flags must be pre-configured in `app.config.json` (`flags` object)
     - Redis storage key format: `<flag>:<id>` (for example `read:note-1`)
+    - Optional per-flag expiry: set `expiresInSeconds` to apply Redis TTL on each toggle
     - Success response: `200`
       ```json
       { "id": "note-1", "flag": "read", "value": true }
@@ -68,6 +70,9 @@ This repository is a Turborepo monorepo with this structure:
     - Error responses: `400`, `500`
       ```json
       { "error": "Both id and flag path params are required" }
+      ```
+      ```json
+      { "error": "Flag \"read\" is not configured" }
       ```
       ```json
       { "error": "Unable to toggle flag" }
@@ -86,6 +91,7 @@ This repository is a Turborepo monorepo with this structure:
   - `noteRootDirectory`: absolute path to your notes root directory.
   - `obsidianVault`: vault folder name under `noteRootDirectory`.
   - `views` (optional): array of named views. Each view has `name` and `filters` where filters match note fields (for example `"folder": "downtime"` and `"frontmatter.type": "book"`). All filters are applied inclusively.
+  - `flags`: object keyed by allowed flag names. Each flag definition supports optional `expiresInSeconds` (positive integer) to set Redis TTL, or omit it for non-expiring flags.
 
 ## Docker Compose deployment
 

@@ -21,6 +21,10 @@ describe("flagsHandler interface", () => {
     get: jest.fn(),
     set: jest.fn(),
   }
+  const flagDefinitions = {
+    archived: {},
+    read: { expiresInSeconds: 3600 },
+  }
 
   test("returns 400 when id is missing", async () => {
     const response = {
@@ -28,7 +32,7 @@ describe("flagsHandler interface", () => {
       json: jest.fn(),
     }
 
-    const handler = createFlagsHandler(redisClient)
+    const handler = createFlagsHandler(redisClient, flagDefinitions)
 
     await handler(
       { params: { id: "", flag: "read" } } as never,
@@ -49,7 +53,7 @@ describe("flagsHandler interface", () => {
       json: jest.fn(),
     }
 
-    const handler = createFlagsHandler(redisClient)
+    const handler = createFlagsHandler(redisClient, flagDefinitions)
 
     await handler(
       { params: { id: "note-1", flag: "  " } } as never,
@@ -69,7 +73,7 @@ describe("flagsHandler interface", () => {
 
     toggleFlagMock.mockResolvedValue({ id: "note-1", flag: "read", value: true })
 
-    const handler = createFlagsHandler(redisClient)
+    const handler = createFlagsHandler(redisClient, flagDefinitions)
 
     await handler(
       { params: { id: " note-1 ", flag: " read " } } as never,
@@ -77,10 +81,14 @@ describe("flagsHandler interface", () => {
       jest.fn(),
     )
 
-    expect(toggleFlagMock).toHaveBeenCalledWith(redisClient, {
-      id: "note-1",
-      flag: "read",
-    })
+    expect(toggleFlagMock).toHaveBeenCalledWith(
+      redisClient,
+      {
+        id: "note-1",
+        flag: "read",
+      },
+      { expiresInSeconds: 3600 },
+    )
     expect(response.status).toHaveBeenCalledWith(200)
     expect(response.json).toHaveBeenCalledWith({
       id: "note-1",
@@ -100,7 +108,7 @@ describe("flagsHandler interface", () => {
     toggleFlagMock.mockRejectedValue(error)
     toLoggableErrorMock.mockReturnValue({ message: "boom", stack: "stack" })
 
-    const handler = createFlagsHandler(redisClient)
+    const handler = createFlagsHandler(redisClient, flagDefinitions)
 
     await handler(
       { params: { id: "note-1", flag: "read" } } as never,
@@ -117,5 +125,26 @@ describe("flagsHandler interface", () => {
     expect(response.json).toHaveBeenCalledWith({ error: "Unable to toggle flag" })
 
     errorSpy.mockRestore()
+  })
+
+  test("returns 400 when flag is not configured", async () => {
+    const response = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    }
+
+    const handler = createFlagsHandler(redisClient, flagDefinitions)
+
+    await handler(
+      { params: { id: "note-1", flag: "unknown" } } as never,
+      response as never,
+      jest.fn(),
+    )
+
+    expect(response.status).toHaveBeenCalledWith(400)
+    expect(response.json).toHaveBeenCalledWith({
+      error: 'Flag "unknown" is not configured',
+    })
+    expect(toggleFlagMock).not.toHaveBeenCalled()
   })
 })

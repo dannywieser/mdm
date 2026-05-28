@@ -11,5 +11,11 @@
         "frontmatter.type": "book"
       }
     }
-  ]
+  ],
+  "flags": {
+    "read": {
+      "expiresInSeconds": 3600
+    },
+    "archived": {}
+  }
 }

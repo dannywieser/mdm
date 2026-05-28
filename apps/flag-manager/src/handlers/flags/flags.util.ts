@@ -1,4 +1,5 @@
 import type {
+  FlagDefinition,
   FlagRedisClient,
   ToggleFlagInput,
   ToggleFlagResult,
@@ -19,12 +20,18 @@ export const toRedisFlagValue = (value: boolean): string =>
 export const toggleFlag = async (
   redisClient: FlagRedisClient,
   input: ToggleFlagInput,
+  options?: FlagDefinition,
 ): Promise<ToggleFlagResult> => {
   const key = createFlagRedisKey(input)
   const currentValue = await redisClient.get(key)
   const nextValue = !parseFlagValue(currentValue)
+  const redisValue = toRedisFlagValue(nextValue)
 
-  await redisClient.set(key, toRedisFlagValue(nextValue))
+  if (typeof options?.expiresInSeconds === "number") {
+    await redisClient.set(key, redisValue, { EX: options.expiresInSeconds })
+  } else {
+    await redisClient.set(key, redisValue)
+  }
 
   return {
     ...input,

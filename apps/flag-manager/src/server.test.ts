@@ -18,13 +18,15 @@ const healthHandlerMock = jest.mocked(healthHandler)
 const createFlagsHandlerMock = jest.mocked(createFlagsHandler)
 
 describe("flag-manager server interface", () => {
+  const flagDefinitions = { read: {}, archived: { expiresInSeconds: 3600 } }
+
   test("wires GET /health to the health handler", async () => {
     healthHandlerMock.mockImplementation((_request, response) => {
       response.status(200).json({ status: "ok" })
     })
     createFlagsHandlerMock.mockReturnValue(jest.fn())
 
-    const app = createApp({ get: jest.fn(), set: jest.fn() })
+    const app = createApp({ get: jest.fn(), set: jest.fn() }, flagDefinitions)
 
     const response = await request(app).get("/health")
 
@@ -39,13 +41,17 @@ describe("flag-manager server interface", () => {
     }
     createFlagsHandlerMock.mockReturnValue(flagsHandler)
 
-    const app = createApp({ get: jest.fn(), set: jest.fn() })
+    const app = createApp({ get: jest.fn(), set: jest.fn() }, flagDefinitions)
 
     const response = await request(app).post("/flags/note-1/read")
 
     expect(response.status).toBe(200)
     expect(response.body).toEqual({ id: "note-1", flag: "read", value: true })
     expect(createFlagsHandlerMock).toHaveBeenCalledTimes(1)
+    expect(createFlagsHandlerMock).toHaveBeenCalledWith(
+      expect.any(Object),
+      flagDefinitions,
+    )
   })
 
   test("wires PATCH /flags/:id/:flag to the flags handler", async () => {
@@ -54,7 +60,7 @@ describe("flag-manager server interface", () => {
     }
     createFlagsHandlerMock.mockReturnValue(flagsHandler)
 
-    const app = createApp({ get: jest.fn(), set: jest.fn() })
+    const app = createApp({ get: jest.fn(), set: jest.fn() }, flagDefinitions)
 
     const response = await request(app).patch("/flags/note-1/read")
 

@@ -52,4 +52,20 @@ describe("flags util", () => {
     expect(redisClient.set).toHaveBeenCalledWith("read:a", "false")
     expect(result).toEqual({ id: "a", flag: "read", value: false })
   })
+
+  test("sets redis expiry when flag definition includes expiresInSeconds", async () => {
+    const redisClient: FlagRedisClient = {
+      get: jest.fn().mockResolvedValue(null),
+      set: jest.fn().mockResolvedValue("OK"),
+    }
+
+    const result = await toggleFlag(
+      redisClient,
+      { id: "a", flag: "read" },
+      { expiresInSeconds: 120 },
+    )
+
+    expect(redisClient.set).toHaveBeenCalledWith("read:a", "true", { EX: 120 })
+    expect(result).toEqual({ id: "a", flag: "read", value: true })
+  })
 })
