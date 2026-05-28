@@ -114,8 +114,8 @@ This repository is a Turborepo monorepo with this structure:
       { "status": "ok" }
       ```
   - `GET /images?path=<relative-note-image-path>`
-    - Purpose: proxy local note image files through imgproxy with default fit resizing
-    - Success response: proxied image bytes from imgproxy
+    - Purpose: validate local note image paths and redirect through imgproxy with default fit resizing
+    - Success response: `307` redirect to imgproxy-backed path
     - Error responses: `400`
       ```json
       { "error": "A valid local image path is required" }
@@ -144,6 +144,7 @@ This repository is a Turborepo monorepo with this structure:
   - `/api/*` → `notes-api:3000/*`
   - `/flags/*` → `flag-manager:3001/flags/*`
   - `/images*` → `image-server:3002/images*`
+  - `/imgproxy/*` → `imgproxy:8080/*` (used by `image-server` redirects)
 - `app.config.json` is mounted into the API container as `/app/app.config.json` (read-only).
 - Configure `noteRootDirectory` in `app.config.json` using a path valid inside the container (for example `/data/notes`).
 - Host notes are mounted into the API container with `NOTES_ROOT`:

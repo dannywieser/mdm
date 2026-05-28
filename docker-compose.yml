@@ -42,7 +42,7 @@ services:
       - imgproxy
     environment:
       PORT: "3002"
-      IMGPROXY_BASE_URL: "http://imgproxy:8080"
+      IMGPROXY_PATH_PREFIX: "/imgproxy"
       IMAGES_ROOT: "/data/images"
     expose:
       - "3002"

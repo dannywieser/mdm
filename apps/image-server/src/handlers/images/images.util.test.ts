@@ -1,4 +1,4 @@
-import { buildImgproxyUrl, resolveImagePath } from "./images.util"
+import { buildImgproxyUrlPath, resolveImagePath } from "./images.util"
 
 describe("image util helpers", () => {
   test("resolveImagePath allows safe local paths", () => {
@@ -14,16 +14,15 @@ describe("image util helpers", () => {
     expect(resolveImagePath("data:image/png;base64,abc")).toBeNull()
   })
 
-  test("buildImgproxyUrl creates imgproxy local plain url", () => {
+  test("buildImgproxyUrlPath creates imgproxy local plain path", () => {
     expect(
-      buildImgproxyUrl({
+      buildImgproxyUrlPath({
         imagePath: "daily/photo one.jpg",
         imagesRoot: "/data/images",
-        imgproxyBaseUrl: "http://imgproxy:8080",
         maxWidth: 800,
       }),
     ).toBe(
-      "http://imgproxy:8080/unsafe/rs:fit:800:0:0/plain/local:///data/images/daily/photo%20one.jpg",
+      "/unsafe/rs:fit:800:0:0/plain/local:///data/images/daily/photo%20one.jpg",
     )
   })
 })

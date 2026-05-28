@@ -7,7 +7,6 @@ export const DEFAULT_MAX_WIDTH = 1600
 interface BuildImgproxyUrlOptions {
   imagePath: string
   imagesRoot: string
-  imgproxyBaseUrl: string
   maxWidth: number
 }
 
@@ -33,15 +32,14 @@ export const resolveImagePath = (imagePath: string): string | null => {
   return sanitizedPath
 }
 
-export const buildImgproxyUrl = ({
+export const buildImgproxyUrlPath = ({
   imagePath,
   imagesRoot,
-  imgproxyBaseUrl,
   maxWidth,
 }: BuildImgproxyUrlOptions): string => {
   const sourcePath = path.posix.join(imagesRoot, imagePath)
   const sourceUrl = encodeURI(`local://${sourcePath}`)
   const resizeOption = `rs:fit:${maxWidth}:0:0`
 
-  return `${imgproxyBaseUrl}/unsafe/${resizeOption}/plain/${sourceUrl}`
+  return `/unsafe/${resizeOption}/plain/${sourceUrl}`
 }
