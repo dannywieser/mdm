@@ -1,4 +1,9 @@
-import { createContext, type ReactNode, useContext } from "react"
+import {
+  createContext,
+  createElement,
+  type ReactNode,
+  useContext,
+} from "react"
 
 type Locale = "en"
 type TranslationKey =
@@ -49,9 +54,7 @@ export const I18nProvider = ({ children, locale = "en" }: I18nProviderProps) => 
   const t = (key: TranslationKey, values?: Record<string, string | number>) =>
     translate(key, values, locale)
 
-  return (
-    <i18nContext.Provider value={{ locale, t }}>{children}</i18nContext.Provider>
-  )
+  return createElement(i18nContext.Provider, { value: { locale, t } }, children)
 }
 
 export const useI18n = (): I18nContextValue => useContext(i18nContext)
