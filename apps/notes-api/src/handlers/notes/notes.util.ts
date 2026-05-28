@@ -44,10 +44,12 @@ export const parseMarkdownFile = async (
   const { body, frontmatter } = parseFrontMatter(source)
   const basename = path.basename(filePath)
   const title = basename.endsWith(".md") ? basename.slice(0, -3) : basename
-  const titleOrBodyDates = [
-    ...parseMarkdownBodyDates(title, dateFormats),
-    ...parseMarkdownBodyDates(body, dateFormats),
-  ].filter((value, index, values) => values.indexOf(value) === index)
+  const titleOrBodyDates = Array.from(
+    new Set([
+      ...parseMarkdownBodyDates(title, dateFormats),
+      ...parseMarkdownBodyDates(body, dateFormats),
+    ]),
+  )
   const html = await remark().use(remarkHtml).process(body)
   const relativePath = path.relative(notesDirectory, filePath)
   const normalizedRelativePath = relativePath.split(path.sep).join("/")
