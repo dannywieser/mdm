@@ -112,10 +112,7 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
 
   cachedNotesConfig = {
     dateFormats: appConfig.dateFormats ?? [],
-    notesDirectory: path.resolve(
-      appConfig.noteRootDirectory,
-      appConfig.obsidianVault,
-    ),
+    notesDirectory: path.resolve(appConfig.noteRootDirectory),
     obsidianVault: appConfig.obsidianVault,
     timezone: appConfig.timezone ?? "UTC",
     views: appConfig.views ?? [],
