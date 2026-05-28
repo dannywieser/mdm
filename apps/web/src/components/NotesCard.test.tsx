@@ -15,6 +15,7 @@ const noteFixture: Note = {
   html: '<p>Hello</p>',
   id: 'my-note',
   modifiedDate: '2026-01-01',
+  obsidianUrl: 'obsidian://open?vault=dgw&file=daily%2Fmy-note',
   title: 'My Note Title'
 }
 

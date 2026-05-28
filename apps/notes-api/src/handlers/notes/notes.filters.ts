@@ -16,6 +16,7 @@ const matchesOnThisDay = (
   context: ViewFilterContext,
 ): boolean => {
   const today = getDateComponents(new Date(), context.timezone)
+  console.log(`[notes/filter] $onThisDay: today=${JSON.stringify(today)} timezone="${context.timezone}" noteValue=${JSON.stringify(noteValue)}`)
 
   if (typeof noteValue === "string") {
     const date = new Date(noteValue)
@@ -77,13 +78,14 @@ const matchesViewFilters = (
   filters: Record<string, string>,
   context: ViewFilterContext,
 ): boolean =>
-  Object.entries(filters).every(([filterPath, expectedValue]) =>
-    isMatchingFilterValue(
-      getValueByPath(note, filterPath),
-      expectedValue,
-      context,
-    ),
-  )
+  Object.entries(filters).every(([filterPath, expectedValue]) => {
+    const noteValue = getValueByPath(note, filterPath)
+    const matches = isMatchingFilterValue(noteValue, expectedValue, context)
+    if (!matches) {
+      console.log(`[notes/filter] "${note.basename}" excluded: ${filterPath}=${JSON.stringify(noteValue)} did not match expected="${expectedValue}"`)
+    }
+    return matches
+  })
 
 export const applyViewFilter = (
   notes: readonly Note[],

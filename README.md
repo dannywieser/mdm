@@ -31,6 +31,7 @@ This repository is a Turborepo monorepo with this structure:
             "bodyDates": ["2026.05.26"],
             "id": "welcome",
             "folder": "notes",
+            "obsidianUrl": "obsidian://open?vault=vault-name&file=welcome",
             "frontmatter": {
               "topic": ["AI"],
               "created": "2026.05.26"
@@ -148,5 +149,14 @@ Run from repository root:
 - `turbo run lint -- --fix` - run ESLint with auto-fixes where possible
 - `turbo run build` - build workspace packages/apps
 - `turbo run test` - run workspace tests
+- `npm run changeset` - create a new changeset entry for user-visible changes
+- `npm run changeset:version` - apply pending changesets (versions + changelog updates)
 
 Equivalent npm script aliases are available: `npm run lint`, `npm run lint:fix`, `npm run build`, and `npm test`.
+
+## Changesets workflow
+
+- This repo uses [Changesets](https://github.com/changesets/changesets) for a single monorepo release track.
+- All workspaces are configured in one fixed release group, so versioning stays aligned across the repo instead of separate package tracks.
+- For user-visible changes, add a changeset in your PR (`npm run changeset`) and write a short summary of what changed.
+- Run `npm run changeset:version` when preparing a release/changelog update to consume pending entries.

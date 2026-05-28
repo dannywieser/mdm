@@ -14,6 +14,7 @@ export interface Note {
   html: string
   id: string
   modifiedDate: string
+  obsidianUrl: string
   title: string
 }
 

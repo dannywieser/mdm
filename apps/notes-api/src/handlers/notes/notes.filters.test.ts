@@ -302,5 +302,8 @@ const defaultMockNote = (basename: string): Note => ({
   html: "<h1>Note</h1>",
   id: basename.replace(/\.[^.]+$/, ""),
   modifiedDate: "2026-05-26T01:00:00.000Z",
+  obsidianUrl: `obsidian://open?vault=vault&file=${encodeURI(
+    basename.replace(/\.[^.]+$/, ""),
+  )}`,
   title: basename.replace(/\.md$/, ""),
 })
