@@ -299,6 +299,60 @@ This is a note.`)
     )
   })
 
+  test("parseMarkdownFile rewrites obsidian wikilink image embeds to attachment path", async () => {
+    readFileMock.mockResolvedValue(
+      "![[attach-20260523155741791.jpg]]",
+    )
+    parseFrontMatterMock.mockReturnValue({
+      body: "![[attach-20260523155741791.jpg]]",
+      frontmatter: null,
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await parseMarkdownFile(
+      "/notes/folder/file-name.md",
+      "/notes",
+      "vault",
+      [],
+      "attachments",
+    )
+
+    expect(note.html).toContain(
+      '<img src="/images?path=attachments%2Ffolder%2Ffile-name%2Fattach-20260523155741791.jpg"',
+    )
+  })
+
+  test("parseMarkdownFile strips pipe alias from obsidian wikilink image embeds", async () => {
+    readFileMock.mockResolvedValue("![[attach-20260523155741791.jpg|200]]")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![[attach-20260523155741791.jpg|200]]",
+      frontmatter: null,
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await parseMarkdownFile(
+      "/notes/root-note.md",
+      "/notes",
+      "vault",
+      [],
+      "attachments",
+    )
+
+    expect(note.html).toContain(
+      '<img src="/images?path=attachments%2Froot-note%2Fattach-20260523155741791.jpg"',
+    )
+  })
+
   test("parseMarkdownFile rewrites relative markdown images to image server urls", async () => {
     readFileMock.mockResolvedValue("![Screenshot](./assets/home%20page.png)")
     parseFrontMatterMock.mockReturnValue({

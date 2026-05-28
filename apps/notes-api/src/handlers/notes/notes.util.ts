@@ -10,6 +10,7 @@ import type { MarkdownNode } from "./notes.util.types"
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
 const IMAGE_SERVER_PATH = "/images"
 const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
+const OBSIDIAN_WIKILINK_EMBED_PATTERN = /!\[\[([^\]|]+)(?:\|[^\]]*)?]]/g
 export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 
 export const collectMarkdownFiles = async (
@@ -90,7 +91,8 @@ const rewriteMarkdownImageUrls = (
   noteRelativePath: string,
   attachmentsDirectory: string,
 ): string => {
-  const markdownTree = remark().parse(markdownBody)
+  const normalizedBody = normalizeObsidianWikiEmbeds(markdownBody)
+  const markdownTree = remark().parse(normalizedBody)
 
   visitMarkdownTree(markdownTree, (node) => {
     if (node.type !== "image" || typeof node.url !== "string") {
@@ -108,6 +110,9 @@ const rewriteMarkdownImageUrls = (
 
   return String(remark().stringify(markdownTree))
 }
+
+const normalizeObsidianWikiEmbeds = (markdownBody: string): string =>
+  markdownBody.replace(OBSIDIAN_WIKILINK_EMBED_PATTERN, "![]($1)")
 
 const resolveLocalImagePath = (
   rawImagePath: string,
