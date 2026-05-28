@@ -13,7 +13,7 @@ export interface ImageProxyConfig {
 }
 
 export const createImageHandler = (config: ImageProxyConfig): RequestHandler => {
-  return async (request, response) => {
+  return (request, response) => {
     const sourcePath =
       typeof request.query["path"] === "string" ? request.query["path"] : ""
     const resolvedImagePath = resolveImagePath(sourcePath)

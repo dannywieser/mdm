@@ -5,16 +5,12 @@ import path from "node:path"
 import remark from "remark"
 import remarkHtml from "remark-html"
 
+import type { MarkdownNode } from "./notes.util.types"
+
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
 const IMAGE_SERVER_PATH = "/images"
 const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
 export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
-
-interface MarkdownNode {
-  children?: MarkdownNode[]
-  type?: string
-  url?: string
-}
 
 export const collectMarkdownFiles = async (
   directory: string,
