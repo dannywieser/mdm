@@ -51,6 +51,28 @@ This repository is a Turborepo monorepo with this structure:
       { "error": "Unable to load notes" }
       ```
 
+- `apps/flag-manager`: Express-based Redis-backed API for per-ID feature flags.
+  - `GET /health`
+    - Purpose: basic service health check
+    - Success response: `200`
+      ```json
+      { "status": "ok" }
+      ```
+  - `POST /flags/:id/:flag` and `PATCH /flags/:id/:flag`
+    - Purpose: toggle the named flag for the given ID
+    - Redis storage key format: `<flag>:<id>` (for example `read:note-1`)
+    - Success response: `200`
+      ```json
+      { "id": "note-1", "flag": "read", "value": true }
+      ```
+    - Error responses: `400`, `500`
+      ```json
+      { "error": "Both id and flag path params are required" }
+      ```
+      ```json
+      { "error": "Unable to toggle flag" }
+      ```
+
 - `apps/web`: React + TypeScript client using Chakra UI, TanStack Query, and React Router.
   - Single route: `/`
   - Renders notes from `GET /notes` using `NotesList` and `NotesCard`
@@ -70,6 +92,11 @@ This repository is a Turborepo monorepo with this structure:
 - `docker-compose.yml` runs:
   - `web` (nginx) on `http://localhost` for static web hosting + `/api` proxy
   - `notes-api` as an internal service on port `3000`
+  - `flag-manager` as an internal service on port `3001`
+  - `redis` as internal data storage for `flag-manager`
+- nginx routes:
+  - `/api/*` → `notes-api:3000/*`
+  - `/flags/*` → `flag-manager:3001/flags/*`
 - `app.config.json` is mounted into the API container as `/app/app.config.json` (read-only).
 - Configure `noteRootDirectory` in `app.config.json` using a path valid inside the container (for example `/data/notes`).
 - Host notes are mounted into the API container with `NOTES_ROOT`:
