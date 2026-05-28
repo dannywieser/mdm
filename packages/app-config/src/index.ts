@@ -88,9 +88,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   }
 
   return {
-    attachmentsDirectory: isNonEmptyString(attachmentsDirectory)
-      ? attachmentsDirectory
-      : undefined,
+    attachmentsDirectory: attachmentsDirectory as string | undefined,
     dateFormats,
     noteRootDirectory,
     obsidianVault,

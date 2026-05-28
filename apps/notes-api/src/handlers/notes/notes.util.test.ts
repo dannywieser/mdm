@@ -96,6 +96,7 @@ describe("notes util helpers", () => {
       "/notes",
       "dgw",
       ["YYYY.MM.DD"],
+      "attachments",
     )
     expect(note).toMatchObject({
       basename: "welcome.md",
