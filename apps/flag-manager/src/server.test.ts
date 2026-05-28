@@ -54,6 +54,21 @@ describe("flag-manager server interface", () => {
     )
   })
 
+  test("wires GET /flags/:id/:flag to the flags handler", async () => {
+    const flagsHandler: RequestHandler = (_request, response) => {
+      response.status(200).json({ id: "note-1", flag: "read", value: true })
+    }
+    createFlagsHandlerMock.mockReturnValue(flagsHandler)
+
+    const app = createApp({ get: jest.fn(), set: jest.fn() }, flagDefinitions)
+
+    const response = await request(app).get("/flags/note-1/read")
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({ id: "note-1", flag: "read", value: true })
+    expect(createFlagsHandlerMock).toHaveBeenCalledTimes(1)
+  })
+
   test("wires PATCH /flags/:id/:flag to the flags handler", async () => {
     const flagsHandler: RequestHandler = (_request, response) => {
       response.status(200).json({ id: "note-1", flag: "read", value: false })

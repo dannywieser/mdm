@@ -25,6 +25,7 @@ export const createApp = (
   const flagsHandler = createFlagsHandler(redisClient, flagDefinitions)
 
   app.get("/health", healthHandler)
+  app.get("/flags/:id/:flag", flagsHandler)
   app.post("/flags/:id/:flag", flagsHandler)
   app.patch("/flags/:id/:flag", flagsHandler)
 

@@ -3,16 +3,18 @@ import { toLoggableError } from "mdm-util"
 import type { FlagRedisClient } from "./flags.types"
 
 import { createFlagsHandler } from "./flags"
-import { toggleFlag } from "./flags.util"
+import { getFlag, toggleFlag } from "./flags.util"
 
 jest.mock("mdm-util", () => ({
   toLoggableError: jest.fn(),
 }))
 
 jest.mock("./flags.util", () => ({
+  getFlag: jest.fn(),
   toggleFlag: jest.fn(),
 }))
 
+const getFlagMock = jest.mocked(getFlag)
 const toggleFlagMock = jest.mocked(toggleFlag)
 const toLoggableErrorMock = jest.mocked(toLoggableError)
 
@@ -97,6 +99,35 @@ describe("flagsHandler interface", () => {
     })
   })
 
+  test("gets the requested flag and returns the current value", async () => {
+    const response = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    }
+
+    getFlagMock.mockResolvedValue({ id: "note-1", flag: "read", value: false })
+
+    const handler = createFlagsHandler(redisClient, flagDefinitions)
+
+    await handler(
+      { method: "GET", params: { id: " note-1 ", flag: " read " } } as never,
+      response as never,
+      jest.fn(),
+    )
+
+    expect(getFlagMock).toHaveBeenCalledWith(redisClient, {
+      id: "note-1",
+      flag: "read",
+    })
+    expect(toggleFlagMock).not.toHaveBeenCalled()
+    expect(response.status).toHaveBeenCalledWith(200)
+    expect(response.json).toHaveBeenCalledWith({
+      id: "note-1",
+      flag: "read",
+      value: false,
+    })
+  })
+
   test("returns 500 when toggling fails", async () => {
     const response = {
       status: jest.fn().mockReturnThis(),
@@ -123,6 +154,36 @@ describe("flagsHandler interface", () => {
     })
     expect(response.status).toHaveBeenCalledWith(500)
     expect(response.json).toHaveBeenCalledWith({ error: "Unable to toggle flag" })
+
+    errorSpy.mockRestore()
+  })
+
+  test("returns 500 when retrieving fails", async () => {
+    const response = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    }
+    const errorSpy = jest.spyOn(console, "error").mockImplementation()
+
+    const error = new Error("boom")
+    getFlagMock.mockRejectedValue(error)
+    toLoggableErrorMock.mockReturnValue({ message: "boom", stack: "stack" })
+
+    const handler = createFlagsHandler(redisClient, flagDefinitions)
+
+    await handler(
+      { method: "GET", params: { id: "note-1", flag: "read" } } as never,
+      response as never,
+      jest.fn(),
+    )
+
+    expect(toLoggableErrorMock).toHaveBeenCalledWith(error)
+    expect(errorSpy).toHaveBeenCalledWith("Unable to retrieve flag", {
+      message: "boom",
+      stack: "stack",
+    })
+    expect(response.status).toHaveBeenCalledWith(500)
+    expect(response.json).toHaveBeenCalledWith({ error: "Unable to retrieve flag" })
 
     errorSpy.mockRestore()
   })

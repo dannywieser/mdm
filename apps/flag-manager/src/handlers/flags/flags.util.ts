@@ -17,6 +17,19 @@ export const parseFlagValue = (value: string | null): boolean =>
 export const toRedisFlagValue = (value: boolean): string =>
   value ? TRUE_VALUE : FALSE_VALUE
 
+export const getFlag = async (
+  redisClient: FlagRedisClient,
+  input: ToggleFlagInput,
+): Promise<ToggleFlagResult> => {
+  const key = createFlagRedisKey(input)
+  const currentValue = await redisClient.get(key)
+
+  return {
+    ...input,
+    value: parseFlagValue(currentValue),
+  }
+}
+
 export const toggleFlag = async (
   redisClient: FlagRedisClient,
   input: ToggleFlagInput,

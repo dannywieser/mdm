@@ -2,6 +2,7 @@ import type { FlagRedisClient } from "./flags.types"
 
 import {
   createFlagRedisKey,
+  getFlag,
   parseFlagValue,
   toRedisFlagValue,
   toggleFlag,
@@ -38,6 +39,19 @@ describe("flags util", () => {
 
     expect(redisClient.get).toHaveBeenCalledWith("read:a")
     expect(redisClient.set).toHaveBeenCalledWith("read:a", "true")
+    expect(result).toEqual({ id: "a", flag: "read", value: true })
+  })
+
+  test("returns current flag value without mutating redis", async () => {
+    const redisClient: FlagRedisClient = {
+      get: jest.fn().mockResolvedValue("true"),
+      set: jest.fn().mockResolvedValue("OK"),
+    }
+
+    const result = await getFlag(redisClient, { id: "a", flag: "read" })
+
+    expect(redisClient.get).toHaveBeenCalledWith("read:a")
+    expect(redisClient.set).not.toHaveBeenCalled()
     expect(result).toEqual({ id: "a", flag: "read", value: true })
   })
 

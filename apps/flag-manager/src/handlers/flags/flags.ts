@@ -4,7 +4,7 @@ import { toLoggableError } from "mdm-util"
 
 import type { FlagDefinition, FlagRedisClient } from "./flags.types"
 
-import { toggleFlag } from "./flags.util"
+import { getFlag, toggleFlag } from "./flags.util"
 
 const isValidPathValue = (value: unknown): value is string =>
   typeof value === "string" && value.trim().length > 0
@@ -33,13 +33,22 @@ export const createFlagsHandler = (
     }
 
     try {
-      const result = await toggleFlag(redisClient, {
+      const input = {
         id: normalizedId,
         flag: normalizedFlag,
-      }, flagDefinition)
+      }
+      const result = request.method === "GET"
+        ? await getFlag(redisClient, input)
+        : await toggleFlag(redisClient, input, flagDefinition)
 
       response.status(200).json(result)
     } catch (error) {
+      if (request.method === "GET") {
+        console.error("Unable to retrieve flag", toLoggableError(error))
+        response.status(500).json({ error: "Unable to retrieve flag" })
+        return
+      }
+
       console.error("Unable to toggle flag", toLoggableError(error))
       response.status(500).json({ error: "Unable to toggle flag" })
     }

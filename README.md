@@ -58,8 +58,24 @@ This repository is a Turborepo monorepo with this structure:
       ```json
       { "status": "ok" }
       ```
+  - `GET /flags/:id/:flag`
+    - Purpose: retrieve the current value of the named flag for the given ID
+    - Success response: `200`
+      ```json
+      { "id": "note-1", "flag": "read", "value": false }
+      ```
+    - Error responses: `400`, `500`
+      ```json
+      { "error": "Both id and flag path params are required" }
+      ```
+      ```json
+      { "error": "Flag \"read\" is not configured" }
+      ```
+      ```json
+      { "error": "Unable to retrieve flag" }
+      ```
   - `POST /flags/:id/:flag` and `PATCH /flags/:id/:flag`
-    - Purpose: toggle the named flag for the given ID
+    - Purpose: toggle the current value of the named flag for the given ID
     - Flags must be pre-configured in `app.config.json` (`flags` object)
     - Redis storage key format: `<flag>:<id>` (for example `read:note-1`)
     - Optional per-flag expiry: set `expiresInSeconds` to apply Redis TTL on each toggle
@@ -77,6 +93,12 @@ This repository is a Turborepo monorepo with this structure:
       ```json
       { "error": "Unable to toggle flag" }
       ```
+  - Sample curl commands:
+    ```bash
+    curl -X POST http://localhost/flags/note-1/read
+    curl -X PATCH http://localhost/flags/note-1/read
+    curl http://localhost/flags/note-1/read
+    ```
 
 - `apps/web`: React + TypeScript client using Chakra UI, TanStack Query, and React Router.
   - Single route: `/`
