@@ -183,4 +183,29 @@ This is a note.`)
       ["YYYY.MM.DD", "YY/MM/DD"],
     )
   })
+
+  test("parseMarkdownFile escapes obsidian file path and strips extension", async () => {
+    readFileMock.mockResolvedValue("content")
+    parseFrontMatterMock.mockReturnValue({
+      body: "content",
+      frontmatter: null,
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await parseMarkdownFile(
+      "/notes/daily/2026.05.27 (Wed) á.md",
+      "/notes",
+      "vault name",
+      [],
+    )
+
+    expect(note.obsidianUrl).toBe(
+      "obsidian://open?vault=vault%20name&file=daily%2F2026.05.27%20(Wed)%20%C3%A1",
+    )
+  })
 })

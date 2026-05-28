@@ -86,7 +86,7 @@ describe("notes handler interface", () => {
         html: "<h1>Note</h1>",
         id: pathToId(filePath),
         modifiedDate: "2026-05-26T00:00:00.000Z",
-        obsidianUrl: `obsidian://open?vault=vault&file=${encodeURIComponent(pathToId(filePath))}`,
+        obsidianUrl: `obsidian://open?vault=vault&file=${encodeURI(pathToId(filePath))}`,
         title: (filePath.split("/").pop() ?? "note.md").replace(/\.md$/, ""),
       }),
     )

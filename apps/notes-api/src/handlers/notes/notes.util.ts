@@ -46,11 +46,17 @@ export const parseMarkdownFile = async (
   const html = await remark().use(remarkHtml).process(body)
   const basename = path.basename(filePath)
   const title = basename.endsWith(".md") ? basename.slice(0, -3) : basename
-  const relativePathWithoutExtension = path
-    .relative(notesDirectory, filePath)
-    .replace(/\.[^.]+$/, "")
-    .replace(/\\/g, "/")
-  const obsidianUrl = `obsidian://open?vault=${encodeURIComponent(obsidianVault)}&file=${encodeURIComponent(relativePathWithoutExtension)}`
+  const relativePath = path.relative(notesDirectory, filePath)
+  const normalizedRelativePath = relativePath.split(path.sep).join("/")
+  const relativePathWithoutExtension = normalizedRelativePath.replace(
+    /\.[^.]+$/,
+    "",
+  )
+  const escapedFilePath = relativePathWithoutExtension
+    .split("/")
+    .map((segment) => encodeURI(segment))
+    .join("%2F")
+  const obsidianUrl = `obsidian://open?vault=${encodeURIComponent(obsidianVault)}&file=${escapedFilePath}`
 
   return {
     createdDate: stats.birthtime.toISOString(),
