@@ -97,7 +97,6 @@ describe("notes util helpers", () => {
       "dgw",
       ["YYYY.MM.DD"],
     )
-
     expect(note).toMatchObject({
       basename: "welcome.md",
       titleOrBodyDates: ["2026.05.26"],
@@ -218,6 +217,84 @@ This is a note.`)
 
     expect(note.obsidianUrl).toBe(
       "obsidian://open?vault=vault%20name&file=daily%2F2026.05.27%20(Wed)%20%C3%A1",
+    )
+  })
+
+  test("parseMarkdownFile rewrites bare-filename images to obsidian attachment path in subfolder note", async () => {
+    readFileMock.mockResolvedValue("![](attach-20260525090751252.jpg)")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![](attach-20260525090751252.jpg)",
+      frontmatter: null,
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await parseMarkdownFile(
+      "/notes/folder/file-name.md",
+      "/notes",
+      "vault",
+      [],
+      "attachments",
+    )
+
+    expect(note.html).toContain(
+      '<img src="/images?path=attachments%2Ffolder%2Ffile-name%2Fattach-20260525090751252.jpg"',
+    )
+  })
+
+  test("parseMarkdownFile rewrites bare-filename images to obsidian attachment path in root note", async () => {
+    readFileMock.mockResolvedValue("![](attach-123.jpg)")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![](attach-123.jpg)",
+      frontmatter: null,
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await parseMarkdownFile(
+      "/notes/root-note.md",
+      "/notes",
+      "vault",
+      [],
+      "attachments",
+    )
+
+    expect(note.html).toContain(
+      '<img src="/images?path=attachments%2Froot-note%2Fattach-123.jpg"',
+    )
+  })
+
+  test("parseMarkdownFile uses configured attachmentsDirectory for bare-filename images", async () => {
+    readFileMock.mockResolvedValue("![](photo.png)")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![](photo.png)",
+      frontmatter: null,
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await parseMarkdownFile(
+      "/notes/topic/note.md",
+      "/notes",
+      "vault",
+      [],
+      "assets",
+    )
+
+    expect(note.html).toContain(
+      '<img src="/images?path=assets%2Ftopic%2Fnote%2Fphoto.png"',
     )
   })
 

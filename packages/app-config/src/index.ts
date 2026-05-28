@@ -35,6 +35,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   }
 
   const parsedConfig = appConfig as Record<string, unknown>
+  const attachmentsDirectory = parsedConfig["attachmentsDirectory"]
   const dateFormats = parsedConfig["dateFormats"]
   const noteRootDirectory = parsedConfig["noteRootDirectory"]
   const obsidianVault = parsedConfig["obsidianVault"]
@@ -50,6 +51,15 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   if (!isNonEmptyString(obsidianVault)) {
     throw new AppConfigError(
       "app.config.json requires a non-empty obsidianVault value",
+    )
+  }
+
+  if (
+    attachmentsDirectory !== undefined &&
+    !isNonEmptyString(attachmentsDirectory)
+  ) {
+    throw new AppConfigError(
+      "app.config.json attachmentsDirectory must be a non-empty string",
     )
   }
 
@@ -78,6 +88,9 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   }
 
   return {
+    attachmentsDirectory: isNonEmptyString(attachmentsDirectory)
+      ? attachmentsDirectory
+      : undefined,
     dateFormats,
     noteRootDirectory,
     obsidianVault,
@@ -111,6 +124,7 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
   const appConfig = validateAppConfig(parsedAppConfig)
 
   cachedNotesConfig = {
+    attachmentsDirectory: appConfig.attachmentsDirectory ?? "attachments",
     dateFormats: appConfig.dateFormats ?? [],
     notesDirectory: path.resolve(appConfig.noteRootDirectory),
     obsidianVault: appConfig.obsidianVault,

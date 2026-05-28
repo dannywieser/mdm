@@ -40,6 +40,7 @@ export const parseMarkdownFile = async (
   notesDirectory: string,
   obsidianVault: string,
   dateFormats: readonly string[] = [],
+  attachmentsDirectory: string = "attachments",
 ): Promise<Note> => {
   const [source, stats] = await Promise.all([
     fs.readFile(filePath, "utf8"),
@@ -57,7 +58,7 @@ export const parseMarkdownFile = async (
 
   const relativePath = path.relative(notesDirectory, filePath)
   const normalizedRelativePath = relativePath.split(path.sep).join("/")
-  const markdownBody = rewriteMarkdownImageUrls(body, normalizedRelativePath)
+  const markdownBody = rewriteMarkdownImageUrls(body, normalizedRelativePath, attachmentsDirectory)
   const html = await remark().use(remarkHtml).process(markdownBody)
   const relativePathWithoutExtension = normalizedRelativePath.replace(
     /\.[^.]+$/,
@@ -87,6 +88,7 @@ export const parseMarkdownFile = async (
 const rewriteMarkdownImageUrls = (
   markdownBody: string,
   noteRelativePath: string,
+  attachmentsDirectory: string,
 ): string => {
   const markdownTree = remark().parse(markdownBody)
 
@@ -95,7 +97,7 @@ const rewriteMarkdownImageUrls = (
       return
     }
 
-    const imagePath = resolveLocalImagePath(node.url, noteRelativePath)
+    const imagePath = resolveLocalImagePath(node.url, noteRelativePath, attachmentsDirectory)
 
     if (!imagePath) {
       return
@@ -110,6 +112,7 @@ const rewriteMarkdownImageUrls = (
 const resolveLocalImagePath = (
   rawImagePath: string,
   noteRelativePath: string,
+  attachmentsDirectory: string,
 ): string | null => {
   const sanitizedImagePath = rawImagePath.trim()
 
@@ -127,6 +130,18 @@ const resolveLocalImagePath = (
   }
 
   const decodedImagePath = safeDecodeURIComponent(baseImagePath)
+
+  if (!decodedImagePath.includes("/")) {
+    const noteDir = path.posix.dirname(noteRelativePath)
+    const noteStem = path.posix.basename(noteRelativePath).replace(/\.[^.]+$/, "")
+    const attachmentSubPath =
+      noteDir === "."
+        ? path.posix.join(attachmentsDirectory, noteStem, decodedImagePath)
+        : path.posix.join(attachmentsDirectory, noteDir, noteStem, decodedImagePath)
+
+    return attachmentSubPath
+  }
+
   const normalizedImagePath = path.posix.normalize(
     decodedImagePath.startsWith("/")
       ? decodedImagePath.replace(/^\/+/, "")

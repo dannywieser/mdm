@@ -4,6 +4,7 @@ export interface NotesView {
 }
 
 export interface ResolvedNotesConfig {
+  attachmentsDirectory: string
   dateFormats: string[]
   notesDirectory: string
   obsidianVault: string
@@ -12,6 +13,7 @@ export interface ResolvedNotesConfig {
 }
 
 export interface AppConfig {
+  attachmentsDirectory?: string
   dateFormats?: string[]
   noteRootDirectory: string
   obsidianVault: string

@@ -61,6 +61,7 @@ describe("notes handler interface", () => {
 
   test("returns notes and delegates file processing to util functions", async () => {
     resolveNotesConfigMock.mockResolvedValue({
+      attachmentsDirectory: "attachments",
       dateFormats: ["YYYY.MM.DD"],
       notesDirectory: "/notes",
       obsidianVault: "vault",
@@ -118,8 +119,8 @@ describe("notes handler interface", () => {
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(parseMarkdownFileMock.mock.calls).toEqual([
-      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"]],
-      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"]],
+      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"], "attachments"],
+      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"], "attachments"],
     ])
     expect(applyViewFilterMock).toHaveBeenCalledWith(
       [
@@ -141,6 +142,7 @@ describe("notes handler interface", () => {
 
   test("passes requested view to filter function", async () => {
     resolveNotesConfigMock.mockResolvedValue({
+      attachmentsDirectory: "attachments",
       dateFormats: [],
       notesDirectory: "/notes",
       obsidianVault: "vault",
@@ -196,6 +198,7 @@ describe("notes handler interface", () => {
 
   test("returns an error when util loading fails", async () => {
     resolveNotesConfigMock.mockResolvedValue({
+      attachmentsDirectory: "attachments",
       dateFormats: [],
       notesDirectory: "/notes",
       obsidianVault: "vault",
@@ -225,6 +228,7 @@ describe("notes handler interface", () => {
           message: string
         }
         notesConfig: {
+          attachmentsDirectory: string
           dateFormats: string[]
           notesDirectory: string
           obsidianVault: string
@@ -235,6 +239,7 @@ describe("notes handler interface", () => {
 
     expect(loggedPayload.error.message).toBe("boom")
     expect(loggedPayload.notesConfig).toEqual({
+      attachmentsDirectory: "attachments",
       dateFormats: [],
       notesDirectory: "/notes",
       obsidianVault: "vault",
