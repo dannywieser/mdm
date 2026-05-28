@@ -43,6 +43,7 @@ export const parseMarkdownFile = async (
   const bodyDates = parseMarkdownBodyDates(body, dateFormats)
   const html = await remark().use(remarkHtml).process(body)
   const basename = path.basename(filePath)
+  const title = basename.endsWith(".md") ? basename.slice(0, -3) : basename
 
   return {
     createdDate: stats.birthtime.toISOString(),
@@ -54,5 +55,6 @@ export const parseMarkdownFile = async (
     id: createFileID(filePath, FILE_ID_NAMESPACE),
     folder: path.basename(path.dirname(filePath)),
     html: String(html),
+    title,
   }
 }

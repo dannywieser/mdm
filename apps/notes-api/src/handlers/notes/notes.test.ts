@@ -86,6 +86,7 @@ describe("notes handler interface", () => {
         html: "<h1>Note</h1>",
         id: pathToId(filePath),
         modifiedDate: "2026-05-26T00:00:00.000Z",
+        title: (filePath.split("/").pop() ?? "note.md").replace(/\.md$/, ""),
       }),
     )
     applyViewFilterMock.mockImplementation((notes) => [...notes])
@@ -166,6 +167,7 @@ describe("notes handler interface", () => {
       html: "<h1>A</h1>",
       id: "a",
       modifiedDate: "2026-05-26T00:00:00.000Z",
+      title: "a",
     })
     applyViewFilterMock.mockImplementation((notes) => [...notes])
     const app = express()

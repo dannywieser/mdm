@@ -14,7 +14,8 @@ const noteFixture: Note = {
   fullPath: '/daily/my-note.md',
   html: '<p>Hello</p>',
   id: 'my-note',
-  modifiedDate: '2026-01-01'
+  modifiedDate: '2026-01-01',
+  title: 'My Note Title'
 }
 
 describe('NotesCard', () => {
@@ -25,7 +26,7 @@ describe('NotesCard', () => {
       </ChakraProvider>
     )
 
-    expect(screen.getByText('My Note')).toBeTruthy()
+    expect(screen.getByText('My Note Title')).toBeTruthy()
     expect(screen.getByText('Hello')).toBeTruthy()
   })
 

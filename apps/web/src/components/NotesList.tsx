@@ -8,11 +8,13 @@ import {
 } from '@chakra-ui/react'
 
 import { useNotesQuery } from '../hooks/useNotesQuery'
+import { useI18n } from '../i18n'
 
 import { NotesCard } from './NotesCard'
 
 export const NotesList = () => {
   const { data, error, isLoading } = useNotesQuery()
+  const { t } = useI18n()
 
   if (isLoading) {
     return (
@@ -27,7 +29,7 @@ export const NotesList = () => {
       <Alert.Root status="error">
         <Alert.Indicator />
         <Alert.Content>
-          <Alert.Title>Unable to load notes.</Alert.Title>
+          <Alert.Title>{t('notes.errorTitle')}</Alert.Title>
           <Alert.Description>{error.message}</Alert.Description>
         </Alert.Content>
       </Alert.Root>
@@ -36,9 +38,12 @@ export const NotesList = () => {
 
   return (
     <VStack align="stretch" gap="6" p="6">
-      <Heading size="lg">Notes</Heading>
+      <Heading size="lg">{t('notes.header')}</Heading>
       <Text color="fg.muted">
-        Vault: {data?.obsidianVault} · Directory: {data?.notesDirectory}
+        {t('notes.meta', {
+          directory: data?.notesDirectory ?? '',
+          vault: data?.obsidianVault ?? ''
+        })}
       </Text>
       <VStack align="stretch" gap="4">
         {data?.notes.map((note) => (

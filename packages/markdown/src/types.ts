@@ -14,6 +14,7 @@ export interface Note {
   html: string
   id: string
   modifiedDate: string
+  title: string
 }
 
 export interface ParsedFrontMatter {

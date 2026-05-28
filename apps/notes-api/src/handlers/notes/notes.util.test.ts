@@ -101,6 +101,7 @@ describe("notes util helpers", () => {
       frontmatter: null,
       fullPath: "/notes/topic/welcome.md",
       modifiedDate: "2026-05-26T01:00:00.000Z",
+      title: "welcome",
     })
     expect(FILE_ID_NAMESPACE).toBe("6ba7b811-9dad-11d1-80b4-00c04fd430c8")
     expect(note.id).toBe("17e3771f-2773-5c87-8f66-6a455a878763")
@@ -158,6 +159,7 @@ This is a note.`)
     expect(note.id).toBe("frontmatter-id")
     expect(note.html).toContain("<h1>Welcome</h1>")
     expect(note.html).toContain("<p>This is a note.</p>")
+    expect(note.title).toBe("frontmatter")
     expect(parseFrontMatterMock).toHaveBeenCalledWith(`---
 topic:
   - AI
