@@ -208,4 +208,52 @@ This is a note.`)
       "obsidian://open?vault=vault%20name&file=daily%2F2026.05.27%20(Wed)%20%C3%A1",
     )
   })
+
+  test("parseMarkdownFile rewrites relative markdown images to image server urls", async () => {
+    readFileMock.mockResolvedValue("![Screenshot](./assets/home page.png)")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![Screenshot](./assets/home page.png)",
+      frontmatter: null,
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await parseMarkdownFile(
+      "/notes/daily/journal.md",
+      "/notes",
+      "vault",
+      [],
+    )
+
+    expect(note.html).toContain(
+      '<img src="/images?path=daily%2Fassets%2Fhome%20page.png"',
+    )
+  })
+
+  test("parseMarkdownFile keeps external markdown image urls unchanged", async () => {
+    readFileMock.mockResolvedValue("![Screenshot](https://example.com/image.png)")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![Screenshot](https://example.com/image.png)",
+      frontmatter: null,
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await parseMarkdownFile(
+      "/notes/daily/journal.md",
+      "/notes",
+      "vault",
+      [],
+    )
+
+    expect(note.html).toContain('<img src="https://example.com/image.png"')
+  })
 })

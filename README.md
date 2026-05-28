@@ -106,6 +106,21 @@ This repository is a Turborepo monorepo with this structure:
   - Renders notes from `GET /notes` using `NotesList` and `NotesCard`
   - Configure the API base URL with `VITE_API_BASE_URL` (defaults to `http://localhost:3000`)
 
+- `apps/image-server`: Express-based image proxy for note image assets backed by imgproxy.
+  - `GET /health`
+    - Purpose: basic service health check
+    - Success response: `200`
+      ```json
+      { "status": "ok" }
+      ```
+  - `GET /images?path=<relative-note-image-path>`
+    - Purpose: proxy local note image files through imgproxy with default fit resizing
+    - Success response: proxied image bytes from imgproxy
+    - Error responses: `400`
+      ```json
+      { "error": "A valid local image path is required" }
+      ```
+
 ## Configuration
 
 - Copy `app.config.example.json` to `app.config.json` at repository root.
@@ -122,15 +137,22 @@ This repository is a Turborepo monorepo with this structure:
   - `web` (nginx) on `http://localhost` for static web hosting + `/api` proxy
   - `notes-api` as an internal service on port `3000`
   - `flag-manager` as an internal service on port `3001`
+  - `image-server` as an internal service on port `3002`
+  - `imgproxy` as internal image optimizer used by `image-server`
   - `redis` as internal data storage for `flag-manager`
 - nginx routes:
   - `/api/*` → `notes-api:3000/*`
   - `/flags/*` → `flag-manager:3001/flags/*`
+  - `/images*` → `image-server:3002/images*`
 - `app.config.json` is mounted into the API container as `/app/app.config.json` (read-only).
 - Configure `noteRootDirectory` in `app.config.json` using a path valid inside the container (for example `/data/notes`).
 - Host notes are mounted into the API container with `NOTES_ROOT`:
   - default: `./notes` on the host maps to `/data/notes`
   - override: `NOTES_ROOT=/absolute/path/on/host docker compose up --build`
+- Host images are mounted into the image services with `IMAGES_ROOT`:
+  - default: `./notes` on the host maps to `/data/images`
+  - override: `IMAGES_ROOT=/absolute/path/on/host docker compose up --build`
+- Notes markdown image paths now resolve through `/images?path=<encoded-relative-path>` for imgproxy optimization.
 - If local and container config values differ, create a separate Docker-specific config file and mount it to `/app/app.config.json`.
 
 Start services:
@@ -149,6 +171,9 @@ Run from repository root:
 - `turbo run lint -- --fix` - run ESLint with auto-fixes where possible
 - `turbo run build` - build workspace packages/apps
 - `turbo run test` - run workspace tests
+- `npm run docker:start` - start/update Docker services in detached mode with build
+- `npm run docker:update` - pull images and rebuild/restart Docker services
+- `npm run docker:stop` - stop Docker services
 - `npm run changeset` - create a new changeset entry for user-visible changes
 - `npm run changeset:version` - apply pending changesets (versions + changelog updates)
 
