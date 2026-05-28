@@ -353,6 +353,37 @@ This is a note.`)
     )
   })
 
+  test("parseMarkdownFile rewrites multiple obsidian wikilink image embeds in a single note", async () => {
+    readFileMock.mockResolvedValue(
+      "First ![[photo-a.jpg]] and second ![[photo-b.jpg|300]]",
+    )
+    parseFrontMatterMock.mockReturnValue({
+      body: "First ![[photo-a.jpg]] and second ![[photo-b.jpg|300]]",
+      frontmatter: null,
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await parseMarkdownFile(
+      "/notes/folder/note.md",
+      "/notes",
+      "vault",
+      [],
+      "attachments",
+    )
+
+    expect(note.html).toContain(
+      '<img src="/images?path=attachments%2Ffolder%2Fnote%2Fphoto-a.jpg"',
+    )
+    expect(note.html).toContain(
+      '<img src="/images?path=attachments%2Ffolder%2Fnote%2Fphoto-b.jpg"',
+    )
+  })
+
   test("parseMarkdownFile rewrites relative markdown images to image server urls", async () => {
     readFileMock.mockResolvedValue("![Screenshot](./assets/home%20page.png)")
     parseFrontMatterMock.mockReturnValue({
