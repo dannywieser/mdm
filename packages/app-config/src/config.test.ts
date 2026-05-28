@@ -73,7 +73,7 @@ describe("config", () => {
     )
   })
 
-  test("resolves notes directory from noteRootDirectory and obsidianVault", async () => {
+  test("resolves notes directory from noteRootDirectory", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD"],
@@ -83,7 +83,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesDirectory()).resolves.toBe(
-      path.resolve("/notes-root", "vault"),
+      path.resolve("/notes-root"),
     )
   })
 
@@ -107,7 +107,7 @@ describe("config", () => {
 
     await expect(resolveNotesConfig()).resolves.toEqual({
       dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
-      notesDirectory: path.resolve("/notes-root", "vault"),
+      notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
       timezone: "UTC",
       views: [
@@ -132,7 +132,7 @@ describe("config", () => {
 
     await expect(resolveNotesConfig()).resolves.toEqual({
       dateFormats: [],
-      notesDirectory: path.resolve("/notes-root", "vault"),
+      notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
       timezone: "UTC",
       views: [],
@@ -150,7 +150,7 @@ describe("config", () => {
 
     await expect(resolveNotesConfig()).resolves.toEqual({
       dateFormats: ["YYYY.MM.DD"],
-      notesDirectory: path.resolve("/notes-root", "vault"),
+      notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
       timezone: "UTC",
       views: [],
