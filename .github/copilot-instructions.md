@@ -29,6 +29,7 @@
 - Split apart complex logic into small, pure functions with descriptive names. Avoid large functions that do many things; instead, break them down into smaller helper functions that can be easily tested and reused.
 - after every change made, review the README file for the application or package and update it if necessary to reflect the changes made or remove any outdated information.
 - When adding dependencies to `package.json`, always prefer pinning a specific version over fuzzy version matching.
+- For user-visible changes, include a Changesets entry by running `npm run changeset` from the repository root and committing the generated `.changeset/*.md` file.
 
 ## express api guidelines
 
