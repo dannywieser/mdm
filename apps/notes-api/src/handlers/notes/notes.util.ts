@@ -86,7 +86,7 @@ const rewriteMarkdownImageUrls = (
   markdownBody: string,
   noteRelativePath: string,
 ): string => {
-  const markdownTree = remark().parse(markdownBody) as MarkdownNode
+  const markdownTree = remark().parse(markdownBody)
 
   visitMarkdownTree(markdownTree, (node) => {
     if (node.type !== "image" || typeof node.url !== "string") {
@@ -121,10 +121,11 @@ const resolveLocalImagePath = (
     return null
   }
 
+  const decodedImagePath = safeDecodeURIComponent(baseImagePath)
   const normalizedImagePath = path.posix.normalize(
-    baseImagePath.startsWith("/")
-      ? baseImagePath.replace(/^\/+/, "")
-      : path.posix.join(path.posix.dirname(noteRelativePath), baseImagePath),
+    decodedImagePath.startsWith("/")
+      ? decodedImagePath.replace(/^\/+/, "")
+      : path.posix.join(path.posix.dirname(noteRelativePath), decodedImagePath),
   )
 
   if (
@@ -154,4 +155,12 @@ const visitMarkdownTree = (
   }
 
   node.children.forEach((childNode) => visitMarkdownTree(childNode, visitor))
+}
+
+const safeDecodeURIComponent = (value: string): string => {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
 }

@@ -54,7 +54,9 @@ describe("images handler", () => {
     expect(response.status).toBe(200)
     expect(response.header["content-type"]).toBe("image/jpeg")
     expect(response.header["cache-control"]).toBe("public,max-age=60")
-    expect(response.text).toBe("image-data")
+    expect(Buffer.from(response.body as Uint8Array).toString("utf8")).toBe(
+      "image-data",
+    )
 
     fetchMock.mockRestore()
   })

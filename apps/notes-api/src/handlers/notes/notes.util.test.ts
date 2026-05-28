@@ -210,9 +210,9 @@ This is a note.`)
   })
 
   test("parseMarkdownFile rewrites relative markdown images to image server urls", async () => {
-    readFileMock.mockResolvedValue("![Screenshot](./assets/home page.png)")
+    readFileMock.mockResolvedValue("![Screenshot](./assets/home%20page.png)")
     parseFrontMatterMock.mockReturnValue({
-      body: "![Screenshot](./assets/home page.png)",
+      body: "![Screenshot](./assets/home%20page.png)",
       frontmatter: null,
     })
     parseMarkdownBodyDatesMock.mockReturnValue([])
