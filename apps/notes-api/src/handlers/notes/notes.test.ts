@@ -86,6 +86,7 @@ describe("notes handler interface", () => {
         html: "<h1>Note</h1>",
         id: pathToId(filePath),
         modifiedDate: "2026-05-26T00:00:00.000Z",
+        obsidianUrl: `obsidian://open?vault=vault&file=${encodeURI(pathToId(filePath))}`,
         title: (filePath.split("/").pop() ?? "note.md").replace(/\.md$/, ""),
       }),
     )
@@ -117,8 +118,8 @@ describe("notes handler interface", () => {
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(parseMarkdownFileMock.mock.calls).toEqual([
-      ["/notes/a.md", ["YYYY.MM.DD"]],
-      ["/notes/b.md", ["YYYY.MM.DD"]],
+      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"]],
+      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"]],
     ])
     expect(applyViewFilterMock).toHaveBeenCalledWith(
       [
@@ -167,6 +168,7 @@ describe("notes handler interface", () => {
       html: "<h1>A</h1>",
       id: "a",
       modifiedDate: "2026-05-26T00:00:00.000Z",
+      obsidianUrl: "obsidian://open?vault=vault&file=a",
       title: "a",
     })
     applyViewFilterMock.mockImplementation((notes) => [...notes])

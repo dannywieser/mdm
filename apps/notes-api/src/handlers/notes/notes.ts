@@ -16,7 +16,9 @@ export const notesHandler: RequestHandler = async (request, response) => {
       notesConfig
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).sort()
     const notes = await Promise.all(
-      markdownFiles.map((filePath) => parseMarkdownFile(filePath, dateFormats)),
+      markdownFiles.map((filePath) =>
+        parseMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats),
+      ),
     )
     const requestedView =
       typeof request.query["view"] === "string"

@@ -89,9 +89,12 @@ describe("notes util helpers", () => {
       mtime: modifiedDate,
     })
 
-    const note = await parseMarkdownFile("/notes/topic/welcome.md", [
-      "YYYY.MM.DD",
-    ])
+    const note = await parseMarkdownFile(
+      "/notes/topic/welcome.md",
+      "/notes",
+      "dgw",
+      ["YYYY.MM.DD"],
+    )
 
     expect(note).toMatchObject({
       basename: "welcome.md",
@@ -101,6 +104,7 @@ describe("notes util helpers", () => {
       frontmatter: null,
       fullPath: "/notes/topic/welcome.md",
       modifiedDate: "2026-05-26T01:00:00.000Z",
+      obsidianUrl: "obsidian://open?vault=dgw&file=topic%2Fwelcome",
       title: "welcome",
     })
     expect(FILE_ID_NAMESPACE).toBe("6ba7b811-9dad-11d1-80b4-00c04fd430c8")
@@ -146,10 +150,12 @@ This is a note.`)
       mtime: modifiedDate,
     })
 
-    const note = await parseMarkdownFile("/notes/topic/frontmatter.md", [
-      "YYYY.MM.DD",
-      "YY/MM/DD",
-    ])
+    const note = await parseMarkdownFile(
+      "/notes/topic/frontmatter.md",
+      "/notes",
+      "dgw",
+      ["YYYY.MM.DD", "YY/MM/DD"],
+    )
 
     expect(note.bodyDates).toEqual(["2026.05.26", "26/05/27"])
     expect(note.frontmatter).toEqual({
@@ -157,6 +163,9 @@ This is a note.`)
       topic: ["AI", "Notes"],
     })
     expect(note.id).toBe("frontmatter-id")
+    expect(note.obsidianUrl).toBe(
+      "obsidian://open?vault=dgw&file=topic%2Ffrontmatter",
+    )
     expect(note.html).toContain("<h1>Welcome</h1>")
     expect(note.html).toContain("<p>This is a note.</p>")
     expect(note.title).toBe("frontmatter")
@@ -172,6 +181,31 @@ This is a note.`)
     expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith(
       "# Welcome\n\nThis is a note.",
       ["YYYY.MM.DD", "YY/MM/DD"],
+    )
+  })
+
+  test("parseMarkdownFile escapes obsidian file path and strips extension", async () => {
+    readFileMock.mockResolvedValue("content")
+    parseFrontMatterMock.mockReturnValue({
+      body: "content",
+      frontmatter: null,
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await parseMarkdownFile(
+      "/notes/daily/2026.05.27 (Wed) á.md",
+      "/notes",
+      "vault name",
+      [],
+    )
+
+    expect(note.obsidianUrl).toBe(
+      "obsidian://open?vault=vault%20name&file=daily%2F2026.05.27%20(Wed)%20%C3%A1",
     )
   })
 })

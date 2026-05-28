@@ -33,6 +33,8 @@ export const collectMarkdownFiles = async (
 
 export const parseMarkdownFile = async (
   filePath: string,
+  notesDirectory: string,
+  obsidianVault: string,
   dateFormats: readonly string[] = [],
 ): Promise<Note> => {
   const [source, stats] = await Promise.all([
@@ -44,6 +46,17 @@ export const parseMarkdownFile = async (
   const html = await remark().use(remarkHtml).process(body)
   const basename = path.basename(filePath)
   const title = basename.endsWith(".md") ? basename.slice(0, -3) : basename
+  const relativePath = path.relative(notesDirectory, filePath)
+  const normalizedRelativePath = relativePath.split(path.sep).join("/")
+  const relativePathWithoutExtension = normalizedRelativePath.replace(
+    /\.[^.]+$/,
+    "",
+  )
+  const escapedFilePath = relativePathWithoutExtension
+    .split("/")
+    .map((segment) => encodeURI(segment))
+    .join("%2F")
+  const obsidianUrl = `obsidian://open?vault=${encodeURIComponent(obsidianVault)}&file=${escapedFilePath}`
 
   return {
     createdDate: stats.birthtime.toISOString(),
@@ -56,5 +69,6 @@ export const parseMarkdownFile = async (
     folder: path.basename(path.dirname(filePath)),
     html: String(html),
     title,
+    obsidianUrl,
   }
 }
