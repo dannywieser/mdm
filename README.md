@@ -31,6 +31,7 @@ This repository is a Turborepo monorepo with this structure:
             "bodyDates": ["2026.05.26"],
             "id": "welcome",
             "folder": "notes",
+            "obsidianUrl": "obsidian://open?vault=vault-name&file=welcome",
             "frontmatter": {
               "topic": ["AI"],
               "created": "2026.05.26"
