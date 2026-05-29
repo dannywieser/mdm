@@ -4,8 +4,10 @@ import type { RequestHandler } from "express"
 import { AppConfigError, resolveNotesConfig } from "app-config"
 import { toLoggableError } from "mdm-util"
 
+import { collectMarkdownFiles } from "./notes.files"
 import { applyViewFilter } from "./notes.filters"
-import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
+import { parseMarkdownFile } from "./notes.parse"
+import { scanMarkdownFile } from "./notes.scan"
 
 export const notesHandler: RequestHandler = async (request, response) => {
   let notesConfig: ResolvedNotesConfig | undefined
@@ -20,9 +22,9 @@ export const notesHandler: RequestHandler = async (request, response) => {
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).sort()
     console.log(`[notes] collectMarkdownFiles found ${markdownFiles.length} file(s) in ${notesDirectory}`)
 
-    const notes = await Promise.all(
+    const scannedNotes = await Promise.all(
       markdownFiles.map((filePath) =>
-        parseMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, attachmentsDirectory),
+        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats),
       ),
     )
     const requestedView =
@@ -30,16 +32,20 @@ export const notesHandler: RequestHandler = async (request, response) => {
         ? request.query["view"]
         : undefined
 
-    console.log(`[notes] applying view="${requestedView ?? "none"}" to ${notes.length} note(s)`)
-    const filteredNotes = applyViewFilter(notes, views, requestedView, {
+    console.log(`[notes] applying view="${requestedView ?? "none"}" to ${scannedNotes.length} note(s)`)
+    const filteredNotes = applyViewFilter(scannedNotes, views, requestedView, {
       dateFormats,
       timezone,
     })
-    console.log(`[notes] ${filteredNotes.length}/${notes.length} note(s) passed view filter`)
+    console.log(`[notes] ${filteredNotes.length}/${scannedNotes.length} note(s) passed view filter`)
+
+    const parsedNotes = await Promise.all(
+      filteredNotes.map((note) => parseMarkdownFile(note, notesDirectory, attachmentsDirectory)),
+    )
 
     response
       .status(200)
-      .json({ notes: filteredNotes, notesDirectory, obsidianVault })
+      .json({ notes: parsedNotes, notesDirectory, obsidianVault })
   } catch (error) {
     if (error instanceof AppConfigError) {
       response.status(500).json({ error: error.message })

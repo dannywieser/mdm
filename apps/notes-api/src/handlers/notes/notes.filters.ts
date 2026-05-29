@@ -1,5 +1,4 @@
 import type { NotesView } from "app-config"
-import type { Note } from "markdown"
 
 import {
   getDateComponents,
@@ -10,6 +9,10 @@ import {
 import type { ViewFilterContext } from "./notes.filters.types"
 
 const ON_THIS_DAY = "$onThisDay"
+
+type FilterableNote = {
+  basename: string
+}
 
 const matchesOnThisDay = (
   noteValue: unknown,
@@ -73,8 +76,8 @@ const isMatchingFilterValue = (
   return false
 }
 
-const matchesViewFilters = (
-  note: Note,
+const matchesViewFilters = <T extends FilterableNote>(
+  note: T,
   filters: Record<string, string>,
   context: ViewFilterContext,
 ): boolean =>
@@ -87,12 +90,12 @@ const matchesViewFilters = (
     return matches
   })
 
-export const applyViewFilter = (
-  notes: readonly Note[],
+export const applyViewFilter = <T extends FilterableNote>(
+  notes: readonly T[],
   configuredViews: readonly NotesView[],
   requestedViewName: string | undefined,
   context: ViewFilterContext = { dateFormats: [], timezone: "UTC" },
-): Note[] => {
+): T[] => {
   if (!requestedViewName) {
     return [...notes]
   }
