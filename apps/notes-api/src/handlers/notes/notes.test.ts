@@ -3,9 +3,13 @@ import express from "express"
 import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
+import type { ScannedNote } from "./notes.types"
+
 import { notesHandler } from "./notes"
+import { collectMarkdownFiles } from "./notes.files"
 import { applyViewFilter } from "./notes.filters"
-import { collectMarkdownFiles, parseMarkdownFile } from "./notes.util"
+import { parseMarkdownFile } from "./notes.parse"
+import { scanMarkdownFile } from "./notes.scan"
 
 jest.mock("app-config", () => {
   const actualConfig =
@@ -21,20 +25,28 @@ jest.mock("mdm-util", () => ({
   toLoggableError: jest.fn(),
 }))
 
+jest.mock("./notes.files", () => ({
+  collectMarkdownFiles: jest.fn(),
+}))
+
 jest.mock("./notes.filters", () => ({
   applyViewFilter: jest.fn(),
 }))
 
-jest.mock("./notes.util", () => ({
-  collectMarkdownFiles: jest.fn(),
+jest.mock("./notes.parse", () => ({
   parseMarkdownFile: jest.fn(),
+}))
+
+jest.mock("./notes.scan", () => ({
+  scanMarkdownFile: jest.fn(),
 }))
 
 const resolveNotesConfigMock = jest.mocked(resolveNotesConfig)
 const toLoggableErrorMock = jest.mocked(toLoggableError)
-const applyViewFilterMock = jest.mocked(applyViewFilter)
 const collectMarkdownFilesMock = jest.mocked(collectMarkdownFiles)
+const applyViewFilterMock = jest.mocked(applyViewFilter)
 const parseMarkdownFileMock = jest.mocked(parseMarkdownFile)
+const scanMarkdownFileMock = jest.mocked(scanMarkdownFile)
 
 describe("notes handler interface", () => {
   test("returns an error when notes directory config cannot be resolved", async () => {
@@ -56,10 +68,29 @@ describe("notes handler interface", () => {
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(applyViewFilterMock).not.toHaveBeenCalled()
     expect(collectMarkdownFilesMock).not.toHaveBeenCalled()
+    expect(scanMarkdownFileMock).not.toHaveBeenCalled()
     expect(parseMarkdownFileMock).not.toHaveBeenCalled()
   })
 
-  test("returns notes and delegates file processing to util functions", async () => {
+  test("returns notes and only parses filtered notes after scanning", async () => {
+    const scannedNotes = [
+      createScannedNote({
+        basename: "a.md",
+        fullPath: "/notes/a.md",
+        id: "a",
+        obsidianUrl: "obsidian://open?vault=vault&file=a",
+        title: "a",
+        titleOrBodyDates: ["2026.05.26"],
+      }),
+      createScannedNote({
+        basename: "b.md",
+        fullPath: "/notes/b.md",
+        id: "b",
+        obsidianUrl: "obsidian://open?vault=vault&file=b",
+        title: "b",
+      }),
+    ]
+
     resolveNotesConfigMock.mockResolvedValue({
       attachmentsDirectory: "attachments",
       dateFormats: ["YYYY.MM.DD"],
@@ -76,22 +107,14 @@ describe("notes handler interface", () => {
       ],
     })
     collectMarkdownFilesMock.mockResolvedValue(["/notes/b.md", "/notes/a.md"])
-    parseMarkdownFileMock.mockImplementation((filePath) =>
-      Promise.resolve({
-        basename: filePath.split("/").pop() ?? "note.md",
-        titleOrBodyDates: filePath.endsWith("a.md") ? ["2026.05.26"] : [],
-        createdDate: "2026-05-26T00:00:00.000Z",
-        folder: "notes",
-        frontmatter: null,
-        fullPath: filePath,
-        html: "<h1>Note</h1>",
-        id: pathToId(filePath),
-        modifiedDate: "2026-05-26T00:00:00.000Z",
-        obsidianUrl: `obsidian://open?vault=vault&file=${encodeURI(pathToId(filePath))}`,
-        title: (filePath.split("/").pop() ?? "note.md").replace(/\.md$/, ""),
-      }),
-    )
-    applyViewFilterMock.mockImplementation((notes) => [...notes])
+    scanMarkdownFileMock
+      .mockResolvedValueOnce(scannedNotes[0])
+      .mockResolvedValueOnce(scannedNotes[1])
+    applyViewFilterMock.mockReturnValue([scannedNotes[0]])
+    parseMarkdownFileMock.mockResolvedValue({
+      ...scannedNotes[0],
+      html: "<h1>Note</h1>",
+    })
     const app = express()
     app.get("/notes", notesHandler)
 
@@ -103,30 +126,23 @@ describe("notes handler interface", () => {
     }
 
     expect(response.status).toBe(200)
-    expect(body.notes).toHaveLength(2)
-    expect(body.notesDirectory).toBe("/notes")
-    expect(body.obsidianVault).toBe("vault")
     expect(body.notes).toEqual([
       expect.objectContaining({
         basename: "a.md",
+        html: "<h1>Note</h1>",
         titleOrBodyDates: ["2026.05.26"],
       }),
-      expect.objectContaining({
-        basename: "b.md",
-        titleOrBodyDates: [],
-      }),
     ])
+    expect(body.notesDirectory).toBe("/notes")
+    expect(body.obsidianVault).toBe("vault")
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
-    expect(parseMarkdownFileMock.mock.calls).toEqual([
-      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"], "attachments"],
-      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"], "attachments"],
+    expect(scanMarkdownFileMock.mock.calls).toEqual([
+      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"]],
+      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"]],
     ])
     expect(applyViewFilterMock).toHaveBeenCalledWith(
-      [
-        expect.objectContaining({ basename: "a.md" }),
-        expect.objectContaining({ basename: "b.md" }),
-      ],
+      scannedNotes,
       [
         {
           filters: {
@@ -138,9 +154,27 @@ describe("notes handler interface", () => {
       undefined,
       { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" },
     )
+    expect(parseMarkdownFileMock).toHaveBeenCalledTimes(1)
+    expect(parseMarkdownFileMock).toHaveBeenCalledWith(
+      scannedNotes[0],
+      "/notes",
+      "attachments",
+    )
   })
 
   test("passes requested view to filter function", async () => {
+    const scannedNote = createScannedNote({
+      basename: "a.md",
+      folder: "downtime",
+      frontmatter: {
+        type: "book",
+      },
+      fullPath: "/notes/a.md",
+      id: "a",
+      obsidianUrl: "obsidian://open?vault=vault&file=a",
+      title: "a",
+    })
+
     resolveNotesConfigMock.mockResolvedValue({
       attachmentsDirectory: "attachments",
       dateFormats: [],
@@ -158,22 +192,12 @@ describe("notes handler interface", () => {
       ],
     })
     collectMarkdownFilesMock.mockResolvedValue(["/notes/a.md"])
+    scanMarkdownFileMock.mockResolvedValue(scannedNote)
+    applyViewFilterMock.mockReturnValue([scannedNote])
     parseMarkdownFileMock.mockResolvedValue({
-      basename: "a.md",
-      titleOrBodyDates: [],
-      createdDate: "2026-05-26T00:00:00.000Z",
-      folder: "downtime",
-      frontmatter: {
-        type: "book",
-      },
-      fullPath: "/notes/a.md",
+      ...scannedNote,
       html: "<h1>A</h1>",
-      id: "a",
-      modifiedDate: "2026-05-26T00:00:00.000Z",
-      obsidianUrl: "obsidian://open?vault=vault&file=a",
-      title: "a",
     })
-    applyViewFilterMock.mockImplementation((notes) => [...notes])
     const app = express()
     app.get("/notes", notesHandler)
 
@@ -181,7 +205,7 @@ describe("notes handler interface", () => {
 
     expect(response.status).toBe(200)
     expect(applyViewFilterMock).toHaveBeenCalledWith(
-      expect.any(Array),
+      [scannedNote],
       [
         {
           filters: {
@@ -217,6 +241,7 @@ describe("notes handler interface", () => {
     expect(response.body).toEqual({ error: "Unable to load notes" })
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
+    expect(scanMarkdownFileMock).not.toHaveBeenCalled()
     expect(parseMarkdownFileMock).not.toHaveBeenCalled()
     expect(toLoggableErrorMock).toHaveBeenCalledWith(expect.any(Error))
     expect(errorSpy).toHaveBeenCalledTimes(1)
@@ -251,6 +276,18 @@ describe("notes handler interface", () => {
   })
 })
 
-const pathToId = (filePath: string): string =>
-  filePath.replace(/\\/g, "/").split("/").pop()?.replace(/\.[^.]+$/, "") ??
-  "note"
+const createScannedNote = (
+  overrides: Partial<ScannedNote> = {},
+): ScannedNote => ({
+  basename: "note.md",
+  titleOrBodyDates: [],
+  createdDate: "2026-05-26T00:00:00.000Z",
+  folder: "notes",
+  frontmatter: null,
+  fullPath: "/notes/note.md",
+  id: "note",
+  modifiedDate: "2026-05-26T00:00:00.000Z",
+  obsidianUrl: "obsidian://open?vault=vault&file=note",
+  title: "note",
+  ...overrides,
+})
