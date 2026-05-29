@@ -3,7 +3,7 @@ import { promises as fs } from "node:fs"
 
 import type { ScannedNote } from "./notes.types"
 
-import { parseMarkdownFile } from "./notes.parse"
+import { parseMarkdownFile, processTaskListHtml } from "./notes.parse"
 
 jest.mock("node:fs", () => ({
   promises: {
@@ -223,6 +223,51 @@ describe("notes parse helpers", () => {
     )
 
     expect(note.html).toContain('<img src="https://example.com/image.png"')
+  })
+})
+
+describe("processTaskListHtml", () => {
+  test("replaces checked checkbox with CircleCheck SVG icon", () => {
+    const input = '<li class="task-list-item"><input type="checkbox" checked disabled> Done</li>'
+    const result = processTaskListHtml(input)
+
+    expect(result).not.toContain('<input')
+    expect(result).toContain('class="task-list-icon task-list-icon--checked"')
+    expect(result).toContain('<circle cx="12" cy="12" r="10"/>')
+  })
+
+  test("replaces unchecked checkbox with CircleDashed SVG icon", () => {
+    const input = '<li class="task-list-item"><input type="checkbox" disabled> Todo</li>'
+    const result = processTaskListHtml(input)
+
+    expect(result).not.toContain('<input')
+    expect(result).toContain('class="task-list-icon task-list-icon--unchecked"')
+    expect(result).toContain('M10.1 2.182')
+  })
+
+  test("handles checked attribute appearing before type attribute", () => {
+    const input = '<input checked type="checkbox" disabled>'
+    const result = processTaskListHtml(input)
+
+    expect(result).toContain('task-list-icon--checked')
+  })
+
+  test("replaces multiple checkboxes in a single HTML string", () => {
+    const input =
+      '<li><input type="checkbox" checked disabled> Done</li>' +
+      '<li><input type="checkbox" disabled> Todo</li>'
+    const result = processTaskListHtml(input)
+
+    expect(result).toContain('task-list-icon--checked')
+    expect(result).toContain('task-list-icon--unchecked')
+    expect(result).not.toContain('<input')
+  })
+
+  test("leaves non-checkbox input elements unchanged", () => {
+    const input = '<input type="text" value="hello">'
+    const result = processTaskListHtml(input)
+
+    expect(result).toBe(input)
   })
 })
 

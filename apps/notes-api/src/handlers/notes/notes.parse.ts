@@ -12,6 +12,17 @@ const IMAGE_SERVER_PATH = "/images"
 const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
 const OBSIDIAN_WIKILINK_EMBED_PATTERN = /!\[\[([^\]|]+)(?:\|[^\]]*)?]]/g
 
+const TASK_LIST_ICON_SVG_ATTRS =
+  'xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
+
+const CHECKED_ICON = `<svg ${TASK_LIST_ICON_SVG_ATTRS} class="task-list-icon task-list-icon--checked"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`
+const UNCHECKED_ICON = `<svg ${TASK_LIST_ICON_SVG_ATTRS} class="task-list-icon task-list-icon--unchecked"><path d="M10.1 2.182a10 10 0 0 1 3.8 0"/><path d="M13.9 21.818a10 10 0 0 1-3.8 0"/><path d="M17.609 3.721a10 10 0 0 1 2.69 2.7"/><path d="M2.182 13.9a10 10 0 0 1 0-3.8"/><path d="M20.279 17.609a10 10 0 0 1-2.7 2.69"/><path d="M21.818 10.1a10 10 0 0 1 0 3.8"/><path d="M3.721 6.391a10 10 0 0 1 2.7-2.69"/><path d="M6.391 20.279a10 10 0 0 1-2.69-2.7"/></svg>`
+
+export const processTaskListHtml = (html: string): string =>
+  html.replace(/<input\s+[^>]*type="checkbox"[^>]*>/gi, (match) =>
+    /\bchecked\b/i.test(match) ? CHECKED_ICON : UNCHECKED_ICON,
+  )
+
 export const parseMarkdownFile = async (
   note: ScannedNote,
   notesDirectory: string,
@@ -30,7 +41,7 @@ export const parseMarkdownFile = async (
 
   return {
     ...note,
-    html: String(html),
+    html: processTaskListHtml(String(html)),
   }
 }
 

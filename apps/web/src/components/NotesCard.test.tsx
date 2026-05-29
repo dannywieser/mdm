@@ -42,31 +42,25 @@ describe('NotesCard', () => {
     expect(document.querySelector('script')).toBeNull()
   })
 
-  it('renders checked task-list items with CircleCheck icon', () => {
+  it('renders server-processed task-list icons from html', () => {
+    const checkedSvg =
+      '<svg class="task-list-icon task-list-icon--checked"><circle cx="12" cy="12" r="10"/></svg>'
+    const uncheckedSvg =
+      '<svg class="task-list-icon task-list-icon--unchecked"><path d="M10.1 2.182"/></svg>'
     const taskListHtml =
-      '<ul class="contains-task-list"><li class="task-list-item"><input type="checkbox" checked disabled> Done</li></ul>'
+      `<ul class="contains-task-list">` +
+      `<li class="task-list-item">${checkedSvg} Done</li>` +
+      `<li class="task-list-item">${uncheckedSvg} Todo</li>` +
+      `</ul>`
+
     const { container } = render(
       <ChakraProvider value={defaultSystem}>
         <NotesCard note={{ ...noteFixture, html: taskListHtml }} />
       </ChakraProvider>
     )
 
-    const checkedIcon = container.querySelector('.task-list-icon--checked')
-    expect(checkedIcon).toBeTruthy()
-    expect(container.querySelector('input[type="checkbox"]')).toBeNull()
-  })
-
-  it('renders unchecked task-list items with CircleDashed icon', () => {
-    const taskListHtml =
-      '<ul class="contains-task-list"><li class="task-list-item"><input type="checkbox" disabled> Todo</li></ul>'
-    const { container } = render(
-      <ChakraProvider value={defaultSystem}>
-        <NotesCard note={{ ...noteFixture, html: taskListHtml }} />
-      </ChakraProvider>
-    )
-
-    const uncheckedIcon = container.querySelector('.task-list-icon--unchecked')
-    expect(uncheckedIcon).toBeTruthy()
+    expect(container.querySelector('.task-list-icon--checked')).toBeTruthy()
+    expect(container.querySelector('.task-list-icon--unchecked')).toBeTruthy()
     expect(container.querySelector('input[type="checkbox"]')).toBeNull()
   })
 })
