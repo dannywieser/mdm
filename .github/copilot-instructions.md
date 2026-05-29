@@ -31,6 +31,28 @@
 - When adding dependencies to `package.json`, always prefer pinning a specific version over fuzzy version matching.
 - For user-visible changes, include a Changesets entry by running `npm run changeset` from the repository root and committing the generated `.changeset/*.md` file.
 
+## changesets guidelines
+
+A changeset is required for any PR that introduces a user-visible change. User-visible changes include:
+
+- New or modified API behaviour (endpoints, request/response shapes, error handling)
+- New features or significant enhancements in any app or package
+- Bug fixes that affect observable runtime behaviour
+- Changes to configuration, environment variables, or startup behaviour
+- Changes to the Docker stack or deployment configuration
+
+Changesets are **not** required for:
+
+- Documentation-only changes (README, comments, JSDoc)
+- Test-only changes (adding or updating test files with no production code changes)
+- Pure refactors with no observable behaviour change
+- CI/workflow-only changes (`.github/workflows/`, config files)
+
+**Agent exit criteria**: before completing any task that touches production source files (`apps/`, `packages/`), you must either:
+
+1. Run `npm run changeset` from the repository root, select the appropriate bump type (`patch` / `minor` / `major`), write a concise summary of the user-visible change, and commit the generated `.changeset/*.md` file alongside your other changes, **or**
+2. Explicitly state in your final response why no changeset was needed (e.g. "test-only change — no changeset required").
+
 ## express api guidelines
 
 - The main service file should be focused on setting up the server, middleware, and routes, and should not contain any business logic. All handler logic should be contained in separate files under the `handlers` directory.

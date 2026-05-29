@@ -1,0 +1,59 @@
+name: Changeset check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  changeset-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changeset
+        env:
+          BYPASS_LABEL: no-changeset
+        run: |
+          # Allow explicit bypass via PR label
+          if echo '${{ toJson(github.event.pull_request.labels.*.name) }}' | grep -q "$BYPASS_LABEL"; then
+            echo "Bypass label '$BYPASS_LABEL' found — skipping changeset check."
+            exit 0
+          fi
+
+          # Detect whether any production source files were modified
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+
+          CHANGED_SRC=$(git diff --name-only "$BASE" "$HEAD" | grep -E '^(apps|packages)/' | grep -v '\.test\.' | grep -v '__tests__' || true)
+
+          if [ -z "$CHANGED_SRC" ]; then
+            echo "No production source changes detected — changeset not required."
+            exit 0
+          fi
+
+          echo "Production source files changed:"
+          echo "$CHANGED_SRC"
+
+          # Check for a new .changeset entry (any .md other than README.md)
+          NEW_CHANGESET=$(git diff --name-only "$BASE" "$HEAD" | grep -E '^\.changeset/.+\.md$' | grep -v 'README' || true)
+
+          if [ -z "$NEW_CHANGESET" ]; then
+            echo ""
+            echo "ERROR: Production source files were modified but no changeset entry was found."
+            echo ""
+            echo "Please run 'npm run changeset' from the repository root, add a summary of the"
+            echo "user-visible change, and commit the generated .changeset/*.md file."
+            echo ""
+            echo "If this change genuinely requires no changeset (e.g. test-only, docs, CI),"
+            echo "add the '$BYPASS_LABEL' label to the PR."
+            exit 1
+          fi
+
+          echo "Changeset found: $NEW_CHANGESET"
