@@ -4,6 +4,7 @@ import { parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
+import remarkGfm from "remark-gfm"
 import remarkHtml from "remark-html"
 
 import type { MarkdownNode, ScannedNote } from "./notes.types"
@@ -37,7 +38,7 @@ export const parseMarkdownFile = async (
     normalizedRelativePath,
     attachmentsDirectory,
   )
-  const html = await remark().use(remarkHtml).process(markdownBody)
+  const html = await remark().use(remarkGfm).use(remarkHtml).process(markdownBody)
 
   return {
     ...note,
@@ -51,7 +52,7 @@ const rewriteMarkdownImageUrls = (
   attachmentsDirectory: string,
 ): string => {
   const normalizedBody = normalizeObsidianWikiEmbeds(markdownBody)
-  const markdownTree = remark().parse(normalizedBody)
+  const markdownTree = remark().use(remarkGfm).parse(normalizedBody)
 
   visitMarkdownTree(markdownTree, (node) => {
     if (node.type !== "image" || typeof node.url !== "string") {
@@ -67,7 +68,7 @@ const rewriteMarkdownImageUrls = (
     node.url = `${IMAGE_SERVER_PATH}?path=${encodeURIComponent(imagePath)}`
   })
 
-  return String(remark().stringify(markdownTree))
+  return String(remark().use(remarkGfm).stringify(markdownTree))
 }
 
 const normalizeObsidianWikiEmbeds = (markdownBody: string): string =>

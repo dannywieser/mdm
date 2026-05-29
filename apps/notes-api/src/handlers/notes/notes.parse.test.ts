@@ -19,6 +19,20 @@ const readFileMock = fs.readFile as jest.Mock
 const parseFrontMatterMock = jest.mocked(parseFrontMatter)
 
 describe("notes parse helpers", () => {
+  test("parseMarkdownFile renders task list items as SVG icons", async () => {
+    const body = "- [x] Done\n- [ ] Todo\n"
+    readFileMock.mockResolvedValue(body)
+    parseFrontMatterMock.mockReturnValue({ body, frontmatter: null })
+
+    const note = await parseMarkdownFile(createScannedNote(), "/notes")
+
+    expect(note.html).toContain('class="task-list-icon task-list-icon--checked"')
+    expect(note.html).toContain('class="task-list-icon task-list-icon--unchecked"')
+    expect(note.html).not.toContain("<input")
+    expect(note.html).not.toContain("[x]")
+    expect(note.html).not.toContain("[ ]")
+  })
+
   test("parseMarkdownFile renders html using the scanned note metadata", async () => {
     readFileMock.mockResolvedValue("# Welcome\n\nThis is a note.")
     parseFrontMatterMock.mockReturnValue({
