@@ -41,4 +41,32 @@ describe('NotesCard', () => {
     expect(screen.getByText('Safe')).toBeTruthy()
     expect(document.querySelector('script')).toBeNull()
   })
+
+  it('renders checked task-list items with CircleCheck icon', () => {
+    const taskListHtml =
+      '<ul class="contains-task-list"><li class="task-list-item"><input type="checkbox" checked disabled> Done</li></ul>'
+    const { container } = render(
+      <ChakraProvider value={defaultSystem}>
+        <NotesCard note={{ ...noteFixture, html: taskListHtml }} />
+      </ChakraProvider>
+    )
+
+    const checkedIcon = container.querySelector('.task-list-icon--checked')
+    expect(checkedIcon).toBeTruthy()
+    expect(container.querySelector('input[type="checkbox"]')).toBeNull()
+  })
+
+  it('renders unchecked task-list items with CircleDashed icon', () => {
+    const taskListHtml =
+      '<ul class="contains-task-list"><li class="task-list-item"><input type="checkbox" disabled> Todo</li></ul>'
+    const { container } = render(
+      <ChakraProvider value={defaultSystem}>
+        <NotesCard note={{ ...noteFixture, html: taskListHtml }} />
+      </ChakraProvider>
+    )
+
+    const uncheckedIcon = container.querySelector('.task-list-icon--unchecked')
+    expect(uncheckedIcon).toBeTruthy()
+    expect(container.querySelector('input[type="checkbox"]')).toBeNull()
+  })
 })

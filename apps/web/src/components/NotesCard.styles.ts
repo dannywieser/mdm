@@ -22,9 +22,15 @@ export const noteContentStyles = {
     alignItems: 'flex-start',
     gap: '2'
   },
-  '& li.task-list-item input[type="checkbox"]': {
-    mt: '1',
-    flexShrink: 0
+  '& li.task-list-item .task-list-icon': {
+    flexShrink: 0,
+    mt: '0.5'
+  },
+  '& li.task-list-item .task-list-icon--checked': {
+    color: 'green.600'
+  },
+  '& li.task-list-item .task-list-icon--unchecked': {
+    color: 'fg.muted'
   },
   '& a': { color: 'colorPalette.fg', textDecoration: 'underline' },
   '& blockquote': {
