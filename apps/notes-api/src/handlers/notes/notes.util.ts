@@ -10,6 +10,7 @@ import type { MarkdownNode } from "./notes.util.types"
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
 const IMAGE_SERVER_PATH = "/images"
 const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
+const OBSIDIAN_WIKILINK_EMBED_PATTERN = /!\[\[([^\]|]+)(?:\|[^\]]*)?]]/g
 export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 
 export const collectMarkdownFiles = async (
@@ -40,6 +41,7 @@ export const parseMarkdownFile = async (
   notesDirectory: string,
   obsidianVault: string,
   dateFormats: readonly string[] = [],
+  attachmentsDirectory: string = "attachments",
 ): Promise<Note> => {
   const [source, stats] = await Promise.all([
     fs.readFile(filePath, "utf8"),
@@ -57,7 +59,7 @@ export const parseMarkdownFile = async (
 
   const relativePath = path.relative(notesDirectory, filePath)
   const normalizedRelativePath = relativePath.split(path.sep).join("/")
-  const markdownBody = rewriteMarkdownImageUrls(body, normalizedRelativePath)
+  const markdownBody = rewriteMarkdownImageUrls(body, normalizedRelativePath, attachmentsDirectory)
   const html = await remark().use(remarkHtml).process(markdownBody)
   const relativePathWithoutExtension = normalizedRelativePath.replace(
     /\.[^.]+$/,
@@ -87,15 +89,17 @@ export const parseMarkdownFile = async (
 const rewriteMarkdownImageUrls = (
   markdownBody: string,
   noteRelativePath: string,
+  attachmentsDirectory: string,
 ): string => {
-  const markdownTree = remark().parse(markdownBody)
+  const normalizedBody = normalizeObsidianWikiEmbeds(markdownBody)
+  const markdownTree = remark().parse(normalizedBody)
 
   visitMarkdownTree(markdownTree, (node) => {
     if (node.type !== "image" || typeof node.url !== "string") {
       return
     }
 
-    const imagePath = resolveLocalImagePath(node.url, noteRelativePath)
+    const imagePath = resolveLocalImagePath(node.url, noteRelativePath, attachmentsDirectory)
 
     if (!imagePath) {
       return
@@ -107,9 +111,13 @@ const rewriteMarkdownImageUrls = (
   return String(remark().stringify(markdownTree))
 }
 
+const normalizeObsidianWikiEmbeds = (markdownBody: string): string =>
+  markdownBody.replace(OBSIDIAN_WIKILINK_EMBED_PATTERN, "![]($1)")
+
 const resolveLocalImagePath = (
   rawImagePath: string,
   noteRelativePath: string,
+  attachmentsDirectory: string,
 ): string | null => {
   const sanitizedImagePath = rawImagePath.trim()
 
@@ -127,6 +135,18 @@ const resolveLocalImagePath = (
   }
 
   const decodedImagePath = safeDecodeURIComponent(baseImagePath)
+
+  if (!decodedImagePath.includes("/")) {
+    const noteDir = path.posix.dirname(noteRelativePath)
+    const noteStem = path.posix.basename(noteRelativePath).replace(/\.[^.]+$/, "")
+    const attachmentSubPath =
+      noteDir === "."
+        ? path.posix.join(attachmentsDirectory, noteStem, decodedImagePath)
+        : path.posix.join(attachmentsDirectory, noteDir, noteStem, decodedImagePath)
+
+    return attachmentSubPath
+  }
+
   const normalizedImagePath = path.posix.normalize(
     decodedImagePath.startsWith("/")
       ? decodedImagePath.replace(/^\/+/, "")

@@ -106,6 +106,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesConfig()).resolves.toEqual({
+      attachmentsDirectory: "attachments",
       dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
       notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
@@ -131,6 +132,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesConfig()).resolves.toEqual({
+      attachmentsDirectory: "attachments",
       dateFormats: [],
       notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
@@ -149,12 +151,56 @@ describe("config", () => {
     )
 
     await expect(resolveNotesConfig()).resolves.toEqual({
+      attachmentsDirectory: "attachments",
       dateFormats: ["YYYY.MM.DD"],
       notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
       timezone: "UTC",
       views: [],
     })
+  })
+
+  test("uses configured attachmentsDirectory when provided", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        attachmentsDirectory: "assets",
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      attachmentsDirectory: "assets",
+    })
+  })
+
+  test("defaults attachmentsDirectory to attachments when omitted", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      attachmentsDirectory: "attachments",
+    })
+  })
+
+  test("throws when attachmentsDirectory is not a non-empty string", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        attachmentsDirectory: "",
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json attachmentsDirectory must be a non-empty string",
+      ),
+    )
   })
 
   test("includes the configured timezone in resolved config", async () => {
