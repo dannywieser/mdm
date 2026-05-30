@@ -1,5 +1,5 @@
 import { Box, Flex, Text, VStack } from "@chakra-ui/react"
-import { NotebookText } from "lucide-react"
+import { Notebook } from "lucide-react"
 
 import { NotesList } from "../NotesList"
 
@@ -17,7 +17,7 @@ export function TerminalContent({ command }: TerminalContentProps) {
   if (command === null) {
     return (
       <Flex height="100%" align="center" justify="center">
-        <NotebookText size={120} color="var(--chakra-colors-green-900)" />
+        <Notebook size={120} color="var(--chakra-colors-green-900)" />
       </Flex>
     )
   }
@@ -27,8 +27,13 @@ export function TerminalContent({ command }: TerminalContentProps) {
       <VStack align="stretch" gap={1} fontFamily="mono" fontSize="sm">
         {HELP_TEXT.map(({ cmd, desc }) => (
           <Box key={cmd}>
-            <Text as="span" color="green.300">{cmd}</Text>
-            <Text as="span" color="green.700"> — {desc}</Text>
+            <Text as="span" color="green.300">
+              {cmd}
+            </Text>
+            <Text as="span" color="green.700">
+              {" "}
+              — {desc}
+            </Text>
           </Box>
         ))}
       </VStack>
@@ -41,7 +46,11 @@ export function TerminalContent({ command }: TerminalContentProps) {
 
   return (
     <Text color="green.700" fontSize="sm" fontFamily="mono">
-      unknown command: {command}. Type <Text as="span" color="green.400">help</Text> for available commands.
+      unknown command: {command}. Type{" "}
+      <Text as="span" color="green.400">
+        help
+      </Text>{" "}
+      for available commands.
     </Text>
   )
 }

@@ -6,7 +6,6 @@ type TranslationKey =
   | "notes.errorTitle"
   | "notes.header"
   | "notes.linkedNotes"
-  | "notes.meta"
   | "notes.openInObsidian"
   | "terminal.appName"
   | "terminal.ready"
