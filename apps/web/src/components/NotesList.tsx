@@ -1,8 +1,6 @@
 import {
   Alert,
-  Box,
   Heading,
-  Spinner,
   Text,
   VStack
 } from '@chakra-ui/react'
@@ -10,6 +8,7 @@ import {
 import { useNotesQuery } from '../hooks/useNotesQuery'
 import { useI18n } from '../i18n'
 
+import { LoadingScreen } from './LoadingScreen'
 import { NotesCard } from './NotesCard'
 
 export const NotesList = () => {
@@ -17,11 +16,7 @@ export const NotesList = () => {
   const { t } = useI18n()
 
   if (isLoading) {
-    return (
-      <Box display="flex" justifyContent="center" py="12">
-        <Spinner size="xl" />
-      </Box>
-    )
+    return <LoadingScreen />
   }
 
   if (error) {
