@@ -19,10 +19,6 @@ const matchesOnThisDay = (
   context: ViewFilterContext,
 ): boolean => {
   const today = getDateComponents(new Date(), context.timezone)
-  console.log(
-    `[notes/filter] $onThisDay: today=${JSON.stringify(today)} timezone="${context.timezone}" noteValue=${JSON.stringify(noteValue)}`,
-  )
-
   if (typeof noteValue === "string") {
     const date = new Date(noteValue)
 

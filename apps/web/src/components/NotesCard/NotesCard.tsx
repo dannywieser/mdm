@@ -3,6 +3,7 @@ import DOMPurify, { type Config as DOMPurifyConfig } from "dompurify"
 
 import { useI18n } from "../../i18n"
 
+import { NoteHeader } from "./NoteHeader"
 import { noteContentStyles } from "./NotesCard.styles"
 import type { NotesCardProps } from "./NotesCard.types"
 
@@ -23,11 +24,7 @@ export const NotesCard = ({ note }: NotesCardProps) => {
       color="green.400"
       fontFamily="mono"
     >
-      <Card.Header borderBottom="1px solid" borderColor="green.900">
-        <Heading size="md" color="green.300">
-          {note.title}
-        </Heading>
-      </Card.Header>
+      <NoteHeader note={note} />
       <Card.Body gap="4">
         <Box
           css={noteContentStyles}

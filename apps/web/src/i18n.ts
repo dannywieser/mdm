@@ -12,6 +12,7 @@ type TranslationKey =
   | "notes.header"
   | "notes.linkedNotes"
   | "notes.meta"
+  | "notes.openInObsidian"
   | "terminal.appName"
   | "terminal.ready"
   | "terminal.inputPlaceholder"
@@ -23,6 +24,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "notes.header": "Notes",
     "notes.linkedNotes": "Linked Notes",
     "notes.meta": "Vault: {vault} · Directory: {directory}",
+    "notes.openInObsidian": "Open in Obsidian",
     "terminal.appName": "mdm",
     "terminal.ready": "Ready.",
     "terminal.inputPlaceholder": "type a command...",
