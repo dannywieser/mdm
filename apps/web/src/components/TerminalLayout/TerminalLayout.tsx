@@ -14,7 +14,18 @@ export function TerminalLayout() {
     >
       <TerminalHeader />
 
-      <Box flex={1} overflowY="auto" p={4}>
+      <Box
+        flex={1}
+        overflowY="auto"
+        p={4}
+        css={{
+          scrollbarColor: 'var(--chakra-colors-green-900) black',
+          scrollbarWidth: 'thin',
+          '&::-webkit-scrollbar': { width: '6px' },
+          '&::-webkit-scrollbar-track': { background: 'black' },
+          '&::-webkit-scrollbar-thumb': { background: 'var(--chakra-colors-green-900)', borderRadius: '3px' },
+        }}
+      >
         <NotesList />
       </Box>
 

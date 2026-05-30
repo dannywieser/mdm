@@ -63,7 +63,7 @@ describe('NotesCard', () => {
       html: '<a href="obsidian://open?vault=v&file=note">open in obsidian</a>',
     })
 
-    const link = container.querySelector('a[href^="obsidian://"]')
+    const link = container.querySelector('a[href="obsidian://open?vault=v&file=note"]')
     expect(link).toBeTruthy()
     expect(link?.getAttribute('href')).toBe('obsidian://open?vault=v&file=note')
   })

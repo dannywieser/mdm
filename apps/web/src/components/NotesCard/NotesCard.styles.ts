@@ -83,6 +83,12 @@ export const noteContentStyles = {
   },
   '& img': {
     borderRadius: 'md',
+    maxWidth: '100%',
+    height: 'auto',
+    maxHeight: { lg: '90vh' },
+    objectFit: 'contain',
+    display: 'block',
+    mx: 'auto',
     my: '4'
   },
   '& .wikilink-unmatched': {
