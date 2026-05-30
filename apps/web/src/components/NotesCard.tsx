@@ -4,16 +4,15 @@ import {
   Collapsible,
   Flex,
   Heading,
-  IconButton,
 } from '@chakra-ui/react'
 import DOMPurify, { type Config as DOMPurifyConfig } from 'dompurify'
 import type { Note } from 'markdown'
 
 import { useI18n } from '../i18n'
 import { useIsRead } from '../hooks/useIsRead'
-import { useToggleNoteRead } from '../hooks/useToggleNoteRead'
 
 import { noteContentStyles } from './NotesCard.styles'
+import { ToggleReadButton } from './ToggleReadButton'
 
 // Extends DOMPurify's default allowed protocols to include obsidian:// deep links.
 const SANITIZE_CONFIG: DOMPurifyConfig = {
@@ -29,27 +28,14 @@ export const NotesCard = ({ note }: NotesCardProps) => {
   const { t } = useI18n()
   const sanitizedHtml = DOMPurify.sanitize(note.html, SANITIZE_CONFIG)
   const { data: isRead } = useIsRead(note.id)
-  const toggleRead = useToggleNoteRead(note.id)
   const isCollapsed = isRead ?? false
-  const toggleLabel = isCollapsed ? t('notes.markAsUnread') : t('notes.markAsRead')
 
   return (
     <Card.Root>
       <Card.Header>
         <Flex align="center" justify="space-between" gap="3">
           <Heading size="md">{note.title}</Heading>
-          <IconButton
-            aria-label={toggleLabel}
-            title={toggleLabel}
-            variant={isCollapsed ? 'subtle' : 'ghost'}
-            colorPalette={isCollapsed ? 'green' : 'gray'}
-            onClick={() => toggleRead.mutate()}
-            loading={toggleRead.isPending}
-          >
-            <Box as="span" aria-hidden="true" fontSize="md">
-              {isCollapsed ? '✓' : '○'}
-            </Box>
-          </IconButton>
+          <ToggleReadButton isRead={isCollapsed} noteId={note.id} />
         </Flex>
       </Card.Header>
       <Collapsible.Root open={!isCollapsed} lazyMount unmountOnExit>
