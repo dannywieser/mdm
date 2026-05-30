@@ -1,8 +1,6 @@
 import { useState } from 'react'
 
-interface TerminalInputProps {
-  onSubmit: (command: string) => void
-}
+import type { TerminalInputProps } from './TerminalInput.types'
 
 export const TerminalInput = ({ onSubmit }: TerminalInputProps) => {
   const [value, setValue] = useState('')

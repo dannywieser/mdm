@@ -1,7 +1,7 @@
 import { forwardRef } from 'react'
 
-import type { HistoryEntry } from './types'
-import { TerminalNoteBlock } from './TerminalNoteBlock'
+import { TerminalNoteBlock } from '../TerminalNoteBlock/TerminalNoteBlock'
+import type { TerminalOutputProps } from './TerminalOutput.types'
 
 const SECTION_DIVIDER =
   '── on-this-day ──────────────────────────────────────────'
@@ -11,12 +11,6 @@ const HELP_COMMANDS = [
   { cmd: 'clear', desc: 'clear the terminal' },
   { cmd: 'help', desc: 'list available commands' },
 ]
-
-interface TerminalOutputProps {
-  history: HistoryEntry[]
-  isLoading: boolean
-  error: Error | null
-}
 
 export const TerminalOutput = forwardRef<HTMLDivElement, TerminalOutputProps>(
   ({ history, isLoading, error }, ref) => (

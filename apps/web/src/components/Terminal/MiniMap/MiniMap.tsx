@@ -1,9 +1,4 @@
-import type { Note } from 'markdown'
-
-interface MiniMapProps {
-  notes: Note[]
-  onSelect: (noteId: string) => void
-}
+import type { MiniMapProps } from './MiniMap.types'
 
 export const MiniMap = ({ notes, onSelect }: MiniMapProps) => (
   <aside className="terminal-minimap" aria-label="Note navigation">

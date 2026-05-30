@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Note } from 'markdown'
 
-import { useNotesQuery } from '../../hooks/useNotesQuery'
-import { MiniMap } from './MiniMap'
-import { TerminalHeader } from './TerminalHeader'
-import { TerminalInput } from './TerminalInput'
-import { TerminalOutput } from './TerminalOutput'
-import type { HistoryEntry } from './types'
+import { useNotesQuery } from '../../../hooks/useNotesQuery'
+import { MiniMap } from '../MiniMap/MiniMap'
+import { TerminalHeader } from '../TerminalHeader/TerminalHeader'
+import { TerminalInput } from '../TerminalInput/TerminalInput'
+import { TerminalOutput } from '../TerminalOutput/TerminalOutput'
+import type { HistoryEntry } from '../types'
 
 let entryCounter = 0
 const nextId = () => `entry-${++entryCounter}`

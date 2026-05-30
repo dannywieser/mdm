@@ -1,16 +1,7 @@
-import DOMPurify, { type Config as DOMPurifyConfig } from 'dompurify'
+import DOMPurify from 'dompurify'
 import { useState } from 'react'
-import type { Note } from 'markdown'
 
-// Extends DOMPurify's default allowed protocols to include obsidian:// deep links.
-const SANITIZE_CONFIG: DOMPurifyConfig = {
-  ALLOWED_URI_REGEXP:
-    /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|obsidian):|[^a-z]|[a-z+.-]+(?:[^a-z+.:-]|$))/i,
-}
-
-interface TerminalNoteBlockProps {
-  note: Note
-}
+import { SANITIZE_CONFIG, type TerminalNoteBlockProps } from './TerminalNoteBlock.types'
 
 export const TerminalNoteBlock = ({ note }: TerminalNoteBlockProps) => {
   const [linkedExpanded, setLinkedExpanded] = useState(false)
