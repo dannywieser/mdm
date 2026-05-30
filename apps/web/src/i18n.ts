@@ -1,9 +1,4 @@
-import {
-  createContext,
-  createElement,
-  type ReactNode,
-  useContext,
-} from "react"
+import { createContext, createElement, type ReactNode, useContext } from "react"
 
 type Locale = "en"
 type TranslationKey =
@@ -22,12 +17,11 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "errors.unableToLoadNotes": "Unable to load notes",
     "notes.errorTitle": "Unable to load notes.",
     "notes.header": "Notes",
-    "notes.linkedNotes": "Linked Notes",
-    "notes.meta": "Vault: {vault} · Directory: {directory}",
+    "notes.linkedNotes": "linked notes",
     "notes.openInObsidian": "Open in Obsidian",
     "terminal.appName": "mdm",
     "terminal.ready": "Ready.",
-    "terminal.inputPlaceholder": "type a command...",
+    "terminal.inputPlaceholder": "what kind of memory are you looking for?",
   },
 }
 
@@ -60,7 +54,10 @@ interface I18nProviderProps {
   locale?: Locale
 }
 
-export const I18nProvider = ({ children, locale = "en" }: I18nProviderProps) => {
+export const I18nProvider = ({
+  children,
+  locale = "en",
+}: I18nProviderProps) => {
   const t = (key: TranslationKey, values?: Record<string, string | number>) =>
     translate(key, values, locale)
 

@@ -23,6 +23,7 @@ export function TerminalInput() {
           caretColor="green.400"
           _placeholder={{ color: "green.900" }}
           fontSize="sm"
+          borderBottomWidth={0}
         />
       </Flex>
     </Box>
