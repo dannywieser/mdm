@@ -67,4 +67,37 @@ describe('MiniMap', () => {
 
     expect(screen.getByText('── notes')).toBeTruthy()
   })
+
+  it('applies terminal-minimap--open class when isOpen is true', () => {
+    render(<MiniMap isOpen={true} notes={noteFixtures} onSelect={vi.fn()} />)
+
+    expect(document.querySelector('.terminal-minimap--open')).toBeTruthy()
+  })
+
+  it('does not apply terminal-minimap--open class when isOpen is false', () => {
+    render(<MiniMap isOpen={false} notes={noteFixtures} onSelect={vi.fn()} />)
+
+    expect(document.querySelector('.terminal-minimap--open')).toBeNull()
+  })
+
+  it('renders the close button when onClose is provided', () => {
+    render(<MiniMap notes={noteFixtures} onClose={vi.fn()} onSelect={vi.fn()} />)
+
+    expect(screen.getByRole('button', { name: 'close notes' })).toBeTruthy()
+  })
+
+  it('does not render the close button when onClose is not provided', () => {
+    render(<MiniMap notes={noteFixtures} onSelect={vi.fn()} />)
+
+    expect(screen.queryByRole('button', { name: 'close notes' })).toBeNull()
+  })
+
+  it('calls onClose when the close button is clicked', async () => {
+    const onClose = vi.fn()
+    render(<MiniMap notes={noteFixtures} onClose={onClose} onSelect={vi.fn()} />)
+
+    await userEvent.click(screen.getByRole('button', { name: 'close notes' }))
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
 })

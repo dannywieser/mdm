@@ -185,4 +185,44 @@ describe('Terminal', () => {
 
     expect(screen.getByText('mdm')).toBeTruthy()
   })
+
+  it('does not render the minimap toggle button before notes load', () => {
+    useNotesQueryMock.mockReturnValue({ data: undefined, error: null, isLoading: true })
+
+    render(<Terminal />)
+
+    expect(document.querySelector('.terminal-header-map-toggle')).toBeNull()
+  })
+
+  it('renders the minimap toggle button after notes load', async () => {
+    useNotesQueryMock.mockReturnValue({
+      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v', headerDateFormat: 'YYYY.MM.DD (ddd)' },
+      error: null,
+      isLoading: false,
+    })
+
+    render(<Terminal />)
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'open notes' })).toBeTruthy(),
+    )
+  })
+
+  it('opens the minimap overlay when the toggle button is clicked', async () => {
+    useNotesQueryMock.mockReturnValue({
+      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v', headerDateFormat: 'YYYY.MM.DD (ddd)' },
+      error: null,
+      isLoading: false,
+    })
+
+    render(<Terminal />)
+
+    await waitFor(() => screen.getByRole('button', { name: 'open notes' }))
+    await userEvent.click(screen.getByRole('button', { name: 'open notes' }))
+
+    await waitFor(() =>
+      expect(document.querySelector('.terminal-minimap--open')).toBeTruthy(),
+    )
+    expect(screen.getAllByRole('button', { name: 'close notes' }).length).toBeGreaterThan(0)
+  })
 })

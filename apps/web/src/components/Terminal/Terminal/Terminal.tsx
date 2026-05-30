@@ -42,6 +42,7 @@ export const Terminal = () => {
   const [history, setHistory] = useState<HistoryEntry[]>([])
   const [currentNotes, setCurrentNotes] = useState<Note[]>([])
   const [lastCommand, setLastCommand] = useState<string | null>(null)
+  const [miniMapOpen, setMiniMapOpen] = useState(false)
   const [scrollInfo, setScrollInfo] = useState<ScrollInfo>({
     firstLine: 1,
     lastLine: 0,
@@ -171,11 +172,20 @@ export const Terminal = () => {
   const scrollToNote = useCallback((noteId: string) => {
     const el = outputRef.current?.querySelector(`[data-note-id="${noteId}"]`)
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setMiniMapOpen(false)
+  }, [])
+
+  const handleToggleMiniMap = useCallback(() => {
+    setMiniMapOpen((prev) => !prev)
   }, [])
 
   return (
     <div className="terminal">
-      <TerminalHeader dateFormat={data?.headerDateFormat} />
+      <TerminalHeader
+        dateFormat={data?.headerDateFormat}
+        miniMapOpen={miniMapOpen}
+        onToggleMiniMap={currentNotes.length > 0 ? handleToggleMiniMap : undefined}
+      />
       <div className="terminal-body">
         <TerminalOutput
           ref={outputRef}
@@ -185,7 +195,12 @@ export const Terminal = () => {
           onScroll={handleOutputScroll}
         />
         {currentNotes.length > 0 && (
-          <MiniMap notes={currentNotes} onSelect={scrollToNote} />
+          <MiniMap
+            isOpen={miniMapOpen}
+            notes={currentNotes}
+            onClose={handleToggleMiniMap}
+            onSelect={scrollToNote}
+          />
         )}
       </div>
       {!isLoading && (

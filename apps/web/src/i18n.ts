@@ -17,6 +17,8 @@ type TranslationKey =
   | "terminal.help.clear"
   | "terminal.help.help"
   | "terminal.help.otd"
+  | "terminal.minimap.close"
+  | "terminal.minimap.open"
   | "terminal.noNotesToday"
 
 const translations: Record<Locale, Record<TranslationKey, string>> = {
@@ -31,6 +33,8 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "terminal.help.clear": "clear the terminal",
     "terminal.help.help": "list available commands",
     "terminal.help.otd": "show today's notes",
+    "terminal.minimap.close": "close notes",
+    "terminal.minimap.open": "open notes",
     "terminal.noNotesToday": "no notes found for today",
   },
 }

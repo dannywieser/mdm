@@ -424,6 +424,24 @@
   border-bottom: 1px solid var(--term-border-color);
   flex-shrink: 0;
   user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.terminal-minimap-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--term-muted);
+  font-size: 11px;
+  padding: 0 2px;
+  line-height: 1;
+  display: none;
+}
+
+.terminal-minimap-close:hover {
+  color: var(--term-text);
 }
 
 .terminal-minimap-list {
@@ -470,6 +488,61 @@
 
 .terminal-minimap-item:hover .terminal-minimap-title {
   color: var(--term-text);
+}
+
+/* ── Header map toggle (mobile only) ─────────────────────── */
+
+.terminal-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.terminal-header-map-toggle {
+  display: none;
+  background: none;
+  border: 1px solid var(--term-border-color);
+  color: var(--term-muted);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 2px;
+  line-height: 1;
+}
+
+.terminal-header-map-toggle:hover {
+  color: var(--term-text);
+  border-color: var(--term-green-dim);
+}
+
+/* ── Mobile breakpoint ───────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .terminal-header-map-toggle {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .terminal-minimap {
+    display: none;
+  }
+
+  .terminal-minimap--open {
+    display: flex;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    z-index: 10;
+  }
+
+  .terminal-minimap--open .terminal-minimap-close {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .terminal-body {
+    position: relative;
+  }
 }
 
 /* ── Status bar ──────────────────────────────────────────── */

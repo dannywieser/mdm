@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
 
 import { TerminalHeader } from './TerminalHeader'
 import { formatHeaderDate } from './TerminalHeader.util'
@@ -31,6 +32,33 @@ describe('TerminalHeader', () => {
     const dateEl = document.querySelector('.terminal-header-date')
     expect(dateEl).toBeTruthy()
     expect(dateEl!.textContent).toMatch(/^\d{2}\/\d{2}\/\d{4}$/)
+  })
+
+  it('does not render the toggle button when onToggleMiniMap is not provided', () => {
+    render(<TerminalHeader />)
+
+    expect(document.querySelector('.terminal-header-map-toggle')).toBeNull()
+  })
+
+  it('renders the toggle button with "open notes" label when miniMapOpen is false', () => {
+    render(<TerminalHeader miniMapOpen={false} onToggleMiniMap={vi.fn()} />)
+
+    expect(screen.getByRole('button', { name: 'open notes' })).toBeTruthy()
+  })
+
+  it('renders the toggle button with "close notes" label when miniMapOpen is true', () => {
+    render(<TerminalHeader miniMapOpen={true} onToggleMiniMap={vi.fn()} />)
+
+    expect(screen.getByRole('button', { name: 'close notes' })).toBeTruthy()
+  })
+
+  it('calls onToggleMiniMap when the toggle button is clicked', async () => {
+    const onToggleMiniMap = vi.fn()
+    render(<TerminalHeader miniMapOpen={false} onToggleMiniMap={onToggleMiniMap} />)
+
+    await userEvent.click(screen.getByRole('button', { name: 'open notes' }))
+
+    expect(onToggleMiniMap).toHaveBeenCalledTimes(1)
   })
 
   describe('formatHeaderDate', () => {
