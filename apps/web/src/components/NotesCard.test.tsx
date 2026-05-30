@@ -57,6 +57,17 @@ describe('NotesCard', () => {
     expect(document.querySelector('script')).toBeNull()
   })
 
+  it('preserves obsidian:// links after sanitization', () => {
+    const { container } = renderCard({
+      ...noteFixture,
+      html: '<a href="obsidian://open?vault=v&file=note">open in obsidian</a>',
+    })
+
+    const link = container.querySelector('a[href^="obsidian://"]')
+    expect(link).toBeTruthy()
+    expect(link?.getAttribute('href')).toBe('obsidian://open?vault=v&file=note')
+  })
+
   it('does not render linked notes section when linkedNotes is empty', () => {
     renderCard({ ...noteFixture, linkedNotes: [] })
 
@@ -64,8 +75,7 @@ describe('NotesCard', () => {
   })
 
   it('does not render linked notes section when linkedNotes is undefined', () => {
-    const { linkedNotes: _linkedNotes, ...noteWithoutLinked } = noteFixture
-    renderCard(noteWithoutLinked as Note)
+    renderCard({ ...noteFixture, linkedNotes: undefined } as Note)
 
     expect(screen.queryByText(/Linked Notes/)).toBeNull()
   })

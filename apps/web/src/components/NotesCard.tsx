@@ -6,13 +6,18 @@ import { useI18n } from '../i18n'
 
 import { noteContentStyles } from './NotesCard.styles'
 
+const SANITIZE_CONFIG: DOMPurify.Config = {
+  ALLOWED_URI_REGEXP:
+    /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|obsidian):|[^a-z]|[a-z+.-]+(?:[^a-z+.:-]|$))/i,
+}
+
 interface NotesCardProps {
   note: Note
 }
 
 export const NotesCard = ({ note }: NotesCardProps) => {
   const { t } = useI18n()
-  const sanitizedHtml = DOMPurify.sanitize(note.html)
+  const sanitizedHtml = DOMPurify.sanitize(note.html, SANITIZE_CONFIG)
 
   return (
     <Card.Root>
@@ -44,7 +49,7 @@ export const NotesCard = ({ note }: NotesCardProps) => {
                       <Box
                         css={noteContentStyles}
                         dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(linked.html),
+                          __html: DOMPurify.sanitize(linked.html, SANITIZE_CONFIG),
                         }}
                       />
                     </Card.Body>
