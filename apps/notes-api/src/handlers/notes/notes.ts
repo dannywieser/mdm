@@ -40,7 +40,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
     console.log(`[notes] ${filteredNotes.length}/${scannedNotes.length} note(s) passed view filter`)
 
     const parsedNotes = await Promise.all(
-      filteredNotes.map((note) => parseMarkdownFile(note, notesDirectory, attachmentsDirectory)),
+      filteredNotes.map((note) => parseMarkdownFile(note, notesDirectory, attachmentsDirectory, scannedNotes)),
     )
 
     response

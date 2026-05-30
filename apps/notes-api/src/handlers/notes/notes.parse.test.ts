@@ -43,6 +43,7 @@ describe("notes parse helpers", () => {
     })
     expect(note.html).toContain("<h1>Welcome</h1>")
     expect(note.html).toContain("<p>This is a note.</p>")
+    expect(note.linkedNotes).toEqual([])
     expect(readFileMock).toHaveBeenCalledWith("/notes/topic/welcome.md", "utf8")
   })
 
@@ -223,6 +224,155 @@ describe("notes parse helpers", () => {
     )
 
     expect(note.html).toContain('<img src="https://example.com/image.png"')
+  })
+
+  test("parseMarkdownFile replaces unmatched wikilink with dashed-underline span", async () => {
+    readFileMock.mockResolvedValue("See [[Missing Note]] for details.")
+    parseFrontMatterMock.mockReturnValue({
+      body: "See [[Missing Note]] for details.",
+      frontmatter: null,
+    })
+
+    const note = await parseMarkdownFile(
+      createScannedNote({ fullPath: "/notes/topic/note.md" }),
+      "/notes",
+      "attachments",
+      [],
+    )
+
+    expect(note.html).toContain('<span class="wikilink-unmatched">Missing Note</span>')
+    expect(note.linkedNotes).toEqual([])
+  })
+
+  test("parseMarkdownFile replaces matched wikilink with obsidian link and adds to linkedNotes", async () => {
+    const linkedScannedNote = createScannedNote({
+      basename: "other-note.md",
+      fullPath: "/notes/topic/other-note.md",
+      id: "other-note",
+      obsidianUrl: "obsidian://open?vault=vault&file=topic%2Fother-note",
+      title: "other-note",
+    })
+    readFileMock
+      .mockResolvedValueOnce("See [[other-note]] here.")
+      .mockResolvedValueOnce("# Other Note content")
+    parseFrontMatterMock
+      .mockReturnValueOnce({ body: "See [[other-note]] here.", frontmatter: null })
+      .mockReturnValueOnce({ body: "# Other Note content", frontmatter: null })
+
+    const note = await parseMarkdownFile(
+      createScannedNote({ fullPath: "/notes/topic/note.md" }),
+      "/notes",
+      "attachments",
+      [linkedScannedNote],
+    )
+
+    expect(note.html).toContain(
+      '<a href="obsidian://open?vault=vault&file=topic%2Fother-note">other-note</a>',
+    )
+    expect(note.linkedNotes).toHaveLength(1)
+    expect(note.linkedNotes?.[0]).toMatchObject({
+      id: "other-note",
+      title: "other-note",
+    })
+    expect(note.linkedNotes?.[0]?.html).toContain("<h1>Other Note content</h1>")
+  })
+
+  test("parseMarkdownFile uses alias text for matched wikilink display", async () => {
+    const linkedScannedNote = createScannedNote({
+      basename: "other-note.md",
+      fullPath: "/notes/topic/other-note.md",
+      id: "other-note",
+      obsidianUrl: "obsidian://open?vault=vault&file=topic%2Fother-note",
+      title: "other-note",
+    })
+    readFileMock
+      .mockResolvedValueOnce("See [[other-note|the linked note]] here.")
+      .mockResolvedValueOnce("# Other Note content")
+    parseFrontMatterMock
+      .mockReturnValueOnce({
+        body: "See [[other-note|the linked note]] here.",
+        frontmatter: null,
+      })
+      .mockReturnValueOnce({ body: "# Other Note content", frontmatter: null })
+
+    const note = await parseMarkdownFile(
+      createScannedNote({ fullPath: "/notes/topic/note.md" }),
+      "/notes",
+      "attachments",
+      [linkedScannedNote],
+    )
+
+    expect(note.html).toContain(
+      '<a href="obsidian://open?vault=vault&file=topic%2Fother-note">the linked note</a>',
+    )
+  })
+
+  test("parseMarkdownFile does not add the same linked note twice for multiple wikilinks", async () => {
+    const linkedScannedNote = createScannedNote({
+      basename: "other-note.md",
+      fullPath: "/notes/topic/other-note.md",
+      id: "other-note",
+      obsidianUrl: "obsidian://open?vault=vault&file=topic%2Fother-note",
+      title: "other-note",
+    })
+    readFileMock
+      .mockResolvedValueOnce("See [[other-note]] and [[other-note]] again.")
+      .mockResolvedValueOnce("# Other Note content")
+    parseFrontMatterMock
+      .mockReturnValueOnce({
+        body: "See [[other-note]] and [[other-note]] again.",
+        frontmatter: null,
+      })
+      .mockReturnValueOnce({ body: "# Other Note content", frontmatter: null })
+
+    const note = await parseMarkdownFile(
+      createScannedNote({ fullPath: "/notes/topic/note.md" }),
+      "/notes",
+      "attachments",
+      [linkedScannedNote],
+    )
+
+    expect(note.linkedNotes).toHaveLength(1)
+  })
+
+  test("parseMarkdownFile does not resolve wikilinks in linked notes (one level deep)", async () => {
+    const deepNote = createScannedNote({
+      basename: "deep-note.md",
+      fullPath: "/notes/topic/deep-note.md",
+      id: "deep-note",
+      obsidianUrl: "obsidian://open?vault=vault&file=topic%2Fdeep-note",
+      title: "deep-note",
+    })
+    const linkedNote = createScannedNote({
+      basename: "linked-note.md",
+      fullPath: "/notes/topic/linked-note.md",
+      id: "linked-note",
+      obsidianUrl: "obsidian://open?vault=vault&file=topic%2Flinked-note",
+      title: "linked-note",
+    })
+    readFileMock
+      .mockResolvedValueOnce("See [[linked-note]] here.")
+      .mockResolvedValueOnce("Linked note body with [[deep-note]] inside.")
+    parseFrontMatterMock
+      .mockReturnValueOnce({ body: "See [[linked-note]] here.", frontmatter: null })
+      .mockReturnValueOnce({
+        body: "Linked note body with [[deep-note]] inside.",
+        frontmatter: null,
+      })
+
+    const note = await parseMarkdownFile(
+      createScannedNote({ fullPath: "/notes/topic/note.md" }),
+      "/notes",
+      "attachments",
+      [linkedNote, deepNote],
+    )
+
+    expect(note.linkedNotes).toHaveLength(1)
+    // wikilink in linked note is rendered as unmatched span (no allNotes passed)
+    expect(note.linkedNotes?.[0]?.html).toContain(
+      '<span class="wikilink-unmatched">deep-note</span>',
+    )
+    expect(note.linkedNotes?.[0]?.linkedNotes).toEqual([])
   })
 })
 

@@ -11,28 +11,96 @@ import type { MarkdownNode, ScannedNote } from "./notes.types"
 const IMAGE_SERVER_PATH = "/images"
 const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
 const OBSIDIAN_WIKILINK_EMBED_PATTERN = /!\[\[([^\]|]+)(?:\|[^\]]*)?]]/g
+const WIKILINK_PATTERN = /(?<!!)\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g
+const WIKILINK_PLACEHOLDER_PATTERN = /WLPH(\d+)ENDWL/g
+
+interface WikilinkReplacement {
+  displayText: string
+  matchedNote: ScannedNote | null
+}
 
 export const parseMarkdownFile = async (
   note: ScannedNote,
   notesDirectory: string,
   attachmentsDirectory: string = "attachments",
+  allNotes: ScannedNote[] = [],
 ): Promise<Note> => {
   const source = await fs.readFile(note.fullPath, "utf8")
   const { body } = parseFrontMatter(source)
   const relativePath = path.relative(notesDirectory, note.fullPath)
   const normalizedRelativePath = relativePath.split(path.sep).join("/")
+
+  const { processedBody, linkedNoteRefs, replacements } = resolveWikilinks(body, allNotes)
+
   const markdownBody = rewriteMarkdownImageUrls(
-    body,
+    processedBody,
     normalizedRelativePath,
     attachmentsDirectory,
   )
-  const html = await remark().use(remarkHtml).process(markdownBody)
+  const rawHtml = await remark().use(remarkHtml).process(markdownBody)
+  const html = applyWikilinkReplacements(String(rawHtml), replacements)
+
+  const linkedNotes = await Promise.all(
+    linkedNoteRefs.map((linkedNote) =>
+      parseMarkdownFile(linkedNote, notesDirectory, attachmentsDirectory, []),
+    ),
+  )
 
   return {
     ...note,
-    html: String(html),
+    html,
+    linkedNotes,
   }
 }
+
+const resolveWikilinks = (
+  body: string,
+  allNotes: ScannedNote[],
+): { processedBody: string; linkedNoteRefs: ScannedNote[]; replacements: WikilinkReplacement[] } => {
+  const linkedNoteRefs: ScannedNote[] = []
+  const replacements: WikilinkReplacement[] = []
+
+  const processedBody = body.replace(
+    WIKILINK_PATTERN,
+    (_, noteRef: string, alias: string | undefined) => {
+      const noteName = noteRef.trim()
+      const displayText = alias?.trim() || noteName
+      const matchedNote =
+        allNotes.find((n) => n.title.toLowerCase() === noteName.toLowerCase()) ?? null
+
+      if (matchedNote && !linkedNoteRefs.some((n) => n.id === matchedNote.id)) {
+        linkedNoteRefs.push(matchedNote)
+      }
+
+      const index = replacements.length
+      replacements.push({ displayText, matchedNote })
+      return `WLPH${index}ENDWL`
+    },
+  )
+
+  return { processedBody, linkedNoteRefs, replacements }
+}
+
+const applyWikilinkReplacements = (
+  html: string,
+  replacements: WikilinkReplacement[],
+): string =>
+  html.replace(WIKILINK_PLACEHOLDER_PATTERN, (_, indexStr: string) => {
+    const replacement = replacements[parseInt(indexStr, 10)]
+
+    if (!replacement) {
+      return ""
+    }
+
+    const { displayText, matchedNote } = replacement
+    const escaped = escapeHtml(displayText)
+
+    if (matchedNote) {
+      return `<a href="${matchedNote.obsidianUrl}">${escaped}</a>`
+    }
+
+    return `<span class="wikilink-unmatched">${escaped}</span>`
+  })
 
 const rewriteMarkdownImageUrls = (
   markdownBody: string,
@@ -134,3 +202,13 @@ const safeDecodeURIComponent = (value: string): string => {
     return value
   }
 }
+
+const HTML_ESCAPE_MAP: Record<string, string> = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+}
+
+const escapeHtml = (text: string): string =>
+  text.replace(/[&<>"]/g, (char) => HTML_ESCAPE_MAP[char] ?? char)

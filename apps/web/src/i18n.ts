@@ -10,6 +10,7 @@ type TranslationKey =
   | "errors.unableToLoadNotes"
   | "notes.errorTitle"
   | "notes.header"
+  | "notes.linkedNotes"
   | "notes.meta"
 
 const translations: Record<Locale, Record<TranslationKey, string>> = {
@@ -17,6 +18,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "errors.unableToLoadNotes": "Unable to load notes",
     "notes.errorTitle": "Unable to load notes.",
     "notes.header": "Notes",
+    "notes.linkedNotes": "Linked Notes",
     "notes.meta": "Vault: {vault} · Directory: {directory}",
   },
 }

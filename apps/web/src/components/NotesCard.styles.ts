@@ -56,5 +56,10 @@ export const noteContentStyles = {
   '& img': {
     borderRadius: 'md',
     my: '4'
+  },
+  '& .wikilink-unmatched': {
+    textDecoration: 'underline',
+    textDecorationStyle: 'dashed',
+    textUnderlineOffset: '3px'
   }
 }
