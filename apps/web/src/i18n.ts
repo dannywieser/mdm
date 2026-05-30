@@ -12,6 +12,9 @@ type TranslationKey =
   | "notes.header"
   | "notes.linkedNotes"
   | "notes.meta"
+  | "terminal.appName"
+  | "terminal.ready"
+  | "terminal.inputPlaceholder"
 
 const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
@@ -20,6 +23,9 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "notes.header": "Notes",
     "notes.linkedNotes": "Linked Notes",
     "notes.meta": "Vault: {vault} · Directory: {directory}",
+    "terminal.appName": "mdm",
+    "terminal.ready": "Ready.",
+    "terminal.inputPlaceholder": "type a command...",
   },
 }
 
