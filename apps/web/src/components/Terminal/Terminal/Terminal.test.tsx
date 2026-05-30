@@ -34,7 +34,7 @@ describe('Terminal', () => {
 
     render(<Terminal />)
 
-    expect(screen.getByText('connecting…')).toBeTruthy()
+    expect(screen.getByRole('img', { name: 'connecting…' })).toBeTruthy()
   })
 
   it('renders error message when the query fails', () => {
@@ -51,7 +51,7 @@ describe('Terminal', () => {
 
   it('auto-runs otd and shows note titles when data loads', async () => {
     useNotesQueryMock.mockReturnValue({
-      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v' },
+      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v', headerDateFormat: 'YYYY.MM.DD (ddd)' },
       error: null,
       isLoading: false,
     })
@@ -67,7 +67,7 @@ describe('Terminal', () => {
 
   it('renders the mini-map after notes load', async () => {
     useNotesQueryMock.mockReturnValue({
-      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v' },
+      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v', headerDateFormat: 'YYYY.MM.DD (ddd)' },
       error: null,
       isLoading: false,
     })
@@ -81,7 +81,7 @@ describe('Terminal', () => {
 
   it('shows help output when the help command is submitted', async () => {
     useNotesQueryMock.mockReturnValue({
-      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v' },
+      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v', headerDateFormat: 'YYYY.MM.DD (ddd)' },
       error: null,
       isLoading: false,
     })
@@ -97,7 +97,7 @@ describe('Terminal', () => {
 
   it('shows error line for unknown commands', async () => {
     useNotesQueryMock.mockReturnValue({
-      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v' },
+      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v', headerDateFormat: 'YYYY.MM.DD (ddd)' },
       error: null,
       isLoading: false,
     })
@@ -114,7 +114,7 @@ describe('Terminal', () => {
 
   it('clears the terminal output when clear is submitted', async () => {
     useNotesQueryMock.mockReturnValue({
-      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v' },
+      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v', headerDateFormat: 'YYYY.MM.DD (ddd)' },
       error: null,
       isLoading: false,
     })

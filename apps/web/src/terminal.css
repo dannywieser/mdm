@@ -134,6 +134,17 @@
   margin: 8px 0;
 }
 
+/* ── Notebook loader (terminal-coloured) ─────────────────── */
+
+.terminal-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 200px;
+  color: var(--term-green);
+}
+
 @keyframes term-blink {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0; }
@@ -459,6 +470,23 @@
 
 .terminal-minimap-item:hover .terminal-minimap-title {
   color: var(--term-text);
+}
+
+/* ── Status bar ──────────────────────────────────────────── */
+
+.terminal-status-bar {
+  display: flex;
+  align-items: center;
+  padding: 2px 16px;
+  background-color: var(--term-header-bg);
+  border-top: 1px solid var(--term-border-color);
+  border-bottom: 1px solid var(--term-border-color);
+  flex-shrink: 0;
+  height: 22px;
+  box-sizing: border-box;
+  color: var(--term-muted);
+  font-size: 11px;
+  user-select: none;
 }
 
 /* ── Input area ──────────────────────────────────────────── */

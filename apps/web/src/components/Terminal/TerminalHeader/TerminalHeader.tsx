@@ -1,11 +1,10 @@
-export const TerminalHeader = () => {
-  const now = new Date()
-  const dateStr = now.toLocaleDateString('en-US', {
-    weekday: 'short',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
+import { formatHeaderDate } from './TerminalHeader.util'
+import type { TerminalHeaderProps } from './TerminalHeader.types'
+
+const DEFAULT_DATE_FORMAT = 'YYYY.MM.DD (ddd)'
+
+export const TerminalHeader = ({ dateFormat = DEFAULT_DATE_FORMAT }: TerminalHeaderProps = {}) => {
+  const dateStr = formatHeaderDate(new Date(), dateFormat)
 
   return (
     <div className="terminal-header">

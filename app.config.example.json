@@ -1,6 +1,7 @@
 {
   "attachmentsDirectory": "attachments",
   "dateFormats": ["YYYY.MM.DD", "YY/MM/DD"],
+  "headerDateFormat": "YYYY.MM.DD (ddd)",
   "noteRootDirectory": "/absolute/path/to/notes",
   "obsidianVault": "vault-name",
   "timeZone": "America/Edmonton",

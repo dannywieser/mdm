@@ -12,6 +12,12 @@ type TranslationKey =
   | "notes.header"
   | "notes.linkedNotes"
   | "notes.meta"
+  | "terminal.connecting"
+  | "terminal.errorMessage"
+  | "terminal.help.clear"
+  | "terminal.help.help"
+  | "terminal.help.otd"
+  | "terminal.noNotesToday"
 
 const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
@@ -20,6 +26,12 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "notes.header": "Notes",
     "notes.linkedNotes": "Linked Notes",
     "notes.meta": "Vault: {vault} · Directory: {directory}",
+    "terminal.connecting": "connecting…",
+    "terminal.errorMessage": "error: {message}",
+    "terminal.help.clear": "clear the terminal",
+    "terminal.help.help": "list available commands",
+    "terminal.help.otd": "show today's notes",
+    "terminal.noNotesToday": "no notes found for today",
   },
 }
 

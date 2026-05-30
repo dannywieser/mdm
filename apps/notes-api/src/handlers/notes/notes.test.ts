@@ -94,6 +94,7 @@ describe("notes handler interface", () => {
     resolveNotesConfigMock.mockResolvedValue({
       attachmentsDirectory: "attachments",
       dateFormats: ["YYYY.MM.DD"],
+      headerDateFormat: "YYYY.MM.DD (ddd)",
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -123,6 +124,7 @@ describe("notes handler interface", () => {
       notes: unknown[]
       notesDirectory: string
       obsidianVault: string
+      headerDateFormat: string
     }
 
     expect(response.status).toBe(200)
@@ -135,6 +137,7 @@ describe("notes handler interface", () => {
     ])
     expect(body.notesDirectory).toBe("/notes")
     expect(body.obsidianVault).toBe("vault")
+    expect(body.headerDateFormat).toBe("YYYY.MM.DD (ddd)")
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(scanMarkdownFileMock.mock.calls).toEqual([
@@ -179,6 +182,7 @@ describe("notes handler interface", () => {
     resolveNotesConfigMock.mockResolvedValue({
       attachmentsDirectory: "attachments",
       dateFormats: [],
+      headerDateFormat: "YYYY.MM.DD (ddd)",
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -225,6 +229,7 @@ describe("notes handler interface", () => {
     resolveNotesConfigMock.mockResolvedValue({
       attachmentsDirectory: "attachments",
       dateFormats: [],
+      headerDateFormat: "YYYY.MM.DD (ddd)",
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -256,6 +261,7 @@ describe("notes handler interface", () => {
         notesConfig: {
           attachmentsDirectory: string
           dateFormats: string[]
+          headerDateFormat: string
           notesDirectory: string
           obsidianVault: string
           views: unknown[]
@@ -267,6 +273,7 @@ describe("notes handler interface", () => {
     expect(loggedPayload.notesConfig).toEqual({
       attachmentsDirectory: "attachments",
       dateFormats: [],
+      headerDateFormat: "YYYY.MM.DD (ddd)",
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",

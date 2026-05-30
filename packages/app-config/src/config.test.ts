@@ -108,6 +108,7 @@ describe("config", () => {
     await expect(resolveNotesConfig()).resolves.toEqual({
       attachmentsDirectory: "attachments",
       dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
+      headerDateFormat: "YYYY.MM.DD (ddd)",
       notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
       timezone: "UTC",
@@ -134,6 +135,7 @@ describe("config", () => {
     await expect(resolveNotesConfig()).resolves.toEqual({
       attachmentsDirectory: "attachments",
       dateFormats: [],
+      headerDateFormat: "YYYY.MM.DD (ddd)",
       notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
       timezone: "UTC",
@@ -153,6 +155,7 @@ describe("config", () => {
     await expect(resolveNotesConfig()).resolves.toEqual({
       attachmentsDirectory: "attachments",
       dateFormats: ["YYYY.MM.DD"],
+      headerDateFormat: "YYYY.MM.DD (ddd)",
       notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
       timezone: "UTC",
@@ -199,6 +202,49 @@ describe("config", () => {
     await expect(resolveNotesConfig()).rejects.toEqual(
       new AppConfigError(
         "app.config.json attachmentsDirectory must be a non-empty string",
+      ),
+    )
+  })
+
+  test("includes the configured headerDateFormat in resolved config", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        headerDateFormat: "DD/MM/YYYY",
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      headerDateFormat: "DD/MM/YYYY",
+    })
+  })
+
+  test("defaults headerDateFormat to YYYY.MM.DD (ddd) when omitted", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      headerDateFormat: "YYYY.MM.DD (ddd)",
+    })
+  })
+
+  test("throws when headerDateFormat is not a non-empty string", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        headerDateFormat: "",
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json headerDateFormat must be a non-empty string",
       ),
     )
   })

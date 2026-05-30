@@ -14,7 +14,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { attachmentsDirectory, dateFormats, notesDirectory, obsidianVault, timezone, views } =
+    const { attachmentsDirectory, dateFormats, headerDateFormat, notesDirectory, obsidianVault, timezone, views } =
       notesConfig
 
     console.log("[notes] config resolved", { notesDirectory, obsidianVault, timezone })
@@ -45,7 +45,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
 
     response
       .status(200)
-      .json({ notes: parsedNotes, notesDirectory, obsidianVault })
+      .json({ notes: parsedNotes, notesDirectory, obsidianVault, headerDateFormat })
   } catch (error) {
     if (error instanceof AppConfigError) {
       response.status(500).json({ error: error.message })

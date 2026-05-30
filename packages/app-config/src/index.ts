@@ -37,6 +37,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   const parsedConfig = appConfig as Record<string, unknown>
   const attachmentsDirectory = parsedConfig["attachmentsDirectory"]
   const dateFormats = parsedConfig["dateFormats"]
+  const headerDateFormat = parsedConfig["headerDateFormat"]
   const noteRootDirectory = parsedConfig["noteRootDirectory"]
   const obsidianVault = parsedConfig["obsidianVault"]
   const timezone = parsedConfig["timezone"]
@@ -60,6 +61,15 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   ) {
     throw new AppConfigError(
       "app.config.json attachmentsDirectory must be a non-empty string",
+    )
+  }
+
+  if (
+    headerDateFormat !== undefined &&
+    !isNonEmptyString(headerDateFormat)
+  ) {
+    throw new AppConfigError(
+      "app.config.json headerDateFormat must be a non-empty string",
     )
   }
 
@@ -90,6 +100,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   return {
     attachmentsDirectory,
     dateFormats,
+    headerDateFormat,
     noteRootDirectory,
     obsidianVault,
     timezone: isNonEmptyString(timezone) ? timezone : undefined,
@@ -124,6 +135,7 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
   cachedNotesConfig = {
     attachmentsDirectory: appConfig.attachmentsDirectory ?? "attachments",
     dateFormats: appConfig.dateFormats ?? [],
+    headerDateFormat: appConfig.headerDateFormat ?? "YYYY.MM.DD (ddd)",
     notesDirectory: path.resolve(appConfig.noteRootDirectory),
     obsidianVault: appConfig.obsidianVault,
     timezone: appConfig.timezone ?? "UTC",

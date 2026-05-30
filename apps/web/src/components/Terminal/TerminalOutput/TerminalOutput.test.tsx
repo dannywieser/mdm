@@ -24,13 +24,13 @@ describe('TerminalOutput', () => {
   it('renders the loading indicator when isLoading is true', () => {
     render(<TerminalOutput history={[]} isLoading={true} error={null} />)
 
-    expect(screen.getByText('connecting…')).toBeTruthy()
+    expect(screen.getByRole('img', { name: 'connecting…' })).toBeTruthy()
   })
 
   it('does not render the loading indicator when isLoading is false', () => {
     render(<TerminalOutput history={[]} isLoading={false} error={null} />)
 
-    expect(screen.queryByText('connecting…')).toBeNull()
+    expect(screen.queryByRole('img', { name: 'connecting…' })).toBeNull()
   })
 
   it('renders an error message when error is provided', () => {
