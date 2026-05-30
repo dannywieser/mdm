@@ -1,11 +1,11 @@
 import { Route, Routes } from 'react-router-dom'
 
-import { NotesList } from './components/NotesList'
+import { Terminal } from './components/Terminal'
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<NotesList />} />
+      <Route path="/" element={<Terminal />} />
     </Routes>
   )
 }

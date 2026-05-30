@@ -1,0 +1,6 @@
+export { Terminal } from './Terminal'
+export { MiniMap } from './MiniMap'
+export { TerminalHeader } from './TerminalHeader'
+export { TerminalInput } from './TerminalInput'
+export { TerminalNoteBlock } from './TerminalNoteBlock'
+export { TerminalOutput } from './TerminalOutput'
