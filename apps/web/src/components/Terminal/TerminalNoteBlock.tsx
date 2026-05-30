@@ -37,6 +37,7 @@ export const TerminalNoteBlock = ({ note }: TerminalNoteBlockProps) => {
             onClick={() => setLinkedExpanded((v) => !v)}
             role="button"
             tabIndex={0}
+            aria-expanded={linkedExpanded}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') setLinkedExpanded((v) => !v)
             }}
