@@ -1,5 +1,7 @@
 import type { RequestHandler } from "express"
 
+import path from "node:path"
+
 import {
   buildImgproxyUrlPath,
   DEFAULT_MAX_WIDTH,
@@ -7,6 +9,7 @@ import {
 } from "./images.util"
 
 export interface ImageProxyConfig {
+  imgproxyEnabled: boolean
   imgproxyPathPrefix: string
   imagesRoot: string
   maxWidth: number
@@ -20,6 +23,12 @@ export const createImageHandler = (config: ImageProxyConfig): RequestHandler => 
 
     if (!resolvedImagePath) {
       response.status(400).json({ error: "A valid local image path is required" })
+      return
+    }
+
+    if (!config.imgproxyEnabled) {
+      const absolutePath = path.join(config.imagesRoot, resolvedImagePath)
+      response.sendFile(absolutePath)
       return
     }
 
@@ -37,6 +46,7 @@ export const resolveImageProxyConfig = (): ImageProxyConfig => {
   const maxWidth = Number(process.env.IMAGE_MAX_WIDTH ?? DEFAULT_MAX_WIDTH)
 
   return {
+    imgproxyEnabled: process.env.IMGPROXY_ENABLED !== "false",
     imgproxyPathPrefix: process.env.IMGPROXY_PATH_PREFIX ?? "/imgproxy",
     imagesRoot: process.env.IMAGES_ROOT ?? "/data/images",
     maxWidth: Number.isFinite(maxWidth) && maxWidth > 0 ? maxWidth : DEFAULT_MAX_WIDTH,

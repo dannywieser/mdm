@@ -14,6 +14,14 @@ type RuntimeRedisClient = FlagRedisClient & {
   on: (event: "error", listener: (error: unknown) => void) => void
 }
 
+const createInMemoryClient = (): FlagRedisClient => {
+  const store = new Map<string, string>()
+  return {
+    get: async (key) => store.get(key) ?? null,
+    set: async (key, value) => { store.set(key, value) },
+  }
+}
+
 export const createApp = (
   redisClient: FlagRedisClient,
   flagDefinitions: Record<string, FlagDefinition>,
@@ -52,16 +60,23 @@ export const createRedisClient = (
 }
 
 const startServer = async (): Promise<void> => {
-  const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379"
+  const redisEnabled = process.env.REDIS_ENABLED !== "false"
   const port = Number(process.env.PORT ?? 3001)
-  const redisClient = createRedisClient(redisUrl)
   const flagDefinitions = await resolveFlagDefinitions()
 
-  redisClient.on("error", (error) => {
-    console.error("Redis client error", error)
-  })
-
-  await redisClient.connect()
+  let redisClient: FlagRedisClient
+  if (redisEnabled) {
+    const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379"
+    const client = createRedisClient(redisUrl)
+    client.on("error", (error) => {
+      console.error("Redis client error", error)
+    })
+    await client.connect()
+    redisClient = client
+  } else {
+    console.log("Redis disabled — using in-memory store")
+    redisClient = createInMemoryClient()
+  }
 
   const app = createApp(redisClient, flagDefinitions)
 
