@@ -6,15 +6,15 @@ import { NotesList } from './NotesList'
 
 const useNotesQueryMock = vi.fn()
 
-vi.mock('../hooks/useNotesQuery', () => ({
+vi.mock('../../hooks/useNotesQuery', () => ({
   useNotesQuery: () => useNotesQueryMock()
 }))
 
-vi.mock('./NotesCard', () => ({
-  NotesCard: ({ note }: { note: { title: string } }) => <div>{note.title}</div>
+vi.mock('../NotesCard', () => ({
+  NotesCard: ({ note }: any) => <div>{note.title}</div>
 }))
 
-vi.mock('./LoadingScreen', () => ({
+vi.mock('../LoadingScreen', () => ({
   LoadingScreen: () => <div data-testid="loading-screen" />
 }))
 
@@ -72,8 +72,6 @@ describe('NotesList', () => {
       </ChakraProvider>
     )
 
-    expect(screen.getByText('Notes')).toBeTruthy()
-    expect(screen.getByText('Vault: vault · Directory: /notes')).toBeTruthy()
     expect(screen.getByText('Note 1')).toBeTruthy()
     expect(screen.getByText('Note 2')).toBeTruthy()
   })

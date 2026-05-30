@@ -2,6 +2,7 @@ export const noteContentStyles = {
   '& h1, & h2, & h3, & h4, & h5, & h6': {
     fontWeight: 'semibold',
     lineHeight: 'shorter',
+    color: 'green.300',
     mt: '6',
     mb: '3'
   },
@@ -27,29 +28,32 @@ export const noteContentStyles = {
     mt: '0.5'
   },
   '& li.task-list-item .task-list-icon--checked': {
-    color: 'green.600'
+    color: 'green.500'
   },
   '& li.task-list-item .task-list-icon--unchecked': {
-    color: 'fg.muted'
+    color: 'green.900'
   },
-  '& a': { color: 'colorPalette.fg', textDecoration: 'underline' },
+  '& a': { color: 'green.400', textDecoration: 'underline', _hover: { color: 'green.300' } },
   '& blockquote': {
     borderInlineStartWidth: '4px',
-    borderColor: 'border.emphasized',
-    color: 'fg.muted',
+    borderColor: 'green.900',
+    color: 'green.600',
     pl: '4',
     py: '1',
     my: '4'
   },
   '& pre': {
-    bg: 'bg.muted',
+    bg: 'black',
+    borderWidth: '1px',
+    borderColor: 'green.900',
     borderRadius: 'md',
     overflowX: 'auto',
     p: '4',
     my: '4'
   },
   '& code': {
-    bg: 'bg.muted',
+    bg: 'black',
+    color: 'green.300',
     borderRadius: 'sm',
     px: '1.5',
     py: '0.5'
@@ -65,13 +69,16 @@ export const noteContentStyles = {
   },
   '& th, & td': {
     borderWidth: '1px',
-    borderColor: 'border.subtle',
+    borderColor: 'green.900',
     px: '3',
     py: '2',
     textAlign: 'left'
   },
+  '& th': {
+    color: 'green.300'
+  },
   '& hr': {
-    borderColor: 'border.subtle',
+    borderColor: 'green.900',
     my: '6'
   },
   '& img': {
@@ -79,6 +86,7 @@ export const noteContentStyles = {
     my: '4'
   },
   '& .wikilink-unmatched': {
+    color: 'green.700',
     textDecoration: 'underline',
     textDecorationStyle: 'dashed',
     textUnderlineOffset: '3px'
