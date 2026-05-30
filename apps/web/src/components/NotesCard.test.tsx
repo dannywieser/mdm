@@ -64,7 +64,7 @@ describe('NotesCard', () => {
   })
 
   it('does not render linked notes section when linkedNotes is undefined', () => {
-    const { linkedNotes: _, ...noteWithoutLinked } = noteFixture
+    const { linkedNotes: _linkedNotes, ...noteWithoutLinked } = noteFixture
     renderCard(noteWithoutLinked as Note)
 
     expect(screen.queryByText(/Linked Notes/)).toBeNull()
