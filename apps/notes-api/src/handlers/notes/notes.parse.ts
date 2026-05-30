@@ -4,6 +4,7 @@ import { parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
+import remarkGfm from "remark-gfm"
 import remarkHtml from "remark-html"
 
 import type { MarkdownNode, ScannedNote } from "./notes.types"
@@ -18,6 +19,17 @@ interface WikilinkReplacement {
   displayText: string
   matchedNote: ScannedNote | null
 }
+
+const TASK_LIST_ICON_SVG_ATTRS =
+  'xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
+
+const CHECKED_ICON = `<svg ${TASK_LIST_ICON_SVG_ATTRS} class="task-list-icon task-list-icon--checked"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`
+const UNCHECKED_ICON = `<svg ${TASK_LIST_ICON_SVG_ATTRS} class="task-list-icon task-list-icon--unchecked"><path d="M10.1 2.182a10 10 0 0 1 3.8 0"/><path d="M13.9 21.818a10 10 0 0 1-3.8 0"/><path d="M17.609 3.721a10 10 0 0 1 2.69 2.7"/><path d="M2.182 13.9a10 10 0 0 1 0-3.8"/><path d="M20.279 17.609a10 10 0 0 1-2.7 2.69"/><path d="M21.818 10.1a10 10 0 0 1 0 3.8"/><path d="M3.721 6.391a10 10 0 0 1 2.7-2.69"/><path d="M6.391 20.279a10 10 0 0 1-2.69-2.7"/></svg>`
+
+export const processTaskListHtml = (html: string): string =>
+  html.replace(/<input\s+[^>]*type="checkbox"[^>]*>/gi, (match) =>
+    /\bchecked\b/i.test(match) ? CHECKED_ICON : UNCHECKED_ICON,
+  )
 
 export const parseMarkdownFile = async (
   note: ScannedNote,
@@ -37,8 +49,8 @@ export const parseMarkdownFile = async (
     normalizedRelativePath,
     attachmentsDirectory,
   )
-  const rawHtml = await remark().use(remarkHtml).process(markdownBody)
-  const html = applyWikilinkReplacements(String(rawHtml), replacements)
+  const rawHtml = await remark().use(remarkGfm).use(remarkHtml).process(markdownBody)
+  const html = applyWikilinkReplacements(processTaskListHtml(String(rawHtml)), replacements)
 
   const linkedNotes = await Promise.all(
     linkedNoteRefs.map((linkedNote) =>
@@ -108,7 +120,7 @@ const rewriteMarkdownImageUrls = (
   attachmentsDirectory: string,
 ): string => {
   const normalizedBody = normalizeObsidianWikiEmbeds(markdownBody)
-  const markdownTree = remark().parse(normalizedBody)
+  const markdownTree = remark().use(remarkGfm).parse(normalizedBody)
 
   visitMarkdownTree(markdownTree, (node) => {
     if (node.type !== "image" || typeof node.url !== "string") {
@@ -124,7 +136,7 @@ const rewriteMarkdownImageUrls = (
     node.url = `${IMAGE_SERVER_PATH}?path=${encodeURIComponent(imagePath)}`
   })
 
-  return String(remark().stringify(markdownTree))
+  return String(remark().use(remarkGfm).stringify(markdownTree))
 }
 
 const normalizeObsidianWikiEmbeds = (markdownBody: string): string =>

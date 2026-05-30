@@ -9,8 +9,29 @@ export const noteContentStyles = {
   '& h2': { fontSize: 'xl' },
   '& h3': { fontSize: 'lg' },
   '& p': { mb: '4', lineHeight: 'tall' },
-  '& ul, & ol': { pl: '6', mb: '4' },
+  '& ul': { pl: '6', mb: '4', listStyleType: 'disc' },
+  '& ol': { pl: '6', mb: '4', listStyleType: 'decimal' },
   '& li': { mb: '1' },
+  '& ul.contains-task-list': {
+    listStyleType: 'none',
+    pl: '0'
+  },
+  '& li.task-list-item': {
+    listStyleType: 'none',
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '2'
+  },
+  '& li.task-list-item .task-list-icon': {
+    flexShrink: 0,
+    mt: '0.5'
+  },
+  '& li.task-list-item .task-list-icon--checked': {
+    color: 'green.600'
+  },
+  '& li.task-list-item .task-list-icon--unchecked': {
+    color: 'fg.muted'
+  },
   '& a': { color: 'colorPalette.fg', textDecoration: 'underline' },
   '& blockquote': {
     borderInlineStartWidth: '4px',
