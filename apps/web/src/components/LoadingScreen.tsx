@@ -2,6 +2,7 @@ import { Box } from '@chakra-ui/react'
 
 export const LoadingScreen = () => (
   <Box
+    data-testid="loading-screen"
     display="flex"
     alignItems="center"
     justifyContent="center"

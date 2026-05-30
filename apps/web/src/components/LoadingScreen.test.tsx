@@ -16,13 +16,13 @@ describe('LoadingScreen', () => {
   })
 
   it('renders centered in full viewport', () => {
-    const { container } = render(
+    render(
       <ChakraProvider value={defaultSystem}>
         <LoadingScreen />
       </ChakraProvider>
     )
 
-    const wrapper = container.firstChild as HTMLElement
-    expect(wrapper).toBeTruthy()
+    const containers = screen.getAllByTestId('loading-screen')
+    expect(containers.length).toBeGreaterThan(0)
   })
 })
