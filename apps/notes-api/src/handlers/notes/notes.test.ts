@@ -159,6 +159,7 @@ describe("notes handler interface", () => {
       scannedNotes[0],
       "/notes",
       "attachments",
+      scannedNotes,
     )
   })
 

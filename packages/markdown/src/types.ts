@@ -13,6 +13,7 @@ export interface Note {
   fullPath: string
   html: string
   id: string
+  linkedNotes?: Note[]
   modifiedDate: string
   obsidianUrl: string
   title: string

@@ -9,9 +9,14 @@ import remarkHtml from "remark-html"
 
 import type { MarkdownNode, ScannedNote } from "./notes.types"
 
+import {
+  applyWikilinkReplacements,
+  normalizeObsidianWikiEmbeds,
+  resolveWikilinks,
+} from "./notes.wikilinks"
+
 const IMAGE_SERVER_PATH = "/images"
 const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
-const OBSIDIAN_WIKILINK_EMBED_PATTERN = /!\[\[([^\]|]+)(?:\|[^\]]*)?]]/g
 
 const TASK_LIST_ICON_SVG_ATTRS =
   'xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
@@ -28,21 +33,33 @@ export const parseMarkdownFile = async (
   note: ScannedNote,
   notesDirectory: string,
   attachmentsDirectory: string = "attachments",
+  allNotes: ScannedNote[] = [],
 ): Promise<Note> => {
   const source = await fs.readFile(note.fullPath, "utf8")
   const { body } = parseFrontMatter(source)
   const relativePath = path.relative(notesDirectory, note.fullPath)
   const normalizedRelativePath = relativePath.split(path.sep).join("/")
+
+  const { processedBody, linkedNoteRefs, replacements } = resolveWikilinks(body, allNotes)
+
   const markdownBody = rewriteMarkdownImageUrls(
-    body,
+    processedBody,
     normalizedRelativePath,
     attachmentsDirectory,
   )
-  const html = await remark().use(remarkGfm).use(remarkHtml).process(markdownBody)
+  const rawHtml = await remark().use(remarkGfm).use(remarkHtml).process(markdownBody)
+  const html = applyWikilinkReplacements(processTaskListHtml(String(rawHtml)), replacements)
+
+  const linkedNotes = await Promise.all(
+    linkedNoteRefs.map((linkedNote) =>
+      parseMarkdownFile(linkedNote, notesDirectory, attachmentsDirectory, []),
+    ),
+  )
 
   return {
     ...note,
-    html: processTaskListHtml(String(html)),
+    html,
+    linkedNotes,
   }
 }
 
@@ -70,9 +87,6 @@ const rewriteMarkdownImageUrls = (
 
   return String(remark().use(remarkGfm).stringify(markdownTree))
 }
-
-const normalizeObsidianWikiEmbeds = (markdownBody: string): string =>
-  markdownBody.replace(OBSIDIAN_WIKILINK_EMBED_PATTERN, "![]($1)")
 
 const resolveLocalImagePath = (
   rawImagePath: string,
