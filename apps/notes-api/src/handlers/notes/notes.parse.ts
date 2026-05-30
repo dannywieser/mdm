@@ -7,13 +7,16 @@ import remark from "remark"
 import remarkGfm from "remark-gfm"
 import remarkHtml from "remark-html"
 
-import type { MarkdownNode, ScannedNote, WikilinkReplacement } from "./notes.types"
+import type { MarkdownNode, ScannedNote } from "./notes.types"
+
+import {
+  applyWikilinkReplacements,
+  normalizeObsidianWikiEmbeds,
+  resolveWikilinks,
+} from "./notes.wikilinks"
 
 const IMAGE_SERVER_PATH = "/images"
 const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
-const OBSIDIAN_WIKILINK_EMBED_PATTERN = /!\[\[([^\]|]+)(?:\|[^\]]*)?]]/g
-const WIKILINK_PATTERN = /(?<!!)\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g
-const WIKILINK_PLACEHOLDER_PATTERN = /WLPH(\d+)ENDWL/g
 
 const TASK_LIST_ICON_SVG_ATTRS =
   'xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
@@ -60,55 +63,6 @@ export const parseMarkdownFile = async (
   }
 }
 
-const resolveWikilinks = (
-  body: string,
-  allNotes: ScannedNote[],
-): { processedBody: string; linkedNoteRefs: ScannedNote[]; replacements: WikilinkReplacement[] } => {
-  const linkedNoteRefs: ScannedNote[] = []
-  const replacements: WikilinkReplacement[] = []
-
-  const processedBody = body.replace(
-    WIKILINK_PATTERN,
-    (_, noteRef: string, alias: string | undefined) => {
-      const noteName = noteRef.trim()
-      const displayText = alias?.trim() || noteName
-      const matchedNote =
-        allNotes.find((n) => n.title.toLowerCase() === noteName.toLowerCase()) ?? null
-
-      if (matchedNote && !linkedNoteRefs.some((n) => n.id === matchedNote.id)) {
-        linkedNoteRefs.push(matchedNote)
-      }
-
-      const index = replacements.length
-      replacements.push({ displayText, matchedNote })
-      return `WLPH${index}ENDWL`
-    },
-  )
-
-  return { processedBody, linkedNoteRefs, replacements }
-}
-
-const applyWikilinkReplacements = (
-  html: string,
-  replacements: WikilinkReplacement[],
-): string =>
-  html.replace(WIKILINK_PLACEHOLDER_PATTERN, (_, indexStr: string) => {
-    const replacement = replacements[parseInt(indexStr, 10)]
-
-    if (!replacement) {
-      return ""
-    }
-
-    const { displayText, matchedNote } = replacement
-    const escaped = escapeHtml(displayText)
-
-    if (matchedNote) {
-      return `<a href="${matchedNote.obsidianUrl}">${escaped}</a>`
-    }
-
-    return `<span class="wikilink-unmatched">${escaped}</span>`
-  })
-
 const rewriteMarkdownImageUrls = (
   markdownBody: string,
   noteRelativePath: string,
@@ -133,9 +87,6 @@ const rewriteMarkdownImageUrls = (
 
   return String(remark().use(remarkGfm).stringify(markdownTree))
 }
-
-const normalizeObsidianWikiEmbeds = (markdownBody: string): string =>
-  markdownBody.replace(OBSIDIAN_WIKILINK_EMBED_PATTERN, "![]($1)")
 
 const resolveLocalImagePath = (
   rawImagePath: string,
@@ -209,14 +160,3 @@ const safeDecodeURIComponent = (value: string): string => {
     return value
   }
 }
-
-const HTML_ESCAPE_MAP: Record<string, string> = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#39;",
-}
-
-const escapeHtml = (text: string): string =>
-  text.replace(/[&<>"']/g, (char) => HTML_ESCAPE_MAP[char] ?? char)
