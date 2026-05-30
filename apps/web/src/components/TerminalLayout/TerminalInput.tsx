@@ -34,9 +34,10 @@ export function TerminalInput({ onSubmit }: TerminalInputProps) {
           placeholder={t("terminal.inputPlaceholder")}
           color="green.400"
           caretColor="green.400"
-          _placeholder={{ color: "green.900" }}
-          fontSize="sm"
+          _placeholder={{ color: "white" }}
+          fontSize="md"
           borderBottomWidth={0}
+          _focusVisible={{ borderBottomWidth: 0, boxShadow: "none" }}
           onKeyDown={handleKeyDown}
         />
       </Flex>
