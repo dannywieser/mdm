@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Note } from 'markdown'
 
+import { useDocumentTitle } from '../../../hooks/useDocumentTitle'
 import { useNotesQuery } from '../../../hooks/useNotesQuery'
 import { MiniMap } from '../MiniMap/MiniMap'
 import { TerminalHeader } from '../TerminalHeader/TerminalHeader'
@@ -40,6 +41,7 @@ export const Terminal = () => {
   const { data, error, isLoading } = useNotesQuery()
   const [history, setHistory] = useState<HistoryEntry[]>([])
   const [currentNotes, setCurrentNotes] = useState<Note[]>([])
+  const [lastCommand, setLastCommand] = useState<string | null>(null)
   const [scrollInfo, setScrollInfo] = useState<ScrollInfo>({
     firstLine: 1,
     lastLine: 0,
@@ -49,6 +51,8 @@ export const Terminal = () => {
   const hasAutoRun = useRef(false)
   const outputRef = useRef<HTMLDivElement>(null)
 
+  useDocumentTitle(lastCommand)
+
   const executeCommand = useCallback(
     (cmd: string, bootstrapNotes?: Note[]) => {
       const trimmed = cmd.trim().toLowerCase()
@@ -56,6 +60,7 @@ export const Terminal = () => {
       if (trimmed === 'clear') {
         setHistory([])
         setCurrentNotes([])
+        setLastCommand(null)
         return
       }
 
@@ -73,14 +78,17 @@ export const Terminal = () => {
           { id: nextId(), type: 'otd', notes },
         ])
         setCurrentNotes(notes)
+        setLastCommand('otd')
       } else if (trimmed === 'help') {
         setHistory((prev) => [...prev, commandEntry, { id: nextId(), type: 'help' }])
+        setLastCommand('help')
       } else {
         setHistory((prev) => [
           ...prev,
           commandEntry,
           { id: nextId(), type: 'error', errorMessage: `command not found: ${trimmed}` },
         ])
+        setLastCommand(trimmed)
       }
     },
     [data],
@@ -96,6 +104,7 @@ export const Terminal = () => {
         { id: nextId(), type: 'otd', notes },
       ])
       setCurrentNotes(notes)
+      setLastCommand('otd')
     }
   }, [data])
 

@@ -134,6 +134,50 @@ describe('Terminal', () => {
     )
   })
 
+  it('sets document title to "mdm | otd" after auto-run', async () => {
+    useNotesQueryMock.mockReturnValue({
+      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v', headerDateFormat: 'YYYY.MM.DD (ddd)' },
+      error: null,
+      isLoading: false,
+    })
+
+    render(<Terminal />)
+
+    await waitFor(() => expect(document.title).toBe('mdm | otd'))
+  })
+
+  it('updates document title to "mdm | help" when help is run', async () => {
+    useNotesQueryMock.mockReturnValue({
+      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v', headerDateFormat: 'YYYY.MM.DD (ddd)' },
+      error: null,
+      isLoading: false,
+    })
+
+    render(<Terminal />)
+
+    const input = screen.getByRole('textbox', { name: /terminal input/i })
+    await userEvent.type(input, 'help{enter}')
+
+    await waitFor(() => expect(document.title).toBe('mdm | help'))
+  })
+
+  it('resets document title to "mdm" when clear is run', async () => {
+    useNotesQueryMock.mockReturnValue({
+      data: { notes: noteFixtures, notesDirectory: '/notes', obsidianVault: 'v', headerDateFormat: 'YYYY.MM.DD (ddd)' },
+      error: null,
+      isLoading: false,
+    })
+
+    render(<Terminal />)
+
+    await waitFor(() => expect(document.title).toBe('mdm | otd'))
+
+    const input = screen.getByRole('textbox', { name: /terminal input/i })
+    await userEvent.type(input, 'clear{enter}')
+
+    await waitFor(() => expect(document.title).toBe('mdm'))
+  })
+
   it('renders the mdm header with date', () => {
     useNotesQueryMock.mockReturnValue({ data: undefined, error: null, isLoading: true })
 
