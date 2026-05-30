@@ -1,4 +1,4 @@
-import { Card, Flex, Heading, IconButton, Tooltip } from "@chakra-ui/react"
+import { Card, Flex, Heading, IconButton } from "@chakra-ui/react"
 import { ExternalLink } from "lucide-react"
 import type { Note } from "markdown"
 
@@ -12,24 +12,23 @@ export function NoteHeader({ note }: NoteHeaderProps) {
   const { t } = useI18n()
 
   return (
-    <Card.Header borderBottom="1px solid" borderColor="green.900">
+    <Card.Header borderBottom="1px solid" borderColor="green.900" px={3} py={2}>
       <Flex align="center" justify="space-between">
         <Heading size="md" color="green.300">
           {note.title}
         </Heading>
-        <Tooltip content={t("notes.openInObsidian")}>
-          <IconButton
-            as="a"
-            href={note.obsidianUrl}
-            size="xs"
-            variant="ghost"
-            color="green.700"
-            _hover={{ color: "green.400" }}
-            aria-label={t("notes.openInObsidian")}
-          >
+        <IconButton
+          asChild
+          size="xs"
+          variant="ghost"
+          color="green.700"
+          _hover={{ bg: "green.800", color: "white" }}
+          aria-label={t("notes.openInObsidian")}
+        >
+          <a href={note.obsidianUrl}>
             <ExternalLink size={14} />
-          </IconButton>
-        </Tooltip>
+          </a>
+        </IconButton>
       </Flex>
     </Card.Header>
   )
