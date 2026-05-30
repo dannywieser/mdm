@@ -1,9 +1,21 @@
 import { ChakraProvider, defaultSystem } from '@chakra-ui/react'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import type { Note } from 'markdown'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { NotesCard } from './NotesCard'
+
+const useIsReadMock = vi.fn()
+const useToggleNoteReadMock = vi.fn()
+const mutateMock = vi.fn()
+
+vi.mock('../hooks/useIsRead', () => ({
+  useIsRead: (noteId: string) => useIsReadMock(noteId),
+}))
+
+vi.mock('../hooks/useToggleNoteRead', () => ({
+  useToggleNoteRead: (noteId: string) => useToggleNoteReadMock(noteId),
+}))
 
 const noteFixture: Note = {
   basename: 'My Note',
@@ -17,7 +29,7 @@ const noteFixture: Note = {
   linkedNotes: [],
   modifiedDate: '2026-01-01',
   obsidianUrl: 'obsidian://open?vault=dgw&file=daily%2Fmy-note',
-  title: 'My Note Title'
+  title: 'My Note Title',
 }
 
 const linkedNoteFixture: Note = {
@@ -32,7 +44,7 @@ const linkedNoteFixture: Note = {
   linkedNotes: [],
   modifiedDate: '2026-01-01',
   obsidianUrl: 'obsidian://open?vault=dgw&file=daily%2Flinked-note',
-  title: 'Linked Note Title'
+  title: 'Linked Note Title',
 }
 
 const renderCard = (note: Note) =>
@@ -41,6 +53,15 @@ const renderCard = (note: Note) =>
       <NotesCard note={note} />
     </ChakraProvider>
   )
+
+beforeEach(() => {
+  mutateMock.mockReset()
+  useIsReadMock.mockReturnValue({ data: false })
+  useToggleNoteReadMock.mockReturnValue({
+    isPending: false,
+    mutate: mutateMock,
+  })
+})
 
 describe('NotesCard', () => {
   it('renders the note title and html content', () => {
@@ -106,5 +127,23 @@ describe('NotesCard', () => {
     expect(container.querySelector('.task-list-icon--checked')).toBeTruthy()
     expect(container.querySelector('.task-list-icon--unchecked')).toBeTruthy()
     expect(container.querySelector('input[type="checkbox"]')).toBeNull()
+  })
+
+  it('collapses the note body when the note is read', () => {
+    useIsReadMock.mockReturnValue({ data: true })
+
+    renderCard(noteFixture)
+
+    expect(screen.getByText('My Note Title')).toBeTruthy()
+    expect(screen.queryByText('Hello')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Mark as unread' })).toBeTruthy()
+  })
+
+  it('toggles the note read state from the header button', () => {
+    renderCard(noteFixture)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mark as read' }))
+
+    expect(mutateMock).toHaveBeenCalledTimes(1)
   })
 })
