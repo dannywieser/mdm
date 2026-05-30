@@ -208,7 +208,8 @@ const HTML_ESCAPE_MAP: Record<string, string> = {
   "<": "&lt;",
   ">": "&gt;",
   '"': "&quot;",
+  "'": "&#39;",
 }
 
 const escapeHtml = (text: string): string =>
-  text.replace(/[&<>"]/g, (char) => HTML_ESCAPE_MAP[char] ?? char)
+  text.replace(/[&<>"']/g, (char) => HTML_ESCAPE_MAP[char] ?? char)
