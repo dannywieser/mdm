@@ -54,6 +54,7 @@ const renderCard = (note: Note) =>
     </ChakraProvider>
   )
 
+
 afterEach(() => {
   cleanup()
 })

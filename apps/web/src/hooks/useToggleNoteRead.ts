@@ -29,13 +29,13 @@ export const useToggleNoteRead = (noteId: string) => {
   return useMutation({
     mutationFn: () => toggleNoteRead(noteId),
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: [...queryKey] })
+      await queryClient.cancelQueries({ queryKey })
     },
     onSuccess: (isRead) => {
       queryClient.setQueryData(queryKey, isRead)
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: [...queryKey] })
+      await queryClient.invalidateQueries({ queryKey })
     },
   })
 }
