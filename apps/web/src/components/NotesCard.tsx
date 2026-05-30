@@ -1,5 +1,5 @@
 import { Box, Card, Collapsible, Heading } from '@chakra-ui/react'
-import DOMPurify from 'dompurify'
+import DOMPurify, { type Config as DOMPurifyConfig } from 'dompurify'
 import type { Note } from 'markdown'
 
 import { useI18n } from '../i18n'
@@ -7,7 +7,7 @@ import { useI18n } from '../i18n'
 import { noteContentStyles } from './NotesCard.styles'
 
 // Extends DOMPurify's default allowed protocols to include obsidian:// deep links.
-const SANITIZE_CONFIG: DOMPurify.Config = {
+const SANITIZE_CONFIG: DOMPurifyConfig = {
   ALLOWED_URI_REGEXP:
     /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|obsidian):|[^a-z]|[a-z+.-]+(?:[^a-z+.:-]|$))/i,
 }
