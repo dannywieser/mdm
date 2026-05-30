@@ -1,6 +1,6 @@
 {
   "name": "image-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "main": "dist/server.js",
   "scripts": {
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "express": "5.2.1",
-    "mdm-util": "1.0.0",
+    "mdm-util": "1.1.0",
     "morgan": "1.10.1"
   }
 }
