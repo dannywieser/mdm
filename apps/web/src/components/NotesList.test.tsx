@@ -14,7 +14,27 @@ vi.mock('./NotesCard', () => ({
   NotesCard: ({ note }: { note: { title: string } }) => <div>{note.title}</div>
 }))
 
+vi.mock('./LoadingScreen', () => ({
+  LoadingScreen: () => <div data-testid="loading-screen" />
+}))
+
 describe('NotesList', () => {
+  it('renders the loading screen while fetching', () => {
+    useNotesQueryMock.mockReturnValue({
+      data: undefined,
+      error: undefined,
+      isLoading: true
+    })
+
+    render(
+      <ChakraProvider value={defaultSystem}>
+        <NotesList />
+      </ChakraProvider>
+    )
+
+    expect(screen.getByTestId('loading-screen')).toBeTruthy()
+  })
+
   it('renders an error state', () => {
     useNotesQueryMock.mockReturnValue({
       data: undefined,
