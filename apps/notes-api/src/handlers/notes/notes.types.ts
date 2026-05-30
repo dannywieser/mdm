@@ -7,3 +7,8 @@ export interface MarkdownNode {
 }
 
 export type ScannedNote = Omit<Note, "html">
+
+export interface WikilinkReplacement {
+  displayText: string
+  matchedNote: ScannedNote | null
+}

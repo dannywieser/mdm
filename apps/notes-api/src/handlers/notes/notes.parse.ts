@@ -7,18 +7,13 @@ import remark from "remark"
 import remarkGfm from "remark-gfm"
 import remarkHtml from "remark-html"
 
-import type { MarkdownNode, ScannedNote } from "./notes.types"
+import type { MarkdownNode, ScannedNote, WikilinkReplacement } from "./notes.types"
 
 const IMAGE_SERVER_PATH = "/images"
 const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
 const OBSIDIAN_WIKILINK_EMBED_PATTERN = /!\[\[([^\]|]+)(?:\|[^\]]*)?]]/g
 const WIKILINK_PATTERN = /(?<!!)\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g
 const WIKILINK_PLACEHOLDER_PATTERN = /WLPH(\d+)ENDWL/g
-
-interface WikilinkReplacement {
-  displayText: string
-  matchedNote: ScannedNote | null
-}
 
 const TASK_LIST_ICON_SVG_ATTRS =
   'xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
