@@ -53,6 +53,13 @@ Changesets are **not** required for:
 1. Run `npm run changeset` from the repository root, select the appropriate bump type (`patch` / `minor` / `major`), write a concise summary of the user-visible change, and commit the generated `.changeset/*.md` file alongside your other changes, **or**
 2. Explicitly state in your final response why no changeset was needed (e.g. "test-only change — no changeset required").
 
+## react component guidelines
+
+- Each React component in `apps/web` must live in its own dedicated subfolder named after the component (e.g. `components/MyComponent/MyComponent.tsx`).
+- Every component folder must include a colocated test file (`<ComponentName>.test.tsx`).
+- If a component has props or shared constants, extract them into a colocated types file (`<ComponentName>.types.ts`) in the same folder. Never inline prop interfaces in the implementation file.
+- If types are shared across multiple components within the same feature folder, place them in a `types.ts` file at the feature folder root.
+
 ## express api guidelines
 
 - The main service file should be focused on setting up the server, middleware, and routes, and should not contain any business logic. All handler logic should be contained in separate files under the `handlers` directory.

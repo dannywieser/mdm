@@ -24,7 +24,7 @@ const noteFixtures: Note[] = [
 
 const useNotesQueryMock = vi.fn()
 
-vi.mock('../../hooks/useNotesQuery', () => ({
+vi.mock('../../../hooks/useNotesQuery', () => ({
   useNotesQuery: () => useNotesQueryMock(),
 }))
 
