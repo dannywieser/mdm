@@ -1,8 +1,20 @@
 import { Box, Flex, Input, Text } from "@chakra-ui/react"
+import { useRef } from "react"
+
 import { useI18n } from "../../i18n"
 
-export function TerminalInput() {
+import type { TerminalInputProps } from "./TerminalInput.types"
+
+export function TerminalInput({ onSubmit }: TerminalInputProps) {
   const { t } = useI18n()
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== "Enter") return
+    const value = inputRef.current?.value.trim() ?? ""
+    onSubmit(value)
+    if (inputRef.current) inputRef.current.value = ""
+  }
 
   return (
     <Box
@@ -17,6 +29,7 @@ export function TerminalInput() {
           &gt;
         </Text>
         <Input
+          ref={inputRef}
           variant="flushed"
           placeholder={t("terminal.inputPlaceholder")}
           color="green.400"
@@ -24,6 +37,7 @@ export function TerminalInput() {
           _placeholder={{ color: "green.900" }}
           fontSize="sm"
           borderBottomWidth={0}
+          onKeyDown={handleKeyDown}
         />
       </Flex>
     </Box>
