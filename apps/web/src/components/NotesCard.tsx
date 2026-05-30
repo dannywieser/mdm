@@ -1,8 +1,6 @@
 import {
   Box,
   Card,
-  CheckCircleIcon,
-  CheckIcon,
   Collapsible,
   Flex,
   Heading,
@@ -48,7 +46,9 @@ export const NotesCard = ({ note }: NotesCardProps) => {
             onClick={() => toggleRead.mutate()}
             loading={toggleRead.isPending}
           >
-            {isCollapsed ? <CheckCircleIcon /> : <CheckIcon />}
+            <Box as="span" aria-hidden="true" fontSize="md">
+              {isCollapsed ? '✓' : '○'}
+            </Box>
           </IconButton>
         </Flex>
       </Card.Header>

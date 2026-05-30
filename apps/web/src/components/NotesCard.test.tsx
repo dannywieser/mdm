@@ -1,7 +1,7 @@
 import { ChakraProvider, defaultSystem } from '@chakra-ui/react'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import type { Note } from 'markdown'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { NotesCard } from './NotesCard'
 
@@ -53,6 +53,11 @@ const renderCard = (note: Note) =>
       <NotesCard note={note} />
     </ChakraProvider>
   )
+
+
+afterEach(() => {
+  cleanup()
+})
 
 beforeEach(() => {
   mutateMock.mockReset()
