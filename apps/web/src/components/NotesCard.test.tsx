@@ -41,4 +41,26 @@ describe('NotesCard', () => {
     expect(screen.getByText('Safe')).toBeTruthy()
     expect(document.querySelector('script')).toBeNull()
   })
+
+  it('renders server-processed task-list icons from html', () => {
+    const checkedSvg =
+      '<svg class="task-list-icon task-list-icon--checked"><circle cx="12" cy="12" r="10"/></svg>'
+    const uncheckedSvg =
+      '<svg class="task-list-icon task-list-icon--unchecked"><path d="M10.1 2.182"/></svg>'
+    const taskListHtml =
+      `<ul class="contains-task-list">` +
+      `<li class="task-list-item">${checkedSvg} Done</li>` +
+      `<li class="task-list-item">${uncheckedSvg} Todo</li>` +
+      `</ul>`
+
+    const { container } = render(
+      <ChakraProvider value={defaultSystem}>
+        <NotesCard note={{ ...noteFixture, html: taskListHtml }} />
+      </ChakraProvider>
+    )
+
+    expect(container.querySelector('.task-list-icon--checked')).toBeTruthy()
+    expect(container.querySelector('.task-list-icon--unchecked')).toBeTruthy()
+    expect(container.querySelector('input[type="checkbox"]')).toBeNull()
+  })
 })

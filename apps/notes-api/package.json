@@ -15,10 +15,11 @@
   "dependencies": {
     "app-config": "1.0.0",
     "express": "5.2.1",
-    "mdm-util": "1.0.0",
     "markdown": "1.0.0",
+    "mdm-util": "1.0.0",
     "morgan": "1.10.1",
     "remark": "13.0.0",
+    "remark-gfm": "1.0.0",
     "remark-html": "13.0.2"
   }
 }
