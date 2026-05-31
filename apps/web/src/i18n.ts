@@ -3,23 +3,31 @@ import {
   createElement,
   type ReactNode,
   useContext,
-} from "react"
+} from 'react'
 
-type Locale = "en"
+type Locale = 'en'
 type TranslationKey =
-  | "errors.unableToLoadNotes"
-  | "notes.errorTitle"
-  | "notes.header"
-  | "notes.linkedNotes"
-  | "notes.meta"
+  | 'errors.unableToLoadNotes'
+  | 'errors.unableToLoadReadState'
+  | 'errors.unableToToggleReadState'
+  | 'notes.errorTitle'
+  | 'notes.header'
+  | 'notes.linkedNotes'
+  | 'notes.markAsRead'
+  | 'notes.markAsUnread'
+  | 'notes.meta'
 
 const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
-    "errors.unableToLoadNotes": "Unable to load notes",
-    "notes.errorTitle": "Unable to load notes.",
-    "notes.header": "Notes",
-    "notes.linkedNotes": "Linked Notes",
-    "notes.meta": "Vault: {vault} · Directory: {directory}",
+    'errors.unableToLoadNotes': 'Unable to load notes',
+    'errors.unableToLoadReadState': 'Unable to load read state',
+    'errors.unableToToggleReadState': 'Unable to toggle read state',
+    'notes.errorTitle': 'Unable to load notes.',
+    'notes.header': 'Notes',
+    'notes.linkedNotes': 'Linked Notes',
+    'notes.markAsRead': 'Mark as read',
+    'notes.markAsUnread': 'Mark as unread',
+    'notes.meta': 'Vault: {vault} · Directory: {directory}',
   },
 }
 
@@ -34,7 +42,7 @@ const interpolate = (
 export const translate = (
   key: TranslationKey,
   values?: Record<string, string | number>,
-  locale: Locale = "en",
+  locale: Locale = 'en',
 ): string => interpolate(translations[locale][key], values)
 
 interface I18nContextValue {
@@ -43,7 +51,7 @@ interface I18nContextValue {
 }
 
 const i18nContext = createContext<I18nContextValue>({
-  locale: "en",
+  locale: 'en',
   t: (key, values) => translate(key, values),
 })
 
@@ -52,7 +60,7 @@ interface I18nProviderProps {
   locale?: Locale
 }
 
-export const I18nProvider = ({ children, locale = "en" }: I18nProviderProps) => {
+export const I18nProvider = ({ children, locale = 'en' }: I18nProviderProps) => {
   const t = (key: TranslationKey, values?: Record<string, string | number>) =>
     translate(key, values, locale)
 
