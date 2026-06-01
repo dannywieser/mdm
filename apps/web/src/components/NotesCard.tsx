@@ -42,7 +42,7 @@ export const NotesCard = ({ note }: NotesCardProps) => {
           </Flex>
         </Flex>
       </Card.Header>
-      <Collapsible.Root open={!isCollapsed} lazyMount unmountOnExit>
+      <Collapsible.Root open={!isCollapsed} lazyMount>
         <Collapsible.Content>
           <Card.Body gap="4">
             <Box

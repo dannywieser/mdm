@@ -18,6 +18,7 @@ export const ToggleReadButton = ({ isRead, noteId }: ToggleReadButtonProps) => {
     <IconButton
       aria-label={toggleLabel}
       title={toggleLabel}
+      size="sm"
       variant={isRead ? 'subtle' : 'ghost'}
       colorPalette={isRead ? 'green' : 'gray'}
       onClick={() => toggleRead.mutate()}
