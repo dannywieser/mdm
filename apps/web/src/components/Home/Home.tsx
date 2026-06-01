@@ -12,10 +12,7 @@ import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
 import { useI18n } from "../../i18n"
 
 import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
-
-import type { HomeProps } from "./Home.types"
-
-export function Home(_props: HomeProps) {
+export function Home() {
   const { t } = useI18n()
   const { data, isLoading } = useStatsQuery()
 

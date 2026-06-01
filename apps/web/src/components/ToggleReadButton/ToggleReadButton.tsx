@@ -11,7 +11,7 @@ export const ToggleReadButton = ({
   noteId,
 }: ToggleReadButtonProps) => {
   const { t } = useI18n()
-  const toggleRead = useToggleNoteRead(noteId)
+  const toggleRead = useToggleNoteRead({ noteId })
   const toggleLabel = isRead ? t("notes.markAsUnread") : t("notes.markAsRead")
 
   return (

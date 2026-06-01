@@ -7,11 +7,11 @@ import { useI18n } from "../../i18n"
 import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
 import { NotesCard } from "../NotesCard/NotesCard"
 
-import type { NotesRouteParams } from "./NotesList.types"
+import type { NotesRouteParamKey } from "./NotesList.types"
 
 export const NotesList = () => {
-  const { view } = useParams<NotesRouteParams>()
-  const { data, error, isLoading } = useNotesQuery(view)
+  const { view } = useParams<NotesRouteParamKey>()
+  const { data, error, isLoading } = useNotesQuery({ view })
   const { t } = useI18n()
 
   if (isLoading) {

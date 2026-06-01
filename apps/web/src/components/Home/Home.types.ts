@@ -1,1 +1,1 @@
-export interface HomeProps {}
+export type HomeProps = Record<string, never>

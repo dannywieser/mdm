@@ -1,1 +1,1 @@
-export interface LoadingScreenProps {}
+export type LoadingScreenProps = Record<string, never>

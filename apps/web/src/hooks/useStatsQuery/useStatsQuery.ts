@@ -17,8 +17,9 @@ const fetchStats = async (): Promise<StatsResponse> => {
   return (await response.json()) as StatsResponse
 }
 
-export const useStatsQuery = (_params: UseStatsQueryParams = {}) =>
+export const useStatsQuery = ({ staleTime }: UseStatsQueryParams = {}) =>
   useQuery({
     queryKey: ["stats"],
     queryFn: fetchStats,
+    staleTime,
   })

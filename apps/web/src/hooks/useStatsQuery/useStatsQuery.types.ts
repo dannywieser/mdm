@@ -1,1 +1,3 @@
-export interface UseStatsQueryParams {}
+export interface UseStatsQueryParams {
+  staleTime?: number
+}

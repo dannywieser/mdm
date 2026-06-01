@@ -1,3 +1,1 @@
-export interface NotesRouteParams {
-  view: string
-}
+export type NotesRouteParamKey = "view"

@@ -19,7 +19,7 @@ import { sanitizeNoteHtml } from "./NotesCard.util"
 export const NotesCard = ({ note }: NotesCardProps) => {
   const { t } = useI18n()
   const sanitizedHtml = sanitizeNoteHtml(note.html)
-  const { data: isRead } = useIsRead(note.id)
+  const { data: isRead } = useIsRead({ noteId: note.id })
   const isCollapsed = isRead ?? false
 
   return (
