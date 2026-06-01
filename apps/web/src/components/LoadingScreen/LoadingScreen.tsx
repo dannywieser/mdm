@@ -1,8 +1,10 @@
-import { Box } from '@chakra-ui/react'
+import { Box } from "@chakra-ui/react"
 
-import { NotebookIcon } from './NotebookIcon/NotebookIcon'
+import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
 
-export const LoadingScreen = () => (
+import type { LoadingScreenProps } from "./LoadingScreen.types"
+
+export const LoadingScreen = (_props: LoadingScreenProps) => (
   <Box
     data-testid="loading-screen"
     display="flex"

@@ -31,6 +31,13 @@
 - When adding dependencies to `package.json`, always prefer pinning a specific version over fuzzy version matching.
 - For user-visible changes, include a Changesets entry by running `npm run changeset` from the repository root and committing the generated `.changeset/*.md` file.
 
+## apps/web structure guidelines
+
+- Keep each React component in `apps/web/src/components/<ComponentName>/` with colocated `<ComponentName>.tsx`, `<ComponentName>.types.ts`, and `<ComponentName>.test.tsx` files.
+- Keep each hook in `apps/web/src/hooks/<hookName>/` with colocated `<hookName>.ts`, `<hookName>.types.ts`, and `<hookName>.test.tsx` files.
+- Add a colocated `<name>.util.ts` file only when helper logic is needed by that component or hook.
+- For shared page chrome (like the app header), define it in a parent route layout so sibling routes (for example `/` and `/notes/:view`) render the same shell.
+
 ## changesets guidelines
 
 A changeset is required for any PR that introduces a user-visible change. User-visible changes include:

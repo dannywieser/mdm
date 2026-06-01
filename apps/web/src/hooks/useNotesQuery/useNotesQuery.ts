@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { translate } from "../i18n"
-import type { NotesResponse } from "../types/notes"
+import { translate } from "../../i18n"
+import type { NotesResponse } from "../../types/notes"
+
+import type { UseNotesQueryParams } from "./useNotesQuery.types"
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api"
 
@@ -18,7 +20,7 @@ const fetchNotes = async (view?: string): Promise<NotesResponse> => {
   return (await response.json()) as NotesResponse
 }
 
-export const useNotesQuery = (view?: string) =>
+export const useNotesQuery = ({ view }: UseNotesQueryParams = {}) =>
   useQuery({
     queryKey: ["notes", view],
     queryFn: () => fetchNotes(view),

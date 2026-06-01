@@ -1,7 +1,9 @@
 import { Flex, Text } from "@chakra-ui/react"
 import { formatDate } from "mdm-util"
 
-export function Header() {
+import type { HeaderProps } from "./Header.types"
+
+export function Header(_props: HeaderProps) {
   return (
     <Flex
       as="header"

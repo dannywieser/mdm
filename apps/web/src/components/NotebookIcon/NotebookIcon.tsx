@@ -1,10 +1,10 @@
-interface NotebookIconProps {
-  animating?: boolean
-  ariaLabel?: string
-  size?: number
-}
+import type { NotebookIconProps } from "./NotebookIcon.types"
 
-export function NotebookIcon({ animating = false, ariaLabel = 'Notebook', size = 80 }: NotebookIconProps) {
+export function NotebookIcon({
+  animating = false,
+  ariaLabel = "Notebook",
+  size = 80,
+}: NotebookIconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -16,7 +16,7 @@ export function NotebookIcon({ animating = false, ariaLabel = 'Notebook', size =
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={animating ? 'notebook-loader' : undefined}
+      className={animating ? "notebook-loader" : undefined}
       aria-label={ariaLabel}
       role="img"
     >
