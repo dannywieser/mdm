@@ -7,6 +7,8 @@ import {
 
 type Locale = 'en'
 type TranslationKey =
+  | 'home.modifiedToday'
+  | 'home.notes'
   | 'errors.unableToLoadNotes'
   | 'errors.unableToLoadReadState'
   | 'errors.unableToLoadStats'
@@ -20,6 +22,8 @@ type TranslationKey =
 
 const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
+    'home.modifiedToday': 'modified today',
+    'home.notes': 'notes',
     'errors.unableToLoadNotes': 'Unable to load notes',
     'errors.unableToLoadReadState': 'Unable to load read state',
     'errors.unableToLoadStats': 'Unable to load stats',

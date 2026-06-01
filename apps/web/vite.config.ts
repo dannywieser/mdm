@@ -3,6 +3,9 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  optimizeDeps: {
+    include: ['mdm-util'],
+  },
   plugins: [react()],
   server: {
     proxy: {
