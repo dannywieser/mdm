@@ -14,7 +14,7 @@ import { useI18n } from "../../i18n"
 import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
 export function Home() {
   const { t } = useI18n()
-  const { data, isLoading } = useStatsQuery()
+  const { data, isLoading } = useStatsQuery({})
 
   return (
     <VStack align="center" gap={6} pt={16}>

@@ -5,11 +5,13 @@ import { Header } from "./components/Header/Header"
 import { Home } from "./components/Home/Home"
 import { NotesList } from "./components/NotesList/NotesList"
 
+const HEADER_CONTENT_OFFSET = 10
+
 function AppLayout() {
   return (
     <Box h="100vh" overflow="auto" position="relative">
       <Header />
-      <Box pt={10}>
+      <Box pt={HEADER_CONTENT_OFFSET}>
         <Outlet />
       </Box>
     </Box>
