@@ -1,4 +1,4 @@
-import { Alert, Heading, Text, VStack } from "@chakra-ui/react"
+import { Alert, VStack } from "@chakra-ui/react"
 import { useParams } from "react-router-dom"
 
 import { useNotesQuery } from "../hooks/useNotesQuery"
