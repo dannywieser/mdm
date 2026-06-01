@@ -80,6 +80,25 @@ describe("notes scan helpers", () => {
     expect(statMock).toHaveBeenCalledWith("/notes/topic/welcome.md")
   })
 
+  test("scanMarkdownFile sets folder to the full relative path from the notes directory", async () => {
+    readFileMock.mockResolvedValue("# Note")
+    parseFrontMatterMock.mockReturnValue({ body: "# Note", frontmatter: null })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await scanMarkdownFile(
+      "/notes/daily/briefing/2026-06-01.md",
+      "/notes",
+      "dgw",
+    )
+
+    expect(note.folder).toBe("daily/briefing")
+  })
+
   test("scanMarkdownFile uses parsed frontmatter and escapes obsidian file paths", async () => {
     readFileMock.mockResolvedValue(`---
 topic:

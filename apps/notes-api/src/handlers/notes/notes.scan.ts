@@ -40,7 +40,7 @@ export const scanMarkdownFile = async (
     basename,
     titleOrBodyDates,
     createdDate: stats.birthtime.toISOString(),
-    folder: path.basename(path.dirname(filePath)),
+    folder: path.relative(notesDirectory, path.dirname(filePath)).split(path.sep).join("/"),
     frontmatter,
     fullPath: filePath,
     id: createFileID(filePath, FILE_ID_NAMESPACE),

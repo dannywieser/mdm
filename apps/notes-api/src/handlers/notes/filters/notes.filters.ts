@@ -8,7 +8,7 @@ import {
 
 import type { ViewFilterContext } from "./notes.filters.types"
 
-const ON_THIS_DAY = "$onThisDay"
+import { ON_THIS_DAY, TODAY } from "./constants"
 
 type FilterableNote = {
   basename: string
@@ -55,6 +55,47 @@ const matchesOnThisDay = (
   return false
 }
 
+const matchesToday = (
+  noteValue: unknown,
+  context: ViewFilterContext,
+): boolean => {
+  const today = getDateComponents(new Date(), context.timezone)
+
+  if (typeof noteValue === "string") {
+    const date = new Date(noteValue)
+
+    if (isNaN(date.getTime())) {
+      return false
+    }
+
+    const { day, month, year } = getDateComponents(date, context.timezone)
+
+    return year === today.year && month === today.month && day === today.day
+  }
+
+  if (Array.isArray(noteValue)) {
+    return (noteValue as unknown[]).some((entry) => {
+      if (typeof entry !== "string") {
+        return false
+      }
+
+      const parsed = parseDateFromFormats(entry, context.dateFormats)
+
+      if (!parsed) {
+        return false
+      }
+
+      return (
+        parsed.year === today.year &&
+        parsed.month === today.month &&
+        parsed.day === today.day
+      )
+    })
+  }
+
+  return false
+}
+
 const isMatchingFilterValue = (
   noteValue: unknown,
   expectedValue: string,
@@ -62,6 +103,10 @@ const isMatchingFilterValue = (
 ): boolean => {
   if (expectedValue === ON_THIS_DAY) {
     return matchesOnThisDay(noteValue, context)
+  }
+
+  if (expectedValue === TODAY) {
+    return matchesToday(noteValue, context)
   }
 
   if (typeof noteValue === "string") {
@@ -81,7 +126,6 @@ const matchesViewFilters = <T extends FilterableNote>(
   context: ViewFilterContext,
 ): boolean =>
   Object.entries(filters).every(([filterPath, expectedValue]) => {
-    console.log("filters", filters)
     const noteValue = getValueByPath(note, filterPath)
     const matches = isMatchingFilterValue(noteValue, expectedValue, context)
     if (matches) {
