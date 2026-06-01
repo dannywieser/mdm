@@ -1,3 +1,4 @@
+import type { NoteFrontmatter } from "markdown"
 import { parseFrontMatter, parseMarkdownBodyDates } from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
@@ -6,6 +7,14 @@ import path from "node:path"
 import type { ScannedNote } from "./notes.types"
 
 export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
+
+const extractFrontmatterDates = (
+  frontmatter: NoteFrontmatter,
+  dateFormats: readonly string[],
+): string[] =>
+  Object.values(frontmatter)
+    .flat()
+    .flatMap((value) => parseMarkdownBodyDates(value, dateFormats))
 
 export const scanMarkdownFile = async (
   filePath: string,
@@ -24,6 +33,7 @@ export const scanMarkdownFile = async (
     new Set([
       ...parseMarkdownBodyDates(title, dateFormats),
       ...parseMarkdownBodyDates(body, dateFormats),
+      ...(frontmatter ? extractFrontmatterDates(frontmatter, dateFormats) : []),
     ]),
   )
 
