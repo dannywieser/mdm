@@ -22,12 +22,17 @@ export class AppConfigError extends Error {}
 
 let cachedNotesConfig: ResolvedNotesConfig | undefined
 
-const isAppConfigView = (value: unknown): value is AppConfigView =>
-  value !== null &&
-  typeof value === "object" &&
-  !Array.isArray(value) &&
-  isNonEmptyString((value as Record<string, unknown>)["name"]) &&
-  isStringRecord((value as Record<string, unknown>)["filters"])
+const isAppConfigView = (value: unknown): value is AppConfigView => {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return false
+  }
+  const obj = value as Record<string, unknown>
+  return (
+    isNonEmptyString(obj["name"]) &&
+    Array.isArray(obj["filters"]) &&
+    (obj["filters"] as unknown[]).every(isStringRecord)
+  )
+}
 
 const validateAppConfig = (appConfig: unknown): AppConfig => {
   if (!appConfig || typeof appConfig !== "object") {

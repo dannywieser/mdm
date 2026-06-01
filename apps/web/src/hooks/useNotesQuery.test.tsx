@@ -26,7 +26,7 @@ afterEach(() => {
 })
 
 describe('useNotesQuery', () => {
-  it('fetches notes successfully', async () => {
+  it('fetches notes without a view filter when no view is provided', async () => {
     const responseBody = {
       notes: [],
       notesDirectory: '/notes',
@@ -48,8 +48,33 @@ describe('useNotesQuery', () => {
       expect(result.current.isSuccess).toBe(true)
     })
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/notes?view=on-this-day')
+    expect(fetchMock).toHaveBeenCalledWith('/api/notes')
     expect(result.current.data).toEqual(responseBody)
+  })
+
+  it('fetches notes with the view filter when a view is provided', async () => {
+    const responseBody = {
+      notes: [],
+      notesDirectory: '/notes',
+      obsidianVault: 'vault'
+    }
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue(responseBody)
+    })
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { result } = renderHook(() => useNotesQuery('on-this-day'), {
+      wrapper: createWrapper()
+    })
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/notes?view=on-this-day')
   })
 
   it('returns an error when the response is not ok', async () => {

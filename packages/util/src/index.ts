@@ -1,3 +1,4 @@
+export { formatDate } from "./date/formatDate"
 export { getDateComponents } from "./date/getDateComponents"
 export { isValidTimezone } from "./date/isValidTimezone"
 export { parseDateFromFormats } from "./date/parseDateFromFormats"

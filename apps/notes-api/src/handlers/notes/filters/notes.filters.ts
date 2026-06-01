@@ -8,7 +8,7 @@ import {
 
 import type { ViewFilterContext } from "./notes.filters.types"
 
-const ON_THIS_DAY = "$onThisDay"
+import { ON_THIS_DAY, TODAY } from "./constants"
 
 type FilterableNote = {
   basename: string
@@ -19,7 +19,6 @@ const matchesOnThisDay = (
   context: ViewFilterContext,
 ): boolean => {
   const today = getDateComponents(new Date(), context.timezone)
-  console.log(`[notes/filter] $onThisDay: today=${JSON.stringify(today)} timezone="${context.timezone}" noteValue=${JSON.stringify(noteValue)}`)
 
   if (typeof noteValue === "string") {
     const date = new Date(noteValue)
@@ -56,6 +55,47 @@ const matchesOnThisDay = (
   return false
 }
 
+const matchesToday = (
+  noteValue: unknown,
+  context: ViewFilterContext,
+): boolean => {
+  const today = getDateComponents(new Date(), context.timezone)
+
+  if (typeof noteValue === "string") {
+    const date = new Date(noteValue)
+
+    if (isNaN(date.getTime())) {
+      return false
+    }
+
+    const { day, month, year } = getDateComponents(date, context.timezone)
+
+    return year === today.year && month === today.month && day === today.day
+  }
+
+  if (Array.isArray(noteValue)) {
+    return (noteValue as unknown[]).some((entry) => {
+      if (typeof entry !== "string") {
+        return false
+      }
+
+      const parsed = parseDateFromFormats(entry, context.dateFormats)
+
+      if (!parsed) {
+        return false
+      }
+
+      return (
+        parsed.year === today.year &&
+        parsed.month === today.month &&
+        parsed.day === today.day
+      )
+    })
+  }
+
+  return false
+}
+
 const isMatchingFilterValue = (
   noteValue: unknown,
   expectedValue: string,
@@ -63,6 +103,10 @@ const isMatchingFilterValue = (
 ): boolean => {
   if (expectedValue === ON_THIS_DAY) {
     return matchesOnThisDay(noteValue, context)
+  }
+
+  if (expectedValue === TODAY) {
+    return matchesToday(noteValue, context)
   }
 
   if (typeof noteValue === "string") {
@@ -84,8 +128,10 @@ const matchesViewFilters = <T extends FilterableNote>(
   Object.entries(filters).every(([filterPath, expectedValue]) => {
     const noteValue = getValueByPath(note, filterPath)
     const matches = isMatchingFilterValue(noteValue, expectedValue, context)
-    if (!matches) {
-      console.log(`[notes/filter] "${note.basename}" excluded: ${filterPath}=${JSON.stringify(noteValue)} did not match expected="${expectedValue}"`)
+    if (matches) {
+      console.log(
+        `[notes/filter] "${note.basename}" included: ${filterPath}=${JSON.stringify(noteValue)} matched expected="${expectedValue}"`,
+      )
     }
     return matches
   })
@@ -109,6 +155,8 @@ export const applyViewFilter = <T extends FilterableNote>(
   }
 
   return notes.filter((note) =>
-    matchesViewFilters(note, selectedView.filters, context),
+    selectedView.filters.some((group) =>
+      matchesViewFilters(note, group, context),
+    ),
   )
 }

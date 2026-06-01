@@ -1,5 +1,5 @@
 export interface NotesView {
-  filters: Record<string, string>
+  filters: Record<string, string>[]
   name: string
 }
 
@@ -22,6 +22,6 @@ export interface AppConfig {
 }
 
 export interface AppConfigView {
-  filters: Record<string, string>
+  filters: Record<string, string>[]
   name: string
 }

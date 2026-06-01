@@ -84,10 +84,12 @@ describe("notes filter helpers", () => {
       notes,
       [
         {
-          filters: {
-            folder: "downtime",
-            "frontmatter.type": "book",
-          },
+          filters: [
+            {
+              folder: "downtime",
+              "frontmatter.type": "book",
+            },
+          ],
           name: "books",
         },
       ],
@@ -116,9 +118,7 @@ describe("notes filter helpers", () => {
       notes,
       [
         {
-          filters: {
-            "frontmatter.topic": "Reading",
-          },
+          filters: [{ "frontmatter.topic": "Reading" }],
           name: "reading",
         },
       ],
@@ -129,6 +129,36 @@ describe("notes filter helpers", () => {
     expect(getValueByPathMock).toHaveBeenCalledWith(notes[0], "frontmatter.topic")
   })
 
+  test("applyViewFilter matches notes satisfying any filter group (OR logic)", () => {
+    const notes = [
+      createMockNote("book.md", {
+        frontmatter: { type: "book" },
+      }),
+      createMockNote("game.md", {
+        frontmatter: { type: "game" },
+      }),
+      createMockNote("movie.md", {
+        frontmatter: { type: "movie" },
+      }),
+    ]
+
+    const filtered = applyViewFilter(
+      notes,
+      [
+        {
+          filters: [
+            { "frontmatter.type": "book" },
+            { "frontmatter.type": "game" },
+          ],
+          name: "downtime",
+        },
+      ],
+      "downtime",
+    )
+
+    expect(filtered).toEqual([notes[0], notes[1]])
+  })
+
   test("applyViewFilter returns all notes when view name is not configured", () => {
     const notes = [createMockNote("book.md"), createMockNote("movie.md")]
 
@@ -136,9 +166,7 @@ describe("notes filter helpers", () => {
       notes,
       [
         {
-          filters: {
-            folder: "downtime",
-          },
+          filters: [{ folder: "downtime" }],
           name: "books",
         },
       ],
@@ -171,7 +199,7 @@ describe("notes filter helpers", () => {
 
       const filtered = applyViewFilter(
         notes,
-        [{ filters: { createdDate: "$onThisDay" }, name: "memories" }],
+        [{ filters: [{ createdDate: "$onThisDay" }], name: "memories" }],
         "memories",
         { dateFormats: [], timezone: "UTC" },
       )
@@ -195,7 +223,7 @@ describe("notes filter helpers", () => {
 
       const filtered = applyViewFilter(
         notes,
-        [{ filters: { modifiedDate: "$onThisDay" }, name: "memories" }],
+        [{ filters: [{ modifiedDate: "$onThisDay" }], name: "memories" }],
         "memories",
         { dateFormats: [], timezone: "UTC" },
       )
@@ -219,7 +247,7 @@ describe("notes filter helpers", () => {
 
       const filtered = applyViewFilter(
         notes,
-        [{ filters: { titleOrBodyDates: "$onThisDay" }, name: "memories" }],
+        [{ filters: [{ titleOrBodyDates: "$onThisDay" }], name: "memories" }],
         "memories",
         { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" },
       )
@@ -248,7 +276,7 @@ describe("notes filter helpers", () => {
 
       const filtered = applyViewFilter(
         notes,
-        [{ filters: { createdDate: "$onThisDay" }, name: "memories" }],
+        [{ filters: [{ createdDate: "$onThisDay" }], name: "memories" }],
         "memories",
         { dateFormats: [], timezone: "America/Toronto" },
       )
@@ -274,12 +302,71 @@ describe("notes filter helpers", () => {
 
       const filtered = applyViewFilter(
         notes,
-        [{ filters: { createdDate: "$onThisDay" }, name: "memories" }],
+        [{ filters: [{ createdDate: "$onThisDay" }], name: "memories" }],
         "memories",
         { dateFormats: [], timezone: "UTC" },
       )
 
       expect(filtered).toEqual([notes[1]])
+    })
+  })
+
+  describe("$today keyword", () => {
+    test("matches notes where any titleOrBodyDate is today", () => {
+      const notes = [
+        createMockNote("today.md", { titleOrBodyDates: ["2026.06.01"] }),
+        createMockNote("yesterday.md", { titleOrBodyDates: ["2026.05.31"] }),
+        createMockNote("no-dates.md", { titleOrBodyDates: [] }),
+      ]
+
+      getDateComponentsMock.mockReturnValue({ day: 1, month: 6, year: 2026 })
+
+      parseDateFromFormatsMock.mockImplementation((dateValue) => {
+        const match = String(dateValue).match(/^(\d{4})\.(\d{2})\.(\d{2})$/)
+        if (!match) return null
+        return {
+          day: parseInt(match[3], 10),
+          month: parseInt(match[2], 10),
+          year: parseInt(match[1], 10),
+        }
+      })
+
+      const filtered = applyViewFilter(
+        notes,
+        [{ filters: [{ titleOrBodyDates: "$today" }], name: "today" }],
+        "today",
+        { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" },
+      )
+
+      expect(filtered).toEqual([notes[0]])
+    })
+
+    test("does not match notes from a previous year on the same date", () => {
+      const notes = [
+        createMockNote("this-year.md", { titleOrBodyDates: ["2026.06.01"] }),
+        createMockNote("last-year.md", { titleOrBodyDates: ["2025.06.01"] }),
+      ]
+
+      getDateComponentsMock.mockReturnValue({ day: 1, month: 6, year: 2026 })
+
+      parseDateFromFormatsMock.mockImplementation((dateValue) => {
+        const match = String(dateValue).match(/^(\d{4})\.(\d{2})\.(\d{2})$/)
+        if (!match) return null
+        return {
+          day: parseInt(match[3], 10),
+          month: parseInt(match[2], 10),
+          year: parseInt(match[1], 10),
+        }
+      })
+
+      const filtered = applyViewFilter(
+        notes,
+        [{ filters: [{ titleOrBodyDates: "$today" }], name: "today" }],
+        "today",
+        { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" },
+      )
+
+      expect(filtered).toEqual([notes[0]])
     })
   })
 })

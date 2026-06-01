@@ -4,6 +4,7 @@ import request from "supertest"
 
 import { healthHandler } from "./handlers/health/health"
 import { notesHandler } from "./handlers/notes/notes"
+import { statsHandler } from "./handlers/stats/stats"
 import { createApp, logStartupConfig } from "./server"
 
 jest.mock("app-config", () => ({
@@ -20,9 +21,13 @@ jest.mock("./handlers/health/health", () => ({
 jest.mock("./handlers/notes/notes", () => ({
   notesHandler: jest.fn(),
 }))
+jest.mock("./handlers/stats/stats", () => ({
+  statsHandler: jest.fn(),
+}))
 
 const healthHandlerMock = jest.mocked(healthHandler)
 const notesHandlerMock = jest.mocked(notesHandler)
+const statsHandlerMock = jest.mocked(statsHandler)
 const resolveNotesConfigMock = jest.mocked(resolveNotesConfig)
 const toLoggableErrorMock = jest.mocked(toLoggableError)
 
@@ -53,10 +58,24 @@ describe("notes-api server interface", () => {
     expect(notesHandlerMock).toHaveBeenCalledTimes(1)
   })
 
+  test("wires GET /stats to the stats handler", async () => {
+    statsHandlerMock.mockImplementation((_request, response) => {
+      response.status(200).json({ modifiedToday: 0, totalNotes: 0, views: [] })
+    })
+    const app = createApp()
+
+    const response = await request(app).get("/stats")
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({ modifiedToday: 0, totalNotes: 0, views: [] })
+    expect(statsHandlerMock).toHaveBeenCalledTimes(1)
+  })
+
   test("logs the resolved notes config on startup", async () => {
     const logSpy = jest.spyOn(console, "log").mockImplementation()
 
     resolveNotesConfigMock.mockResolvedValue({
+      attachmentsDirectory: "attachments",
       dateFormats: ["YYYY.MM.DD"],
       notesDirectory: "/notes",
       obsidianVault: "vault",
@@ -70,6 +89,7 @@ describe("notes-api server interface", () => {
       "Resolved notes config",
       JSON.stringify(
         {
+          attachmentsDirectory: "attachments",
           dateFormats: ["YYYY.MM.DD"],
           notesDirectory: "/notes",
           obsidianVault: "vault",

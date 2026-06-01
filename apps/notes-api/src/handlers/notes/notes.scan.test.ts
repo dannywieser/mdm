@@ -80,6 +80,54 @@ describe("notes scan helpers", () => {
     expect(statMock).toHaveBeenCalledWith("/notes/topic/welcome.md")
   })
 
+  test("scanMarkdownFile sets folder to the full relative path from the notes directory", async () => {
+    readFileMock.mockResolvedValue("# Note")
+    parseFrontMatterMock.mockReturnValue({ body: "# Note", frontmatter: null })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await scanMarkdownFile(
+      "/notes/daily/briefing/2026-06-01.md",
+      "/notes",
+      "dgw",
+    )
+
+    expect(note.folder).toBe("daily/briefing")
+  })
+
+  test("scanMarkdownFile includes date-like frontmatter values in titleOrBodyDates", async () => {
+    readFileMock.mockResolvedValue("# Note")
+    parseFrontMatterMock.mockReturnValue({
+      body: "# Note",
+      frontmatter: {
+        created: "2026.06.01",
+        tags: ["reading", "2025.12.31"],
+      },
+    })
+    parseMarkdownBodyDatesMock
+      .mockReturnValueOnce([])                // title
+      .mockReturnValueOnce([])                // body
+      .mockReturnValueOnce(["2026.06.01"])    // frontmatter: created
+      .mockReturnValueOnce([])                // frontmatter: reading
+      .mockReturnValueOnce(["2025.12.31"])    // frontmatter: 2025.12.31
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-06-01T00:00:00.000Z"),
+      mtime: new Date("2026-06-01T01:00:00.000Z"),
+    })
+
+    const note = await scanMarkdownFile("/notes/note.md", "/notes", "vault", ["YYYY.MM.DD"])
+
+    expect(note.titleOrBodyDates).toEqual(["2026.06.01", "2025.12.31"])
+    expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith("2026.06.01", ["YYYY.MM.DD"])
+    expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith("reading", ["YYYY.MM.DD"])
+    expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith("2025.12.31", ["YYYY.MM.DD"])
+  })
+
   test("scanMarkdownFile uses parsed frontmatter and escapes obsidian file paths", async () => {
     readFileMock.mockResolvedValue(`---
 topic:
@@ -98,8 +146,11 @@ This is a note.`)
       },
     })
     parseMarkdownBodyDatesMock
-      .mockReturnValueOnce(["2026.05.26"])
-      .mockReturnValueOnce(["2026.05.26", "26/05/27"])
+      .mockReturnValueOnce(["2026.05.26"])          // title
+      .mockReturnValueOnce(["2026.05.26", "26/05/27"]) // body
+      .mockReturnValueOnce(["2026.05.26"])          // frontmatter: created
+      .mockReturnValueOnce([])                      // frontmatter: AI
+      .mockReturnValueOnce([])                      // frontmatter: Notes
     createFileIDMock.mockReturnValue("frontmatter-id")
     statMock.mockResolvedValue({
       birthtime: new Date("2026-05-26T00:00:00.000Z"),

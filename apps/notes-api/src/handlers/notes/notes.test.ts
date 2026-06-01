@@ -5,9 +5,9 @@ import request from "supertest"
 
 import type { ScannedNote } from "./notes.types"
 
+import { applyViewFilter } from "./filters/notes.filters"
 import { notesHandler } from "./notes"
 import { collectMarkdownFiles } from "./notes.files"
-import { applyViewFilter } from "./notes.filters"
 import { parseMarkdownFile } from "./notes.parse"
 import { scanMarkdownFile } from "./notes.scan"
 
@@ -29,7 +29,7 @@ jest.mock("./notes.files", () => ({
   collectMarkdownFiles: jest.fn(),
 }))
 
-jest.mock("./notes.filters", () => ({
+jest.mock("./filters/notes.filters", () => ({
   applyViewFilter: jest.fn(),
 }))
 
