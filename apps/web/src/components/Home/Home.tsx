@@ -7,6 +7,8 @@ import {
   StatValueText,
 } from "@chakra-ui/react"
 
+import { Link } from "react-router-dom"
+
 import { useI18n } from "../../i18n"
 import { useStatsQuery } from "../../hooks/useStatsQuery"
 import { Header } from "../Header/Header"
@@ -34,10 +36,12 @@ export function Home() {
               <StatValueText>{data.modifiedToday}</StatValueText>
             </StatRoot>
             {data.views.map((view) => (
-              <StatRoot borderColor="gray.200" borderRadius="md" borderWidth="1px" key={view.name} px={3} py={2} size="sm">
-                <StatLabel>{view.name}</StatLabel>
-                <StatValueText>{view.count}</StatValueText>
-              </StatRoot>
+              <Link key={view.name} style={{ textDecoration: 'none' }} to={`/notes/${view.name}`}>
+                <StatRoot borderColor="gray.200" borderRadius="md" borderWidth="1px" px={3} py={2} size="sm" _hover={{ borderColor: 'gray.400' }}>
+                  <StatLabel>{view.name}</StatLabel>
+                  <StatValueText>{view.count}</StatValueText>
+                </StatRoot>
+              </Link>
             ))}
           </SimpleGrid>
         )}

@@ -1,4 +1,5 @@
-import { Box, IconButton } from '@chakra-ui/react'
+import { IconButton } from '@chakra-ui/react'
+import { Book, BookCheck } from 'lucide-react'
 
 import { useToggleNoteRead } from '../hooks/useToggleNoteRead'
 import { useI18n } from '../i18n'
@@ -22,9 +23,7 @@ export const ToggleReadButton = ({ isRead, noteId }: ToggleReadButtonProps) => {
       onClick={() => toggleRead.mutate()}
       loading={toggleRead.isPending}
     >
-      <Box as="span" aria-hidden="true" fontSize="md">
-        {isRead ? '✓' : '○'}
-      </Box>
+      {isRead ? <BookCheck size={16} /> : <Book size={16} />}
     </IconButton>
   )
 }

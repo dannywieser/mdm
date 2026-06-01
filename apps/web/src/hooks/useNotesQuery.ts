@@ -5,8 +5,11 @@ import type { NotesResponse } from "../types/notes"
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api"
 
-const fetchNotes = async (): Promise<NotesResponse> => {
-  const response = await fetch(`${API_BASE_URL}/notes?view=on-this-day`)
+const fetchNotes = async (view?: string): Promise<NotesResponse> => {
+  const url = view
+    ? `${API_BASE_URL}/notes?view=${encodeURIComponent(view)}`
+    : `${API_BASE_URL}/notes`
+  const response = await fetch(url)
 
   if (!response.ok) {
     throw new Error(translate("errors.unableToLoadNotes"))
@@ -15,8 +18,8 @@ const fetchNotes = async (): Promise<NotesResponse> => {
   return (await response.json()) as NotesResponse
 }
 
-export const useNotesQuery = () =>
+export const useNotesQuery = (view?: string) =>
   useQuery({
-    queryKey: ["notes"],
-    queryFn: fetchNotes,
+    queryKey: ["notes", view],
+    queryFn: () => fetchNotes(view),
   })
