@@ -95,10 +95,12 @@ describe("config", () => {
         obsidianVault: "vault",
         views: [
           {
-            filters: {
-              folder: "downtime",
-              "frontmatter.type": "book",
-            },
+            filters: [
+              {
+                folder: "downtime",
+                "frontmatter.type": "book",
+              },
+            ],
             name: "books",
           },
         ],
@@ -113,10 +115,12 @@ describe("config", () => {
       timezone: "UTC",
       views: [
         {
-          filters: {
-            folder: "downtime",
-            "frontmatter.type": "book",
-          },
+          filters: [
+            {
+              folder: "downtime",
+              "frontmatter.type": "book",
+            },
+          ],
           name: "books",
         },
       ],

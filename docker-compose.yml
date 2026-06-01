@@ -65,21 +65,5 @@ services:
 
   redis:
     image: redis:8.2.1-alpine3.22
-    expose:
-      - "6379"
-
-  svc-x:
-    image: busybox:1.36.1
-    command: ["sh", "-c", "sleep infinity"]
-    expose:
-      - "8080"
-    profiles:
-      - future-services
-
-  svc-y:
-    image: busybox:1.36.1
-    command: ["sh", "-c", "sleep infinity"]
-    expose:
-      - "8081"
-    profiles:
-      - future-services
+    ports:
+      - "127.0.0.1:6379:6379"
