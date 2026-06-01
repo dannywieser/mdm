@@ -9,6 +9,7 @@ type Locale = 'en'
 type TranslationKey =
   | 'errors.unableToLoadNotes'
   | 'errors.unableToLoadReadState'
+  | 'errors.unableToLoadStats'
   | 'errors.unableToToggleReadState'
   | 'notes.errorTitle'
   | 'notes.header'
@@ -21,6 +22,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
     'errors.unableToLoadNotes': 'Unable to load notes',
     'errors.unableToLoadReadState': 'Unable to load read state',
+    'errors.unableToLoadStats': 'Unable to load stats',
     'errors.unableToToggleReadState': 'Unable to toggle read state',
     'notes.errorTitle': 'Unable to load notes.',
     'notes.header': 'Notes',

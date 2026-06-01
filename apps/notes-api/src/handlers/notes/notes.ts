@@ -4,8 +4,8 @@ import type { RequestHandler } from "express"
 import { AppConfigError, resolveNotesConfig } from "app-config"
 import { toLoggableError } from "mdm-util"
 
-import { collectMarkdownFiles } from "./notes.files"
 import { applyViewFilter } from "./filters/notes.filters"
+import { collectMarkdownFiles } from "./notes.files"
 import { parseMarkdownFile } from "./notes.parse"
 import { scanMarkdownFile } from "./notes.scan"
 
