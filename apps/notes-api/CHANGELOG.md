@@ -1,5 +1,20 @@
 # notes-api
 
+## 1.2.0
+
+### Minor Changes
+
+- bc20358: The `folder` field on notes now contains the full relative path from the vault root (e.g. `daily/briefing`) instead of just the immediate parent directory name. View filters using `folder` can now match nested paths.
+- bc20358: View filters are now an array of filter objects. Multiple conditions within a single object are AND'd together; multiple objects in the array are OR'd. Existing single-object filters must be wrapped in an array.
+- bc20358: Add a `GET /stats` endpoint returning total note count, notes modified today, and per-view note counts. The web home page now fetches and displays these stats below the notebook icon.
+
+### Patch Changes
+
+- Updated dependencies [bc20358]
+  - app-config@1.2.0
+  - markdown@1.2.0
+  - mdm-util@1.2.0
+
 ## 1.1.0
 
 ### Minor Changes

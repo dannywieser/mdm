@@ -1,5 +1,16 @@
 # web
 
+## 1.2.0
+
+### Minor Changes
+
+- bc20358: Add a `GET /stats` endpoint returning total note count, notes modified today, and per-view note counts. The web home page now fetches and displays these stats below the notebook icon.
+
+### Patch Changes
+
+- c30d89d: Add note read status hooks and a note card toggle that collapses read notes.
+  - mdm-util@1.2.0
+
 ## 1.1.0
 
 ### Minor Changes

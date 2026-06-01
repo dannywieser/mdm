@@ -1,6 +1,6 @@
 {
   "name": "notes-api",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "main": "dist/server.js",
   "scripts": {
@@ -13,10 +13,10 @@
     "test": "jest --config jest.config.cjs"
   },
   "dependencies": {
-    "app-config": "1.1.0",
+    "app-config": "1.2.0",
     "express": "5.2.1",
-    "markdown": "1.1.0",
-    "mdm-util": "1.1.0",
+    "markdown": "1.2.0",
+    "mdm-util": "1.2.0",
     "morgan": "1.10.1",
     "remark": "13.0.0",
     "remark-gfm": "1.0.0",
