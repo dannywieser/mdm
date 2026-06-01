@@ -1,4 +1,5 @@
 import type { NoteFrontmatter } from "markdown"
+
 import { parseFrontMatter, parseMarkdownBodyDates } from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
