@@ -4,15 +4,16 @@ import {
   Collapsible,
   Flex,
   Heading,
-} from '@chakra-ui/react'
-import DOMPurify, { type Config as DOMPurifyConfig } from 'dompurify'
-import type { Note } from 'markdown'
+} from "@chakra-ui/react"
+import DOMPurify, { type Config as DOMPurifyConfig } from "dompurify"
+import type { Note } from "markdown"
 
-import { useI18n } from '../i18n'
-import { useIsRead } from '../hooks/useIsRead'
+import { useI18n } from "../i18n"
+import { useIsRead } from "../hooks/useIsRead"
 
-import { noteContentStyles } from './NotesCard.styles'
-import { ToggleReadButton } from './ToggleReadButton'
+import { noteContentStyles } from "./NotesCard.styles"
+import { OpenInObsidianButton } from "./OpenInObsidianButton/OpenInObsidianButton"
+import { ToggleReadButton } from "./ToggleReadButton"
 
 // Extends DOMPurify's default allowed protocols to include obsidian:// deep links.
 const SANITIZE_CONFIG: DOMPurifyConfig = {
@@ -32,16 +33,22 @@ export const NotesCard = ({ note }: NotesCardProps) => {
 
   return (
     <Card.Root>
-      <Card.Header>
-        <Flex align="center" justify="space-between" gap="3">
+      <Card.Header py="2">
+        <Flex align="center" justify="space-between">
           <Heading size="md">{note.title}</Heading>
-          <ToggleReadButton isRead={isCollapsed} noteId={note.id} />
+          <Flex gap="1" shrink={0}>
+            <ToggleReadButton isRead={isCollapsed} noteId={note.id} />
+            <OpenInObsidianButton note={note} />
+          </Flex>
         </Flex>
       </Card.Header>
       <Collapsible.Root open={!isCollapsed} lazyMount unmountOnExit>
         <Collapsible.Content>
           <Card.Body gap="4">
-            <Box css={noteContentStyles} dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />
+            <Box
+              css={noteContentStyles}
+              dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+            />
             {note.linkedNotes && note.linkedNotes.length > 0 && (
               <Collapsible.Root>
                 <Collapsible.Trigger asChild>
@@ -49,9 +56,9 @@ export const NotesCard = ({ note }: NotesCardProps) => {
                     size="sm"
                     cursor="pointer"
                     color="fg.muted"
-                    _hover={{ color: 'fg' }}
+                    _hover={{ color: "fg" }}
                   >
-                    {t('notes.linkedNotes')} ({note.linkedNotes.length})
+                    {t("notes.linkedNotes")} ({note.linkedNotes.length})
                   </Heading>
                 </Collapsible.Trigger>
                 <Collapsible.Content>
@@ -65,7 +72,10 @@ export const NotesCard = ({ note }: NotesCardProps) => {
                           <Box
                             css={noteContentStyles}
                             dangerouslySetInnerHTML={{
-                              __html: DOMPurify.sanitize(linked.html, SANITIZE_CONFIG),
+                              __html: DOMPurify.sanitize(
+                                linked.html,
+                                SANITIZE_CONFIG,
+                              ),
                             }}
                           />
                         </Card.Body>
