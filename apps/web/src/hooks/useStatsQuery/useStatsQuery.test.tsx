@@ -32,7 +32,7 @@ describe("useStatsQuery", () => {
     const responseBody = {
       totalNotes: 2,
       modifiedToday: 1,
-      views: [{ name: "books", count: 1 }],
+      views: [{ component: "NotesList", count: 1, id: "books", name: "Books" }],
     }
 
     const fetchMock = vi.fn().mockResolvedValue({

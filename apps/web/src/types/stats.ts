@@ -1,5 +1,7 @@
 export interface StatsViewCount {
+  component: string
   count: number
+  id: string
   name: string
 }
 

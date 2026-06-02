@@ -95,12 +95,14 @@ describe("config", () => {
         obsidianVault: "vault",
         views: [
           {
+            component: "NotesList",
             filters: [
               {
                 folder: "downtime",
                 "frontmatter.type": "book",
               },
             ],
+            id: "books",
             name: "books",
           },
         ],
@@ -115,12 +117,14 @@ describe("config", () => {
       timezone: "UTC",
       views: [
         {
+          component: "NotesList",
           filters: [
             {
               folder: "downtime",
               "frontmatter.type": "book",
             },
           ],
+          id: "books",
           name: "books",
         },
       ],
@@ -323,7 +327,7 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json views must be an array of objects with non-empty name and string filters",
+        "app.config.json views must be an array of objects with non-empty id, name, component, and string filters",
       ),
     )
   })

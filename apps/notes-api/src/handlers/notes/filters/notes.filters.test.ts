@@ -84,12 +84,14 @@ describe("notes filter helpers", () => {
       notes,
       [
         {
+          component: "NotesList",
           filters: [
             {
               folder: "downtime",
               "frontmatter.type": "book",
             },
           ],
+          id: "books",
           name: "books",
         },
       ],
@@ -118,7 +120,9 @@ describe("notes filter helpers", () => {
       notes,
       [
         {
+          component: "NotesList",
           filters: [{ "frontmatter.topic": "Reading" }],
+          id: "reading",
           name: "reading",
         },
       ],
@@ -126,7 +130,10 @@ describe("notes filter helpers", () => {
     )
 
     expect(filtered).toEqual([notes[0]])
-    expect(getValueByPathMock).toHaveBeenCalledWith(notes[0], "frontmatter.topic")
+    expect(getValueByPathMock).toHaveBeenCalledWith(
+      notes[0],
+      "frontmatter.topic",
+    )
   })
 
   test("applyViewFilter matches notes satisfying any filter group (OR logic)", () => {
@@ -146,10 +153,12 @@ describe("notes filter helpers", () => {
       notes,
       [
         {
+          component: "NotesList",
           filters: [
             { "frontmatter.type": "book" },
             { "frontmatter.type": "game" },
           ],
+          id: "downtime",
           name: "downtime",
         },
       ],
@@ -166,7 +175,9 @@ describe("notes filter helpers", () => {
       notes,
       [
         {
+          component: "NotesList",
           filters: [{ folder: "downtime" }],
+          id: "books",
           name: "books",
         },
       ],
@@ -199,7 +210,14 @@ describe("notes filter helpers", () => {
 
       const filtered = applyViewFilter(
         notes,
-        [{ filters: [{ createdDate: "$onThisDay" }], name: "memories" }],
+        [
+          {
+            component: "NotesList",
+            filters: [{ createdDate: "$onThisDay" }],
+            id: "memories",
+            name: "memories",
+          },
+        ],
         "memories",
         { dateFormats: [], timezone: "UTC" },
       )
@@ -223,7 +241,14 @@ describe("notes filter helpers", () => {
 
       const filtered = applyViewFilter(
         notes,
-        [{ filters: [{ modifiedDate: "$onThisDay" }], name: "memories" }],
+        [
+          {
+            component: "NotesList",
+            filters: [{ modifiedDate: "$onThisDay" }],
+            id: "memories",
+            name: "memories",
+          },
+        ],
         "memories",
         { dateFormats: [], timezone: "UTC" },
       )
@@ -247,7 +272,14 @@ describe("notes filter helpers", () => {
 
       const filtered = applyViewFilter(
         notes,
-        [{ filters: [{ titleOrBodyDates: "$onThisDay" }], name: "memories" }],
+        [
+          {
+            component: "NotesList",
+            filters: [{ titleOrBodyDates: "$onThisDay" }],
+            id: "memories",
+            name: "memories",
+          },
+        ],
         "memories",
         { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" },
       )
@@ -276,7 +308,14 @@ describe("notes filter helpers", () => {
 
       const filtered = applyViewFilter(
         notes,
-        [{ filters: [{ createdDate: "$onThisDay" }], name: "memories" }],
+        [
+          {
+            component: "NotesList",
+            filters: [{ createdDate: "$onThisDay" }],
+            id: "memories",
+            name: "memories",
+          },
+        ],
         "memories",
         { dateFormats: [], timezone: "America/Toronto" },
       )
@@ -302,7 +341,14 @@ describe("notes filter helpers", () => {
 
       const filtered = applyViewFilter(
         notes,
-        [{ filters: [{ createdDate: "$onThisDay" }], name: "memories" }],
+        [
+          {
+            component: "NotesList",
+            filters: [{ createdDate: "$onThisDay" }],
+            id: "memories",
+            name: "memories",
+          },
+        ],
         "memories",
         { dateFormats: [], timezone: "UTC" },
       )
@@ -333,7 +379,14 @@ describe("notes filter helpers", () => {
 
       const filtered = applyViewFilter(
         notes,
-        [{ filters: [{ titleOrBodyDates: "$today" }], name: "today" }],
+        [
+          {
+            component: "NotesReview",
+            filters: [{ titleOrBodyDates: "$today" }],
+            id: "today",
+            name: "Today",
+          },
+        ],
         "today",
         { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" },
       )
@@ -361,7 +414,14 @@ describe("notes filter helpers", () => {
 
       const filtered = applyViewFilter(
         notes,
-        [{ filters: [{ titleOrBodyDates: "$today" }], name: "today" }],
+        [
+          {
+            component: "NotesReview",
+            filters: [{ titleOrBodyDates: "$today" }],
+            id: "today",
+            name: "Today",
+          },
+        ],
         "today",
         { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" },
       )

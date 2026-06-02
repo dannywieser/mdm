@@ -15,8 +15,8 @@ This repository is a Turborepo monorepo with this structure:
       { "status": "ok" }
       ```
   - `GET /notes`
-      - Purpose: recursively load `*.md` and `*.markdown` files from the directory resolved by `noteRootDirectory` + `obsidianVault` in `app.config.json`, extract optional frontmatter metadata, extract title/body dates using configured `dateFormats`, parse markdown into a node tree, and return note metadata
-      - Optional query: `view=<name>` to apply a configured notes view filter
+    - Purpose: recursively load `*.md` and `*.markdown` files from the directory resolved by `noteRootDirectory` + `obsidianVault` in `app.config.json`, extract optional frontmatter metadata, extract title/body dates using configured `dateFormats`, parse markdown into a node tree, and return note metadata
+    - Optional query: `view=<id>` to apply a configured notes view filter by view ID
     - Success response: `200`
       ```json
       {
@@ -111,8 +111,8 @@ This repository is a Turborepo monorepo with this structure:
     ```
 
 - `apps/web`: React + TypeScript client using Chakra UI, TanStack Query, and React Router.
-  - Single route: `/`
-  - Renders notes from `GET /notes` using `NotesList` and `NotesCard`
+  - Routes: `/` and `/notes/:view`
+  - `/notes/:view` resolves the view config by ID and renders the configured component (for example `NotesList` or `NotesReview`)
   - Configure the API base URL with `VITE_API_BASE_URL` (defaults to `http://localhost:3000`)
 
 - `apps/image-server`: Express-based image proxy for note image assets backed by imgproxy.
@@ -137,7 +137,11 @@ This repository is a Turborepo monorepo with this structure:
   - `dateFormats`: array of expected date patterns to extract from note bodies, such as `["YYYY.MM.DD", "YY/MM/DD"]`.
   - `noteRootDirectory`: absolute path to your notes root directory.
   - `obsidianVault`: vault folder name under `noteRootDirectory`.
-  - `views` (optional): array of named views. Each view has `name` and `filters` where filters match note fields (for example `"folder": "downtime"` and `"frontmatter.type": "book"`). All filters are applied inclusively.
+  - `views` (optional): array of view configs. Each view has:
+    - `id`: route key used by `/notes/:view` and `GET /notes?view=<id>`
+    - `name`: human-readable label shown in the UI
+    - `component`: component name that the web app renders for that view (for example `NotesList` or `NotesReview`)
+    - `filters`: array of filter groups. Within each group, conditions are ANDed; across groups, matches are ORed.
   - `flags`: object keyed by allowed flag names. Each flag definition supports optional `expiresInSeconds` (positive integer) to set Redis TTL, or omit it for non-expiring flags.
 
 ## Docker Compose deployment

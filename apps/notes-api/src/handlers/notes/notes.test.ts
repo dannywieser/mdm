@@ -99,9 +99,13 @@ describe("notes handler interface", () => {
       timezone: "UTC",
       views: [
         {
-          filters: {
-            folder: "notes",
-          },
+          component: "NotesList",
+          filters: [
+            {
+              folder: "notes",
+            },
+          ],
+          id: "notes-only",
           name: "notes-only",
         },
       ],
@@ -151,9 +155,13 @@ describe("notes handler interface", () => {
       scannedNotes,
       [
         {
-          filters: {
-            folder: "notes",
-          },
+          component: "NotesList",
+          filters: [
+            {
+              folder: "notes",
+            },
+          ],
+          id: "notes-only",
           name: "notes-only",
         },
       ],
@@ -190,10 +198,14 @@ describe("notes handler interface", () => {
       timezone: "UTC",
       views: [
         {
-          filters: {
-            "frontmatter.type": "book",
-            folder: "downtime",
-          },
+          component: "NotesList",
+          filters: [
+            {
+              "frontmatter.type": "book",
+              folder: "downtime",
+            },
+          ],
+          id: "books",
           name: "books",
         },
       ],
@@ -218,10 +230,14 @@ describe("notes handler interface", () => {
       [scannedNote],
       [
         {
-          filters: {
-            "frontmatter.type": "book",
-            folder: "downtime",
-          },
+          component: "NotesList",
+          filters: [
+            {
+              "frontmatter.type": "book",
+              folder: "downtime",
+            },
+          ],
+          id: "books",
           name: "books",
         },
       ],

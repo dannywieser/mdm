@@ -139,16 +139,14 @@ const matchesViewFilters = <T extends FilterableNote>(
 export const applyViewFilter = <T extends FilterableNote>(
   notes: readonly T[],
   configuredViews: readonly NotesView[],
-  requestedViewName: string | undefined,
+  requestedViewId: string | undefined,
   context: ViewFilterContext = { dateFormats: [], timezone: "UTC" },
 ): T[] => {
-  if (!requestedViewName) {
+  if (!requestedViewId) {
     return [...notes]
   }
 
-  const selectedView = configuredViews.find(
-    ({ name }) => name === requestedViewName,
-  )
+  const selectedView = configuredViews.find(({ id }) => id === requestedViewId)
 
   if (!selectedView) {
     return [...notes]

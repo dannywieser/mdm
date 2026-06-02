@@ -11,6 +11,7 @@ import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
 import type { NotesReviewRouteParamKey } from "./NotesReview.types"
 import { MarkdownTree } from "../MarkdownTree/MarkdownTree"
 import { AppError } from "../AppError/AppError"
+import { OpenInObsidianButton } from "../OpenInObsidianButton/OpenInObsidianButton"
 
 export const NotesReview = () => {
   const { view } = useParams<NotesReviewRouteParamKey>()
@@ -62,6 +63,7 @@ export const NotesReview = () => {
       </Text>
       <MarkdownTree content={currentNote.content} />
       <Flex gap="2" justify="flex-end">
+        <OpenInObsidianButton note={currentNote} />
         <Button variant="ghost" onClick={advance}>
           <ChevronRight size={16} />
           {t("review.skip")}

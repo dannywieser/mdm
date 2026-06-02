@@ -52,9 +52,9 @@ export function Home() {
           </StatRoot>
           {data.views.map((view) => (
             <Link
-              key={view.name}
+              key={view.id}
               style={{ textDecoration: "none" }}
-              to={`/notes/${view.name}`}
+              to={`/notes/${view.id}`}
             >
               <StatRoot
                 borderColor="gray.200"

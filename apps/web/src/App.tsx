@@ -3,8 +3,7 @@ import { Outlet, Route, Routes } from "react-router-dom"
 
 import { Header } from "./components/Header/Header"
 import { Home } from "./components/Home/Home"
-import { NotesList } from "./components/NotesList/NotesList"
-import { NotesReview } from "./components/NotesReview/NotesReview"
+import { NotesView } from "./components/NotesView/NotesView"
 
 function AppLayout() {
   return (
@@ -20,8 +19,7 @@ function App() {
     <Routes>
       <Route element={<AppLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/notes/:view" element={<NotesList />} />
-        <Route path="/notes/:view/review" element={<NotesReview />} />
+        <Route path="/notes/:view" element={<NotesView />} />
       </Route>
     </Routes>
   )

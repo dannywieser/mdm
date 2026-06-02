@@ -35,10 +35,14 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
     case "root":
       return <Fragment key={key}>{children}</Fragment>
     case "heading":
-      return <MarkdownHeading key={key} depth={node.depth}>{children}</MarkdownHeading>
+      return (
+        <MarkdownHeading key={key} depth={node.depth}>
+          {children}
+        </MarkdownHeading>
+      )
     case "paragraph":
       return (
-        <Text key={key} mb="4" lineHeight="tall">
+        <Text key={key} lineHeight="tall">
           {children}
         </Text>
       )
@@ -171,7 +175,11 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
         </Box>
       )
     case "tableRow":
-      return <Box as="tr" key={key}>{children}</Box>
+      return (
+        <Box as="tr" key={key}>
+          {children}
+        </Box>
+      )
     case "tableCell":
       return (
         <Box
@@ -192,4 +200,6 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
 }
 
 const renderChildren = (node: MarkdownNode): ReactNode[] =>
-  (node.children ?? []).map((childNode, index) => renderNode(childNode, `${node.type}-${index}`))
+  (node.children ?? []).map((childNode, index) =>
+    renderNode(childNode, `${node.type}-${index}`),
+  )
