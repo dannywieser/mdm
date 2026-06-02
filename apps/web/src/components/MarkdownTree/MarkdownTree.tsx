@@ -3,7 +3,6 @@ import {
   Blockquote,
   Code,
   CodeBlock,
-  Heading,
   HStack,
   Icon,
   Image,
@@ -16,6 +15,7 @@ import type { MarkdownNode } from "markdown"
 import { CircleCheck, CircleDashed } from "lucide-react"
 import { Fragment, type ReactNode } from "react"
 
+import { MarkdownHeading } from "./MarkdownHeading"
 import type { MarkdownTreeProps } from "./MarkdownTree.types"
 
 const isExternalLink = (url: string): boolean => /^(?:https?:)?\/\//.test(url)
@@ -34,31 +34,8 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
   switch (node.type) {
     case "root":
       return <Fragment key={key}>{children}</Fragment>
-    case "heading": {
-      const depth = Math.min(Math.max(node.depth ?? 1, 1), 6)
-      const headingTagByDepth: Record<number, "h1" | "h2" | "h3" | "h4" | "h5" | "h6"> = {
-        1: "h1",
-        2: "h2",
-        3: "h3",
-        4: "h4",
-        5: "h5",
-        6: "h6",
-      }
-      const sizeByDepth: Record<number, "2xl" | "xl" | "lg" | "md" | "sm" | "xs"> = {
-        1: "2xl",
-        2: "xl",
-        3: "lg",
-        4: "md",
-        5: "sm",
-        6: "xs",
-      }
-
-      return (
-        <Heading key={key} as={headingTagByDepth[depth]} size={sizeByDepth[depth]} mt="6" mb="3">
-          {children}
-        </Heading>
-      )
-    }
+    case "heading":
+      return <MarkdownHeading key={key} depth={node.depth}>{children}</MarkdownHeading>
     case "paragraph":
       return (
         <Text key={key} mb="4" lineHeight="tall">
