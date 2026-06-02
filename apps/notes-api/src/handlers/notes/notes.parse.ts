@@ -57,7 +57,13 @@ const buildMarkdownTree = (
   replacements: WikilinkReplacement[],
 ): MarkdownNode => {
   const normalizedBody = normalizeObsidianWikiEmbeds(markdownBody)
-  const markdownTree = remark().use(remarkGfm).parse(normalizedBody) as MarkdownNode
+  const parsedTree = remark().use(remarkGfm).parse(normalizedBody)
+
+  if (!isMarkdownNode(parsedTree)) {
+    throw new Error("Unable to parse markdown into a valid node tree")
+  }
+
+  const markdownTree = parsedTree
 
   visitMarkdownTree(markdownTree, (node) => {
     if (node.type !== "image" || typeof node.url !== "string") {
@@ -226,4 +232,26 @@ const safeDecodeURIComponent = (value: string): string => {
   } catch {
     return value
   }
+}
+
+const isMarkdownNode = (value: unknown): value is MarkdownNode => {
+  if (!value || typeof value !== "object") {
+    return false
+  }
+
+  const candidate = value as { children?: unknown; type?: unknown }
+
+  if (typeof candidate.type !== "string") {
+    return false
+  }
+
+  if (candidate.children === undefined) {
+    return true
+  }
+
+  if (!Array.isArray(candidate.children)) {
+    return false
+  }
+
+  return candidate.children.every((childNode) => isMarkdownNode(childNode))
 }

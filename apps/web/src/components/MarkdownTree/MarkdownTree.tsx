@@ -130,7 +130,7 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
         <Box
           as={node.ordered ? "ol" : "ul"}
           key={key}
-          pl={node.ordered ? "6" : "6"}
+          pl="6"
           mb="4"
           listStyleType={node.ordered ? "decimal" : "disc"}
         >
