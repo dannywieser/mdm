@@ -15,7 +15,7 @@ This repository is a Turborepo monorepo with this structure:
       { "status": "ok" }
       ```
   - `GET /notes`
-      - Purpose: recursively load `*.md` and `*.markdown` files from the directory resolved by `noteRootDirectory` + `obsidianVault` in `app.config.json`, extract optional frontmatter metadata, extract title/body dates using configured `dateFormats`, render markdown to HTML, and return note metadata
+      - Purpose: recursively load `*.md` and `*.markdown` files from the directory resolved by `noteRootDirectory` + `obsidianVault` in `app.config.json`, extract optional frontmatter metadata, extract title/body dates using configured `dateFormats`, parse markdown into a node tree, and return note metadata
       - Optional query: `view=<name>` to apply a configured notes view filter
     - Success response: `200`
       ```json
@@ -36,7 +36,16 @@ This repository is a Turborepo monorepo with this structure:
               "topic": ["AI"],
               "created": "2026.05.26"
             },
-            "html": "<h1>Welcome</h1>"
+            "content": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "heading",
+                  "depth": 1,
+                  "children": [{ "type": "text", "value": "Welcome" }]
+                }
+              ]
+            }
           }
         ]
       }

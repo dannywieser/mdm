@@ -1,5 +1,4 @@
 import {
-  Box,
   Card,
   Collapsible,
   Flex,
@@ -10,15 +9,13 @@ import { useIsRead } from "../../hooks/useIsRead/useIsRead"
 import { useI18n } from "../../i18n"
 
 import { OpenInObsidianButton } from "../OpenInObsidianButton/OpenInObsidianButton"
+import { MarkdownTree } from "../MarkdownTree/MarkdownTree"
 import { ToggleReadButton } from "../ToggleReadButton/ToggleReadButton"
 
-import { noteContentStyles } from "./NotesCard.styles"
 import type { NotesCardProps } from "./NotesCard.types"
-import { sanitizeNoteHtml } from "./NotesCard.util"
 
 export const NotesCard = ({ note }: NotesCardProps) => {
   const { t } = useI18n()
-  const sanitizedHtml = sanitizeNoteHtml(note.html)
   const { data: isRead } = useIsRead({ noteId: note.id })
   const isCollapsed = isRead ?? false
 
@@ -36,10 +33,7 @@ export const NotesCard = ({ note }: NotesCardProps) => {
       <Collapsible.Root open={!isCollapsed} lazyMount>
         <Collapsible.Content>
           <Card.Body gap="4">
-            <Box
-              css={noteContentStyles}
-              dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
-            />
+            <MarkdownTree content={note.content} />
             {note.linkedNotes && note.linkedNotes.length > 0 && (
               <Collapsible.Root>
                 <Collapsible.Trigger asChild>
@@ -53,23 +47,18 @@ export const NotesCard = ({ note }: NotesCardProps) => {
                   </Heading>
                 </Collapsible.Trigger>
                 <Collapsible.Content>
-                  <Box display="flex" flexDirection="column" gap="3" mt="3">
+                  <Flex direction="column" gap="3" mt="3">
                     {note.linkedNotes.map((linked) => (
                       <Card.Root key={linked.id} size="sm" variant="subtle">
                         <Card.Header>
                           <Heading size="sm">{linked.title}</Heading>
                         </Card.Header>
                         <Card.Body>
-                          <Box
-                            css={noteContentStyles}
-                            dangerouslySetInnerHTML={{
-                              __html: sanitizeNoteHtml(linked.html),
-                            }}
-                          />
+                          <MarkdownTree content={linked.content} />
                         </Card.Body>
                       </Card.Root>
                     ))}
-                  </Box>
+                  </Flex>
                 </Collapsible.Content>
               </Collapsible.Root>
             )}

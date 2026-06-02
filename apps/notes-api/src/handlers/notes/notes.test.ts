@@ -113,7 +113,10 @@ describe("notes handler interface", () => {
     applyViewFilterMock.mockReturnValue([scannedNotes[0]])
     parseMarkdownFileMock.mockResolvedValue({
       ...scannedNotes[0],
-      html: "<h1>Note</h1>",
+      content: {
+        children: [{ type: "text", value: "Note" }],
+        type: "root",
+      },
     })
     const app = express()
     app.get("/notes", notesHandler)
@@ -129,7 +132,10 @@ describe("notes handler interface", () => {
     expect(body.notes).toEqual([
       expect.objectContaining({
         basename: "a.md",
-        html: "<h1>Note</h1>",
+        content: {
+          children: [{ type: "text", value: "Note" }],
+          type: "root",
+        },
         titleOrBodyDates: ["2026.05.26"],
       }),
     ])
@@ -197,7 +203,10 @@ describe("notes handler interface", () => {
     applyViewFilterMock.mockReturnValue([scannedNote])
     parseMarkdownFileMock.mockResolvedValue({
       ...scannedNote,
-      html: "<h1>A</h1>",
+      content: {
+        children: [{ type: "text", value: "A" }],
+        type: "root",
+      },
     })
     const app = express()
     app.get("/notes", notesHandler)

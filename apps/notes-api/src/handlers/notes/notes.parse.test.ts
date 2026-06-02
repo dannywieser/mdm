@@ -1,9 +1,11 @@
+import type { MarkdownNode } from "markdown"
+
 import { parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
 
 import type { ScannedNote } from "./notes.types"
 
-import { parseMarkdownFile, processTaskListHtml } from "./notes.parse"
+import { parseMarkdownFile } from "./notes.parse"
 
 jest.mock("node:fs", () => ({
   promises: {
@@ -19,21 +21,19 @@ const readFileMock = fs.readFile as jest.Mock
 const parseFrontMatterMock = jest.mocked(parseFrontMatter)
 
 describe("notes parse helpers", () => {
-  test("parseMarkdownFile renders task list items as SVG icons", async () => {
+  test("parseMarkdownFile preserves task list state in markdown node tree", async () => {
     const body = "- [x] Done\n- [ ] Todo\n"
     readFileMock.mockResolvedValue(body)
     parseFrontMatterMock.mockReturnValue({ body, frontmatter: null })
 
     const note = await parseMarkdownFile(createScannedNote(), "/notes")
 
-    expect(note.html).toContain('class="task-list-icon task-list-icon--checked"')
-    expect(note.html).toContain('class="task-list-icon task-list-icon--unchecked"')
-    expect(note.html).not.toContain("<input")
-    expect(note.html).not.toContain("[x]")
-    expect(note.html).not.toContain("[ ]")
+    const taskItems = findNodesByType(note.content, "listItem")
+    expect(taskItems).toHaveLength(2)
+    expect(taskItems.map((item) => item.checked).sort()).toEqual([false, true])
   })
 
-  test("parseMarkdownFile renders html using the scanned note metadata", async () => {
+  test("parseMarkdownFile returns a markdown node tree with scanned note metadata", async () => {
     readFileMock.mockResolvedValue("# Welcome\n\nThis is a note.")
     parseFrontMatterMock.mockReturnValue({
       body: "# Welcome\n\nThis is a note.",
@@ -55,8 +55,12 @@ describe("notes parse helpers", () => {
       title: "welcome",
       fullPath: "/notes/topic/welcome.md",
     })
-    expect(note.html).toContain("<h1>Welcome</h1>")
-    expect(note.html).toContain("<p>This is a note.</p>")
+
+    const heading = findNodesByType(note.content, "heading")[0]
+    const paragraph = findNodesByType(note.content, "paragraph")[0]
+
+    expect(extractNodeText(heading)).toBe("Welcome")
+    expect(extractNodeText(paragraph)).toBe("This is a note.")
     expect(note.linkedNotes).toEqual([])
     expect(readFileMock).toHaveBeenCalledWith("/notes/topic/welcome.md", "utf8")
   })
@@ -79,8 +83,9 @@ describe("notes parse helpers", () => {
       "attachments",
     )
 
-    expect(note.html).toContain(
-      '<img src="/images?path=attachments%2Ffolder%2Ffile-name%2Fattach-20260525090751252.jpg"',
+    const image = findNodesByType(note.content, "image")[0]
+    expect(image?.url).toBe(
+      "/images?path=attachments%2Ffolder%2Ffile-name%2Fattach-20260525090751252.jpg",
     )
   })
 
@@ -102,9 +107,8 @@ describe("notes parse helpers", () => {
       "attachments",
     )
 
-    expect(note.html).toContain(
-      '<img src="/images?path=attachments%2Froot-note%2Fattach-123.jpg"',
-    )
+    const image = findNodesByType(note.content, "image")[0]
+    expect(image?.url).toBe("/images?path=attachments%2Froot-note%2Fattach-123.jpg")
   })
 
   test("parseMarkdownFile uses configured attachmentsDirectory for bare-filename images", async () => {
@@ -122,9 +126,8 @@ describe("notes parse helpers", () => {
       "assets",
     )
 
-    expect(note.html).toContain(
-      '<img src="/images?path=assets%2Ftopic%2Fnote%2Fphoto.png"',
-    )
+    const image = findNodesByType(note.content, "image")[0]
+    expect(image?.url).toBe("/images?path=assets%2Ftopic%2Fnote%2Fphoto.png")
   })
 
   test("parseMarkdownFile rewrites obsidian wikilink image embeds to attachment path", async () => {
@@ -145,8 +148,9 @@ describe("notes parse helpers", () => {
       "attachments",
     )
 
-    expect(note.html).toContain(
-      '<img src="/images?path=attachments%2Ffolder%2Ffile-name%2Fattach-20260523155741791.jpg"',
+    const image = findNodesByType(note.content, "image")[0]
+    expect(image?.url).toBe(
+      "/images?path=attachments%2Ffolder%2Ffile-name%2Fattach-20260523155741791.jpg",
     )
   })
 
@@ -168,8 +172,9 @@ describe("notes parse helpers", () => {
       "attachments",
     )
 
-    expect(note.html).toContain(
-      '<img src="/images?path=attachments%2Froot-note%2Fattach-20260523155741791.jpg"',
+    const image = findNodesByType(note.content, "image")[0]
+    expect(image?.url).toBe(
+      "/images?path=attachments%2Froot-note%2Fattach-20260523155741791.jpg",
     )
   })
 
@@ -190,12 +195,11 @@ describe("notes parse helpers", () => {
       "attachments",
     )
 
-    expect(note.html).toContain(
-      '<img src="/images?path=attachments%2Ffolder%2Fnote%2Fphoto-a.jpg"',
-    )
-    expect(note.html).toContain(
-      '<img src="/images?path=attachments%2Ffolder%2Fnote%2Fphoto-b.jpg"',
-    )
+    const images = findNodesByType(note.content, "image")
+    expect(images.map((image) => image.url).sort()).toEqual([
+      "/images?path=attachments%2Ffolder%2Fnote%2Fphoto-a.jpg",
+      "/images?path=attachments%2Ffolder%2Fnote%2Fphoto-b.jpg",
+    ])
   })
 
   test("parseMarkdownFile rewrites relative markdown images to image server urls", async () => {
@@ -215,9 +219,8 @@ describe("notes parse helpers", () => {
       "/notes",
     )
 
-    expect(note.html).toContain(
-      '<img src="/images?path=daily%2Fassets%2Fhome%20page.png"',
-    )
+    const image = findNodesByType(note.content, "image")[0]
+    expect(image?.url).toBe("/images?path=daily%2Fassets%2Fhome%20page.png")
   })
 
   test("parseMarkdownFile keeps external markdown image urls unchanged", async () => {
@@ -237,10 +240,11 @@ describe("notes parse helpers", () => {
       "/notes",
     )
 
-    expect(note.html).toContain('<img src="https://example.com/image.png"')
+    const image = findNodesByType(note.content, "image")[0]
+    expect(image?.url).toBe("https://example.com/image.png")
   })
 
-  test("parseMarkdownFile replaces unmatched wikilink with dashed-underline span", async () => {
+  test("parseMarkdownFile replaces unmatched wikilink with unmatched wikilink text node", async () => {
     readFileMock.mockResolvedValue("See [[Missing Note]] for details.")
     parseFrontMatterMock.mockReturnValue({
       body: "See [[Missing Note]] for details.",
@@ -254,11 +258,14 @@ describe("notes parse helpers", () => {
       [],
     )
 
-    expect(note.html).toContain('<span class="wikilink-unmatched">Missing Note</span>')
+    const unmatchedNode = findNodesByType(note.content, "text").find(
+      (node) => node.wikilinkType === "unmatched",
+    )
+    expect(unmatchedNode?.value).toBe("Missing Note")
     expect(note.linkedNotes).toEqual([])
   })
 
-  test("parseMarkdownFile replaces matched wikilink with obsidian link and adds to linkedNotes", async () => {
+  test("parseMarkdownFile replaces matched wikilink with link node and adds to linkedNotes", async () => {
     const linkedScannedNote = createScannedNote({
       basename: "other-note.md",
       fullPath: "/notes/topic/other-note.md",
@@ -280,15 +287,17 @@ describe("notes parse helpers", () => {
       [linkedScannedNote],
     )
 
-    expect(note.html).toContain(
-      '<a href="obsidian://open?vault=vault&file=topic%2Fother-note">other-note</a>',
-    )
+    const linkNode = findNodesByType(note.content, "link")[0]
+    expect(linkNode?.url).toBe("obsidian://open?vault=vault&file=topic%2Fother-note")
+    expect(extractNodeText(linkNode)).toBe("other-note")
     expect(note.linkedNotes).toHaveLength(1)
     expect(note.linkedNotes?.[0]).toMatchObject({
       id: "other-note",
       title: "other-note",
     })
-    expect(note.linkedNotes?.[0]?.html).toContain("<h1>Other Note content</h1>")
+    expect(extractNodeText(findNodesByType(note.linkedNotes?.[0]?.content, "heading")[0])).toBe(
+      "Other Note content",
+    )
   })
 
   test("parseMarkdownFile uses alias text for matched wikilink display", async () => {
@@ -316,9 +325,8 @@ describe("notes parse helpers", () => {
       [linkedScannedNote],
     )
 
-    expect(note.html).toContain(
-      '<a href="obsidian://open?vault=vault&file=topic%2Fother-note">the linked note</a>',
-    )
+    const linkNode = findNodesByType(note.content, "link")[0]
+    expect(extractNodeText(linkNode)).toBe("the linked note")
   })
 
   test("parseMarkdownFile does not add the same linked note twice for multiple wikilinks", async () => {
@@ -382,58 +390,56 @@ describe("notes parse helpers", () => {
     )
 
     expect(note.linkedNotes).toHaveLength(1)
-    // wikilink in linked note is rendered as unmatched span (no allNotes passed)
-    expect(note.linkedNotes?.[0]?.html).toContain(
-      '<span class="wikilink-unmatched">deep-note</span>',
+    const linkedUnmatchedNode = findNodesByType(note.linkedNotes?.[0]?.content, "text").find(
+      (node) => node.wikilinkType === "unmatched",
     )
+    expect(linkedUnmatchedNode?.value).toBe("deep-note")
     expect(note.linkedNotes?.[0]?.linkedNotes).toEqual([])
   })
 })
 
-describe("processTaskListHtml", () => {
-  test("replaces checked checkbox with CircleCheck SVG icon", () => {
-    const input = '<li class="task-list-item"><input type="checkbox" checked disabled> Done</li>'
-    const result = processTaskListHtml(input)
+const findNodesByType = (tree: MarkdownNode | undefined, type: string): MarkdownNode[] => {
+  if (!tree) {
+    return []
+  }
 
-    expect(result).not.toContain('<input')
-    expect(result).toContain('class="task-list-icon task-list-icon--checked"')
-    expect(result).toContain('<circle cx="12" cy="12" r="10"/>')
-  })
+  const result: MarkdownNode[] = []
+  const stack: MarkdownNode[] = [tree]
 
-  test("replaces unchecked checkbox with CircleDashed SVG icon", () => {
-    const input = '<li class="task-list-item"><input type="checkbox" disabled> Todo</li>'
-    const result = processTaskListHtml(input)
+  while (stack.length > 0) {
+    const current = stack.pop()
 
-    expect(result).not.toContain('<input')
-    expect(result).toContain('class="task-list-icon task-list-icon--unchecked"')
-    expect(result).toContain('M10.1 2.182')
-  })
+    if (!current) {
+      continue
+    }
 
-  test("handles checked attribute appearing before type attribute", () => {
-    const input = '<input checked type="checkbox" disabled>'
-    const result = processTaskListHtml(input)
+    if (current.type === type) {
+      result.push(current)
+    }
 
-    expect(result).toContain('task-list-icon--checked')
-  })
+    if (Array.isArray(current.children)) {
+      stack.push(...current.children)
+    }
+  }
 
-  test("replaces multiple checkboxes in a single HTML string", () => {
-    const input =
-      '<li><input type="checkbox" checked disabled> Done</li>' +
-      '<li><input type="checkbox" disabled> Todo</li>'
-    const result = processTaskListHtml(input)
+  return result
+}
 
-    expect(result).toContain('task-list-icon--checked')
-    expect(result).toContain('task-list-icon--unchecked')
-    expect(result).not.toContain('<input')
-  })
+const extractNodeText = (node: MarkdownNode | undefined): string => {
+  if (!node) {
+    return ""
+  }
 
-  test("leaves non-checkbox input elements unchanged", () => {
-    const input = '<input type="text" value="hello">'
-    const result = processTaskListHtml(input)
+  if (typeof node.value === "string") {
+    return node.value
+  }
 
-    expect(result).toBe(input)
-  })
-})
+  if (!Array.isArray(node.children)) {
+    return ""
+  }
+
+  return node.children.map((childNode) => extractNodeText(childNode)).join("")
+}
 
 const createScannedNote = (
   overrides: Partial<ScannedNote> = {},
