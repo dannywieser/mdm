@@ -24,4 +24,14 @@ describe("MarkdownHeading", () => {
 
     expect(screen.getByRole("heading", { level: 6, name: "Deep" })).toBeTruthy()
   })
+
+  test("clamps heading depth to h1 minimum", () => {
+    render(
+      <ChakraProvider value={defaultSystem}>
+        <MarkdownHeading depth={0}>Top</MarkdownHeading>
+      </ChakraProvider>,
+    )
+
+    expect(screen.getByRole("heading", { level: 1, name: "Top" })).toBeTruthy()
+  })
 })
