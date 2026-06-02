@@ -1,7 +1,8 @@
+import type { Mock } from "vitest"
+
 import { parseFrontMatter, parseMarkdownBodyDates } from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
-import type { Mock } from "vitest"
 
 import { FILE_ID_NAMESPACE, scanMarkdownFile } from "./notes.scan"
 

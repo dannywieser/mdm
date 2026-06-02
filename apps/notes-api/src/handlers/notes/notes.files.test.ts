@@ -1,5 +1,6 @@
-import { promises as fs, type Dirent } from "node:fs"
 import type { Mock } from "vitest"
+
+import { promises as fs, type Dirent } from "node:fs"
 
 import { collectMarkdownFiles } from "./notes.files"
 

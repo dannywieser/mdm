@@ -1,8 +1,8 @@
 import type { MarkdownNode } from "markdown"
+import type { Mock } from "vitest"
 
 import { parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
-import type { Mock } from "vitest"
 
 import type { ScannedNote } from "./notes.types"
 

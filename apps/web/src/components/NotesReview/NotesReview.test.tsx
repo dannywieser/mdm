@@ -85,8 +85,8 @@ describe("NotesReview", () => {
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [
-          { id: "1", title: "Note 1" },
-          { id: "2", title: "Note 2" },
+          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
+          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
         ],
       },
       error: undefined,
@@ -106,8 +106,8 @@ describe("NotesReview", () => {
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [
-          { id: "1", title: "Note 1" },
-          { id: "2", title: "Note 2" },
+          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
+          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
         ],
       },
       error: undefined,
@@ -126,16 +126,15 @@ describe("NotesReview", () => {
     fireEvent.click(screen.getByRole("button", { name: "notes.markAsRead" }))
 
     expect(mutateMock).toHaveBeenCalled()
-    expect(screen.queryByText("Note 1")).toBeNull()
-    expect(screen.getByText("Note 2")).toBeTruthy()
+    expect(screen.getByRole("link").getAttribute("href")).toBe("obsidian://note-2")
   })
 
   test("advances to the next note when skip is clicked without marking as read", () => {
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [
-          { id: "1", title: "Note 1" },
-          { id: "2", title: "Note 2" },
+          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
+          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
         ],
       },
       error: undefined,
@@ -151,8 +150,7 @@ describe("NotesReview", () => {
     fireEvent.click(screen.getByRole("button", { name: "review.skip" }))
 
     expect(defaultMutate).not.toHaveBeenCalled()
-    expect(screen.queryByText("Note 1")).toBeNull()
-    expect(screen.getByText("Note 2")).toBeTruthy()
+    expect(screen.getByRole("link").getAttribute("href")).toBe("obsidian://note-2")
   })
 
   test("shows all caught up after reviewing all notes", () => {
