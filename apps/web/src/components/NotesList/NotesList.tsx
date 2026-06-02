@@ -1,15 +1,17 @@
 import { Alert, VStack } from "@chakra-ui/react"
 import { useParams } from "react-router-dom"
 
-import { useNotesQuery } from "../hooks/useNotesQuery"
-import { useI18n } from "../i18n"
+import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
+import { useI18n } from "../../i18n"
 
-import { LoadingScreen } from "./LoadingScreen"
-import { NotesCard } from "./NotesCard"
+import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
+import { NotesCard } from "../NotesCard/NotesCard"
+
+import type { NotesRouteParamKey } from "./NotesList.types"
 
 export const NotesList = () => {
-  const { view } = useParams<{ view: string }>()
-  const { data, error, isLoading } = useNotesQuery(view)
+  const { view } = useParams<NotesRouteParamKey>()
+  const { data, error, isLoading } = useNotesQuery({ view })
   const { t } = useI18n()
 
   if (isLoading) {

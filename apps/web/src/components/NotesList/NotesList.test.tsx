@@ -1,25 +1,25 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
 import { render, screen } from "@testing-library/react"
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 
 import { NotesList } from "./NotesList"
 
 const useNotesQueryMock = vi.fn()
 
-vi.mock("../hooks/useNotesQuery", () => ({
+vi.mock("../../hooks/useNotesQuery/useNotesQuery", () => ({
   useNotesQuery: () => useNotesQueryMock(),
 }))
 
-vi.mock("./NotesCard", () => ({
+vi.mock("../NotesCard/NotesCard", () => ({
   NotesCard: ({ note }: { note: { title: string } }) => <div>{note.title}</div>,
 }))
 
-vi.mock("./LoadingScreen", () => ({
+vi.mock("../LoadingScreen/LoadingScreen", () => ({
   LoadingScreen: () => <div data-testid="loading-screen" />,
 }))
 
 describe("NotesList", () => {
-  it("renders the loading screen while fetching", () => {
+  test("renders the loading screen while fetching", () => {
     useNotesQueryMock.mockReturnValue({
       data: undefined,
       error: undefined,
@@ -35,7 +35,7 @@ describe("NotesList", () => {
     expect(screen.getByTestId("loading-screen")).toBeTruthy()
   })
 
-  it("renders an error state", () => {
+  test("renders an error state", () => {
     useNotesQueryMock.mockReturnValue({
       data: undefined,
       error: new Error("Request failed"),
@@ -52,7 +52,7 @@ describe("NotesList", () => {
     expect(screen.getByText("Request failed")).toBeTruthy()
   })
 
-  it("renders notes when query succeeds", () => {
+  test("renders notes when query succeeds", () => {
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [

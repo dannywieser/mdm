@@ -1,7 +1,6 @@
-import { Box } from '@chakra-ui/react'
+import { Box } from "@chakra-ui/react"
 
-import { NotebookIcon } from './NotebookIcon/NotebookIcon'
-
+import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
 export const LoadingScreen = () => (
   <Box
     data-testid="loading-screen"

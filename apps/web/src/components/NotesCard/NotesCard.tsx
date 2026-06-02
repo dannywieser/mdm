@@ -5,30 +5,21 @@ import {
   Flex,
   Heading,
 } from "@chakra-ui/react"
-import DOMPurify, { type Config as DOMPurifyConfig } from "dompurify"
-import type { Note } from "markdown"
 
-import { useI18n } from "../i18n"
-import { useIsRead } from "../hooks/useIsRead"
+import { useIsRead } from "../../hooks/useIsRead/useIsRead"
+import { useI18n } from "../../i18n"
+
+import { OpenInObsidianButton } from "../OpenInObsidianButton/OpenInObsidianButton"
+import { ToggleReadButton } from "../ToggleReadButton/ToggleReadButton"
 
 import { noteContentStyles } from "./NotesCard.styles"
-import { OpenInObsidianButton } from "./OpenInObsidianButton/OpenInObsidianButton"
-import { ToggleReadButton } from "./ToggleReadButton"
-
-// Extends DOMPurify's default allowed protocols to include obsidian:// deep links.
-const SANITIZE_CONFIG: DOMPurifyConfig = {
-  ALLOWED_URI_REGEXP:
-    /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|obsidian):|[^a-z]|[a-z+.-]+(?:[^a-z+.:-]|$))/i,
-}
-
-interface NotesCardProps {
-  note: Note
-}
+import type { NotesCardProps } from "./NotesCard.types"
+import { sanitizeNoteHtml } from "./NotesCard.util"
 
 export const NotesCard = ({ note }: NotesCardProps) => {
   const { t } = useI18n()
-  const sanitizedHtml = DOMPurify.sanitize(note.html, SANITIZE_CONFIG)
-  const { data: isRead } = useIsRead(note.id)
+  const sanitizedHtml = sanitizeNoteHtml(note.html)
+  const { data: isRead } = useIsRead({ noteId: note.id })
   const isCollapsed = isRead ?? false
 
   return (
@@ -72,10 +63,7 @@ export const NotesCard = ({ note }: NotesCardProps) => {
                           <Box
                             css={noteContentStyles}
                             dangerouslySetInnerHTML={{
-                              __html: DOMPurify.sanitize(
-                                linked.html,
-                                SANITIZE_CONFIG,
-                              ),
+                              __html: sanitizeNoteHtml(linked.html),
                             }}
                           />
                         </Card.Body>
