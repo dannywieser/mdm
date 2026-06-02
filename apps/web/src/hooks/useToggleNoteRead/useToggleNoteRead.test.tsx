@@ -80,6 +80,6 @@ describe("useToggleNoteRead", () => {
       expect(result.current.isError).toBe(true)
     })
 
-    expect(result.current.error?.message).toBe("Unable to toggle read state")
+    expect(result.current.error?.message).toBe("unable to toggle read state")
   })
 })

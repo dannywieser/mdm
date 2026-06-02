@@ -68,9 +68,12 @@ describe("useNotesQuery", () => {
 
     vi.stubGlobal("fetch", fetchMock)
 
-    const { result } = renderHook(() => useNotesQuery({ view: "on-this-day" }), {
-      wrapper: createWrapper(),
-    })
+    const { result } = renderHook(
+      () => useNotesQuery({ view: "on-this-day" }),
+      {
+        wrapper: createWrapper(),
+      },
+    )
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true)
@@ -94,6 +97,8 @@ describe("useNotesQuery", () => {
       expect(result.current.isError).toBe(true)
     })
 
-    expect(result.current.error?.message).toBe("Unable to load notes")
+    expect(result.current.error?.message).toBe(
+      "well, that didn't go as planned",
+    )
   })
 })

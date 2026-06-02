@@ -48,7 +48,7 @@ describe("NotesList", () => {
       </ChakraProvider>,
     )
 
-    expect(screen.getByText("Unable to load notes.")).toBeTruthy()
+    expect(screen.getByText("unable to load notes")).toBeTruthy()
     expect(screen.getByText("Request failed")).toBeTruthy()
   })
 

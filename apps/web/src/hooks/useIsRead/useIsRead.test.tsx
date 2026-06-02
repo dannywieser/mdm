@@ -63,6 +63,6 @@ describe("useIsRead", () => {
       expect(result.current.isError).toBe(true)
     })
 
-    expect(result.current.error?.message).toBe("Unable to load read state")
+    expect(result.current.error?.message).toBe("unable to load read state")
   })
 })

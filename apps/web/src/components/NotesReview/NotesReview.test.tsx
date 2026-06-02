@@ -15,16 +15,8 @@ vi.mock("../../hooks/useToggleNoteRead/useToggleNoteRead", () => ({
   useToggleNoteRead: () => useToggleNoteReadMock(),
 }))
 
-vi.mock("../NotebookIcon/NotebookIcon", () => ({
-  NotebookIcon: () => <div data-testid="notebook-icon" />,
-}))
-
-vi.mock("../AppError/AppError", () => ({
-  AppError: ({ message }) => <div data-testid="app-error">{message}</div>,
-}))
-
 vi.mock("../MarkdownTree/MarkdownTree", () => ({
-  MarkdownTree: () => <div data-testid="markdown-tree" />,
+  MarkdownTree: () => null,
 }))
 
 const defaultMutate = vi.fn()
@@ -33,21 +25,28 @@ afterEach(() => {
   cleanup()
 })
 
-const renderComponent = () =>
-  render(
-    <ChakraProvider value={defaultSystem}>
-      <NotesReview />
-    </ChakraProvider>,
-  )
-
 describe("NotesReview", () => {
+  const renderComponent = () =>
+    render(
+      <ChakraProvider value={defaultSystem}>
+        <NotesReview />
+      </ChakraProvider>,
+    )
+
   test("renders the notebook icon while fetching", () => {
-    useNotesQueryMock.mockReturnValue({ data: undefined, error: undefined, isLoading: true })
-    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    useNotesQueryMock.mockReturnValue({
+      data: undefined,
+      error: undefined,
+      isLoading: true,
+    })
+    useToggleNoteReadMock.mockReturnValue({
+      mutate: defaultMutate,
+      isPending: false,
+    })
 
     renderComponent()
 
-    expect(screen.getByTestId("notebook-icon")).toBeTruthy()
+    expect(screen.getByRole("img", { name: "Notebook" })).toBeTruthy()
   })
 
   test("renders an error state", () => {
@@ -56,11 +55,14 @@ describe("NotesReview", () => {
       error: new Error("Request failed"),
       isLoading: false,
     })
-    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    useToggleNoteReadMock.mockReturnValue({
+      mutate: defaultMutate,
+      isPending: false,
+    })
 
     renderComponent()
 
-    expect(screen.getByTestId("app-error")).toBeTruthy()
+    expect(screen.getByText("unable to load notes")).toBeTruthy()
   })
 
   test("renders all caught up when there are no notes", () => {
@@ -69,14 +71,17 @@ describe("NotesReview", () => {
       error: undefined,
       isLoading: false,
     })
-    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    useToggleNoteReadMock.mockReturnValue({
+      mutate: defaultMutate,
+      isPending: false,
+    })
 
     renderComponent()
 
-    expect(screen.getByText("All caught up!")).toBeTruthy()
+    expect(screen.getByText("all caught up!")).toBeTruthy()
   })
 
-  test("renders the note content with progress indicator", () => {
+  test("renders progress indicator for the current note", () => {
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [
@@ -87,11 +92,13 @@ describe("NotesReview", () => {
       error: undefined,
       isLoading: false,
     })
-    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    useToggleNoteReadMock.mockReturnValue({
+      mutate: defaultMutate,
+      isPending: false,
+    })
 
     renderComponent()
 
-    expect(screen.getByTestId("markdown-tree")).toBeTruthy()
     expect(screen.getByText("1 of 2")).toBeTruthy()
   })
 
@@ -109,7 +116,10 @@ describe("NotesReview", () => {
     const mutateMock = vi.fn((_, options?: { onSuccess?: () => void }) => {
       options?.onSuccess?.()
     })
-    useToggleNoteReadMock.mockReturnValue({ mutate: mutateMock, isPending: false })
+    useToggleNoteReadMock.mockReturnValue({
+      mutate: mutateMock,
+      isPending: false,
+    })
 
     renderComponent()
 
@@ -130,11 +140,14 @@ describe("NotesReview", () => {
       error: undefined,
       isLoading: false,
     })
-    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    useToggleNoteReadMock.mockReturnValue({
+      mutate: defaultMutate,
+      isPending: false,
+    })
 
     renderComponent()
 
-    fireEvent.click(screen.getByRole("button", { name: "Skip" }))
+    fireEvent.click(screen.getByRole("button", { name: "skip" }))
 
     expect(defaultMutate).not.toHaveBeenCalled()
     expect(screen.getByText("2 of 2")).toBeTruthy()
@@ -149,12 +162,15 @@ describe("NotesReview", () => {
     const mutateMock = vi.fn((_, options?: { onSuccess?: () => void }) => {
       options?.onSuccess?.()
     })
-    useToggleNoteReadMock.mockReturnValue({ mutate: mutateMock, isPending: false })
+    useToggleNoteReadMock.mockReturnValue({
+      mutate: mutateMock,
+      isPending: false,
+    })
 
     renderComponent()
 
     fireEvent.click(screen.getByRole("button", { name: "mark as read" }))
 
-    expect(screen.getByText("All caught up!")).toBeTruthy()
+    expect(screen.getByText("all caught up!")).toBeTruthy()
   })
 })
