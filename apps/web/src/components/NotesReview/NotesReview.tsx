@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Box, Button, Flex, Text, VStack } from "@chakra-ui/react"
-import { BookCheck, ChevronRight } from "lucide-react"
+import { BookCheck, ChevronRight, ExternalLink } from "lucide-react"
 import { useParams } from "react-router-dom"
 
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
@@ -62,14 +62,20 @@ export const NotesReview = () => {
         })}
       </Text>
       <MarkdownTree content={currentNote.content} />
-      <Flex gap="2" justify="flex-end">
-        <OpenInObsidianButton note={currentNote} />
-        <Button variant="ghost" onClick={advance}>
+      <Flex flexDirection={{ base: "column", sm: "row" }} gap="2" justify="flex-end">
+        <Button asChild colorPalette="purple" variant="ghost" width={{ base: "full", sm: "auto" }}>
+          <a href={currentNote.obsidianUrl}>
+            <ExternalLink size={16} />
+            {t("review.openInObsidian")}
+          </a>
+        </Button>
+        <Button variant="ghost" width={{ base: "full", sm: "auto" }} onClick={advance}>
           <ChevronRight size={16} />
           {t("review.skip")}
         </Button>
         <Button
           colorPalette="green"
+          width={{ base: "full", sm: "auto" }}
           onClick={handleMarkAsRead}
           loading={toggleRead.isPending}
         >
