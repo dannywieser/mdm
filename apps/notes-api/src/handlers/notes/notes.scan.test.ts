@@ -27,7 +27,7 @@ const parseFrontMatterMock = jest.mocked(parseFrontMatter)
 const parseMarkdownBodyDatesMock = jest.mocked(parseMarkdownBodyDates)
 
 describe("notes scan helpers", () => {
-  test("scanMarkdownFile returns filterable metadata without html", async () => {
+  test("scanMarkdownFile returns filterable metadata without parsed markdown content", async () => {
     const createdDate = new Date("2026-05-26T00:00:00.000Z")
     const modifiedDate = new Date("2026-05-26T01:00:00.000Z")
 
@@ -64,7 +64,7 @@ describe("notes scan helpers", () => {
       obsidianUrl: "obsidian://open?vault=dgw&file=topic%2Fwelcome",
       title: "welcome",
     })
-    expect(note).not.toHaveProperty("html")
+    expect(note).not.toHaveProperty("content")
     expect(FILE_ID_NAMESPACE).toBe("6ba7b811-9dad-11d1-80b4-00c04fd430c8")
     expect(readFileMock).toHaveBeenCalledWith("/notes/topic/welcome.md", "utf8")
     expect(parseFrontMatterMock).toHaveBeenCalledWith("# Welcome\n\nThis is a note.")

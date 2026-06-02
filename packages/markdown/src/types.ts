@@ -1,5 +1,20 @@
 export type FrontmatterValue = string | string[]
 
+export interface MarkdownNode {
+  alt?: string | null
+  checked?: boolean | null
+  children?: MarkdownNode[]
+  depth?: number
+  lang?: string | null
+  ordered?: boolean
+  start?: number | null
+  title?: string | null
+  type: string
+  url?: string
+  value?: string
+  wikilinkType?: "matched" | "unmatched"
+}
+
 export interface NoteFrontmatter {
   [key: string]: FrontmatterValue
 }
@@ -11,7 +26,7 @@ export interface Note {
   frontmatter: NoteFrontmatter | null
   folder: string
   fullPath: string
-  html: string
+  content: MarkdownNode
   id: string
   linkedNotes?: Note[]
   modifiedDate: string

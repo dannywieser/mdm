@@ -386,7 +386,10 @@ const defaultMockNote = (basename: string): Note => ({
   folder: "notes",
   frontmatter: null,
   fullPath: `/notes/${basename}`,
-  html: "<h1>Note</h1>",
+  content: {
+    children: [{ type: "text", value: "Note" }],
+    type: "root",
+  },
   id: basename.replace(/\.[^.]+$/, ""),
   modifiedDate: "2026-05-26T01:00:00.000Z",
   obsidianUrl: `obsidian://open?vault=vault&file=${encodeURI(

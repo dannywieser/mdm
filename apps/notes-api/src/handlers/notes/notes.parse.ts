@@ -1,33 +1,21 @@
-import type { Note } from "markdown"
+import type { MarkdownNode, Note } from "markdown"
 
 import { parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
 import remarkGfm from "remark-gfm"
-import remarkHtml from "remark-html"
 
-import type { MarkdownNode, ScannedNote } from "./notes.types"
+import type { ScannedNote, WikilinkReplacement } from "./notes.types"
 
 import {
-  applyWikilinkReplacements,
   normalizeObsidianWikiEmbeds,
   resolveWikilinks,
+  WIKILINK_PLACEHOLDER_PATTERN,
 } from "./notes.wikilinks"
 
 const IMAGE_SERVER_PATH = "/images"
 const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
-
-const TASK_LIST_ICON_SVG_ATTRS =
-  'xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
-
-const CHECKED_ICON = `<svg ${TASK_LIST_ICON_SVG_ATTRS} class="task-list-icon task-list-icon--checked"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`
-const UNCHECKED_ICON = `<svg ${TASK_LIST_ICON_SVG_ATTRS} class="task-list-icon task-list-icon--unchecked"><path d="M10.1 2.182a10 10 0 0 1 3.8 0"/><path d="M13.9 21.818a10 10 0 0 1-3.8 0"/><path d="M17.609 3.721a10 10 0 0 1 2.69 2.7"/><path d="M2.182 13.9a10 10 0 0 1 0-3.8"/><path d="M20.279 17.609a10 10 0 0 1-2.7 2.69"/><path d="M21.818 10.1a10 10 0 0 1 0 3.8"/><path d="M3.721 6.391a10 10 0 0 1 2.7-2.69"/><path d="M6.391 20.279a10 10 0 0 1-2.69-2.7"/></svg>`
-
-export const processTaskListHtml = (html: string): string =>
-  html.replace(/<input\s+[^>]*type="checkbox"[^>]*>/gi, (match) =>
-    /\bchecked\b/i.test(match) ? CHECKED_ICON : UNCHECKED_ICON,
-  )
 
 export const parseMarkdownFile = async (
   note: ScannedNote,
@@ -42,13 +30,12 @@ export const parseMarkdownFile = async (
 
   const { processedBody, linkedNoteRefs, replacements } = resolveWikilinks(body, allNotes)
 
-  const markdownBody = rewriteMarkdownImageUrls(
+  const content = buildMarkdownTree(
     processedBody,
     normalizedRelativePath,
     attachmentsDirectory,
+    replacements,
   )
-  const rawHtml = await remark().use(remarkGfm).use(remarkHtml).process(markdownBody)
-  const html = applyWikilinkReplacements(processTaskListHtml(String(rawHtml)), replacements)
 
   const linkedNotes = await Promise.all(
     linkedNoteRefs.map((linkedNote) =>
@@ -58,18 +45,19 @@ export const parseMarkdownFile = async (
 
   return {
     ...note,
-    html,
+    content,
     linkedNotes,
   }
 }
 
-const rewriteMarkdownImageUrls = (
+const buildMarkdownTree = (
   markdownBody: string,
   noteRelativePath: string,
   attachmentsDirectory: string,
-): string => {
+  replacements: WikilinkReplacement[],
+): MarkdownNode => {
   const normalizedBody = normalizeObsidianWikiEmbeds(markdownBody)
-  const markdownTree = remark().use(remarkGfm).parse(normalizedBody)
+  const markdownTree = remark().use(remarkGfm).parse(normalizedBody) as MarkdownNode
 
   visitMarkdownTree(markdownTree, (node) => {
     if (node.type !== "image" || typeof node.url !== "string") {
@@ -85,7 +73,86 @@ const rewriteMarkdownImageUrls = (
     node.url = `${IMAGE_SERVER_PATH}?path=${encodeURIComponent(imagePath)}`
   })
 
-  return String(remark().use(remarkGfm).stringify(markdownTree))
+  applyWikilinkReplacementsToMarkdownTree(markdownTree, replacements)
+
+  return markdownTree
+}
+
+const applyWikilinkReplacementsToMarkdownTree = (
+  tree: MarkdownNode,
+  replacements: WikilinkReplacement[],
+): void => {
+  visitMarkdownTree(tree, (node) => {
+    if (!Array.isArray(node.children) || node.children.length === 0) {
+      return
+    }
+
+    node.children = node.children.flatMap((childNode) =>
+      replaceWikilinkPlaceholdersInNode(childNode, replacements),
+    )
+  })
+}
+
+const replaceWikilinkPlaceholdersInNode = (
+  node: MarkdownNode,
+  replacements: WikilinkReplacement[],
+): MarkdownNode[] => {
+  if (node.type !== "text" || typeof node.value !== "string") {
+    return [node]
+  }
+
+  const parts: MarkdownNode[] = []
+  let cursor = 0
+
+  for (const match of node.value.matchAll(WIKILINK_PLACEHOLDER_PATTERN)) {
+    const matchedText = match[0]
+    const start = match.index ?? 0
+    const end = start + matchedText.length
+    const index = Number.parseInt(match[1] ?? "", 10)
+    const replacement = replacements[index]
+
+    if (!replacement) {
+      continue
+    }
+
+    if (start > cursor) {
+      parts.push({
+        type: "text",
+        value: node.value.slice(cursor, start),
+      })
+    }
+
+    const { displayText, matchedNote } = replacement
+
+    if (matchedNote) {
+      parts.push({
+        type: "link",
+        url: matchedNote.obsidianUrl,
+        children: [{ type: "text", value: displayText }],
+      })
+    } else {
+      parts.push({
+        type: "text",
+        value: displayText,
+        wikilinkType: "unmatched",
+      })
+    }
+
+    cursor = end
+  }
+
+  if (parts.length === 0) {
+    return [node]
+  }
+
+  if (cursor < node.value.length) {
+    parts.push({
+      type: "text",
+      value: node.value.slice(cursor),
+    })
+  }
+
+  return parts
 }
 
 const resolveLocalImagePath = (

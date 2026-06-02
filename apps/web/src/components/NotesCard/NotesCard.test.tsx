@@ -21,11 +21,19 @@ vi.mock("../../hooks/useToggleNoteRead/useToggleNoteRead", () => ({
 const noteFixture: Note = {
   basename: "My Note",
   titleOrBodyDates: [],
+  content: {
+    children: [
+      {
+        children: [{ type: "text", value: "Hello" }],
+        type: "paragraph",
+      },
+    ],
+    type: "root",
+  },
   createdDate: "2026-01-01",
   folder: "daily",
   frontmatter: null,
   fullPath: "/daily/my-note.md",
-  html: "<p>Hello</p>",
   id: "my-note",
   linkedNotes: [],
   modifiedDate: "2026-01-01",
@@ -36,11 +44,19 @@ const noteFixture: Note = {
 const linkedNoteFixture: Note = {
   basename: "Linked Note",
   titleOrBodyDates: [],
+  content: {
+    children: [
+      {
+        children: [{ type: "text", value: "Linked content" }],
+        type: "paragraph",
+      },
+    ],
+    type: "root",
+  },
   createdDate: "2026-01-01",
   folder: "daily",
   frontmatter: null,
   fullPath: "/daily/linked-note.md",
-  html: "<p>Linked content</p>",
   id: "linked-note",
   linkedNotes: [],
   modifiedDate: "2026-01-01",
@@ -69,29 +85,50 @@ beforeEach(() => {
 })
 
 describe("NotesCard", () => {
-  test("renders the note title and html content", () => {
+  test("renders the note title and markdown content", () => {
     renderCard(noteFixture)
 
     expect(screen.getByText("My Note Title")).toBeTruthy()
     expect(screen.getByText("Hello")).toBeTruthy()
   })
 
-  test("sanitizes unsafe html content", () => {
-    renderCard({ ...noteFixture, html: "<p>Safe</p><script>alert(1)</script>" })
-
-    expect(screen.getByText("Safe")).toBeTruthy()
-    expect(document.querySelector("script")).toBeNull()
-  })
-
-  test("preserves obsidian:// links after sanitization", () => {
+  test("renders obsidian links from markdown tree", () => {
     renderCard({
       ...noteFixture,
-      html: '<a href="obsidian://open?vault=v&file=note">open in obsidian</a>',
+      content: {
+        children: [
+          {
+            children: [
+              {
+                children: [{ type: "text", value: "open in obsidian" }],
+                type: "link",
+                url: "obsidian://open?vault=v&file=note",
+              },
+            ],
+            type: "paragraph",
+          },
+        ],
+        type: "root",
+      },
     })
 
     const link = screen.getByRole("link", { name: "open in obsidian" })
     expect(link).toBeTruthy()
     expect(link.getAttribute("href")).toBe("obsidian://open?vault=v&file=note")
+  })
+
+  test("renders note images with Chakra Image component", () => {
+    renderCard({
+      ...noteFixture,
+      content: {
+        children: [{ alt: "Screenshot", type: "image", url: "/images?path=assets%2Fshot.png" }],
+        type: "root",
+      },
+    })
+
+    const image = screen.getByRole("img", { name: "Screenshot" })
+    expect(image).toBeTruthy()
+    expect(image.getAttribute("src")).toContain("/images?path=assets%2Fshot.png")
   })
 
   test("does not render linked notes section when linkedNotes is empty", () => {
@@ -112,26 +149,52 @@ describe("NotesCard", () => {
     expect(screen.getByText("Linked Notes (1)")).toBeTruthy()
   })
 
-  test("renders server-processed task-list icons from html", () => {
-    const checkedSvg =
-      '<svg class="task-list-icon task-list-icon--checked"><circle cx="12" cy="12" r="10"/></svg>'
-    const uncheckedSvg =
-      '<svg class="task-list-icon task-list-icon--unchecked"><path d="M10.1 2.182"/></svg>'
-    const taskListHtml =
-      `<ul class="contains-task-list">` +
-      `<li class="task-list-item">${checkedSvg} Done</li>` +
-      `<li class="task-list-item">${uncheckedSvg} Todo</li>` +
-      `</ul>`
-
+  test("renders markdown task list icons from tree", () => {
     const { container } = render(
       <ChakraProvider value={defaultSystem}>
-        <NotesCard note={{ ...noteFixture, html: taskListHtml }} />
+        <NotesCard
+          note={{
+            ...noteFixture,
+            content: {
+              children: [
+                {
+                  children: [
+                    {
+                      checked: true,
+                      children: [
+                        {
+                          children: [{ type: "text", value: "Done" }],
+                          type: "paragraph",
+                        },
+                      ],
+                      type: "listItem",
+                    },
+                    {
+                      checked: false,
+                      children: [
+                        {
+                          children: [{ type: "text", value: "Todo" }],
+                          type: "paragraph",
+                        },
+                      ],
+                      type: "listItem",
+                    },
+                  ],
+                  ordered: false,
+                  type: "list",
+                },
+              ],
+              type: "root",
+            },
+          }}
+        />
       </ChakraProvider>,
     )
 
-    expect(container.querySelector(".task-list-icon--checked")).toBeTruthy()
-    expect(container.querySelector(".task-list-icon--unchecked")).toBeTruthy()
+    expect(screen.getByText("Done")).toBeTruthy()
+    expect(screen.getByText("Todo")).toBeTruthy()
     expect(container.querySelector('input[type="checkbox"]')).toBeNull()
+    expect(container.querySelector("svg")).toBeTruthy()
   })
 
   test("collapses the note body when the note is read", () => {

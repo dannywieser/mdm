@@ -3,6 +3,7 @@ export { parseMarkdownBodyDates } from "./parsers/parseMarkdownBodyDates"
 
 export type {
   FrontmatterValue,
+  MarkdownNode,
   Note,
   NoteFrontmatter,
   ParsedDate,
