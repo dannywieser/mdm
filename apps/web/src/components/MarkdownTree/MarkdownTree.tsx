@@ -2,11 +2,13 @@ import {
   Box,
   Blockquote,
   Code,
+  CodeBlock,
   Heading,
   HStack,
   Icon,
   Image,
   Link,
+  List,
   Separator,
   Text,
 } from "@chakra-ui/react"
@@ -105,11 +107,13 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
       )
     case "code":
       return (
-        <Box as="pre" key={key} bg="bg.muted" borderRadius="md" overflowX="auto" p="4" my="4">
-          <Code bg="transparent" p="0">
-            {node.value ?? ""}
-          </Code>
-        </Box>
+        <CodeBlock.Root key={key} code={node.value ?? ""} my="4">
+          <CodeBlock.Content>
+            <CodeBlock.Code>
+              <CodeBlock.CodeText />
+            </CodeBlock.Code>
+          </CodeBlock.Content>
+        </CodeBlock.Root>
       )
     case "blockquote":
       return (
@@ -119,36 +123,38 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
       )
     case "list":
       return (
-        <Box
+        <List.Root
           as={node.ordered ? "ol" : "ul"}
           key={key}
-          pl="6"
+          ps="6"
           mb="4"
           listStyleType={node.ordered ? "decimal" : "disc"}
         >
           {children}
-        </Box>
+        </List.Root>
       )
     case "listItem": {
       if (typeof node.checked === "boolean") {
         return (
-          <HStack as="li" key={key} align="flex-start" gap="2" listStyleType="none" mb="1">
-            <Icon
-              as={node.checked ? CircleCheck : CircleDashed}
-              boxSize="4"
-              color={node.checked ? "green.600" : "fg.muted"}
-              mt="0.5"
-              flexShrink={0}
-            />
-            <Box flex="1">{children}</Box>
-          </HStack>
+          <List.Item key={key} listStyleType="none" mb="1">
+            <HStack align="flex-start" gap="2">
+              <Icon
+                as={node.checked ? CircleCheck : CircleDashed}
+                boxSize="4"
+                color={node.checked ? "green.600" : "fg.muted"}
+                mt="0.5"
+                flexShrink={0}
+              />
+              <Box flex="1">{children}</Box>
+            </HStack>
+          </List.Item>
         )
       }
 
       return (
-        <Box as="li" key={key} mb="1">
+        <List.Item key={key} mb="1">
           {children}
-        </Box>
+        </List.Item>
       )
     }
     case "link": {
