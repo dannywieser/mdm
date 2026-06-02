@@ -1,5 +1,6 @@
 import {
   Box,
+  Blockquote,
   Code,
   Heading,
   HStack,
@@ -112,18 +113,9 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
       )
     case "blockquote":
       return (
-        <Box
-          as="blockquote"
-          key={key}
-          borderInlineStartWidth="4px"
-          borderColor="border.emphasized"
-          color="fg.muted"
-          pl="4"
-          py="1"
-          my="4"
-        >
-          {children}
-        </Box>
+        <Blockquote.Root key={key} my="4">
+          <Blockquote.Content>{children}</Blockquote.Content>
+        </Blockquote.Root>
       )
     case "list":
       return (
