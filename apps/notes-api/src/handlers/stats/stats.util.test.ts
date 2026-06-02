@@ -6,7 +6,9 @@ import { applyViewFilter } from "../notes/filters/notes.filters"
 import { buildViewCounts, countModifiedToday } from "./stats.util"
 
 jest.mock("mdm-util", () => ({ getDateComponents: jest.fn() }))
-jest.mock("../notes/filters/notes.filters", () => ({ applyViewFilter: jest.fn() }))
+jest.mock("../notes/filters/notes.filters", () => ({
+  applyViewFilter: jest.fn(),
+}))
 
 const getDateComponentsMock = jest.mocked(getDateComponents)
 const applyViewFilterMock = jest.mocked(applyViewFilter)
@@ -57,8 +59,18 @@ describe("stats util", () => {
     test("returns a count per configured view", () => {
       const notes = [createNote("2026-06-01T10:00:00.000Z")]
       const views = [
-        { filters: [{ "frontmatter.type": "book" }], name: "books" },
-        { filters: [{ "frontmatter.type": "game" }], name: "games" },
+        {
+          component: "NotesList",
+          filters: [{ "frontmatter.type": "book" }],
+          id: "books",
+          name: "Books",
+        },
+        {
+          component: "NotesReview",
+          filters: [{ "frontmatter.type": "game" }],
+          id: "games",
+          name: "Games",
+        },
       ]
       const context = { dateFormats: [], timezone: "UTC" }
 
@@ -69,17 +81,34 @@ describe("stats util", () => {
       const result = buildViewCounts(notes, views, context)
 
       expect(result).toEqual([
-        { count: 1, name: "books" },
-        { count: 0, name: "games" },
+        { component: "NotesList", count: 1, id: "books", name: "Books" },
+        {
+          component: "NotesReview",
+          count: 0,
+          id: "games",
+          name: "Games",
+        },
       ])
-      expect(applyViewFilterMock).toHaveBeenCalledWith(notes, views, "books", context)
-      expect(applyViewFilterMock).toHaveBeenCalledWith(notes, views, "games", context)
+      expect(applyViewFilterMock).toHaveBeenCalledWith(
+        notes,
+        views,
+        "books",
+        context,
+      )
+      expect(applyViewFilterMock).toHaveBeenCalledWith(
+        notes,
+        views,
+        "games",
+        context,
+      )
     })
 
     test("returns an empty array when there are no views", () => {
       const notes = [createNote("2026-06-01T10:00:00.000Z")]
 
-      expect(buildViewCounts(notes, [], { dateFormats: [], timezone: "UTC" })).toEqual([])
+      expect(
+        buildViewCounts(notes, [], { dateFormats: [], timezone: "UTC" }),
+      ).toEqual([])
       expect(applyViewFilterMock).not.toHaveBeenCalled()
     })
   })

@@ -1,39 +1,42 @@
-import {
-  createContext,
-  createElement,
-  type ReactNode,
-  useContext,
-} from 'react'
+import { createContext, createElement, type ReactNode, useContext } from "react"
 
-type Locale = 'en'
+type Locale = "en"
 type TranslationKey =
-  | 'home.modifiedToday'
-  | 'home.notes'
-  | 'errors.unableToLoadNotes'
-  | 'errors.unableToLoadReadState'
-  | 'errors.unableToLoadStats'
-  | 'errors.unableToToggleReadState'
-  | 'notes.errorTitle'
-  | 'notes.header'
-  | 'notes.linkedNotes'
-  | 'notes.markAsRead'
-  | 'notes.markAsUnread'
-  | 'notes.meta'
+  | "home.modifiedToday"
+  | "home.notes"
+  | "errors.unableToLoadNotes"
+  | "errors.unableToLoadReadState"
+  | "errors.unableToLoadStats"
+  | "errors.unableToToggleReadState"
+  | "notes.errorTitle"
+  | "notes.header"
+  | "notes.linkedNotes"
+  | "notes.markAsRead"
+  | "notes.markAsUnread"
+  | "notes.meta"
+  | "review.allCaughtUp"
+  | "review.openInObsidian"
+  | "review.progress"
+  | "review.skip"
 
 const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
-    'home.modifiedToday': 'modified today',
-    'home.notes': 'notes',
-    'errors.unableToLoadNotes': 'Unable to load notes',
-    'errors.unableToLoadReadState': 'Unable to load read state',
-    'errors.unableToLoadStats': 'Unable to load stats',
-    'errors.unableToToggleReadState': 'Unable to toggle read state',
-    'notes.errorTitle': 'Unable to load notes.',
-    'notes.header': 'Notes',
-    'notes.linkedNotes': 'Linked Notes',
-    'notes.markAsRead': 'Mark as read',
-    'notes.markAsUnread': 'Mark as unread',
-    'notes.meta': 'Vault: {vault} · Directory: {directory}',
+    "home.modifiedToday": "modified today",
+    "home.notes": "notes",
+    "errors.unableToLoadNotes": "well, that didn't go as planned",
+    "errors.unableToLoadReadState": "unable to load read state",
+    "errors.unableToLoadStats": "unable to load stats",
+    "errors.unableToToggleReadState": "unable to toggle read state",
+    "notes.errorTitle": "unable to load notes",
+    "notes.header": "notes",
+    "notes.linkedNotes": "linked notes",
+    "notes.markAsRead": "mark as read",
+    "notes.markAsUnread": "mark as unread",
+    "notes.meta": "Vault: {vault} · Directory: {directory}",
+    "review.allCaughtUp": "all caught up!",
+    "review.openInObsidian": "open in obsidian",
+    "review.progress": "{current} of {total}",
+    "review.skip": "skip",
   },
 }
 
@@ -48,7 +51,7 @@ const interpolate = (
 export const translate = (
   key: TranslationKey,
   values?: Record<string, string | number>,
-  locale: Locale = 'en',
+  locale: Locale = "en",
 ): string => interpolate(translations[locale][key], values)
 
 interface I18nContextValue {
@@ -57,7 +60,7 @@ interface I18nContextValue {
 }
 
 const i18nContext = createContext<I18nContextValue>({
-  locale: 'en',
+  locale: "en",
   t: (key, values) => translate(key, values),
 })
 
@@ -66,7 +69,10 @@ interface I18nProviderProps {
   locale?: Locale
 }
 
-export const I18nProvider = ({ children, locale = 'en' }: I18nProviderProps) => {
+export const I18nProvider = ({
+  children,
+  locale = "en",
+}: I18nProviderProps) => {
   const t = (key: TranslationKey, values?: Record<string, string | number>) =>
     translate(key, values, locale)
 

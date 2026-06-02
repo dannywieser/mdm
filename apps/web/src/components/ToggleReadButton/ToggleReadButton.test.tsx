@@ -28,7 +28,7 @@ describe("ToggleReadButton", () => {
       </ChakraProvider>,
     )
 
-    const button = screen.getByRole("button", { name: "Mark as read" })
+    const button = screen.getByRole("button", { name: "mark as read" })
     fireEvent.click(button)
 
     expect(mutateMock).toHaveBeenCalledTimes(1)

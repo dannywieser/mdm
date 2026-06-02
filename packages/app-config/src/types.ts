@@ -1,5 +1,7 @@
 export interface NotesView {
+  component: string
   filters: Record<string, string>[]
+  id: string
   name: string
 }
 
@@ -22,6 +24,8 @@ export interface AppConfig {
 }
 
 export interface AppConfigView {
+  component: string
   filters: Record<string, string>[]
+  id: string
   name: string
 }

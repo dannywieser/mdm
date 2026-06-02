@@ -121,14 +121,22 @@ describe("NotesCard", () => {
     renderCard({
       ...noteFixture,
       content: {
-        children: [{ alt: "Screenshot", type: "image", url: "/images?path=assets%2Fshot.png" }],
+        children: [
+          {
+            alt: "Screenshot",
+            type: "image",
+            url: "/images?path=assets%2Fshot.png",
+          },
+        ],
         type: "root",
       },
     })
 
     const image = screen.getByRole("img", { name: "Screenshot" })
     expect(image).toBeTruthy()
-    expect(image.getAttribute("src")).toContain("/images?path=assets%2Fshot.png")
+    expect(image.getAttribute("src")).toContain(
+      "/images?path=assets%2Fshot.png",
+    )
   })
 
   test("does not render linked notes section when linkedNotes is empty", () => {
@@ -146,7 +154,7 @@ describe("NotesCard", () => {
   test("renders collapsible linked notes trigger when linked notes are present", () => {
     renderCard({ ...noteFixture, linkedNotes: [linkedNoteFixture] })
 
-    expect(screen.getByText("Linked Notes (1)")).toBeTruthy()
+    expect(screen.getByText("linked notes (1)")).toBeTruthy()
   })
 
   test("renders markdown task list icons from tree", () => {
@@ -204,13 +212,13 @@ describe("NotesCard", () => {
 
     expect(screen.getByText("My Note Title")).toBeTruthy()
     expect(screen.queryByText("Hello")).toBeNull()
-    expect(screen.getByRole("button", { name: "Mark as unread" })).toBeTruthy()
+    expect(screen.getByRole("button", { name: "mark as unread" })).toBeTruthy()
   })
 
   test("toggles the note read state from the header button", () => {
     renderCard(noteFixture)
 
-    fireEvent.click(screen.getByRole("button", { name: "Mark as read" }))
+    fireEvent.click(screen.getByRole("button", { name: "mark as read" }))
 
     expect(mutateMock).toHaveBeenCalledTimes(1)
   })

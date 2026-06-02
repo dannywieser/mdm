@@ -29,6 +29,8 @@ export const buildViewCounts = (
   context: ViewFilterContext,
 ): StatsViewCount[] =>
   views.map((view) => ({
-    count: applyViewFilter(notes, views, view.name, context).length,
+    component: view.component,
+    count: applyViewFilter(notes, views, view.id, context).length,
+    id: view.id,
     name: view.name,
   }))

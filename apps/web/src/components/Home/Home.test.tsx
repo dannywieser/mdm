@@ -18,7 +18,9 @@ describe("Home", () => {
       data: {
         totalNotes: 12,
         modifiedToday: 3,
-        views: [{ name: "books", count: 4 }],
+        views: [
+          { component: "NotesList", count: 4, id: "books", name: "Books" },
+        ],
       },
     })
 
@@ -32,6 +34,8 @@ describe("Home", () => {
 
     expect(screen.getByText("12")).toBeTruthy()
     expect(screen.getByText("3")).toBeTruthy()
-    expect(screen.getByRole("link", { name: /books/i })).toBeTruthy()
+    expect(
+      screen.getByRole("link", { name: /books/i }).getAttribute("href"),
+    ).toBe("/notes/books")
   })
 })

@@ -6,11 +6,15 @@
   "timezone": "America/Edmonton",
   "views": [
     {
-      "name": "books",
-      "filters": {
-        "folder": "downtime",
-        "frontmatter.type": "book"
-      }
+      "id": "books",
+      "name": "Books",
+      "component": "NotesList",
+      "filters": [
+        {
+          "folder": "downtime",
+          "frontmatter.type": "book"
+        }
+      ]
     }
   ],
   "flags": {

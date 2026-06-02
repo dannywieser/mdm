@@ -46,7 +46,14 @@ const mockConfig = {
   notesDirectory: "/notes",
   obsidianVault: "vault",
   timezone: "UTC",
-  views: [{ filters: [{ "frontmatter.type": "book" }], name: "books" }],
+  views: [
+    {
+      component: "NotesList",
+      filters: [{ "frontmatter.type": "book" }],
+      id: "books",
+      name: "Books",
+    },
+  ],
 }
 
 describe("stats handler interface", () => {
@@ -66,7 +73,9 @@ describe("stats handler interface", () => {
       titleOrBodyDates: [],
     })
     countModifiedTodayMock.mockReturnValue(1)
-    buildViewCountsMock.mockReturnValue([{ count: 5, name: "books" }])
+    buildViewCountsMock.mockReturnValue([
+      { component: "NotesList", count: 5, id: "books", name: "Books" },
+    ])
   })
 
   test("returns stats with totalNotes, modifiedToday, and per-view counts", async () => {
@@ -79,7 +88,7 @@ describe("stats handler interface", () => {
     expect(response.body).toEqual({
       modifiedToday: 1,
       totalNotes: 2,
-      views: [{ count: 5, name: "books" }],
+      views: [{ component: "NotesList", count: 5, id: "books", name: "Books" }],
     })
   })
 
