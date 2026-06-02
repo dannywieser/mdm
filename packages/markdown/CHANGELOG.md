@@ -1,5 +1,15 @@
 # markdown
 
+## 1.3.0
+
+### Minor Changes
+
+- 298b99c: Refactor notes markdown parsing and rendering to use markdown node trees instead of HTML, including Chakra-based markdown rendering and wikilink/image handling updates.
+
+### Patch Changes
+
+- mdm-util@1.3.0
+
 ## 1.2.0
 
 ### Patch Changes
