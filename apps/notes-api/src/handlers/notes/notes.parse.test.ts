@@ -2,23 +2,24 @@ import type { MarkdownNode } from "markdown"
 
 import { parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
+import type { Mock } from "vitest"
 
 import type { ScannedNote } from "./notes.types"
 
 import { parseMarkdownFile } from "./notes.parse"
 
-jest.mock("node:fs", () => ({
+vi.mock("node:fs", () => ({
   promises: {
-    readFile: jest.fn(),
+    readFile: vi.fn(),
   },
 }))
 
-jest.mock("markdown", () => ({
-  parseFrontMatter: jest.fn(),
+vi.mock("markdown", () => ({
+  parseFrontMatter: vi.fn(),
 }))
 
-const readFileMock = fs.readFile as jest.Mock
-const parseFrontMatterMock = jest.mocked(parseFrontMatter)
+const readFileMock = fs.readFile as Mock
+const parseFrontMatterMock = vi.mocked(parseFrontMatter)
 
 describe("notes parse helpers", () => {
   test("parseMarkdownFile preserves task list state in markdown node tree", async () => {

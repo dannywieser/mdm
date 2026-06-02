@@ -11,42 +11,42 @@ import { collectMarkdownFiles } from "./notes.files"
 import { parseMarkdownFile } from "./notes.parse"
 import { scanMarkdownFile } from "./notes.scan"
 
-jest.mock("app-config", () => {
+vi.mock("app-config", async () => {
   const actualConfig =
-    jest.requireActual<typeof import("app-config")>("app-config")
+    await vi.importActual<typeof import("app-config")>("app-config")
 
   return {
     ...actualConfig,
-    resolveNotesConfig: jest.fn(),
+    resolveNotesConfig: vi.fn(),
   }
 })
 
-jest.mock("mdm-util", () => ({
-  toLoggableError: jest.fn(),
+vi.mock("mdm-util", () => ({
+  toLoggableError: vi.fn(),
 }))
 
-jest.mock("./notes.files", () => ({
-  collectMarkdownFiles: jest.fn(),
+vi.mock("./notes.files", () => ({
+  collectMarkdownFiles: vi.fn(),
 }))
 
-jest.mock("./filters/notes.filters", () => ({
-  applyViewFilter: jest.fn(),
+vi.mock("./filters/notes.filters", () => ({
+  applyViewFilter: vi.fn(),
 }))
 
-jest.mock("./notes.parse", () => ({
-  parseMarkdownFile: jest.fn(),
+vi.mock("./notes.parse", () => ({
+  parseMarkdownFile: vi.fn(),
 }))
 
-jest.mock("./notes.scan", () => ({
-  scanMarkdownFile: jest.fn(),
+vi.mock("./notes.scan", () => ({
+  scanMarkdownFile: vi.fn(),
 }))
 
-const resolveNotesConfigMock = jest.mocked(resolveNotesConfig)
-const toLoggableErrorMock = jest.mocked(toLoggableError)
-const collectMarkdownFilesMock = jest.mocked(collectMarkdownFiles)
-const applyViewFilterMock = jest.mocked(applyViewFilter)
-const parseMarkdownFileMock = jest.mocked(parseMarkdownFile)
-const scanMarkdownFileMock = jest.mocked(scanMarkdownFile)
+const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
+const toLoggableErrorMock = vi.mocked(toLoggableError)
+const collectMarkdownFilesMock = vi.mocked(collectMarkdownFiles)
+const applyViewFilterMock = vi.mocked(applyViewFilter)
+const parseMarkdownFileMock = vi.mocked(parseMarkdownFile)
+const scanMarkdownFileMock = vi.mocked(scanMarkdownFile)
 
 describe("notes handler interface", () => {
   test("returns an error when notes directory config cannot be resolved", async () => {
@@ -257,7 +257,7 @@ describe("notes handler interface", () => {
     })
     collectMarkdownFilesMock.mockRejectedValue(new Error("boom"))
     toLoggableErrorMock.mockReturnValue({ message: "boom", stack: "stack" })
-    const errorSpy = jest.spyOn(console, "error").mockImplementation()
+    const errorSpy = vi.spyOn(console, "error").mockImplementation()
     const app = express()
     app.get("/notes", notesHandler)
 

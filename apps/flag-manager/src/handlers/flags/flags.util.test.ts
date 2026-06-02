@@ -31,8 +31,8 @@ describe("flags util", () => {
 
   test("toggles from false to true when key is missing", async () => {
     const redisClient: FlagRedisClient = {
-      get: jest.fn().mockResolvedValue(null),
-      set: jest.fn().mockResolvedValue("OK"),
+      get: vi.fn().mockResolvedValue(null),
+      set: vi.fn().mockResolvedValue("OK"),
     }
 
     const result = await toggleFlag(redisClient, { id: "a", flag: "read" })
@@ -44,8 +44,8 @@ describe("flags util", () => {
 
   test("returns current flag value without mutating redis", async () => {
     const redisClient: FlagRedisClient = {
-      get: jest.fn().mockResolvedValue("true"),
-      set: jest.fn().mockResolvedValue("OK"),
+      get: vi.fn().mockResolvedValue("true"),
+      set: vi.fn().mockResolvedValue("OK"),
     }
 
     const result = await getFlag(redisClient, { id: "a", flag: "read" })
@@ -57,8 +57,8 @@ describe("flags util", () => {
 
   test("toggles from true to false when key exists", async () => {
     const redisClient: FlagRedisClient = {
-      get: jest.fn().mockResolvedValue("true"),
-      set: jest.fn().mockResolvedValue("OK"),
+      get: vi.fn().mockResolvedValue("true"),
+      set: vi.fn().mockResolvedValue("OK"),
     }
 
     const result = await toggleFlag(redisClient, { id: "a", flag: "read" })
@@ -69,8 +69,8 @@ describe("flags util", () => {
 
   test("sets redis expiry when flag definition includes expiresInSeconds", async () => {
     const redisClient: FlagRedisClient = {
-      get: jest.fn().mockResolvedValue(null),
-      set: jest.fn().mockResolvedValue("OK"),
+      get: vi.fn().mockResolvedValue(null),
+      set: vi.fn().mockResolvedValue("OK"),
     }
 
     const result = await toggleFlag(

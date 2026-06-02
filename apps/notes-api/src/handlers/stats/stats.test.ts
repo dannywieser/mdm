@@ -8,37 +8,37 @@ import { scanMarkdownFile } from "../notes/notes.scan"
 import { statsHandler } from "./stats"
 import { buildViewCounts, countModifiedToday } from "./stats.util"
 
-jest.mock("app-config", () => {
+vi.mock("app-config", async () => {
   const actualConfig =
-    jest.requireActual<typeof import("app-config")>("app-config")
+    await vi.importActual<typeof import("app-config")>("app-config")
 
   return {
     ...actualConfig,
-    resolveNotesConfig: jest.fn(),
+    resolveNotesConfig: vi.fn(),
   }
 })
 
-jest.mock("mdm-util", () => ({ toLoggableError: jest.fn() }))
+vi.mock("mdm-util", () => ({ toLoggableError: vi.fn() }))
 
-jest.mock("../notes/notes.files", () => ({
-  collectMarkdownFiles: jest.fn(),
+vi.mock("../notes/notes.files", () => ({
+  collectMarkdownFiles: vi.fn(),
 }))
 
-jest.mock("../notes/notes.scan", () => ({
-  scanMarkdownFile: jest.fn(),
+vi.mock("../notes/notes.scan", () => ({
+  scanMarkdownFile: vi.fn(),
 }))
 
-jest.mock("./stats.util", () => ({
-  buildViewCounts: jest.fn(),
-  countModifiedToday: jest.fn(),
+vi.mock("./stats.util", () => ({
+  buildViewCounts: vi.fn(),
+  countModifiedToday: vi.fn(),
 }))
 
-const resolveNotesConfigMock = jest.mocked(resolveNotesConfig)
-const toLoggableErrorMock = jest.mocked(toLoggableError)
-const collectMarkdownFilesMock = jest.mocked(collectMarkdownFiles)
-const scanMarkdownFileMock = jest.mocked(scanMarkdownFile)
-const buildViewCountsMock = jest.mocked(buildViewCounts)
-const countModifiedTodayMock = jest.mocked(countModifiedToday)
+const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
+const toLoggableErrorMock = vi.mocked(toLoggableError)
+const collectMarkdownFilesMock = vi.mocked(collectMarkdownFiles)
+const scanMarkdownFileMock = vi.mocked(scanMarkdownFile)
+const buildViewCountsMock = vi.mocked(buildViewCounts)
+const countModifiedTodayMock = vi.mocked(countModifiedToday)
 
 const mockConfig = {
   attachmentsDirectory: "attachments",

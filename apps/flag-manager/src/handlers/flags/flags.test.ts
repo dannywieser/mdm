@@ -5,23 +5,23 @@ import type { FlagRedisClient } from "./flags.types"
 import { createFlagsHandler } from "./flags"
 import { getFlag, toggleFlag } from "./flags.util"
 
-jest.mock("mdm-util", () => ({
-  toLoggableError: jest.fn(),
+vi.mock("mdm-util", () => ({
+  toLoggableError: vi.fn(),
 }))
 
-jest.mock("./flags.util", () => ({
-  getFlag: jest.fn(),
-  toggleFlag: jest.fn(),
+vi.mock("./flags.util", () => ({
+  getFlag: vi.fn(),
+  toggleFlag: vi.fn(),
 }))
 
-const getFlagMock = jest.mocked(getFlag)
-const toggleFlagMock = jest.mocked(toggleFlag)
-const toLoggableErrorMock = jest.mocked(toLoggableError)
+const getFlagMock = vi.mocked(getFlag)
+const toggleFlagMock = vi.mocked(toggleFlag)
+const toLoggableErrorMock = vi.mocked(toLoggableError)
 
 describe("flagsHandler interface", () => {
   const redisClient: FlagRedisClient = {
-    get: jest.fn(),
-    set: jest.fn(),
+    get: vi.fn(),
+    set: vi.fn(),
   }
   const flagDefinitions = {
     archived: {},
@@ -30,8 +30,8 @@ describe("flagsHandler interface", () => {
 
   test("returns 400 when id is missing", async () => {
     const response = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn(),
     }
 
     const handler = createFlagsHandler(redisClient, flagDefinitions)
@@ -39,7 +39,7 @@ describe("flagsHandler interface", () => {
     await handler(
       { params: { id: "", flag: "read" } } as never,
       response as never,
-      jest.fn(),
+      vi.fn(),
     )
 
     expect(response.status).toHaveBeenCalledWith(400)
@@ -51,8 +51,8 @@ describe("flagsHandler interface", () => {
 
   test("returns 400 when flag is missing", async () => {
     const response = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn(),
     }
 
     const handler = createFlagsHandler(redisClient, flagDefinitions)
@@ -60,7 +60,7 @@ describe("flagsHandler interface", () => {
     await handler(
       { params: { id: "note-1", flag: "  " } } as never,
       response as never,
-      jest.fn(),
+      vi.fn(),
     )
 
     expect(response.status).toHaveBeenCalledWith(400)
@@ -69,8 +69,8 @@ describe("flagsHandler interface", () => {
 
   test("toggles the requested flag and returns the new value", async () => {
     const response = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn(),
     }
 
     toggleFlagMock.mockResolvedValue({ id: "note-1", flag: "read", value: true })
@@ -80,7 +80,7 @@ describe("flagsHandler interface", () => {
     await handler(
       { params: { id: " note-1 ", flag: " read " } } as never,
       response as never,
-      jest.fn(),
+      vi.fn(),
     )
 
     expect(toggleFlagMock).toHaveBeenCalledWith(
@@ -101,8 +101,8 @@ describe("flagsHandler interface", () => {
 
   test("gets the requested flag and returns the current value", async () => {
     const response = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn(),
     }
 
     getFlagMock.mockResolvedValue({ id: "note-1", flag: "read", value: false })
@@ -112,7 +112,7 @@ describe("flagsHandler interface", () => {
     await handler(
       { method: "GET", params: { id: " note-1 ", flag: " read " } } as never,
       response as never,
-      jest.fn(),
+      vi.fn(),
     )
 
     expect(getFlagMock).toHaveBeenCalledWith(redisClient, {
@@ -130,10 +130,10 @@ describe("flagsHandler interface", () => {
 
   test("returns 500 when toggling fails", async () => {
     const response = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn(),
     }
-    const errorSpy = jest.spyOn(console, "error").mockImplementation()
+    const errorSpy = vi.spyOn(console, "error").mockImplementation()
 
     const error = new Error("boom")
     toggleFlagMock.mockRejectedValue(error)
@@ -144,7 +144,7 @@ describe("flagsHandler interface", () => {
     await handler(
       { params: { id: "note-1", flag: "read" } } as never,
       response as never,
-      jest.fn(),
+      vi.fn(),
     )
 
     expect(toLoggableErrorMock).toHaveBeenCalledWith(error)
@@ -160,10 +160,10 @@ describe("flagsHandler interface", () => {
 
   test("returns 500 when retrieving fails", async () => {
     const response = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn(),
     }
-    const errorSpy = jest.spyOn(console, "error").mockImplementation()
+    const errorSpy = vi.spyOn(console, "error").mockImplementation()
 
     const error = new Error("boom")
     getFlagMock.mockRejectedValue(error)
@@ -174,7 +174,7 @@ describe("flagsHandler interface", () => {
     await handler(
       { method: "GET", params: { id: "note-1", flag: "read" } } as never,
       response as never,
-      jest.fn(),
+      vi.fn(),
     )
 
     expect(toLoggableErrorMock).toHaveBeenCalledWith(error)
@@ -190,8 +190,8 @@ describe("flagsHandler interface", () => {
 
   test("returns 400 when flag is not configured", async () => {
     const response = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn(),
     }
 
     const handler = createFlagsHandler(redisClient, flagDefinitions)
@@ -199,7 +199,7 @@ describe("flagsHandler interface", () => {
     await handler(
       { params: { id: "note-1", flag: "unknown" } } as never,
       response as never,
-      jest.fn(),
+      vi.fn(),
     )
 
     expect(response.status).toHaveBeenCalledWith(400)

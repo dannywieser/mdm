@@ -68,10 +68,11 @@ Changesets are **not** required for:
 ## unit testing guidelines
 
 - Use `test` (not `it`) in tests, and write descriptions that read naturally without implying an `it` prefix.
-- All changes and additions to the codebase should be accompanied by appropriate unit tests that cover the new functionality and ensure that existing functionality is not broken. Tests should be written using Jest and should follow best practices for test organization and structure.
-- Use the global Jest config (`clearMocks: true`) for mock cleanup; never call `jest.clearAllMocks()` manually in individual tests.
+- All changes and additions to the codebase should be accompanied by appropriate unit tests that cover the new functionality and ensure that existing functionality is not broken. Tests should be written using Vitest and should follow best practices for test organization and structure.
+- Use global Vitest config (`clearMocks: true`) for mock cleanup; never call manual global mock cleanup helpers in individual tests.
 - Prefer mocking for all dependencies external to the file/unit being tested.
 - In particular always mock platform libraries like `fs` and `path` when testing file handling logic, to avoid unintended side effects and ensure test reliability.
+- In `apps/web` tests, mock the i18n module so `t(...)`/`translate(...)` returns translation keys, and assert on keys instead of translated copy.
 
 ## util package guidelines
 

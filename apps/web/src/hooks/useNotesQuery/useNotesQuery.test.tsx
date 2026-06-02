@@ -97,8 +97,6 @@ describe("useNotesQuery", () => {
       expect(result.current.isError).toBe(true)
     })
 
-    expect(result.current.error?.message).toBe(
-      "well, that didn't go as planned",
-    )
+    expect(result.current.error?.message).toBe("errors.unableToLoadNotes")
   })
 })

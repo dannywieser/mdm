@@ -5,13 +5,13 @@ import type { ScannedNote } from "../notes/notes.types"
 import { applyViewFilter } from "../notes/filters/notes.filters"
 import { buildViewCounts, countModifiedToday } from "./stats.util"
 
-jest.mock("mdm-util", () => ({ getDateComponents: jest.fn() }))
-jest.mock("../notes/filters/notes.filters", () => ({
-  applyViewFilter: jest.fn(),
+vi.mock("mdm-util", () => ({ getDateComponents: vi.fn() }))
+vi.mock("../notes/filters/notes.filters", () => ({
+  applyViewFilter: vi.fn(),
 }))
 
-const getDateComponentsMock = jest.mocked(getDateComponents)
-const applyViewFilterMock = jest.mocked(applyViewFilter)
+const getDateComponentsMock = vi.mocked(getDateComponents)
+const applyViewFilterMock = vi.mocked(applyViewFilter)
 
 const createNote = (modifiedDate: string): ScannedNote => ({
   basename: "note.md",

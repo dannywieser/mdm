@@ -7,29 +7,29 @@ import { notesHandler } from "./handlers/notes/notes"
 import { statsHandler } from "./handlers/stats/stats"
 import { createApp, logStartupConfig } from "./server"
 
-jest.mock("app-config", () => ({
-  resolveNotesConfig: jest.fn(),
+vi.mock("app-config", () => ({
+  resolveNotesConfig: vi.fn(),
 }))
 
-jest.mock("mdm-util", () => ({
-  toLoggableError: jest.fn(),
+vi.mock("mdm-util", () => ({
+  toLoggableError: vi.fn(),
 }))
 
-jest.mock("./handlers/health/health", () => ({
-  healthHandler: jest.fn(),
+vi.mock("./handlers/health/health", () => ({
+  healthHandler: vi.fn(),
 }))
-jest.mock("./handlers/notes/notes", () => ({
-  notesHandler: jest.fn(),
+vi.mock("./handlers/notes/notes", () => ({
+  notesHandler: vi.fn(),
 }))
-jest.mock("./handlers/stats/stats", () => ({
-  statsHandler: jest.fn(),
+vi.mock("./handlers/stats/stats", () => ({
+  statsHandler: vi.fn(),
 }))
 
-const healthHandlerMock = jest.mocked(healthHandler)
-const notesHandlerMock = jest.mocked(notesHandler)
-const statsHandlerMock = jest.mocked(statsHandler)
-const resolveNotesConfigMock = jest.mocked(resolveNotesConfig)
-const toLoggableErrorMock = jest.mocked(toLoggableError)
+const healthHandlerMock = vi.mocked(healthHandler)
+const notesHandlerMock = vi.mocked(notesHandler)
+const statsHandlerMock = vi.mocked(statsHandler)
+const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
+const toLoggableErrorMock = vi.mocked(toLoggableError)
 
 describe("notes-api server interface", () => {
   test("wires GET /health to the health handler", async () => {
@@ -72,7 +72,7 @@ describe("notes-api server interface", () => {
   })
 
   test("logs the resolved notes config on startup", async () => {
-    const logSpy = jest.spyOn(console, "log").mockImplementation()
+    const logSpy = vi.spyOn(console, "log").mockImplementation()
 
     resolveNotesConfigMock.mockResolvedValue({
       attachmentsDirectory: "attachments",
@@ -105,7 +105,7 @@ describe("notes-api server interface", () => {
   })
 
   test("logs startup config resolution failures", async () => {
-    const errorSpy = jest.spyOn(console, "error").mockImplementation()
+    const errorSpy = vi.spyOn(console, "error").mockImplementation()
 
     resolveNotesConfigMock.mockRejectedValue(new Error("boom"))
     toLoggableErrorMock.mockReturnValue({ message: "boom", stack: "stack" })

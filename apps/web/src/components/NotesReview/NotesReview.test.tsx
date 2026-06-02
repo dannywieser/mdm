@@ -62,7 +62,7 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    expect(screen.getByText("unable to load notes")).toBeTruthy()
+    expect(screen.getByText("notes.errorTitle")).toBeTruthy()
   })
 
   test("renders all caught up when there are no notes", () => {
@@ -78,7 +78,7 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    expect(screen.getByText("all caught up!")).toBeTruthy()
+    expect(screen.getByText("review.allCaughtUp")).toBeTruthy()
   })
 
   test("renders progress indicator for the current note", () => {
@@ -99,7 +99,7 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    expect(screen.getByText("1 of 2")).toBeTruthy()
+    expect(screen.getByText("review.progress")).toBeTruthy()
   })
 
   test("advances to the next note when mark as read succeeds", () => {
@@ -123,10 +123,11 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    fireEvent.click(screen.getByRole("button", { name: "mark as read" }))
+    fireEvent.click(screen.getByRole("button", { name: "notes.markAsRead" }))
 
     expect(mutateMock).toHaveBeenCalled()
-    expect(screen.getByText("2 of 2")).toBeTruthy()
+    expect(screen.queryByText("Note 1")).toBeNull()
+    expect(screen.getByText("Note 2")).toBeTruthy()
   })
 
   test("advances to the next note when skip is clicked without marking as read", () => {
@@ -147,10 +148,11 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    fireEvent.click(screen.getByRole("button", { name: "skip" }))
+    fireEvent.click(screen.getByRole("button", { name: "review.skip" }))
 
     expect(defaultMutate).not.toHaveBeenCalled()
-    expect(screen.getByText("2 of 2")).toBeTruthy()
+    expect(screen.queryByText("Note 1")).toBeNull()
+    expect(screen.getByText("Note 2")).toBeTruthy()
   })
 
   test("shows all caught up after reviewing all notes", () => {
@@ -169,8 +171,8 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    fireEvent.click(screen.getByRole("button", { name: "mark as read" }))
+    fireEvent.click(screen.getByRole("button", { name: "notes.markAsRead" }))
 
-    expect(screen.getByText("all caught up!")).toBeTruthy()
+    expect(screen.getByText("review.allCaughtUp")).toBeTruthy()
   })
 })

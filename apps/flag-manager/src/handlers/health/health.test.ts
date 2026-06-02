@@ -2,10 +2,10 @@ import { healthHandler } from "./health"
 
 describe("healthHandler", () => {
   test("responds with 200 and ok status", () => {
-    const json = jest.fn()
-    const response = { status: jest.fn().mockReturnValue({ json }) }
+    const json = vi.fn()
+    const response = { status: vi.fn().mockReturnValue({ json }) }
 
-    healthHandler({} as never, response as never, jest.fn())
+    healthHandler({} as never, response as never, vi.fn())
 
     expect(response.status).toHaveBeenCalledWith(200)
     expect(json).toHaveBeenCalledWith({ status: "ok" })

@@ -67,6 +67,6 @@ describe("useStatsQuery", () => {
       expect(result.current.isError).toBe(true)
     })
 
-    expect(result.current.error?.message).toBe("unable to load stats")
+    expect(result.current.error?.message).toBe("errors.unableToLoadStats")
   })
 })

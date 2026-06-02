@@ -1,14 +1,15 @@
 import { promises as fs, type Dirent } from "node:fs"
+import type { Mock } from "vitest"
 
 import { collectMarkdownFiles } from "./notes.files"
 
-jest.mock("node:fs", () => ({
+vi.mock("node:fs", () => ({
   promises: {
-    readdir: jest.fn(),
+    readdir: vi.fn(),
   },
 }))
 
-const readdirMock = fs.readdir as jest.Mock
+const readdirMock = fs.readdir as Mock
 
 const createDirent = (name: string, type: "file" | "directory"): Dirent =>
   ({
