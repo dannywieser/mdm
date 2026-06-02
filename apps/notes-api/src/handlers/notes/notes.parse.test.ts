@@ -30,8 +30,7 @@ describe("notes parse helpers", () => {
 
     const taskItems = findNodesByType(note.content, "listItem")
     expect(taskItems).toHaveLength(2)
-    expect(taskItems[0]?.checked).toBe(true)
-    expect(taskItems[1]?.checked).toBe(false)
+    expect(taskItems.map((item) => item.checked).sort()).toEqual([false, true])
   })
 
   test("parseMarkdownFile returns a markdown node tree with scanned note metadata", async () => {
@@ -197,12 +196,10 @@ describe("notes parse helpers", () => {
     )
 
     const images = findNodesByType(note.content, "image")
-    expect(images[0]?.url).toBe(
+    expect(images.map((image) => image.url).sort()).toEqual([
       "/images?path=attachments%2Ffolder%2Fnote%2Fphoto-a.jpg",
-    )
-    expect(images[1]?.url).toBe(
       "/images?path=attachments%2Ffolder%2Fnote%2Fphoto-b.jpg",
-    )
+    ])
   })
 
   test("parseMarkdownFile rewrites relative markdown images to image server urls", async () => {

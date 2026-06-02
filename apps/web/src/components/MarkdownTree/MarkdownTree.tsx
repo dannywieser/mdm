@@ -33,6 +33,14 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
       return <Fragment key={key}>{children}</Fragment>
     case "heading": {
       const depth = Math.min(Math.max(node.depth ?? 1, 1), 6)
+      const headingTagByDepth: Record<number, "h1" | "h2" | "h3" | "h4" | "h5" | "h6"> = {
+        1: "h1",
+        2: "h2",
+        3: "h3",
+        4: "h4",
+        5: "h5",
+        6: "h6",
+      }
       const sizeByDepth: Record<number, "2xl" | "xl" | "lg" | "md" | "sm" | "xs"> = {
         1: "2xl",
         2: "xl",
@@ -43,7 +51,7 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
       }
 
       return (
-        <Heading key={key} as={`h${depth}`} size={sizeByDepth[depth]} mt="6" mb="3">
+        <Heading key={key} as={headingTagByDepth[depth]} size={sizeByDepth[depth]} mt="6" mb="3">
           {children}
         </Heading>
       )
