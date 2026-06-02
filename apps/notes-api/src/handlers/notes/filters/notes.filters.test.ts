@@ -8,15 +8,15 @@ import {
 
 import { applyViewFilter } from "./notes.filters"
 
-jest.mock("mdm-util", () => ({
-  getDateComponents: jest.fn(),
-  getValueByPath: jest.fn(),
-  parseDateFromFormats: jest.fn(),
+vi.mock("mdm-util", () => ({
+  getDateComponents: vi.fn(),
+  getValueByPath: vi.fn(),
+  parseDateFromFormats: vi.fn(),
 }))
 
-const getDateComponentsMock = jest.mocked(getDateComponents)
-const getValueByPathMock = jest.mocked(getValueByPath)
-const parseDateFromFormatsMock = jest.mocked(parseDateFromFormats)
+const getDateComponentsMock = vi.mocked(getDateComponents)
+const getValueByPathMock = vi.mocked(getValueByPath)
+const parseDateFromFormatsMock = vi.mocked(parseDateFromFormats)
 
 describe("notes filter helpers", () => {
   beforeEach(() => {

@@ -14,26 +14,26 @@ import {
   resolveNotesDirectory,
 } from "./index"
 
-jest.mock("node:fs", () => ({
+vi.mock("node:fs", () => ({
   promises: {
-    access: jest.fn(),
-    readFile: jest.fn(),
+    access: vi.fn(),
+    readFile: vi.fn(),
   },
 }))
 
-jest.mock("mdm-util", () => ({
-  isNonEmptyString: jest.fn(),
-  isStringArray: jest.fn(),
-  isStringRecord: jest.fn(),
-  isValidTimezone: jest.fn(),
+vi.mock("mdm-util", () => ({
+  isNonEmptyString: vi.fn(),
+  isStringArray: vi.fn(),
+  isStringRecord: vi.fn(),
+  isValidTimezone: vi.fn(),
 }))
 
-const accessMock = jest.mocked(fs.access)
-const isNonEmptyStringMock = jest.mocked(isNonEmptyString)
-const isStringArrayMock = jest.mocked(isStringArray)
-const isStringRecordMock = jest.mocked(isStringRecord)
-const isValidTimezoneMock = jest.mocked(isValidTimezone)
-const readFileMock = jest.mocked(fs.readFile)
+const accessMock = vi.mocked(fs.access)
+const isNonEmptyStringMock = vi.mocked(isNonEmptyString)
+const isStringArrayMock = vi.mocked(isStringArray)
+const isStringRecordMock = vi.mocked(isStringRecord)
+const isValidTimezoneMock = vi.mocked(isValidTimezone)
+const readFileMock = vi.mocked(fs.readFile)
 
 describe("config", () => {
   beforeEach(() => {

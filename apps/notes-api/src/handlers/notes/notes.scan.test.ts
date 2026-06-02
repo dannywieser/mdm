@@ -1,30 +1,32 @@
+import type { Mock } from "vitest"
+
 import { parseFrontMatter, parseMarkdownBodyDates } from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
 
 import { FILE_ID_NAMESPACE, scanMarkdownFile } from "./notes.scan"
 
-jest.mock("node:fs", () => ({
+vi.mock("node:fs", () => ({
   promises: {
-    readFile: jest.fn(),
-    stat: jest.fn(),
+    readFile: vi.fn(),
+    stat: vi.fn(),
   },
 }))
 
-jest.mock("markdown", () => ({
-  parseFrontMatter: jest.fn(),
-  parseMarkdownBodyDates: jest.fn(),
+vi.mock("markdown", () => ({
+  parseFrontMatter: vi.fn(),
+  parseMarkdownBodyDates: vi.fn(),
 }))
 
-jest.mock("mdm-util", () => ({
-  createFileID: jest.fn(),
+vi.mock("mdm-util", () => ({
+  createFileID: vi.fn(),
 }))
 
-const createFileIDMock = jest.mocked(createFileID)
-const readFileMock = fs.readFile as jest.Mock
-const statMock = fs.stat as jest.Mock
-const parseFrontMatterMock = jest.mocked(parseFrontMatter)
-const parseMarkdownBodyDatesMock = jest.mocked(parseMarkdownBodyDates)
+const createFileIDMock = vi.mocked(createFileID)
+const readFileMock = fs.readFile as Mock
+const statMock = fs.stat as Mock
+const parseFrontMatterMock = vi.mocked(parseFrontMatter)
+const parseMarkdownBodyDatesMock = vi.mocked(parseMarkdownBodyDates)
 
 describe("notes scan helpers", () => {
   test("scanMarkdownFile returns filterable metadata without parsed markdown content", async () => {

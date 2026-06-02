@@ -142,19 +142,19 @@ describe("NotesCard", () => {
   test("does not render linked notes section when linkedNotes is empty", () => {
     renderCard({ ...noteFixture, linkedNotes: [] })
 
-    expect(screen.queryByText(/Linked Notes/)).toBeNull()
+    expect(screen.queryByText(/notes\.linkedNotes/)).toBeNull()
   })
 
   test("does not render linked notes section when linkedNotes is undefined", () => {
     renderCard({ ...noteFixture, linkedNotes: undefined } as Note)
 
-    expect(screen.queryByText(/Linked Notes/)).toBeNull()
+    expect(screen.queryByText(/notes\.linkedNotes/)).toBeNull()
   })
 
   test("renders collapsible linked notes trigger when linked notes are present", () => {
     renderCard({ ...noteFixture, linkedNotes: [linkedNoteFixture] })
 
-    expect(screen.getByText("linked notes (1)")).toBeTruthy()
+    expect(screen.getByText("notes.linkedNotes (1)")).toBeTruthy()
   })
 
   test("renders markdown task list icons from tree", () => {
@@ -212,13 +212,15 @@ describe("NotesCard", () => {
 
     expect(screen.getByText("My Note Title")).toBeTruthy()
     expect(screen.queryByText("Hello")).toBeNull()
-    expect(screen.getByRole("button", { name: "mark as unread" })).toBeTruthy()
+    expect(
+      screen.getByRole("button", { name: "notes.markAsUnread" }),
+    ).toBeTruthy()
   })
 
   test("toggles the note read state from the header button", () => {
     renderCard(noteFixture)
 
-    fireEvent.click(screen.getByRole("button", { name: "mark as read" }))
+    fireEvent.click(screen.getByRole("button", { name: "notes.markAsRead" }))
 
     expect(mutateMock).toHaveBeenCalledTimes(1)
   })

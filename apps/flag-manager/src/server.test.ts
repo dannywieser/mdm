@@ -6,16 +6,16 @@ import { createFlagsHandler } from "./handlers/flags/flags"
 import { healthHandler } from "./handlers/health/health"
 import { createApp } from "./server"
 
-jest.mock("./handlers/health/health", () => ({
-  healthHandler: jest.fn(),
+vi.mock("./handlers/health/health", () => ({
+  healthHandler: vi.fn(),
 }))
 
-jest.mock("./handlers/flags/flags", () => ({
-  createFlagsHandler: jest.fn(),
+vi.mock("./handlers/flags/flags", () => ({
+  createFlagsHandler: vi.fn(),
 }))
 
-const healthHandlerMock = jest.mocked(healthHandler)
-const createFlagsHandlerMock = jest.mocked(createFlagsHandler)
+const healthHandlerMock = vi.mocked(healthHandler)
+const createFlagsHandlerMock = vi.mocked(createFlagsHandler)
 
 describe("flag-manager server interface", () => {
   const flagDefinitions = { read: {}, archived: { expiresInSeconds: 3600 } }
@@ -24,9 +24,9 @@ describe("flag-manager server interface", () => {
     healthHandlerMock.mockImplementation((_request, response) => {
       response.status(200).json({ status: "ok" })
     })
-    createFlagsHandlerMock.mockReturnValue(jest.fn())
+    createFlagsHandlerMock.mockReturnValue(vi.fn())
 
-    const app = createApp({ get: jest.fn(), set: jest.fn() }, flagDefinitions)
+    const app = createApp({ get: vi.fn(), set: vi.fn() }, flagDefinitions)
 
     const response = await request(app).get("/health")
 
@@ -41,7 +41,7 @@ describe("flag-manager server interface", () => {
     }
     createFlagsHandlerMock.mockReturnValue(flagsHandler)
 
-    const app = createApp({ get: jest.fn(), set: jest.fn() }, flagDefinitions)
+    const app = createApp({ get: vi.fn(), set: vi.fn() }, flagDefinitions)
 
     const response = await request(app).post("/flags/note-1/read")
 
@@ -60,7 +60,7 @@ describe("flag-manager server interface", () => {
     }
     createFlagsHandlerMock.mockReturnValue(flagsHandler)
 
-    const app = createApp({ get: jest.fn(), set: jest.fn() }, flagDefinitions)
+    const app = createApp({ get: vi.fn(), set: vi.fn() }, flagDefinitions)
 
     const response = await request(app).get("/flags/note-1/read")
 
@@ -75,7 +75,7 @@ describe("flag-manager server interface", () => {
     }
     createFlagsHandlerMock.mockReturnValue(flagsHandler)
 
-    const app = createApp({ get: jest.fn(), set: jest.fn() }, flagDefinitions)
+    const app = createApp({ get: vi.fn(), set: vi.fn() }, flagDefinitions)
 
     const response = await request(app).patch("/flags/note-1/read")
 

@@ -62,7 +62,7 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    expect(screen.getByText("unable to load notes")).toBeTruthy()
+    expect(screen.getByText("notes.errorTitle")).toBeTruthy()
   })
 
   test("renders all caught up when there are no notes", () => {
@@ -78,15 +78,15 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    expect(screen.getByText("all caught up!")).toBeTruthy()
+    expect(screen.getByText("review.allCaughtUp")).toBeTruthy()
   })
 
   test("renders progress indicator for the current note", () => {
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [
-          { id: "1", title: "Note 1" },
-          { id: "2", title: "Note 2" },
+          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
+          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
         ],
       },
       error: undefined,
@@ -99,15 +99,15 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    expect(screen.getByText("1 of 2")).toBeTruthy()
+    expect(screen.getByText("review.progress")).toBeTruthy()
   })
 
   test("advances to the next note when mark as read succeeds", () => {
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [
-          { id: "1", title: "Note 1" },
-          { id: "2", title: "Note 2" },
+          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
+          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
         ],
       },
       error: undefined,
@@ -123,18 +123,18 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    fireEvent.click(screen.getByRole("button", { name: "mark as read" }))
+    fireEvent.click(screen.getByRole("button", { name: "notes.markAsRead" }))
 
     expect(mutateMock).toHaveBeenCalled()
-    expect(screen.getByText("2 of 2")).toBeTruthy()
+    expect(screen.getByRole("link").getAttribute("href")).toBe("obsidian://note-2")
   })
 
   test("advances to the next note when skip is clicked without marking as read", () => {
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [
-          { id: "1", title: "Note 1" },
-          { id: "2", title: "Note 2" },
+          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
+          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
         ],
       },
       error: undefined,
@@ -147,10 +147,10 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    fireEvent.click(screen.getByRole("button", { name: "skip" }))
+    fireEvent.click(screen.getByRole("button", { name: "review.skip" }))
 
     expect(defaultMutate).not.toHaveBeenCalled()
-    expect(screen.getByText("2 of 2")).toBeTruthy()
+    expect(screen.getByRole("link").getAttribute("href")).toBe("obsidian://note-2")
   })
 
   test("shows all caught up after reviewing all notes", () => {
@@ -169,8 +169,8 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    fireEvent.click(screen.getByRole("button", { name: "mark as read" }))
+    fireEvent.click(screen.getByRole("button", { name: "notes.markAsRead" }))
 
-    expect(screen.getByText("all caught up!")).toBeTruthy()
+    expect(screen.getByText("review.allCaughtUp")).toBeTruthy()
   })
 })
