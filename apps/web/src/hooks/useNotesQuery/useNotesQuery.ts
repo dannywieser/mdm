@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { useSuspenseQuery } from "@tanstack/react-query"
 
 import { translate } from "../../i18n"
 import type { NotesResponse } from "../../types/notes"
@@ -21,7 +21,7 @@ const fetchNotes = async (view?: string): Promise<NotesResponse> => {
 }
 
 export const useNotesQuery = ({ view }: UseNotesQueryParams = {}) =>
-  useQuery({
+  useSuspenseQuery({
     queryKey: ["notes", view],
     queryFn: () => fetchNotes(view),
   })

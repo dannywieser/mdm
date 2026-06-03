@@ -1,28 +1,31 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
-import { render, screen } from "@testing-library/react"
-import { describe, expect, test } from "vitest"
+import { cleanup, render, screen } from "@testing-library/react"
+import { afterEach, describe, expect, test } from "vitest"
 
 import { LoadingScreen } from "./LoadingScreen"
 
+afterEach(() => {
+  cleanup()
+})
+
 describe("LoadingScreen", () => {
-  test("renders the notebook SVG with accessible label", () => {
+  test("renders the notebook SVG", () => {
     render(
       <ChakraProvider value={defaultSystem}>
         <LoadingScreen />
       </ChakraProvider>,
     )
 
-    expect(screen.getByRole("img", { name: "Loading" })).toBeTruthy()
+    expect(screen.getByRole("img", { name: "Notebook" })).toBeTruthy()
   })
 
-  test("renders centered in full viewport", () => {
+  test("renders with loading screen test id", () => {
     render(
       <ChakraProvider value={defaultSystem}>
         <LoadingScreen />
       </ChakraProvider>,
     )
 
-    const containers = screen.getAllByTestId("loading-screen")
-    expect(containers.length).toBeGreaterThan(0)
+    expect(screen.getByTestId("loading-screen")).toBeTruthy()
   })
 })

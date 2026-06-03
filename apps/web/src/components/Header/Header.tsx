@@ -1,8 +1,11 @@
 import { Flex, Text } from "@chakra-ui/react"
 import { formatDate } from "mdm-util"
 
+import { usePageTitle } from "../../context/PageTitle/usePageTitle"
+
 export function Header() {
-  const title = " mdm"
+  const appName = "mdm"
+  const { title } = usePageTitle()
 
   return (
     <Flex
@@ -18,9 +21,16 @@ export function Header() {
       zIndex="sticky"
       backgroundColor="black"
     >
-      <Text fontSize="sm" fontWeight="semibold" color="white">
-        {title}
-      </Text>
+      <Flex alignItems="baseline" gap={2}>
+        <Text fontSize="sm" fontWeight="semibold" color="white">
+          {appName}
+        </Text>
+        {title && (
+          <Text fontSize="sm" color="gray.400">
+            &gt; {title}
+          </Text>
+        )}
+      </Flex>
       <Text fontSize="sm" color="white">
         {formatDate(new Date())}
       </Text>
