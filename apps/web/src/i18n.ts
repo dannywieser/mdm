@@ -18,6 +18,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "notes.markAsRead": "mark as read",
     "notes.markAsUnread": "mark as unread",
     "notes.meta": "Vault: {vault} · Directory: {directory}",
+    "review.backToHome": "back to home",
     "review.complete": "review complete",
     "review.close": "close",
     "review.forReview": "for review ({count})",

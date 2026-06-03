@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { useQueries } from "@tanstack/react-query"
 import { Box, Button, Flex, Text, VStack } from "@chakra-ui/react"
 import { BookCheck } from "lucide-react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 import { useToggleNoteRead } from "../../hooks/useToggleNoteRead/useToggleNoteRead"
@@ -116,6 +116,16 @@ export const NotesReview = () => {
               }}
             >
               {t("review.complete")}
+            </Text>
+            <Text
+              fontSize="sm"
+              style={{
+                animation: "review-item-in 0.25s ease forwards",
+                animationDelay: `${reviewedNotes.length * 0.06 + 0.3}s`,
+                opacity: 0,
+              }}
+            >
+              <Link to="/">{t("review.backToHome")}</Link>
             </Text>
           </>
         )}
