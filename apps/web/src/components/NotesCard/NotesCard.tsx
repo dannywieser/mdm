@@ -20,7 +20,7 @@ export const NotesCard = ({ note }: NotesCardProps) => {
   const isCollapsed = isRead ?? false
 
   return (
-    <Card.Root>
+    <Card.Root bg="app.panelBackground" color="app.text">
       <Card.Header py="2">
         <Flex align="center" justify="space-between">
           <Heading size="md">{note.title}</Heading>
@@ -40,8 +40,8 @@ export const NotesCard = ({ note }: NotesCardProps) => {
                   <Heading
                     size="sm"
                     cursor="pointer"
-                    color="fg.muted"
-                    _hover={{ color: "fg" }}
+                    color="app.textMuted"
+                    _hover={{ color: "app.text" }}
                   >
                     {t("notes.linkedNotes")} ({note.linkedNotes.length})
                   </Heading>
@@ -49,7 +49,7 @@ export const NotesCard = ({ note }: NotesCardProps) => {
                 <Collapsible.Content>
                   <Flex direction="column" gap="3" mt="3">
                     {note.linkedNotes.map((linked) => (
-                      <Card.Root key={linked.id} size="sm" variant="subtle">
+                      <Card.Root key={linked.id} size="sm" variant="subtle" bg="app.panelBackgroundHover" color="app.text">
                         <Card.Header>
                           <Heading size="sm">{linked.title}</Heading>
                         </Card.Header>

@@ -1,11 +1,17 @@
-import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
+import { ChakraProvider } from "@chakra-ui/react"
 import { cleanup, render, screen } from "@testing-library/react"
 import { afterEach, describe, expect, test, vi } from "vitest"
+
+import { defaultColorPaletteSystem } from "../../theme/system"
 
 import { Header } from "./Header"
 
 vi.mock("mdm-util", () => ({
   formatDate: () => "2026-06-01",
+}))
+
+vi.mock("../PaletteSelector/PaletteSelector", () => ({
+  PaletteSelector: () => <div data-testid="palette-selector" />,
 }))
 
 const usePageTitleMock = vi.fn()
@@ -20,7 +26,7 @@ afterEach(() => {
 
 const renderComponent = () =>
   render(
-    <ChakraProvider value={defaultSystem}>
+    <ChakraProvider value={defaultColorPaletteSystem}>
       <Header />
     </ChakraProvider>,
   )
@@ -33,6 +39,7 @@ describe("Header", () => {
 
     expect(screen.getByText("mdm")).toBeTruthy()
     expect(screen.getByText("2026-06-01")).toBeTruthy()
+    expect(screen.getByTestId("palette-selector")).toBeTruthy()
   })
 
   test("renders page title alongside app name when set", () => {

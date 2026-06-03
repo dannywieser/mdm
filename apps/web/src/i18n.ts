@@ -1,22 +1,8 @@
 import { createContext, createElement, type ReactNode, useContext } from "react"
 
-type Locale = "en"
-type TranslationKey =
-  | "home.modifiedToday"
-  | "home.notes"
-  | "errors.unableToLoadNotes"
-  | "errors.unableToLoadReadState"
-  | "errors.unableToLoadStats"
-  | "errors.unableToToggleReadState"
-  | "notes.errorTitle"
-  | "notes.header"
-  | "notes.linkedNotes"
-  | "notes.markAsRead"
-  | "notes.markAsUnread"
-  | "notes.meta"
-  | "review.complete"
-  | "review.close"
-  | "review.forReview"
+import type { Locale, TranslationKey } from "./i18n.types"
+
+export type { TranslationKey } from "./i18n.types"
 
 const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
@@ -35,6 +21,12 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "review.complete": "review complete",
     "review.close": "close",
     "review.forReview": "for review ({count})",
+    "palette.catppuccin": "catppuccin",
+    "palette.dracula": "dracula",
+    "palette.gotham": "gotham",
+    "palette.gruvbox": "gruvbox",
+    "palette.nord": "nord",
+    "palette.solarized": "solarized",
   },
 }
 

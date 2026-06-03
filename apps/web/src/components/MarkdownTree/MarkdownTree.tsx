@@ -122,7 +122,7 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
               <Icon
                 as={node.checked ? CircleCheck : CircleDashed}
                 boxSize="4"
-                color={node.checked ? "green.600" : "fg.muted"}
+                color={node.checked ? "app.successBackground" : "app.textMuted"}
                 mt="0.5"
                 flexShrink={0}
               />
@@ -144,7 +144,7 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
         <Link
           key={key}
           href={href}
-          color="colorPalette.fg"
+          color="app.accent"
           textDecoration="underline"
           target={isExternalLink(href) ? "_blank" : undefined}
           rel={isExternalLink(href) ? "noreferrer" : undefined}
@@ -186,7 +186,7 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
           as="td"
           key={key}
           borderWidth="1px"
-          borderColor="border.subtle"
+          borderColor="app.border"
           px="3"
           py="2"
           textAlign="left"

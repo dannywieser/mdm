@@ -6,10 +6,10 @@ import type { AppErrorProps } from "./AppError.types"
 export function AppError({ message }: AppErrorProps) {
   return (
     <VStack align="center" gap={6} pt={16}>
-      <Box color="gray.300">
+      <Box color="app.iconMuted">
         <Bug size={80} />
       </Box>
-      <Text color="fg.muted" fontSize="sm">
+      <Text color="app.textMuted" fontSize="sm">
         {message}
       </Text>
     </VStack>

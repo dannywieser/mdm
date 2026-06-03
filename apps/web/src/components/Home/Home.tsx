@@ -18,18 +18,18 @@ export function Home() {
 
   return (
     <VStack align="center" gap={6} pt={16}>
-      <Box color="gray.300">
+      <Box color="app.iconMuted">
         <NotebookIcon animating={isLoading} size={80} />
       </Box>
       {data && (
         <SimpleGrid
-          color="fg.muted"
+          color="app.textMuted"
           columns={{ base: 2, md: 4 }}
           gap={1}
           textAlign="center"
         >
           <StatRoot
-            borderColor="gray.200"
+            borderColor="app.border"
             borderRadius="md"
             borderWidth="1px"
             px={3}
@@ -40,7 +40,7 @@ export function Home() {
             <StatValueText>{data.totalNotes}</StatValueText>
           </StatRoot>
           <StatRoot
-            borderColor="gray.200"
+            borderColor="app.border"
             borderRadius="md"
             borderWidth="1px"
             px={3}
@@ -57,13 +57,13 @@ export function Home() {
               to={`/notes/${view.id}`}
             >
               <StatRoot
-                borderColor="gray.200"
+                borderColor="app.border"
                 borderRadius="md"
                 borderWidth="1px"
                 px={3}
                 py={2}
                 size="sm"
-                _hover={{ borderColor: "gray.400" }}
+                _hover={{ borderColor: "app.borderHover" }}
               >
                 <StatLabel>{view.name}</StatLabel>
                 <StatValueText>{view.count}</StatValueText>
