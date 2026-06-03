@@ -1,5 +1,23 @@
 # web
 
+## 1.3.0
+
+### Minor Changes
+
+- ef112d7: Reorganized web components and hooks into per-feature folders and moved the shared header into a parent route so notes views use the same page shell.
+- 947679f: Add NotesReview component — presents notes for a view one at a time, with buttons to mark each as read (advancing to the next) or skip. Accessible at `/notes/:view/review`.
+- 298b99c: Refactor notes markdown parsing and rendering to use markdown node trees instead of HTML, including Chakra-based markdown rendering and wikilink/image handling updates.
+- 947679f: Views in `app.config.json` now require three distinct fields:
+  - `id` — the route key used in `GET /notes?view=<id>` and `/notes/:view` routing
+  - `name` — human-readable label displayed in the UI
+  - `component` — the web component used to render that view route (for example `NotesList` or `NotesReview`)
+
+  The `GET /stats` response includes `id` and `component` alongside `name` and `count` for each view. The web route `/notes/:view` resolves the configured component by `id` and renders it dynamically.
+
+### Patch Changes
+
+- mdm-util@1.3.0
+
 ## 1.2.0
 
 ### Minor Changes
