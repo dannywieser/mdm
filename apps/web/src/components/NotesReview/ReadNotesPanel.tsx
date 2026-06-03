@@ -36,25 +36,21 @@ const ReadNotesList = ({ notes }: ReadNotesPanelProps) => {
   )
 }
 
-export const ReadNotesSidebar = ({ notes }: ReadNotesPanelProps) => {
-  if (notes.length === 0) return null
-
-  return (
-    <VStack
-      align="stretch"
-      borderRight="1px solid"
-      borderColor="border.muted"
-      display={{ base: "none", sm: "flex" }}
-      flexShrink={0}
-      gap="1"
-      minWidth="0"
-      p="4"
-      width="200px"
-    >
-      <ReadNotesList notes={notes} />
-    </VStack>
-  )
-}
+export const ReadNotesSidebar = ({ notes }: ReadNotesPanelProps) => (
+  <VStack
+    align="stretch"
+    borderRight="1px solid"
+    borderColor="border.muted"
+    display={{ base: "none", sm: "flex" }}
+    flexShrink={0}
+    gap="1"
+    minWidth="0"
+    p="4"
+    width="200px"
+  >
+    {notes.length > 0 && <ReadNotesList notes={notes} />}
+  </VStack>
+)
 
 export const ReadNotesMobileTrigger = ({ notes }: ReadNotesPanelProps) => {
   const { t } = useI18n()

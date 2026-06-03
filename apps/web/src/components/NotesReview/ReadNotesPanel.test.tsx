@@ -21,9 +21,9 @@ const renderWith = (ui: React.ReactElement) =>
   render(<ChakraProvider value={defaultSystem}>{ui}</ChakraProvider>)
 
 describe("ReadNotesSidebar", () => {
-  test("renders nothing when notes list is empty", () => {
-    const { container } = renderWith(<ReadNotesSidebar notes={[]} />)
-    expect(container.firstChild).toBeNull()
+  test("renders empty container when notes list is empty", () => {
+    renderWith(<ReadNotesSidebar notes={[]} />)
+    expect(screen.queryByText("review.read")).toBeNull()
   })
 
   test("renders the section heading and note titles", () => {

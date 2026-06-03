@@ -29,6 +29,16 @@ vi.mock("../MarkdownTree/MarkdownTree", () => ({
   MarkdownTree: () => null,
 }))
 
+vi.mock("../../context/PageTitle/PageTitle", () => ({
+  usePageTitle: () => ({ title: "", setTitle: vi.fn() }),
+}))
+
+vi.mock("../OpenInObsidianButton/OpenInObsidianButton", () => ({
+  OpenInObsidianButton: ({ note }: { note: { obsidianUrl: string } }) => (
+    <a href={note.obsidianUrl}>open</a>
+  ),
+}))
+
 vi.mock("./ReadNotesPanel", () => ({
   ReadNotesSidebar: () => null,
   ReadNotesMobileTrigger: ({ notes }: { notes: { id: string }[] }) =>
@@ -40,7 +50,7 @@ const defaultMutate = vi.fn()
 const noReadStates = () => useQueriesMock.mockReturnValue([])
 const readStatesFor = (ids: string[], readIds: string[]) =>
   useQueriesMock.mockReturnValue(
-    ids.map((id) => ({ data: readIds.includes(id) })),
+    ids.map((id) => ({ data: readIds.includes(id), status: "success" })),
   )
 
 afterEach(() => {
@@ -128,6 +138,50 @@ describe("NotesReview", () => {
     expect(screen.getByText("review.progress")).toBeTruthy()
   })
 
+  test("starts at the first unread note when read states are settled", () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
+          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
+          { id: "3", obsidianUrl: "obsidian://note-3", title: "Note 3" },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+    useToggleNoteReadMock.mockReturnValue({
+      mutate: defaultMutate,
+      isPending: false,
+    })
+    readStatesFor(["1", "2", "3"], ["1", "2"])
+
+    renderComponent()
+
+    expect(screen.getByRole("link").getAttribute("href")).toBe("obsidian://note-3")
+  })
+
+  test("renders obsidian link for the current note", () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+    useToggleNoteReadMock.mockReturnValue({
+      mutate: defaultMutate,
+      isPending: false,
+    })
+    readStatesFor(["1"], [])
+
+    renderComponent()
+
+    expect(screen.getByRole("link").getAttribute("href")).toBe("obsidian://note-1")
+  })
+
   test("advances to the next note when mark as read succeeds", () => {
     useNotesQueryMock.mockReturnValue({
       data: {
@@ -153,31 +207,6 @@ describe("NotesReview", () => {
     fireEvent.click(screen.getByRole("button", { name: "notes.markAsRead" }))
 
     expect(mutateMock).toHaveBeenCalled()
-    expect(screen.getByRole("link").getAttribute("href")).toBe("obsidian://note-2")
-  })
-
-  test("advances to the next note when skip is clicked without marking as read", () => {
-    useNotesQueryMock.mockReturnValue({
-      data: {
-        notes: [
-          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
-          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
-        ],
-      },
-      error: undefined,
-      isLoading: false,
-    })
-    useToggleNoteReadMock.mockReturnValue({
-      mutate: defaultMutate,
-      isPending: false,
-    })
-    readStatesFor(["1", "2"], [])
-
-    renderComponent()
-
-    fireEvent.click(screen.getByRole("button", { name: "review.skip" }))
-
-    expect(defaultMutate).not.toHaveBeenCalled()
     expect(screen.getByRole("link").getAttribute("href")).toBe("obsidian://note-2")
   })
 
