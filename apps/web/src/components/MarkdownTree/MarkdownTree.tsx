@@ -144,7 +144,7 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
         <Link
           key={key}
           href={href}
-          color="colorPalette.fg"
+          color="app.accent"
           textDecoration="underline"
           target={isExternalLink(href) ? "_blank" : undefined}
           rel={isExternalLink(href) ? "noreferrer" : undefined}

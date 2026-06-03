@@ -26,7 +26,7 @@ const createPaletteSystem = (paletteName: ColorPaletteName) => {
             border: { value: palette.border },
             borderHover: { value: palette.borderHover },
             iconMuted: { value: palette.iconMuted },
-            selectedText: { value: palette.selectedText },
+            accent: { value: palette.accent },
             panelBackground: { value: palette.panelBackground },
             panelBackgroundHover: { value: palette.panelBackgroundHover },
             successBackground: { value: palette.successBackground },

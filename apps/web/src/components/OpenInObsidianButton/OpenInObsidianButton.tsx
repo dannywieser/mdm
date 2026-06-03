@@ -10,7 +10,7 @@ export const OpenInObsidianButton = ({ note }: OpenInObsidianButtonProps) => (
     size="md"
     title="Open in Obsidian"
     variant="ghost"
-    color="app.selectedText"
+    color="app.accent"
     bg="app.panelBackground"
     _hover={{ bg: "app.panelBackgroundHover" }}
   >

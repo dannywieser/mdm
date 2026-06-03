@@ -14,7 +14,7 @@ export interface ColorPaletteDefinition {
   mutedText: string
   panelBackground: string
   panelBackgroundHover: string
-  selectedText: string
+  accent: string
   successBackground: string
   successHoverBackground: string
   successText: string
@@ -34,7 +34,7 @@ export const colorPaletteDefinitions: Record<
     panelBackgroundHover: "#3a3f55",
     text: "#f8f8f2",
     mutedText: "#a0a8c0",
-    selectedText: "#bd93f9",
+    accent: "#bd93f9",
     border: "#44475a",
     borderHover: "#6272a4",
     successBackground: "#50fa7b",
@@ -49,7 +49,7 @@ export const colorPaletteDefinitions: Record<
     panelBackgroundHover: "#3c3836",
     text: "#ebdbb2",
     mutedText: "#a89984",
-    selectedText: "#d79921",
+    accent: "#d79921",
     border: "#504945",
     borderHover: "#665c54",
     successBackground: "#98971a",
@@ -64,7 +64,7 @@ export const colorPaletteDefinitions: Record<
     panelBackgroundHover: "#434c5e",
     text: "#eceff4",
     mutedText: "#a3b1c6",
-    selectedText: "#88c0d0",
+    accent: "#88c0d0",
     border: "#4c566a",
     borderHover: "#81a1c1",
     successBackground: "#a3be8c",
@@ -79,7 +79,7 @@ export const colorPaletteDefinitions: Record<
     panelBackgroundHover: "#45475a",
     text: "#cdd6f4",
     mutedText: "#a6adc8",
-    selectedText: "#cba6f7",
+    accent: "#cba6f7",
     border: "#585b70",
     borderHover: "#89b4fa",
     successBackground: "#a6e3a1",
@@ -94,7 +94,7 @@ export const colorPaletteDefinitions: Record<
     panelBackgroundHover: "#0b3f4b",
     text: "#eee8d5",
     mutedText: "#93a1a1",
-    selectedText: "#b58900",
+    accent: "#b58900",
     border: "#586e75",
     borderHover: "#657b83",
     successBackground: "#859900",

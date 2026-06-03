@@ -24,7 +24,7 @@ const TocList = ({ notes, currentIndex }: NotesReviewTableOfContentsProps) => {
           key={note.id}
           color={
             i === currentIndex
-              ? "app.selectedText"
+              ? "app.accent"
               : note.isRead
                 ? "app.textMuted"
                 : undefined
@@ -105,7 +105,7 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
                   key={note.id}
                   color={
                     i === currentIndex
-                      ? "app.selectedText"
+                      ? "app.accent"
                       : note.isRead
                         ? "app.textMuted"
                         : undefined
