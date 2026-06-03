@@ -2,15 +2,16 @@ import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
 import { cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
+import type { LinkedNote } from "./LinkedNotesList.types"
 import { LinkedNotesList } from "./LinkedNotesList"
 
 vi.mock("../MarkdownTree/MarkdownTree", () => ({
-  MarkdownTree: ({ content }: { content: string }) => <div>{content}</div>,
+  MarkdownTree: () => null,
 }))
 
-const notes = [
-  { id: "1", title: "Linked One", content: "content one" },
-  { id: "2", title: "Linked Two", content: "content two" },
+const notes: LinkedNote[] = [
+  { id: "1", title: "Linked One", content: { type: "root", children: [] } },
+  { id: "2", title: "Linked Two", content: { type: "root", children: [] } },
 ]
 
 afterEach(() => {
