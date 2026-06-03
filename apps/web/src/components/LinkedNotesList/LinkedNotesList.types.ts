@@ -1,10 +1,6 @@
-import type { MarkdownNode } from "markdown"
+import type { Note } from "markdown"
 
-export interface LinkedNote {
-  id: string
-  title: string
-  content: MarkdownNode
-}
+export type LinkedNote = Pick<Note, "id" | "title" | "content">
 
 export interface LinkedNotesListProps {
   notes: LinkedNote[]
