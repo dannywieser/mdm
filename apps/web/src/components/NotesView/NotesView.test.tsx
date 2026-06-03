@@ -31,17 +31,6 @@ const renderNotesView = (path: string) =>
   )
 
 describe("NotesView", () => {
-  test("renders loading state while stats are loading", () => {
-    useStatsQueryMock.mockReturnValue({
-      data: undefined,
-      isLoading: true,
-    })
-
-    renderNotesView("/notes/today")
-
-    expect(screen.getByTestId("loading-screen")).toBeTruthy()
-  })
-
   test("renders NotesReview when configured component is NotesReview", () => {
     useStatsQueryMock.mockReturnValue({
       data: {
@@ -56,7 +45,6 @@ describe("NotesView", () => {
           },
         ],
       },
-      isLoading: false,
     })
 
     renderNotesView("/notes/today")
@@ -73,7 +61,6 @@ describe("NotesView", () => {
           { component: "NotesList", count: 1, id: "books", name: "Books" },
         ],
       },
-      isLoading: false,
     })
 
     renderNotesView("/notes/unknown")

@@ -29,10 +29,6 @@ vi.mock("../MarkdownTree/MarkdownTree", () => ({
   MarkdownTree: () => null,
 }))
 
-vi.mock("../LoadingScreen/LoadingScreen", () => ({
-  LoadingScreen: () => <div data-testid="loading-screen" />,
-}))
-
 vi.mock("../../context/PageTitle/usePageTitle", () => ({
   usePageTitle: () => ({ title: "", setTitle: vi.fn() }),
 }))
@@ -79,50 +75,9 @@ describe("NotesReview", () => {
       </ChakraProvider>,
     )
 
-  test("renders the loading screen while fetching", () => {
-    useNotesQueryMock.mockReturnValue({
-      data: undefined,
-      error: undefined,
-      isLoading: true,
-    })
-    useToggleNoteReadMock.mockReturnValue({
-      mutate: defaultMutate,
-      isPending: false,
-    })
-    noReadStates()
-
-    renderComponent()
-
-    expect(screen.getByTestId("loading-screen")).toBeTruthy()
-  })
-
-  test("renders an error state", () => {
-    useNotesQueryMock.mockReturnValue({
-      data: undefined,
-      error: new Error("Request failed"),
-      isLoading: false,
-    })
-    useToggleNoteReadMock.mockReturnValue({
-      mutate: defaultMutate,
-      isPending: false,
-    })
-    noReadStates()
-
-    renderComponent()
-
-    expect(screen.getByText("notes.errorTitle")).toBeTruthy()
-  })
-
   test("renders all caught up when there are no notes", () => {
-    useNotesQueryMock.mockReturnValue({
-      data: { notes: [] },
-      error: undefined,
-      isLoading: false,
-    })
-    useToggleNoteReadMock.mockReturnValue({
-      mutate: defaultMutate,
-      isPending: false,
-    })
+    useNotesQueryMock.mockReturnValue({ data: { notes: [] } })
+    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
     noReadStates()
 
     renderComponent()
@@ -139,13 +94,8 @@ describe("NotesReview", () => {
           { id: "3", obsidianUrl: "obsidian://note-3", title: "Note 3" },
         ],
       },
-      error: undefined,
-      isLoading: false,
     })
-    useToggleNoteReadMock.mockReturnValue({
-      mutate: defaultMutate,
-      isPending: false,
-    })
+    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
     readStatesFor(["1", "2", "3"], ["1", "2"])
 
     renderComponent()
@@ -155,18 +105,9 @@ describe("NotesReview", () => {
 
   test("renders obsidian link for the current note", () => {
     useNotesQueryMock.mockReturnValue({
-      data: {
-        notes: [
-          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
-        ],
-      },
-      error: undefined,
-      isLoading: false,
+      data: { notes: [{ id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" }] },
     })
-    useToggleNoteReadMock.mockReturnValue({
-      mutate: defaultMutate,
-      isPending: false,
-    })
+    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
     readStatesFor(["1"], [])
 
     renderComponent()
@@ -182,16 +123,11 @@ describe("NotesReview", () => {
           { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
         ],
       },
-      error: undefined,
-      isLoading: false,
     })
     const mutateMock = vi.fn((_, options?: { onSuccess?: () => void }) => {
       options?.onSuccess?.()
     })
-    useToggleNoteReadMock.mockReturnValue({
-      mutate: mutateMock,
-      isPending: false,
-    })
+    useToggleNoteReadMock.mockReturnValue({ mutate: mutateMock, isPending: false })
     readStatesFor(["1", "2"], [])
 
     renderComponent()
@@ -205,16 +141,11 @@ describe("NotesReview", () => {
   test("shows all caught up after reviewing all notes", () => {
     useNotesQueryMock.mockReturnValue({
       data: { notes: [{ id: "1", title: "Note 1" }] },
-      error: undefined,
-      isLoading: false,
     })
     const mutateMock = vi.fn((_, options?: { onSuccess?: () => void }) => {
       options?.onSuccess?.()
     })
-    useToggleNoteReadMock.mockReturnValue({
-      mutate: mutateMock,
-      isPending: false,
-    })
+    useToggleNoteReadMock.mockReturnValue({ mutate: mutateMock, isPending: false })
     readStatesFor(["1"], [])
 
     renderComponent()
@@ -232,18 +163,12 @@ describe("NotesReview", () => {
           { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
         ],
       },
-      error: undefined,
-      isLoading: false,
     })
-    useToggleNoteReadMock.mockReturnValue({
-      mutate: defaultMutate,
-      isPending: false,
-    })
+    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
     readStatesFor(["1", "2"], [])
 
     renderComponent()
 
     expect(screen.getByText("1/2")).toBeTruthy()
   })
-
 })

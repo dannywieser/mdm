@@ -1,22 +1,38 @@
+import { Component, Suspense, type ReactNode } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { renderHook, waitFor } from "@testing-library/react"
-import { type ReactNode } from "react"
+import { renderHook, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
 import { useStatsQuery } from "./useStatsQuery"
 
+class ErrorBoundary extends Component<
+  { children: ReactNode },
+  { error: Error | null }
+> {
+  state = { error: null }
+  static getDerivedStateFromError(error: Error) {
+    return { error }
+  }
+  render() {
+    if (this.state.error) {
+      return <div data-testid="error">{this.state.error.message}</div>
+    }
+    return this.props.children
+  }
+}
+
 const createWrapper = () => {
   const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
+    defaultOptions: { queries: { retry: false } },
   })
 
   function QueryWrapper({ children }: { children: ReactNode }) {
     return (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <ErrorBoundary>
+          <Suspense fallback={null}>{children}</Suspense>
+        </ErrorBoundary>
+      </QueryClientProvider>
     )
   }
 
@@ -35,38 +51,27 @@ describe("useStatsQuery", () => {
       views: [{ component: "NotesList", count: 1, id: "books", name: "Books" }],
     }
 
-    const fetchMock = vi.fn().mockResolvedValue({
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: true,
       json: vi.fn().mockResolvedValue(responseBody),
-    })
-
-    vi.stubGlobal("fetch", fetchMock)
+    }))
 
     const { result } = renderHook(() => useStatsQuery(), {
       wrapper: createWrapper(),
     })
 
-    await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
-    })
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(fetchMock).toHaveBeenCalledWith("/api/stats")
+    expect(global.fetch).toHaveBeenCalledWith("/api/stats")
     expect(result.current.data).toEqual(responseBody)
   })
 
-  test("returns an error when the stats response is not ok", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: false })
+  test("throws to error boundary when the stats response is not ok", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }))
+    vi.spyOn(console, "error").mockImplementation(() => {})
 
-    vi.stubGlobal("fetch", fetchMock)
+    renderHook(() => useStatsQuery(), { wrapper: createWrapper() })
 
-    const { result } = renderHook(() => useStatsQuery(), {
-      wrapper: createWrapper(),
-    })
-
-    await waitFor(() => {
-      expect(result.current.isError).toBe(true)
-    })
-
-    expect(result.current.error?.message).toBe("errors.unableToLoadStats")
+    expect(await screen.findByTestId("error")).toBeTruthy()
   })
 })

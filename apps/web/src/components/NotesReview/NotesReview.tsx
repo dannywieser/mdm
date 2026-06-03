@@ -10,10 +10,8 @@ import { fetchIsRead } from "../../hooks/useIsRead/useIsRead"
 import { usePageTitle } from "../../context/PageTitle/usePageTitle"
 import { useI18n } from "../../i18n"
 
-import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
 import type { NotesReviewRouteParamKey } from "./NotesReview.types"
 import { MarkdownTree } from "../MarkdownTree/MarkdownTree"
-import { AppError } from "../AppError/AppError"
 import {
   NotesReviewTableOfContentsMobileTrigger,
   NotesReviewTableOfContentsSidebar,
@@ -22,12 +20,17 @@ import { OpenInObsidianButton } from "../OpenInObsidianButton/OpenInObsidianButt
 
 export const NotesReview = () => {
   const { view } = useParams<NotesReviewRouteParamKey>()
-  const { data, error, isLoading } = useNotesQuery({ view })
+  const { data } = useNotesQuery({ view })
   const { t } = useI18n()
   const [currentIndex, setCurrentIndex] = useState(0)
   const initialized = useRef(false)
 
-  const notes = useMemo(() => data?.notes ?? [], [data?.notes])
+  useEffect(() => {
+    setCurrentIndex(0)
+    initialized.current = false
+  }, [view])
+
+  const notes = useMemo(() => data.notes, [data.notes])
   const currentNote = notes[currentIndex]
   const toggleRead = useToggleNoteRead({ noteId: currentNote?.id ?? "" })
 
@@ -68,14 +71,6 @@ export const NotesReview = () => {
     })
   }
 
-  if (isLoading) {
-    return <LoadingScreen />
-  }
-
-  if (error) {
-    return <AppError message={t("notes.errorTitle")} />
-  }
-
   if (!notes.length || currentIndex >= notes.length) {
     return (
       <VStack p="6">
@@ -95,7 +90,6 @@ export const NotesReview = () => {
 
       <VStack align="stretch" flex="1" gap="2" minWidth="0" p="4">
         <Flex align="center" justify="flex-end">
-          <OpenInObsidianButton note={currentNote} />
           <NotesReviewTableOfContentsMobileTrigger
             notes={tocNotes}
             currentIndex={currentIndex}
@@ -108,6 +102,7 @@ export const NotesReview = () => {
           gap="2"
           justify="flex-end"
         >
+          <OpenInObsidianButton note={currentNote} />
           <Button
             colorPalette="green"
             width={{ base: "full", sm: "auto" }}

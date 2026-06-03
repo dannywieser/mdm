@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { useSuspenseQuery } from "@tanstack/react-query"
 
 import { translate } from "../../i18n"
 import type { StatsResponse } from "../../types/stats"
@@ -18,7 +18,7 @@ const fetchStats = async (): Promise<StatsResponse> => {
 }
 
 export const useStatsQuery = ({ staleTime }: UseStatsQueryParams = {}) =>
-  useQuery({
+  useSuspenseQuery({
     queryKey: ["stats"],
     queryFn: fetchStats,
     staleTime,
