@@ -1,16 +1,16 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useQueries } from "@tanstack/react-query"
-import { Box, Button, Flex, Text, VStack } from "@chakra-ui/react"
+import { Button, Flex, Text, VStack } from "@chakra-ui/react"
 import { BookCheck } from "lucide-react"
 import { useParams } from "react-router-dom"
 
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 import { useToggleNoteRead } from "../../hooks/useToggleNoteRead/useToggleNoteRead"
 import { fetchIsRead } from "../../hooks/useIsRead/useIsRead"
-import { usePageTitle } from "../../context/PageTitle/PageTitle"
+import { usePageTitle } from "../../context/PageTitle/usePageTitle"
 import { useI18n } from "../../i18n"
 
-import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
+import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
 import type { NotesReviewRouteParamKey } from "./NotesReview.types"
 import { MarkdownTree } from "../MarkdownTree/MarkdownTree"
 import { AppError } from "../AppError/AppError"
@@ -24,7 +24,7 @@ export const NotesReview = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const initialized = useRef(false)
 
-  const notes = data?.notes ?? []
+  const notes = useMemo(() => data?.notes ?? [], [data?.notes])
   const currentNote = notes[currentIndex]
   const toggleRead = useToggleNoteRead({ noteId: currentNote?.id ?? "" })
 
@@ -62,13 +62,7 @@ export const NotesReview = () => {
   }
 
   if (isLoading) {
-    return (
-      <VStack align="center" gap={6} pt={16}>
-        <Box color="gray.300">
-          <NotebookIcon animating={isLoading} size={80} />
-        </Box>
-      </VStack>
-    )
+    return <LoadingScreen />
   }
 
   if (error) {

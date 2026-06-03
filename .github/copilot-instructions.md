@@ -30,6 +30,7 @@
 - after every change made, review the README file for the application or package and update it if necessary to reflect the changes made or remove any outdated information.
 - When adding dependencies to `package.json`, always prefer pinning a specific version over fuzzy version matching.
 - For user-visible changes, include a Changesets entry by running `npm run changeset` from the repository root and committing the generated `.changeset/*.md` file.
+- Always run linting after every single change made, and fix any lint errors before committing. The project uses ESLint with the `eslint:recommended` ruleset, plus some custom rules. Pay attention to any warnings or errors reported by the linter, as they can help catch potential issues and maintain code quality.
 
 ## apps/web structure guidelines
 

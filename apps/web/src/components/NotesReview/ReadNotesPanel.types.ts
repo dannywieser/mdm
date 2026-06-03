@@ -1,5 +1,8 @@
-import type { Note } from "markdown"
+export interface ReadNote {
+  id: string
+  title: string
+}
 
 export interface ReadNotesPanelProps {
-  notes: Note[]
+  notes: ReadNote[]
 }

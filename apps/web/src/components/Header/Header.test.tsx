@@ -10,7 +10,7 @@ vi.mock("mdm-util", () => ({
 
 const usePageTitleMock = vi.fn()
 
-vi.mock("../../context/PageTitle/PageTitle", () => ({
+vi.mock("../../context/PageTitle/usePageTitle", () => ({
   usePageTitle: () => usePageTitleMock(),
 }))
 

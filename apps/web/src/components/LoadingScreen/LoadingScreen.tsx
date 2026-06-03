@@ -1,10 +1,16 @@
-import { VStack, Box } from "@chakra-ui/react"
+import { Box } from "@chakra-ui/react"
 
 import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
+
 export const LoadingScreen = () => (
-  <VStack align="center" gap={6} pt={16}>
-    <Box color="gray.300">
-      <NotebookIcon animating={true} size={80} />
-    </Box>
-  </VStack>
+  <Box
+    data-testid="loading-screen"
+    display="flex"
+    alignItems="center"
+    justifyContent="center"
+    minHeight="100vh"
+    width="100%"
+  >
+    <NotebookIcon animating ariaLabel="Loading" size={96} />
+  </Box>
 )

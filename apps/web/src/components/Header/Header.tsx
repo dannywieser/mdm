@@ -1,7 +1,7 @@
 import { Flex, Text } from "@chakra-ui/react"
 import { formatDate } from "mdm-util"
 
-import { usePageTitle } from "../../context/PageTitle/PageTitle"
+import { usePageTitle } from "../../context/PageTitle/usePageTitle"
 
 export function Header() {
   const appName = "mdm"

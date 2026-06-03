@@ -29,7 +29,11 @@ vi.mock("../MarkdownTree/MarkdownTree", () => ({
   MarkdownTree: () => null,
 }))
 
-vi.mock("../../context/PageTitle/PageTitle", () => ({
+vi.mock("../LoadingScreen/LoadingScreen", () => ({
+  LoadingScreen: () => <div data-testid="loading-screen" />,
+}))
+
+vi.mock("../../context/PageTitle/usePageTitle", () => ({
   usePageTitle: () => ({ title: "", setTitle: vi.fn() }),
 }))
 
@@ -65,7 +69,7 @@ describe("NotesReview", () => {
       </ChakraProvider>,
     )
 
-  test("renders the notebook icon while fetching", () => {
+  test("renders the loading screen while fetching", () => {
     useNotesQueryMock.mockReturnValue({
       data: undefined,
       error: undefined,
@@ -79,7 +83,7 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    expect(screen.getByRole("img", { name: "Notebook" })).toBeTruthy()
+    expect(screen.getByTestId("loading-screen")).toBeTruthy()
   })
 
   test("renders an error state", () => {
