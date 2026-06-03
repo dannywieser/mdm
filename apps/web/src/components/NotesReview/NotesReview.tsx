@@ -24,12 +24,14 @@ export const NotesReview = () => {
   const { view } = useParams<NotesReviewRouteParamKey>()
   const { data } = useNotesQuery({ view })
   const { t } = useI18n()
-  const [currentIndex, setCurrentIndex] = useState(0)
+  // -1 means "not yet initialized" — keeps LoadingScreen visible until the
+  // first-unread position is known, preventing a flash of note 0.
+  const [currentIndex, setCurrentIndex] = useState(-1)
   const initialized = useRef(false)
   const contentTopRef = useRef<HTMLDivElement>(null)
 
   const notes = useMemo(() => data.notes, [data.notes])
-  const currentNote = notes[currentIndex]
+  const currentNote = notes[currentIndex] as (typeof notes)[number] | undefined
   const toggleRead = useToggleNoteRead({ noteId: currentNote?.id ?? "" })
 
   const { setTitle } = usePageTitle()
@@ -40,10 +42,8 @@ export const NotesReview = () => {
   }, [currentNote?.title, setTitle])
 
   useEffect(() => {
-    contentTopRef.current?.scrollIntoView({
-      behavior: "instant",
-      block: "start",
-    })
+    if (currentIndex < 0) return
+    contentTopRef.current?.scrollIntoView({ behavior: "instant", block: "start" })
   }, [currentIndex])
 
   const readStates = useQueries({
@@ -76,15 +76,19 @@ export const NotesReview = () => {
     })
   }
 
-  if (!notes.length || currentIndex >= notes.length) {
+  const isLoading = notes.length > 0 && currentIndex === -1
+
+  if (isLoading || !notes.length || currentIndex >= notes.length) {
     return (
-      <VStack p="6">
+      <VStack p="6" pt={16}>
         <Box color="app.iconMuted">
-          <NotebookIcon animating={false} size={80} />
+          <NotebookIcon animating={isLoading} size={80} />
         </Box>
-        <Text fontSize="lg" fontWeight="semibold">
-          {t("review.complete")}
-        </Text>
+        {!isLoading && (
+          <Text fontSize="lg" fontWeight="semibold">
+            {t("review.complete")}
+          </Text>
+        )}
       </VStack>
     )
   }
@@ -111,14 +115,14 @@ export const NotesReview = () => {
           />
         </Flex>
 
-        <MarkdownTree content={currentNote.content} />
-        <LinkedNotesList notes={currentNote.linkedNotes ?? []} />
+        <MarkdownTree content={currentNote!.content} />
+        <LinkedNotesList notes={currentNote!.linkedNotes ?? []} />
         <Flex
           flexDirection={{ base: "column", sm: "row" }}
           gap="2"
           justify="flex-end"
         >
-          <OpenInObsidianButton note={currentNote} />
+          <OpenInObsidianButton note={currentNote!} />
           <Button
             bg="app.successBackground"
             color="app.successText"
