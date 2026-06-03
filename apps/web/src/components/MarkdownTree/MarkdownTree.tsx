@@ -186,7 +186,7 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
           as="td"
           key={key}
           borderWidth="1px"
-          borderColor="border.subtle"
+          borderColor="app.border"
           px="3"
           py="2"
           textAlign="left"

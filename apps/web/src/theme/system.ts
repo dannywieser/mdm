@@ -7,7 +7,7 @@ import {
 } from "./palettes"
 
 const createPaletteSystem = (paletteName: ColorPaletteName) => {
-  const palette = colorPaletteDefinitions[paletteName]
+  const { dark, light } = colorPaletteDefinitions[paletteName]
 
   const config = defineConfig({
     globalCss: {
@@ -20,18 +20,18 @@ const createPaletteSystem = (paletteName: ColorPaletteName) => {
       semanticTokens: {
         colors: {
           app: {
-            background: { value: palette.background },
-            text: { value: palette.text },
-            textMuted: { value: palette.mutedText },
-            border: { value: palette.border },
-            borderHover: { value: palette.borderHover },
-            iconMuted: { value: palette.iconMuted },
-            accent: { value: palette.accent },
-            panelBackground: { value: palette.panelBackground },
-            panelBackgroundHover: { value: palette.panelBackgroundHover },
-            successBackground: { value: palette.successBackground },
-            successHoverBackground: { value: palette.successHoverBackground },
-            successText: { value: palette.successText },
+            background: { value: { base: light.background, _dark: dark.background } },
+            text: { value: { base: light.text, _dark: dark.text } },
+            textMuted: { value: { base: light.mutedText, _dark: dark.mutedText } },
+            border: { value: { base: light.border, _dark: dark.border } },
+            borderHover: { value: { base: light.borderHover, _dark: dark.borderHover } },
+            iconMuted: { value: { base: light.iconMuted, _dark: dark.iconMuted } },
+            accent: { value: { base: light.accent, _dark: dark.accent } },
+            panelBackground: { value: { base: light.panelBackground, _dark: dark.panelBackground } },
+            panelBackgroundHover: { value: { base: light.panelBackgroundHover, _dark: dark.panelBackgroundHover } },
+            successBackground: { value: { base: light.successBackground, _dark: dark.successBackground } },
+            successHoverBackground: { value: { base: light.successHoverBackground, _dark: dark.successHoverBackground } },
+            successText: { value: { base: light.successText, _dark: dark.successText } },
           },
         },
       },
@@ -47,6 +47,7 @@ export const colorPaletteSystems: Record<ColorPaletteName, ReturnType<typeof cre
   nord: createPaletteSystem("nord"),
   catppuccin: createPaletteSystem("catppuccin"),
   solarized: createPaletteSystem("solarized"),
+  gotham: createPaletteSystem("gotham"),
 }
 
 export const defaultColorPaletteSystem =

@@ -87,7 +87,7 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
         </IconButton>
       </Drawer.Trigger>
       <Drawer.Positioner>
-        <Drawer.Content>
+        <Drawer.Content bg="app.background" color="app.text">
           <Drawer.Header>
             <Drawer.Title>
               {t("review.forReview", { count: notes.length })}

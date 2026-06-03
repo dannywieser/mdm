@@ -28,7 +28,7 @@ export const PaletteSelector = () => {
           w="4"
           h="4"
           borderRadius="full"
-          bg={colorPaletteDefinitions[palette].accent}
+          bg={colorPaletteDefinitions[palette].dark.accent}
           border="2px solid"
           borderColor="app.border"
           cursor="pointer"
@@ -68,7 +68,7 @@ export const PaletteSelector = () => {
                     w="5"
                     h="5"
                     borderRadius="full"
-                    bg={colorPaletteDefinitions[option.value].accent}
+                    bg={colorPaletteDefinitions[option.value].dark.accent}
                     border="2px solid"
                     borderColor={isActive ? "app.text" : "app.border"}
                   />

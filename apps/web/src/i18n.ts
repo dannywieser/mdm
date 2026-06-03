@@ -21,11 +21,12 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "review.complete": "review complete",
     "review.close": "close",
     "review.forReview": "for review ({count})",
-    "palette.catppuccin": "Catppuccin",
-    "palette.dracula": "Dracula",
-    "palette.gruvbox": "Gruvbox",
-    "palette.nord": "Nord",
-    "palette.solarized": "Solarized",
+    "palette.catppuccin": "catppuccin",
+    "palette.dracula": "dracula",
+    "palette.gotham": "gotham",
+    "palette.gruvbox": "gruvbox",
+    "palette.nord": "nord",
+    "palette.solarized": "solarized",
   },
 }
 
