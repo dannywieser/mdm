@@ -1,5 +1,11 @@
 # app-config
 
+## 1.4.0
+
+### Patch Changes
+
+- mdm-util@1.4.0
+
 ## 1.3.0
 
 ### Minor Changes
