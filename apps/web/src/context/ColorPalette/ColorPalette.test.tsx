@@ -1,10 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react"
-import { beforeEach, describe, expect, test } from "vitest"
+import { cleanup, render, screen, waitFor } from "@testing-library/react"
+import { afterEach, beforeEach, describe, expect, test } from "vitest"
 
 import { useColorPalette } from "./useColorPalette"
-import { ColorPaletteProvider } from "./ColorPalette"
-
-const paletteStorageKey = "mdm.colorPalette"
+import { ColorPaletteProvider, colorPaletteStorageKey } from "./ColorPalette"
 
 const Consumer = () => {
   const { palette, setPalette } = useColorPalette()
@@ -20,12 +18,16 @@ const Consumer = () => {
 }
 
 describe("ColorPaletteProvider", () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
     window.localStorage.clear()
   })
 
   test("loads palette from localStorage", () => {
-    window.localStorage.setItem(paletteStorageKey, "nord")
+    window.localStorage.setItem(colorPaletteStorageKey, "nord")
 
     render(
       <ColorPaletteProvider>
@@ -37,7 +39,7 @@ describe("ColorPaletteProvider", () => {
   })
 
   test("persists changed palette to localStorage", async () => {
-    window.localStorage.setItem(paletteStorageKey, "dracula")
+    window.localStorage.setItem(colorPaletteStorageKey, "dracula")
 
     render(
       <ColorPaletteProvider>
@@ -48,7 +50,9 @@ describe("ColorPaletteProvider", () => {
     screen.getByRole("button", { name: "set-solarized" }).click()
 
     await waitFor(() => {
-      expect(window.localStorage.getItem(paletteStorageKey)).toBe("solarized")
+      expect(window.localStorage.getItem(colorPaletteStorageKey)).toBe(
+        "solarized",
+      )
     })
   })
 })

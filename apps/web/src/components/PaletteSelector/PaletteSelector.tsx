@@ -1,7 +1,7 @@
 import { NativeSelect } from "@chakra-ui/react"
 
 import { useColorPalette } from "../../context/ColorPalette/useColorPalette"
-import { colorPaletteOptions } from "../../theme/palettes"
+import { colorPaletteOptions, isColorPaletteName } from "../../theme/palettes"
 
 export const PaletteSelector = () => {
   const { palette, setPalette } = useColorPalette()
@@ -14,7 +14,12 @@ export const PaletteSelector = () => {
         borderColor="app.border"
         color="app.text"
         value={palette}
-        onChange={(event) => setPalette(event.currentTarget.value as typeof palette)}
+        onChange={(event) => {
+          const nextPalette = event.currentTarget.value
+          if (isColorPaletteName(nextPalette)) {
+            setPalette(nextPalette)
+          }
+        }}
       >
         {colorPaletteOptions.map((option) => (
           <option key={option.value} value={option.value}>

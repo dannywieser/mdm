@@ -10,6 +10,12 @@ const createPaletteSystem = (paletteName: ColorPaletteName) => {
   const palette = colorPaletteDefinitions[paletteName]
 
   const config = defineConfig({
+    globalCss: {
+      "html, body": {
+        bg: "app.background",
+        color: "app.text",
+      },
+    },
     theme: {
       semanticTokens: {
         colors: {
@@ -27,12 +33,6 @@ const createPaletteSystem = (paletteName: ColorPaletteName) => {
             successHoverBackground: { value: palette.successHoverBackground },
             successText: { value: palette.successText },
           },
-        },
-      },
-      globalCss: {
-        "html, body": {
-          bg: "app.background",
-          color: "app.text",
         },
       },
     },

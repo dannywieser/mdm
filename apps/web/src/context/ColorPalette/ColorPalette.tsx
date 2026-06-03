@@ -13,7 +13,7 @@ import {
 
 import { ColorPaletteContext } from "./ColorPaletteContext"
 
-const colorPaletteStorageKey = "mdm.colorPalette"
+export const colorPaletteStorageKey = "mdm.colorPalette"
 
 const getInitialColorPalette = (): ColorPaletteName => {
   if (typeof window === "undefined") {
@@ -29,7 +29,11 @@ export const ColorPaletteProvider = ({ children }: { children: ReactNode }) => {
   const [palette, setPalette] = useState<ColorPaletteName>(getInitialColorPalette)
 
   useEffect(() => {
-    window.localStorage.setItem(colorPaletteStorageKey, palette)
+    const currentValue = window.localStorage.getItem(colorPaletteStorageKey)
+
+    if (currentValue !== palette) {
+      window.localStorage.setItem(colorPaletteStorageKey, palette)
+    }
   }, [palette])
 
   const system = useMemo(
