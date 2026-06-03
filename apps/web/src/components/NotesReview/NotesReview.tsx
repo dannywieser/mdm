@@ -25,11 +25,6 @@ export const NotesReview = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const initialized = useRef(false)
 
-  useEffect(() => {
-    setCurrentIndex(0)
-    initialized.current = false
-  }, [view])
-
   const notes = useMemo(() => data.notes, [data.notes])
   const currentNote = notes[currentIndex]
   const toggleRead = useToggleNoteRead({ noteId: currentNote?.id ?? "" })

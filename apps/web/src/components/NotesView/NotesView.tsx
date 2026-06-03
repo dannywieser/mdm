@@ -25,5 +25,5 @@ export const NotesView = () => {
   const SelectedComponent =
     (componentName && VIEW_COMPONENTS[componentName]) ?? NotesList
 
-  return <SelectedComponent />
+  return <SelectedComponent key={view} />
 }
