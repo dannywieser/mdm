@@ -7,7 +7,7 @@ import type { FlagResponse } from "../flags.types"
 
 import type { UseIsReadParams } from "./useIsRead.types"
 
-const fetchIsRead = async (noteId: string): Promise<boolean> => {
+export const fetchIsRead = async (noteId: string): Promise<boolean> => {
   const response = await fetch(
     `${FLAGS_BASE_URL}/${encodeURIComponent(noteId)}/${READ_FLAG_NAME}`,
   )

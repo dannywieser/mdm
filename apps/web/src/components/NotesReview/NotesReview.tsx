@@ -1,16 +1,19 @@
 import { useState } from "react"
+import { useQueries } from "@tanstack/react-query"
 import { Box, Button, Flex, Text, VStack } from "@chakra-ui/react"
 import { BookCheck, ChevronRight, ExternalLink } from "lucide-react"
 import { useParams } from "react-router-dom"
 
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 import { useToggleNoteRead } from "../../hooks/useToggleNoteRead/useToggleNoteRead"
+import { fetchIsRead } from "../../hooks/useIsRead/useIsRead"
 import { useI18n } from "../../i18n"
 
 import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
 import type { NotesReviewRouteParamKey } from "./NotesReview.types"
 import { MarkdownTree } from "../MarkdownTree/MarkdownTree"
 import { AppError } from "../AppError/AppError"
+import { ReadNotesMobileTrigger, ReadNotesSidebar } from "./ReadNotesPanel"
 
 export const NotesReview = () => {
   const { view } = useParams<NotesReviewRouteParamKey>()
@@ -21,6 +24,16 @@ export const NotesReview = () => {
   const notes = data?.notes ?? []
   const currentNote = notes[currentIndex]
   const toggleRead = useToggleNoteRead({ noteId: currentNote?.id ?? "" })
+
+  const readStates = useQueries({
+    queries: notes.map((note) => ({
+      queryKey: ["note-read", note.id],
+      queryFn: () => fetchIsRead(note.id),
+      enabled: note.id.trim().length > 0,
+    })),
+  })
+
+  const readNotes = notes.filter((_, i) => readStates[i]?.data === true)
 
   const advance = () => setCurrentIndex((i) => i + 1)
 
@@ -53,48 +66,56 @@ export const NotesReview = () => {
   }
 
   return (
-    <VStack align="stretch" gap="6" p="6">
-      <Text color="fg.muted" fontSize="sm">
-        {t("review.progress", {
-          current: currentIndex + 1,
-          total: notes.length,
-        })}
-      </Text>
-      <MarkdownTree content={currentNote.content} />
-      <Flex
-        flexDirection={{ base: "column", sm: "row" }}
-        gap="2"
-        justify="flex-end"
-      >
-        <Button
-          asChild
-          colorPalette="purple"
-          variant="ghost"
-          width={{ base: "full", sm: "auto" }}
+    <Flex align="flex-start" gap="0">
+      <ReadNotesSidebar notes={readNotes} />
+
+      <VStack align="stretch" flex="1" gap="6" minWidth="0" p="6">
+        <Flex align="center" justify="space-between">
+          <Text color="fg.muted" fontSize="sm">
+            {t("review.progress", {
+              current: currentIndex + 1,
+              total: notes.length,
+            })}
+          </Text>
+          <ReadNotesMobileTrigger notes={readNotes} />
+        </Flex>
+
+        <MarkdownTree content={currentNote.content} />
+        <Flex
+          flexDirection={{ base: "column", sm: "row" }}
+          gap="2"
+          justify="flex-end"
         >
-          <a href={currentNote.obsidianUrl}>
-            <ExternalLink size={16} />
-            {t("review.openInObsidian")}
-          </a>
-        </Button>
-        <Button
-          variant="ghost"
-          width={{ base: "full", sm: "auto" }}
-          onClick={advance}
-        >
-          <ChevronRight size={16} />
-          {t("review.skip")}
-        </Button>
-        <Button
-          colorPalette="green"
-          width={{ base: "full", sm: "auto" }}
-          onClick={handleMarkAsRead}
-          loading={toggleRead.isPending}
-        >
-          <BookCheck size={16} />
-          {t("notes.markAsRead")}
-        </Button>
-      </Flex>
-    </VStack>
+          <Button
+            asChild
+            colorPalette="purple"
+            variant="ghost"
+            width={{ base: "full", sm: "auto" }}
+          >
+            <a href={currentNote.obsidianUrl}>
+              <ExternalLink size={16} />
+              {t("review.openInObsidian")}
+            </a>
+          </Button>
+          <Button
+            variant="ghost"
+            width={{ base: "full", sm: "auto" }}
+            onClick={advance}
+          >
+            <ChevronRight size={16} />
+            {t("review.skip")}
+          </Button>
+          <Button
+            colorPalette="green"
+            width={{ base: "full", sm: "auto" }}
+            onClick={handleMarkAsRead}
+            loading={toggleRead.isPending}
+          >
+            <BookCheck size={16} />
+            {t("notes.markAsRead")}
+          </Button>
+        </Flex>
+      </VStack>
+    </Flex>
   )
 }

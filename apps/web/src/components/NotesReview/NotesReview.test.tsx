@@ -6,6 +6,7 @@ import { NotesReview } from "./NotesReview"
 
 const useNotesQueryMock = vi.fn()
 const useToggleNoteReadMock = vi.fn()
+const useQueriesMock = vi.fn()
 
 vi.mock("../../hooks/useNotesQuery/useNotesQuery", () => ({
   useNotesQuery: () => useNotesQueryMock(),
@@ -15,11 +16,32 @@ vi.mock("../../hooks/useToggleNoteRead/useToggleNoteRead", () => ({
   useToggleNoteRead: () => useToggleNoteReadMock(),
 }))
 
+vi.mock("../../hooks/useIsRead/useIsRead", () => ({
+  fetchIsRead: vi.fn(),
+}))
+
+vi.mock("@tanstack/react-query", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@tanstack/react-query")>()
+  return { ...actual, useQueries: () => useQueriesMock() }
+})
+
 vi.mock("../MarkdownTree/MarkdownTree", () => ({
   MarkdownTree: () => null,
 }))
 
+vi.mock("./ReadNotesPanel", () => ({
+  ReadNotesSidebar: () => null,
+  ReadNotesMobileTrigger: ({ notes }: { notes: { id: string }[] }) =>
+    notes.length > 0 ? <button>{notes.length}</button> : null,
+}))
+
 const defaultMutate = vi.fn()
+
+const noReadStates = () => useQueriesMock.mockReturnValue([])
+const readStatesFor = (ids: string[], readIds: string[]) =>
+  useQueriesMock.mockReturnValue(
+    ids.map((id) => ({ data: readIds.includes(id) })),
+  )
 
 afterEach(() => {
   cleanup()
@@ -43,6 +65,7 @@ describe("NotesReview", () => {
       mutate: defaultMutate,
       isPending: false,
     })
+    noReadStates()
 
     renderComponent()
 
@@ -59,6 +82,7 @@ describe("NotesReview", () => {
       mutate: defaultMutate,
       isPending: false,
     })
+    noReadStates()
 
     renderComponent()
 
@@ -75,6 +99,7 @@ describe("NotesReview", () => {
       mutate: defaultMutate,
       isPending: false,
     })
+    noReadStates()
 
     renderComponent()
 
@@ -96,6 +121,7 @@ describe("NotesReview", () => {
       mutate: defaultMutate,
       isPending: false,
     })
+    readStatesFor(["1", "2"], [])
 
     renderComponent()
 
@@ -120,6 +146,7 @@ describe("NotesReview", () => {
       mutate: mutateMock,
       isPending: false,
     })
+    readStatesFor(["1", "2"], [])
 
     renderComponent()
 
@@ -144,6 +171,7 @@ describe("NotesReview", () => {
       mutate: defaultMutate,
       isPending: false,
     })
+    readStatesFor(["1", "2"], [])
 
     renderComponent()
 
@@ -166,11 +194,84 @@ describe("NotesReview", () => {
       mutate: mutateMock,
       isPending: false,
     })
+    readStatesFor(["1"], [])
 
     renderComponent()
 
     fireEvent.click(screen.getByRole("button", { name: "notes.markAsRead" }))
 
     expect(screen.getByText("review.allCaughtUp")).toBeTruthy()
+  })
+
+  test("passes read notes to ReadNotesMobileTrigger", () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
+          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+    useToggleNoteReadMock.mockReturnValue({
+      mutate: defaultMutate,
+      isPending: false,
+    })
+    readStatesFor(["1", "2"], ["1"])
+
+    renderComponent()
+
+    expect(screen.getByText("1")).toBeTruthy()
+  })
+
+  test("does not render ReadNotesMobileTrigger content when no notes are read", () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
+          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+    useToggleNoteReadMock.mockReturnValue({
+      mutate: defaultMutate,
+      isPending: false,
+    })
+    readStatesFor(["1", "2"], [])
+
+    renderComponent()
+
+    expect(screen.queryByRole("button", { name: "review.read" })).toBeNull()
+  })
+
+  test("keeps total count unchanged after marking a note as read", () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
+          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
+          { id: "3", obsidianUrl: "obsidian://note-3", title: "Note 3" },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+    const mutateMock = vi.fn((_, options?: { onSuccess?: () => void }) => {
+      options?.onSuccess?.()
+    })
+    useToggleNoteReadMock.mockReturnValue({
+      mutate: mutateMock,
+      isPending: false,
+    })
+    readStatesFor(["1", "2", "3"], [])
+
+    renderComponent()
+
+    fireEvent.click(screen.getByRole("button", { name: "notes.markAsRead" }))
+
+    expect(screen.getByText("review.progress")).toBeTruthy()
   })
 })
