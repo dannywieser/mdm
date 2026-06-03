@@ -5,7 +5,7 @@ import { useI18n } from "../../i18n"
 
 import type { NotesReviewTableOfContentsProps } from "./NotesReviewTableOfContents.types"
 
-const TocList = ({ notes }: NotesReviewTableOfContentsProps) => {
+const TocList = ({ notes, currentIndex }: NotesReviewTableOfContentsProps) => {
   const { t } = useI18n()
 
   return (
@@ -19,11 +19,17 @@ const TocList = ({ notes }: NotesReviewTableOfContentsProps) => {
       >
         {t("review.forReview", { count: notes.length })}
       </Text>
-      {notes.map((note) => (
+      {notes.map((note, i) => (
         <Text
           key={note.id}
-          color={note.isRead ? "fg.subtle" : undefined}
-          fontWeight={note.isRead ? undefined : "bold"}
+          color={
+            i === currentIndex
+              ? "purple.700"
+              : note.isRead
+                ? "fg.subtle"
+                : undefined
+          }
+          fontWeight={i === currentIndex || !note.isRead ? "bold" : undefined}
           fontSize="xs"
           overflow="hidden"
           textOverflow="ellipsis"
@@ -93,11 +99,19 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
           </Drawer.Header>
           <Drawer.Body>
             <VStack align="stretch" gap="3">
-              {notes.map((note) => (
+              {notes.map((note, i) => (
                 <Text
                   key={note.id}
-                  color={note.isRead ? "fg.subtle" : undefined}
-                  fontWeight={note.isRead ? undefined : "bold"}
+                  color={
+                    i === currentIndex
+                      ? "purple.700"
+                      : note.isRead
+                        ? "fg.subtle"
+                        : undefined
+                  }
+                  fontWeight={
+                    i === currentIndex || !note.isRead ? "bold" : undefined
+                  }
                   fontSize="sm"
                 >
                   {note.title}

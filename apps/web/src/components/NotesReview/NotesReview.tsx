@@ -24,6 +24,7 @@ export const NotesReview = () => {
   const { t } = useI18n()
   const [currentIndex, setCurrentIndex] = useState(0)
   const initialized = useRef(false)
+  const contentTopRef = useRef<HTMLDivElement>(null)
 
   const notes = useMemo(() => data.notes, [data.notes])
   const currentNote = notes[currentIndex]
@@ -35,6 +36,10 @@ export const NotesReview = () => {
     setTitle(currentNote?.title ?? "")
     return () => setTitle("")
   }, [currentNote?.title, setTitle])
+
+  useEffect(() => {
+    contentTopRef.current?.scrollIntoView({ behavior: "instant", block: "start" })
+  }, [currentIndex])
 
   const readStates = useQueries({
     queries: notes.map((note) => ({
@@ -83,7 +88,7 @@ export const NotesReview = () => {
         currentIndex={currentIndex}
       />
 
-      <VStack align="stretch" flex="1" gap="2" minWidth="0" p="4">
+      <VStack ref={contentTopRef} align="stretch" flex="1" gap="2" minWidth="0" p="4">
         <Flex align="center" justify="flex-end">
           <NotesReviewTableOfContentsMobileTrigger
             notes={tocNotes}
