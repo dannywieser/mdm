@@ -78,6 +78,8 @@ export const NotesReview = () => {
 
   const isLoading = notes.length > 0 && currentIndex === -1
 
+  const reviewedNotes = notes.filter((_, i) => readStates[i]?.data === true)
+
   if (isLoading || !notes.length || currentIndex >= notes.length) {
     return (
       <VStack p="6" pt={16}>
@@ -85,9 +87,37 @@ export const NotesReview = () => {
           <NotebookIcon animating={isLoading} size={80} />
         </Box>
         {!isLoading && (
-          <Text fontSize="lg" fontWeight="semibold">
-            {t("review.complete")}
-          </Text>
+          <>
+            {reviewedNotes.length > 0 && (
+              <VStack align="center" gap="1" mt="4">
+                {reviewedNotes.map((note, i) => (
+                  <Text
+                    key={note.id}
+                    color="fg.muted"
+                    fontSize="sm"
+                    style={{
+                      animation: "review-item-in 0.25s ease forwards",
+                      animationDelay: `${i * 0.06}s`,
+                      opacity: 0,
+                    }}
+                  >
+                    {note.title}
+                  </Text>
+                ))}
+              </VStack>
+            )}
+            <Text
+              fontSize="lg"
+              fontWeight="semibold"
+              style={{
+                animation: "review-item-in 0.25s ease forwards",
+                animationDelay: `${reviewedNotes.length * 0.06 + 0.1}s`,
+                opacity: 0,
+              }}
+            >
+              {t("review.complete")}
+            </Text>
+          </>
         )}
       </VStack>
     )
