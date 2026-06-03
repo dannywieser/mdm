@@ -51,19 +51,8 @@ export const colorPaletteDefinitions: Record<
       successText: "#1f232d",
       iconMuted: "#8be9fd",
     },
-    light: {
-      background: "#f8f8f2",
-      panelBackground: "#eeeef0",
-      panelBackgroundHover: "#e4e4e8",
-      text: "#282a36",
-      mutedText: "#6272a4",
-      accent: "#7b5ea7",
-      border: "#d8d8de",
-      borderHover: "#c0c0ca",
-      successBackground: "#2d8b4e",
-      successHoverBackground: "#236e3d",
-      successText: "#f8f8f2",
-      iconMuted: "#0891b2",
+    get light() {
+      return this.dark
     },
   },
   gruvbox: {
