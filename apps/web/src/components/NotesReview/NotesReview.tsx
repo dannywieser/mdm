@@ -11,6 +11,7 @@ import { usePageTitle } from "../../context/PageTitle/usePageTitle"
 import { useI18n } from "../../i18n"
 
 import type { NotesReviewRouteParamKey } from "./NotesReview.types"
+import { LinkedNotesList } from "../LinkedNotesList/LinkedNotesList"
 import { MarkdownTree } from "../MarkdownTree/MarkdownTree"
 import {
   NotesReviewTableOfContentsMobileTrigger,
@@ -111,6 +112,7 @@ export const NotesReview = () => {
         </Flex>
 
         <MarkdownTree content={currentNote.content} />
+        <LinkedNotesList notes={currentNote.linkedNotes ?? []} />
         <Flex
           flexDirection={{ base: "column", sm: "row" }}
           gap="2"
