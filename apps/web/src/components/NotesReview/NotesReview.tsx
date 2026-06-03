@@ -14,7 +14,10 @@ import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
 import type { NotesReviewRouteParamKey } from "./NotesReview.types"
 import { MarkdownTree } from "../MarkdownTree/MarkdownTree"
 import { AppError } from "../AppError/AppError"
-import { ReadNotesMobileTrigger, ReadNotesSidebar } from "./ReadNotesPanel"
+import {
+  NotesReviewTableOfContentsMobileTrigger,
+  NotesReviewTableOfContentsSidebar,
+} from "./NotesReviewTableOfContents"
 import { OpenInObsidianButton } from "../OpenInObsidianButton/OpenInObsidianButton"
 
 export const NotesReview = () => {
@@ -53,7 +56,11 @@ export const NotesReview = () => {
     setCurrentIndex(firstUnread === -1 ? notes.length : firstUnread)
   }, [allReadStatesSettled, notes, readStates])
 
-  const readNotes = notes.filter((_, i) => readStates[i]?.data === true)
+  const tocNotes = notes.map((note, i) => ({
+    id: note.id,
+    title: note.title,
+    isRead: readStates[i]?.data === true,
+  }))
 
   const handleMarkAsRead = () => {
     toggleRead.mutate(undefined, {
@@ -81,20 +88,18 @@ export const NotesReview = () => {
 
   return (
     <Flex align="flex-start" gap="0">
-      <ReadNotesSidebar notes={readNotes} />
+      <NotesReviewTableOfContentsSidebar
+        notes={tocNotes}
+        currentIndex={currentIndex}
+      />
 
       <VStack align="stretch" flex="1" gap="2" minWidth="0" p="4">
-        <Flex align="center" justify="space-between">
-          <Text color="fg.muted" fontSize="sm">
-            {t("review.progress", {
-              current: currentIndex + 1,
-              total: notes.length,
-            })}
-          </Text>
-          <Flex gap="1">
-            <OpenInObsidianButton note={currentNote} />
-            <ReadNotesMobileTrigger notes={readNotes} />
-          </Flex>
+        <Flex align="center" justify="flex-end">
+          <OpenInObsidianButton note={currentNote} />
+          <NotesReviewTableOfContentsMobileTrigger
+            notes={tocNotes}
+            currentIndex={currentIndex}
+          />
         </Flex>
 
         <MarkdownTree content={currentNote.content} />

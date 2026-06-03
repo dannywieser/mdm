@@ -16,8 +16,7 @@ type TranslationKey =
   | "notes.meta"
   | "review.allCaughtUp"
   | "review.close"
-  | "review.progress"
-  | "review.read"
+  | "review.forReview"
 
 const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
@@ -35,8 +34,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "notes.meta": "Vault: {vault} · Directory: {directory}",
     "review.allCaughtUp": "all caught up!",
     "review.close": "close",
-    "review.progress": "{current}/{total}",
-    "review.read": "read",
+    "review.forReview": "for review ({count})",
   },
 }
 

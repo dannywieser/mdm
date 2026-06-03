@@ -3,9 +3,9 @@ import { BookCheck, X } from "lucide-react"
 
 import { useI18n } from "../../i18n"
 
-import type { ReadNotesPanelProps } from "./ReadNotesPanel.types"
+import type { NotesReviewTableOfContentsProps } from "./NotesReviewTableOfContents.types"
 
-const ReadNotesList = ({ notes }: ReadNotesPanelProps) => {
+const TocList = ({ notes }: NotesReviewTableOfContentsProps) => {
   const { t } = useI18n()
 
   return (
@@ -16,14 +16,14 @@ const ReadNotesList = ({ notes }: ReadNotesPanelProps) => {
         fontWeight="semibold"
         letterSpacing="wide"
         mb="1"
-        textTransform="uppercase"
       >
-        {t("review.read")}
+        {t("review.forReview", { count: notes.length })}
       </Text>
       {notes.map((note) => (
         <Text
           key={note.id}
-          color="fg.subtle"
+          color={note.isRead ? "fg.subtle" : undefined}
+          fontWeight={note.isRead ? undefined : "bold"}
           fontSize="xs"
           overflow="hidden"
           textOverflow="ellipsis"
@@ -36,7 +36,10 @@ const ReadNotesList = ({ notes }: ReadNotesPanelProps) => {
   )
 }
 
-export const ReadNotesSidebar = ({ notes }: ReadNotesPanelProps) => (
+export const NotesReviewTableOfContentsSidebar = ({
+  notes,
+  currentIndex,
+}: NotesReviewTableOfContentsProps) => (
   <VStack
     align="stretch"
     borderRight="1px solid"
@@ -48,11 +51,14 @@ export const ReadNotesSidebar = ({ notes }: ReadNotesPanelProps) => (
     p="4"
     width="200px"
   >
-    {notes.length > 0 && <ReadNotesList notes={notes} />}
+    {notes.length > 0 && <TocList notes={notes} currentIndex={currentIndex} />}
   </VStack>
 )
 
-export const ReadNotesMobileTrigger = ({ notes }: ReadNotesPanelProps) => {
+export const NotesReviewTableOfContentsMobileTrigger = ({
+  notes,
+  currentIndex,
+}: NotesReviewTableOfContentsProps) => {
   const { t } = useI18n()
 
   if (notes.length === 0) return null
@@ -61,7 +67,7 @@ export const ReadNotesMobileTrigger = ({ notes }: ReadNotesPanelProps) => {
     <Drawer.Root placement="bottom" size="full">
       <Drawer.Trigger asChild>
         <IconButton
-          aria-label={t("review.read")}
+          aria-label={t("review.forReview", { count: notes.length })}
           colorPalette="green"
           display={{ base: "flex", sm: "none" }}
           size="sm"
@@ -69,14 +75,16 @@ export const ReadNotesMobileTrigger = ({ notes }: ReadNotesPanelProps) => {
         >
           <BookCheck size={16} />
           <Text fontSize="xs" ml="1">
-            {notes.length}
+            {currentIndex + 1}/{notes.length}
           </Text>
         </IconButton>
       </Drawer.Trigger>
       <Drawer.Positioner>
         <Drawer.Content>
           <Drawer.Header>
-            <Drawer.Title>{t("review.read")}</Drawer.Title>
+            <Drawer.Title>
+              {t("review.forReview", { count: notes.length })}
+            </Drawer.Title>
             <Drawer.CloseTrigger asChild>
               <IconButton aria-label={t("review.close")} variant="ghost">
                 <X size={16} />
@@ -86,7 +94,12 @@ export const ReadNotesMobileTrigger = ({ notes }: ReadNotesPanelProps) => {
           <Drawer.Body>
             <VStack align="stretch" gap="3">
               {notes.map((note) => (
-                <Text key={note.id} fontSize="sm">
+                <Text
+                  key={note.id}
+                  color={note.isRead ? "fg.subtle" : undefined}
+                  fontWeight={note.isRead ? undefined : "bold"}
+                  fontSize="sm"
+                >
                   {note.title}
                 </Text>
               ))}

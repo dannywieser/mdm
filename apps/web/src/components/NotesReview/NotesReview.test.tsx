@@ -43,10 +43,20 @@ vi.mock("../OpenInObsidianButton/OpenInObsidianButton", () => ({
   ),
 }))
 
-vi.mock("./ReadNotesPanel", () => ({
-  ReadNotesSidebar: () => null,
-  ReadNotesMobileTrigger: ({ notes }: { notes: { id: string }[] }) =>
-    notes.length > 0 ? <button>{notes.length}</button> : null,
+vi.mock("./NotesReviewTableOfContents", () => ({
+  NotesReviewTableOfContentsSidebar: () => null,
+  NotesReviewTableOfContentsMobileTrigger: ({
+    notes,
+    currentIndex,
+  }: {
+    notes: { id: string }[]
+    currentIndex: number
+  }) =>
+    notes.length > 0 ? (
+      <button>
+        {currentIndex + 1}/{notes.length}
+      </button>
+    ) : null,
 }))
 
 const defaultMutate = vi.fn()
@@ -118,28 +128,6 @@ describe("NotesReview", () => {
     renderComponent()
 
     expect(screen.getByText("review.allCaughtUp")).toBeTruthy()
-  })
-
-  test("renders progress indicator for the current note", () => {
-    useNotesQueryMock.mockReturnValue({
-      data: {
-        notes: [
-          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
-          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
-        ],
-      },
-      error: undefined,
-      isLoading: false,
-    })
-    useToggleNoteReadMock.mockReturnValue({
-      mutate: defaultMutate,
-      isPending: false,
-    })
-    readStatesFor(["1", "2"], [])
-
-    renderComponent()
-
-    expect(screen.getByText("review.progress")).toBeTruthy()
   })
 
   test("starts at the first unread note when read states are settled", () => {
@@ -236,29 +224,7 @@ describe("NotesReview", () => {
     expect(screen.getByText("review.allCaughtUp")).toBeTruthy()
   })
 
-  test("passes read notes to ReadNotesMobileTrigger", () => {
-    useNotesQueryMock.mockReturnValue({
-      data: {
-        notes: [
-          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
-          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
-        ],
-      },
-      error: undefined,
-      isLoading: false,
-    })
-    useToggleNoteReadMock.mockReturnValue({
-      mutate: defaultMutate,
-      isPending: false,
-    })
-    readStatesFor(["1", "2"], ["1"])
-
-    renderComponent()
-
-    expect(screen.getByText("1")).toBeTruthy()
-  })
-
-  test("does not render ReadNotesMobileTrigger content when no notes are read", () => {
+  test("passes all notes with read state to NotesReviewTableOfContentsMobileTrigger", () => {
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [
@@ -277,34 +243,7 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    expect(screen.queryByRole("button", { name: "review.read" })).toBeNull()
+    expect(screen.getByText("1/2")).toBeTruthy()
   })
 
-  test("keeps total count unchanged after marking a note as read", () => {
-    useNotesQueryMock.mockReturnValue({
-      data: {
-        notes: [
-          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
-          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
-          { id: "3", obsidianUrl: "obsidian://note-3", title: "Note 3" },
-        ],
-      },
-      error: undefined,
-      isLoading: false,
-    })
-    const mutateMock = vi.fn((_, options?: { onSuccess?: () => void }) => {
-      options?.onSuccess?.()
-    })
-    useToggleNoteReadMock.mockReturnValue({
-      mutate: mutateMock,
-      isPending: false,
-    })
-    readStatesFor(["1", "2", "3"], [])
-
-    renderComponent()
-
-    fireEvent.click(screen.getByRole("button", { name: "notes.markAsRead" }))
-
-    expect(screen.getByText("review.progress")).toBeTruthy()
-  })
 })
