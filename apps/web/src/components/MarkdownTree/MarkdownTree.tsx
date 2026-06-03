@@ -122,7 +122,7 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
               <Icon
                 as={node.checked ? CircleCheck : CircleDashed}
                 boxSize="4"
-                color={node.checked ? "green.600" : "fg.muted"}
+                color={node.checked ? "app.successBackground" : "app.textMuted"}
                 mt="0.5"
                 flexShrink={0}
               />

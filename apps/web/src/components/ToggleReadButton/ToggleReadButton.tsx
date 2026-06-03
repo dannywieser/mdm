@@ -19,8 +19,12 @@ export const ToggleReadButton = ({
       aria-label={toggleLabel}
       title={toggleLabel}
       size="sm"
-      variant={isRead ? "subtle" : "ghost"}
-      colorPalette={isRead ? "green" : "gray"}
+      variant="ghost"
+      bg={isRead ? "app.successBackground" : "app.panelBackground"}
+      color={isRead ? "app.successText" : "app.textMuted"}
+      _hover={{
+        bg: isRead ? "app.successHoverBackground" : "app.panelBackgroundHover",
+      }}
       onClick={() => toggleRead.mutate()}
       loading={toggleRead.isPending}
     >

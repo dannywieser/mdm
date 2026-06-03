@@ -78,7 +78,7 @@ export const NotesReview = () => {
   if (!notes.length || currentIndex >= notes.length) {
     return (
       <VStack p="6">
-        <Box color="gray.300">
+        <Box color="app.iconMuted">
           <NotebookIcon animating={false} size={80} />
         </Box>
         <Text fontSize="lg" fontWeight="semibold">
@@ -118,7 +118,9 @@ export const NotesReview = () => {
         >
           <OpenInObsidianButton note={currentNote} />
           <Button
-            colorPalette="green"
+            bg="app.successBackground"
+            color="app.successText"
+            _hover={{ bg: "app.successHoverBackground" }}
             width={{ base: "full", sm: "auto" }}
             onClick={handleMarkAsRead}
             loading={toggleRead.isPending}

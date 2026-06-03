@@ -9,8 +9,10 @@ export const OpenInObsidianButton = ({ note }: OpenInObsidianButtonProps) => (
     aria-label="Open in Obsidian"
     size="md"
     title="Open in Obsidian"
-    variant="subtle"
-    colorPalette="purple"
+    variant="ghost"
+    color="app.selectedText"
+    bg="app.panelBackground"
+    _hover={{ bg: "app.panelBackgroundHover" }}
   >
     <a href={note.obsidianUrl}>
       <ExternalLink size={16} />

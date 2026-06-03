@@ -11,7 +11,7 @@ const TocList = ({ notes, currentIndex }: NotesReviewTableOfContentsProps) => {
   return (
     <VStack align="stretch" gap="1">
       <Text
-        color="fg.muted"
+        color="app.textMuted"
         fontSize="xs"
         fontWeight="semibold"
         letterSpacing="wide"
@@ -24,9 +24,9 @@ const TocList = ({ notes, currentIndex }: NotesReviewTableOfContentsProps) => {
           key={note.id}
           color={
             i === currentIndex
-              ? "purple.700"
+              ? "app.selectedText"
               : note.isRead
-                ? "fg.subtle"
+                ? "app.textMuted"
                 : undefined
           }
           fontWeight={i === currentIndex || !note.isRead ? "bold" : undefined}
@@ -49,7 +49,7 @@ export const NotesReviewTableOfContentsSidebar = ({
   <VStack
     align="stretch"
     borderRight="1px solid"
-    borderColor="border.muted"
+    borderColor="app.border"
     display={{ base: "none", sm: "flex" }}
     flexShrink={0}
     gap="1"
@@ -74,10 +74,11 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
       <Drawer.Trigger asChild>
         <IconButton
           aria-label={t("review.forReview", { count: notes.length })}
-          colorPalette="green"
+          color="app.successBackground"
           display={{ base: "flex", sm: "none" }}
           size="sm"
           variant="ghost"
+          _hover={{ bg: "app.panelBackgroundHover" }}
         >
           <BookCheck size={16} />
           <Text fontSize="xs" ml="1">
@@ -104,9 +105,9 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
                   key={note.id}
                   color={
                     i === currentIndex
-                      ? "purple.700"
+                      ? "app.selectedText"
                       : note.isRead
-                        ? "fg.subtle"
+                        ? "app.textMuted"
                         : undefined
                   }
                   fontWeight={
