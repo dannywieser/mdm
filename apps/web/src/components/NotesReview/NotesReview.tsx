@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useQueries } from "@tanstack/react-query"
-import { Button, Flex, Text, VStack } from "@chakra-ui/react"
+import { Box, Button, Flex, Text, VStack } from "@chakra-ui/react"
 import { BookCheck } from "lucide-react"
 import { useParams } from "react-router-dom"
 
@@ -17,6 +17,7 @@ import {
   NotesReviewTableOfContentsSidebar,
 } from "./NotesReviewTableOfContents"
 import { OpenInObsidianButton } from "../OpenInObsidianButton/OpenInObsidianButton"
+import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
 
 export const NotesReview = () => {
   const { view } = useParams<NotesReviewRouteParamKey>()
@@ -38,7 +39,10 @@ export const NotesReview = () => {
   }, [currentNote?.title, setTitle])
 
   useEffect(() => {
-    contentTopRef.current?.scrollIntoView({ behavior: "instant", block: "start" })
+    contentTopRef.current?.scrollIntoView({
+      behavior: "instant",
+      block: "start",
+    })
   }, [currentIndex])
 
   const readStates = useQueries({
@@ -74,8 +78,11 @@ export const NotesReview = () => {
   if (!notes.length || currentIndex >= notes.length) {
     return (
       <VStack p="6">
+        <Box color="gray.300">
+          <NotebookIcon animating={false} size={80} />
+        </Box>
         <Text fontSize="lg" fontWeight="semibold">
-          {t("review.allCaughtUp")}
+          {t("review.complete")}
         </Text>
       </VStack>
     )
@@ -88,7 +95,14 @@ export const NotesReview = () => {
         currentIndex={currentIndex}
       />
 
-      <VStack ref={contentTopRef} align="stretch" flex="1" gap="2" minWidth="0" p="4">
+      <VStack
+        ref={contentTopRef}
+        align="stretch"
+        flex="1"
+        gap="2"
+        minWidth="0"
+        p="4"
+      >
         <Flex align="center" justify="flex-end">
           <NotesReviewTableOfContentsMobileTrigger
             notes={tocNotes}
