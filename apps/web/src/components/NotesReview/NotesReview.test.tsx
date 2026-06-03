@@ -82,7 +82,7 @@ describe("NotesReview", () => {
 
     renderComponent()
 
-    expect(screen.getByText("review.allCaughtUp")).toBeTruthy()
+    expect(screen.getByText("review.complete")).toBeTruthy()
   })
 
   test("starts at the first unread note when read states are settled", () => {
@@ -152,7 +152,7 @@ describe("NotesReview", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "notes.markAsRead" }))
 
-    expect(screen.getByText("review.allCaughtUp")).toBeTruthy()
+    expect(screen.getByText("review.complete")).toBeTruthy()
   })
 
   test("passes all notes with read state to NotesReviewTableOfContentsMobileTrigger", () => {
