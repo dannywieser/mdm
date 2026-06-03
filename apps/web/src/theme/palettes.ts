@@ -1,3 +1,5 @@
+import type { TranslationKey } from "../i18n.types"
+
 export type ColorPaletteName =
   | "dracula"
   | "gruvbox"
@@ -10,7 +12,7 @@ export interface ColorPaletteDefinition {
   border: string
   borderHover: string
   iconMuted: string
-  label: string
+  i18nKey: TranslationKey
   mutedText: string
   panelBackground: string
   panelBackgroundHover: string
@@ -28,7 +30,7 @@ export const colorPaletteDefinitions: Record<
   ColorPaletteDefinition
 > = {
   dracula: {
-    label: "Dracula",
+    i18nKey: "palette.dracula",
     background: "#282a36",
     panelBackground: "#303445",
     panelBackgroundHover: "#3a3f55",
@@ -43,7 +45,7 @@ export const colorPaletteDefinitions: Record<
     iconMuted: "#8be9fd",
   },
   gruvbox: {
-    label: "Gruvbox",
+    i18nKey: "palette.gruvbox",
     background: "#282828",
     panelBackground: "#32302f",
     panelBackgroundHover: "#3c3836",
@@ -58,7 +60,7 @@ export const colorPaletteDefinitions: Record<
     iconMuted: "#83a598",
   },
   nord: {
-    label: "Nord",
+    i18nKey: "palette.nord",
     background: "#2e3440",
     panelBackground: "#3b4252",
     panelBackgroundHover: "#434c5e",
@@ -73,7 +75,7 @@ export const colorPaletteDefinitions: Record<
     iconMuted: "#81a1c1",
   },
   catppuccin: {
-    label: "Catppuccin",
+    i18nKey: "palette.catppuccin",
     background: "#1e1e2e",
     panelBackground: "#313244",
     panelBackgroundHover: "#45475a",
@@ -88,7 +90,7 @@ export const colorPaletteDefinitions: Record<
     iconMuted: "#89b4fa",
   },
   solarized: {
-    label: "Solarized",
+    i18nKey: "palette.solarized",
     background: "#002b36",
     panelBackground: "#073642",
     panelBackgroundHover: "#0b3f4b",
@@ -108,7 +110,7 @@ export const colorPaletteOptions = (
   Object.keys(colorPaletteDefinitions) as ColorPaletteName[]
 ).map((value) => ({
   value,
-  label: colorPaletteDefinitions[value].label,
+  i18nKey: colorPaletteDefinitions[value].i18nKey,
 }))
 
 export const isColorPaletteName = (
