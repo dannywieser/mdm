@@ -13,6 +13,7 @@ export type TranslationKey =
   | "notes.markAsRead"
   | "notes.markAsUnread"
   | "notes.meta"
+  | "review.backToHome"
   | "review.complete"
   | "review.close"
   | "review.forReview"

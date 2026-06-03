@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { useQueries } from "@tanstack/react-query"
 import { Box, Button, Flex, Text, VStack } from "@chakra-ui/react"
 import { BookCheck } from "lucide-react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 import { useToggleNoteRead } from "../../hooks/useToggleNoteRead/useToggleNoteRead"
@@ -11,6 +11,7 @@ import { usePageTitle } from "../../context/PageTitle/usePageTitle"
 import { useI18n } from "../../i18n"
 
 import type { NotesReviewRouteParamKey } from "./NotesReview.types"
+import { LinkedNotesList } from "../LinkedNotesList/LinkedNotesList"
 import { MarkdownTree } from "../MarkdownTree/MarkdownTree"
 import {
   NotesReviewTableOfContentsMobileTrigger,
@@ -23,12 +24,14 @@ export const NotesReview = () => {
   const { view } = useParams<NotesReviewRouteParamKey>()
   const { data } = useNotesQuery({ view })
   const { t } = useI18n()
-  const [currentIndex, setCurrentIndex] = useState(0)
+  // -1 means "not yet initialized" — keeps LoadingScreen visible until the
+  // first-unread position is known, preventing a flash of note 0.
+  const [currentIndex, setCurrentIndex] = useState(-1)
   const initialized = useRef(false)
   const contentTopRef = useRef<HTMLDivElement>(null)
 
   const notes = useMemo(() => data.notes, [data.notes])
-  const currentNote = notes[currentIndex]
+  const currentNote = notes[currentIndex] as (typeof notes)[number] | undefined
   const toggleRead = useToggleNoteRead({ noteId: currentNote?.id ?? "" })
 
   const { setTitle } = usePageTitle()
@@ -39,10 +42,8 @@ export const NotesReview = () => {
   }, [currentNote?.title, setTitle])
 
   useEffect(() => {
-    contentTopRef.current?.scrollIntoView({
-      behavior: "instant",
-      block: "start",
-    })
+    if (currentIndex < 0) return
+    contentTopRef.current?.scrollIntoView({ behavior: "instant", block: "start" })
   }, [currentIndex])
 
   const readStates = useQueries({
@@ -75,15 +76,59 @@ export const NotesReview = () => {
     })
   }
 
-  if (!notes.length || currentIndex >= notes.length) {
+  const isLoading = notes.length > 0 && currentIndex === -1
+
+  const reviewedNotes = notes.filter((_, i) => readStates[i]?.data === true)
+
+  if (isLoading || !notes.length || currentIndex >= notes.length) {
     return (
-      <VStack p="6">
+      <VStack p="6" pt={16}>
         <Box color="app.iconMuted">
-          <NotebookIcon animating={false} size={80} />
+          <NotebookIcon animating={isLoading} size={80} />
         </Box>
-        <Text fontSize="lg" fontWeight="semibold">
-          {t("review.complete")}
-        </Text>
+        {!isLoading && (
+          <>
+            {reviewedNotes.length > 0 && (
+              <VStack align="center" gap="1" mt="4">
+                {reviewedNotes.map((note, i) => (
+                  <Text
+                    key={note.id}
+                    color="fg.muted"
+                    fontSize="sm"
+                    style={{
+                      animation: "review-item-in 0.25s ease forwards",
+                      animationDelay: `${i * 0.06}s`,
+                      opacity: 0,
+                    }}
+                  >
+                    {note.title}
+                  </Text>
+                ))}
+              </VStack>
+            )}
+            <Text
+              fontSize="lg"
+              fontWeight="semibold"
+              style={{
+                animation: "review-item-in 0.25s ease forwards",
+                animationDelay: `${reviewedNotes.length * 0.06 + 0.1}s`,
+                opacity: 0,
+              }}
+            >
+              {t("review.complete")}
+            </Text>
+            <Text
+              fontSize="sm"
+              style={{
+                animation: "review-item-in 0.25s ease forwards",
+                animationDelay: `${reviewedNotes.length * 0.06 + 0.3}s`,
+                opacity: 0,
+              }}
+            >
+              <Link to="/">{t("review.backToHome")}</Link>
+            </Text>
+          </>
+        )}
       </VStack>
     )
   }
@@ -110,13 +155,14 @@ export const NotesReview = () => {
           />
         </Flex>
 
-        <MarkdownTree content={currentNote.content} />
+        <MarkdownTree content={currentNote!.content} />
+        <LinkedNotesList notes={currentNote!.linkedNotes ?? []} />
         <Flex
           flexDirection={{ base: "column", sm: "row" }}
           gap="2"
           justify="flex-end"
         >
-          <OpenInObsidianButton note={currentNote} />
+          <OpenInObsidianButton note={currentNote!} />
           <Button
             bg="app.successBackground"
             color="app.successText"

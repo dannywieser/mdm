@@ -8,6 +8,17 @@ const useNotesQueryMock = vi.fn()
 const useToggleNoteReadMock = vi.fn()
 const useQueriesMock = vi.fn()
 
+vi.mock("react-router-dom", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react-router-dom")>()
+  return {
+    ...actual,
+    useParams: () => ({ view: "test-view" }),
+    Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+      <a href={to}>{children}</a>
+    ),
+  }
+})
+
 vi.mock("../../hooks/useNotesQuery/useNotesQuery", () => ({
   useNotesQuery: () => useNotesQueryMock(),
 }))
@@ -28,6 +39,7 @@ vi.mock("@tanstack/react-query", async (importOriginal) => {
 vi.mock("../MarkdownTree/MarkdownTree", () => ({
   MarkdownTree: () => null,
 }))
+
 
 vi.mock("../../context/PageTitle/usePageTitle", () => ({
   usePageTitle: () => ({ title: "", setTitle: vi.fn() }),
@@ -74,6 +86,21 @@ describe("NotesReview", () => {
         <NotesReview />
       </ChakraProvider>,
     )
+
+  test("shows animated icon without completion text while read states are pending", () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [{ id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" }],
+      },
+    })
+    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    useQueriesMock.mockReturnValue([{ status: "pending" }])
+
+    renderComponent()
+
+    expect(screen.getByRole("img", { name: "Notebook" })).toBeTruthy()
+    expect(screen.queryByText("review.complete")).toBeNull()
+  })
 
   test("renders all caught up when there are no notes", () => {
     useNotesQueryMock.mockReturnValue({ data: { notes: [] } })
