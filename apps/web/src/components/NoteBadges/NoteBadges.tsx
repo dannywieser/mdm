@@ -35,7 +35,12 @@ export const NoteBadges = ({ note, badges }: NoteBadgesProps) => {
   return (
     <Flex gap="2" wrap="wrap">
       {resolvedBadges.map(({ key, value }) => (
-        <Badge key={key} colorPalette="blue" variant="subtle">
+        <Badge
+          key={key}
+          variant="subtle"
+          bg="app.panelBackgroundHover"
+          color="app.textMuted"
+        >
           {value}
         </Badge>
       ))}
