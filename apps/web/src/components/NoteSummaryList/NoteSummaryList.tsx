@@ -1,6 +1,4 @@
 import { Badge, Flex, Heading, Table, VStack } from "@chakra-ui/react"
-import { getValueByPath } from "mdm-util"
-import type { Note } from "markdown"
 import { Link, useParams } from "react-router-dom"
 
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
@@ -13,22 +11,7 @@ import type {
   NoteSummaryListProps,
   NoteSummaryListRouteParamKey,
 } from "./NoteSummaryList.types"
-
-const resolveBadgeValues = (note: Note, badge: string): string[] => {
-  const value = getValueByPath(note, badge)
-
-  if (Array.isArray(value)) {
-    return value.filter((entry): entry is string => typeof entry === "string" && entry.trim().length > 0)
-  }
-
-  if (typeof value === "string" && value.trim().length > 0) {
-    return [value]
-  }
-
-  return []
-}
-
-const getColumnLabel = (badge: string): string => badge.split(".").filter(Boolean).at(-1) ?? badge
+import { getColumnLabel, resolveBadgeValues } from "./NoteSummaryList.util"
 
 export const NoteSummaryList = ({ badges = [] }: NoteSummaryListProps) => {
   const { view } = useParams<NoteSummaryListRouteParamKey>()

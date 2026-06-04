@@ -6,9 +6,16 @@ import { describe, expect, test, vi } from "vitest"
 import { NoteSummaryList } from "./NoteSummaryList"
 
 const useNotesQueryMock = vi.fn()
+const resolveBadgeValuesMock = vi.fn()
+const getColumnLabelMock = vi.fn()
 
 vi.mock("../../hooks/useNotesQuery/useNotesQuery", () => ({
   useNotesQuery: () => useNotesQueryMock(),
+}))
+
+vi.mock("./NoteSummaryList.util", () => ({
+  resolveBadgeValues: (...args: unknown[]) => resolveBadgeValuesMock(...args),
+  getColumnLabel: (...args: unknown[]) => getColumnLabelMock(...args),
 }))
 
 vi.mock("../LoadingScreen/LoadingScreen", () => ({
@@ -32,6 +39,10 @@ const renderSummaryList = (badges: string[] = []) =>
 
 describe("NoteSummaryList", () => {
   test("renders the loading screen while fetching", () => {
+    resolveBadgeValuesMock.mockReset()
+    getColumnLabelMock.mockReset()
+    getColumnLabelMock.mockImplementation((badge: string) => badge)
+
     useNotesQueryMock.mockReturnValue({
       data: undefined,
       error: undefined,
@@ -44,6 +55,10 @@ describe("NoteSummaryList", () => {
   })
 
   test("renders an error state", () => {
+    resolveBadgeValuesMock.mockReset()
+    getColumnLabelMock.mockReset()
+    getColumnLabelMock.mockImplementation((badge: string) => badge)
+
     useNotesQueryMock.mockReturnValue({
       data: undefined,
       error: new Error("Request failed"),
@@ -57,6 +72,22 @@ describe("NoteSummaryList", () => {
   })
 
   test("renders summary table with dynamic badge columns", () => {
+    resolveBadgeValuesMock.mockReset()
+    getColumnLabelMock.mockReset()
+    getColumnLabelMock.mockImplementation((badge: string) => badge.split(".").at(-1) ?? badge)
+    resolveBadgeValuesMock.mockImplementation((note: { id: string }, badge: string) => {
+      const values: Record<string, string[]> = {
+        "1-folder": ["books"],
+        "1-frontmatter.type": ["book"],
+        "1-frontmatter.genre": ["fiction", "mystery"],
+        "2-folder": ["books"],
+        "2-frontmatter.type": ["book"],
+        "2-frontmatter.genre": ["history"],
+      }
+
+      return values[`${note.id}-${badge}`] ?? []
+    })
+
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [
@@ -96,5 +127,9 @@ describe("NoteSummaryList", () => {
     expect(screen.getByText("fiction")).toBeTruthy()
     expect(screen.getByText("mystery")).toBeTruthy()
     expect(screen.getByText("history")).toBeTruthy()
+    expect(getColumnLabelMock).toHaveBeenCalledWith("folder")
+    expect(getColumnLabelMock).toHaveBeenCalledWith("frontmatter.type")
+    expect(getColumnLabelMock).toHaveBeenCalledWith("frontmatter.genre")
+    expect(resolveBadgeValuesMock).toHaveBeenCalled()
   })
 })
