@@ -5,12 +5,12 @@ import { describe, expect, test, vi } from "vitest"
 
 import { NotesGallery } from "./NotesGallery"
 
-const renderGallery = () =>
+const renderGallery = (badges: string[] = []) =>
   render(
     <ChakraProvider value={defaultSystem}>
       <MemoryRouter initialEntries={["/notes/books"]}>
         <Routes>
-          <Route path="/notes/:view" element={<NotesGallery />} />
+          <Route path="/notes/:view" element={<NotesGallery badges={badges} />} />
         </Routes>
       </MemoryRouter>
     </ChakraProvider>,
@@ -25,6 +25,19 @@ vi.mock("../../hooks/useNotesQuery/useNotesQuery", () => ({
 vi.mock("../LoadingScreen/LoadingScreen", () => ({
   LoadingScreen: () => <div data-testid="loading-screen" />,
 }))
+
+vi.mock("../NoteBadges/NoteBadges", () => ({
+  NoteBadges: ({ badges }: { badges: string[] }) => (
+    <div data-testid="note-badges">{badges.join(",")}</div>
+  ),
+}))
+
+const noteWithCover = {
+  id: "1",
+  title: "With Cover",
+  obsidianUrl: "obsidian://open?vault=v&file=1",
+  frontmatter: { cover: "https://example.com/cover.jpg" },
+}
 
 describe("NotesGallery", () => {
   test("renders the loading screen while fetching", () => {
@@ -56,12 +69,7 @@ describe("NotesGallery", () => {
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [
-          {
-            id: "1",
-            title: "With Cover",
-            obsidianUrl: "obsidian://open?vault=v&file=1",
-            frontmatter: { cover: "https://example.com/cover.jpg" },
-          },
+          noteWithCover,
           {
             id: "2",
             title: "No Cover",
@@ -104,5 +112,18 @@ describe("NotesGallery", () => {
     expect(img.getAttribute("src")).toBe(
       `/images?path=${encodeURIComponent("https://example.com/first.jpg")}`,
     )
+  })
+
+  test("renders NoteBadges with configured badges", () => {
+    useNotesQueryMock.mockReturnValue({
+      data: { notes: [noteWithCover] },
+      error: undefined,
+      isLoading: false,
+    })
+
+    renderGallery(["frontmatter.genre", "frontmatter.status"])
+
+    expect(screen.getAllByTestId("note-badges").length).toBeGreaterThan(0)
+    expect(screen.getAllByText("frontmatter.genre,frontmatter.status").length).toBeGreaterThan(0)
   })
 })

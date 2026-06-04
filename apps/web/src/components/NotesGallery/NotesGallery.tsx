@@ -1,4 +1,4 @@
-import { Alert, Card, Image, SimpleGrid, Text } from "@chakra-ui/react"
+import { Alert, Box, Card, Image, SimpleGrid, Text } from "@chakra-ui/react"
 import { useParams } from "react-router-dom"
 
 import type { FrontmatterValue } from "markdown"
@@ -7,15 +7,16 @@ import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 import { useI18n } from "../../i18n"
 
 import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
+import { NoteBadges } from "../NoteBadges/NoteBadges"
 
-import type { NotesGalleryRouteParamKey } from "./NotesGallery.types"
+import type { NotesGalleryProps, NotesGalleryRouteParamKey } from "./NotesGallery.types"
 
 function getCoverSrc(cover: FrontmatterValue): string {
   const path = Array.isArray(cover) ? cover[0] : cover
   return `/images?path=${encodeURIComponent(path)}`
 }
 
-export const NotesGallery = () => {
+export const NotesGallery = ({ badges = [] }: NotesGalleryProps) => {
   const { view } = useParams<NotesGalleryRouteParamKey>()
   const { data, error, isLoading } = useNotesQuery({ view })
   const { t } = useI18n()
@@ -45,29 +46,37 @@ export const NotesGallery = () => {
     <SimpleGrid columns={{ base: 2, md: 3, lg: 4 }} gap={4} p={6}>
       {notesWithCovers.map((note) => (
         <a href={note.obsidianUrl} key={note.id} style={{ textDecoration: "none" }}>
-        <Card.Root
-          bg="app.panelBackground"
-          borderColor="app.border"
-          overflow="hidden"
-          _hover={{ borderColor: "app.borderHover" }}
-        >
-          <Image
-            alt={note.title}
-            aspectRatio="16 / 9"
-            objectFit="cover"
-            src={getCoverSrc(note.frontmatter!.cover)}
-          />
-          <Card.Body p={3}>
-            <Text
-              color="app.text"
-              fontSize="sm"
-              fontWeight="medium"
-              lineClamp={2}
+          <Card.Root
+            role="group"
+            bg="app.panelBackground"
+            borderColor="app.border"
+            overflow="hidden"
+            position="relative"
+            _hover={{ borderColor: "app.borderHover" }}
+          >
+            <Image
+              alt={note.title}
+              aspectRatio="16 / 9"
+              objectFit="cover"
+              src={getCoverSrc(note.frontmatter!.cover)}
+            />
+            <Box
+              background="rgba(0,0,0,0.65)"
+              bottom={0}
+              left={0}
+              opacity={0}
+              p={3}
+              position="absolute"
+              right={0}
+              transition="opacity 0.2s"
+              _groupHover={{ opacity: 1 }}
             >
-              {note.title}
-            </Text>
-          </Card.Body>
-        </Card.Root>
+              <Text color="white" fontSize="sm" fontWeight="medium" lineClamp={2} mb={badges.length ? 2 : 0}>
+                {note.title}
+              </Text>
+              <NoteBadges badges={badges} note={note} />
+            </Box>
+          </Card.Root>
         </a>
       ))}
     </SimpleGrid>
