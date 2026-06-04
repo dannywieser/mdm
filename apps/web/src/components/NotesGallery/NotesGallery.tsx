@@ -75,6 +75,7 @@ export const NotesGallery = ({ badges = [] }: NotesGalleryProps) => {
               right={0}
               transition="opacity 0.2s"
               _groupHover={{ opacity: 1 }}
+              _groupFocusWithin={{ opacity: 1 }}
             >
               <Text color="white" fontSize="sm" fontWeight="medium" lineClamp={2} mb={badges.length ? 2 : 0}>
                 {note.title}
