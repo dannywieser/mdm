@@ -47,7 +47,7 @@ export const NoteSummaryList = ({ badges = [] }: NoteSummaryListProps) => {
       <Table.Root>
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader>Name</Table.ColumnHeader>
+            <Table.ColumnHeader>{t("notes.nameColumn")}</Table.ColumnHeader>
             {badges.map((badge) => (
               <Table.ColumnHeader key={badge}>{getColumnLabel(badge)}</Table.ColumnHeader>
             ))}

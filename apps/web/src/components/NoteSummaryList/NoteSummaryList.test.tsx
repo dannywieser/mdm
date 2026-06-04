@@ -84,7 +84,7 @@ describe("NoteSummaryList", () => {
 
     expect(screen.getByText("notes.matchedCount")).toBeTruthy()
     expect(screen.getByRole("link", { name: "review.backToHome" }).getAttribute("href")).toBe("/")
-    expect(screen.getByText("Name")).toBeTruthy()
+    expect(screen.getByText("notes.nameColumn")).toBeTruthy()
     expect(screen.getByText("folder")).toBeTruthy()
     expect(screen.getByText("type")).toBeTruthy()
     expect(screen.getByText("genre")).toBeTruthy()

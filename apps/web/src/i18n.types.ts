@@ -11,6 +11,7 @@ export type TranslationKey =
   | "notes.header"
   | "notes.linkedNotes"
   | "notes.matchedCount"
+  | "notes.nameColumn"
   | "notes.markAsRead"
   | "notes.markAsUnread"
   | "notes.meta"
