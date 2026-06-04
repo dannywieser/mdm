@@ -40,8 +40,17 @@ const isExcludeViewFilter = (value: unknown): value is ExcludeViewFilter => {
   return keys.length === 1 && keys[0] === "$exclude" && isStringRecord(obj["$exclude"])
 }
 
-const isViewFilter = (value: unknown): boolean =>
-  isStringRecord(value) || isExcludeViewFilter(value)
+const isViewFilter = (value: unknown): boolean => {
+  if (isExcludeViewFilter(value)) {
+    return true
+  }
+
+  if (!isStringRecord(value)) {
+    return false
+  }
+
+  return !("$exclude" in value)
+}
 
 const isAppConfigView = (value: unknown): value is AppConfigView => {
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
