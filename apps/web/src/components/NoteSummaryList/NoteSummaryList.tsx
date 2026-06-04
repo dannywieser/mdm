@@ -4,7 +4,6 @@ import type { Note } from "markdown"
 import { Link, useParams } from "react-router-dom"
 
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
-import { useI18n } from "../../i18n"
 
 import { AppError } from "../AppError/AppError"
 import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
@@ -33,7 +32,6 @@ const getColumnLabel = (badge: string): string => badge.split(".").filter(Boolea
 export const NoteSummaryList = ({ badges = [] }: NoteSummaryListProps) => {
   const { view } = useParams<NoteSummaryListRouteParamKey>()
   const { data, error, isLoading } = useNotesQuery({ view })
-  const { t } = useI18n()
 
   if (isLoading) return <LoadingScreen />
   if (error) return <AppError message={error.message} />
@@ -42,7 +40,7 @@ export const NoteSummaryList = ({ badges = [] }: NoteSummaryListProps) => {
     <VStack align="stretch" gap="4" p="6">
       <Flex align="center" justify="space-between">
         <Heading size="md">{`${data.notes.length} matched notes`}</Heading>
-        <Link to="/">{t("review.backToHome")}</Link>
+        <Link to="/">back to home</Link>
       </Flex>
       <Table.Root>
         <Table.Header>

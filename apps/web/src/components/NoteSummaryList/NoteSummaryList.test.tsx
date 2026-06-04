@@ -91,7 +91,7 @@ describe("NoteSummaryList", () => {
     expect(screen.getByRole("link", { name: "Book One" }).getAttribute("href")).toBe(
       "obsidian://open?vault=v&file=book-one",
     )
-    expect(screen.getByText("books")).toBeTruthy()
+    expect(screen.getAllByText("books").length).toBeGreaterThan(0)
     expect(screen.getAllByText("book").length).toBeGreaterThan(0)
     expect(screen.getByText("fiction")).toBeTruthy()
     expect(screen.getByText("mystery")).toBeTruthy()
