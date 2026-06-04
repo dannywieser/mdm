@@ -82,8 +82,8 @@ describe("NoteSummaryList", () => {
 
     renderSummaryList(["folder", "frontmatter.type", "frontmatter.genre"])
 
-    expect(screen.getByText("2 matched notes")).toBeTruthy()
-    expect(screen.getByRole("link", { name: "back to home" }).getAttribute("href")).toBe("/")
+    expect(screen.getByText("notes.matchedCount")).toBeTruthy()
+    expect(screen.getByRole("link", { name: "review.backToHome" }).getAttribute("href")).toBe("/")
     expect(screen.getByText("Name")).toBeTruthy()
     expect(screen.getByText("folder")).toBeTruthy()
     expect(screen.getByText("type")).toBeTruthy()

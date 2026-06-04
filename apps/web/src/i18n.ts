@@ -15,6 +15,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "notes.errorTitle": "unable to load notes",
     "notes.header": "notes",
     "notes.linkedNotes": "linked notes",
+    "notes.matchedCount": "{count} matched notes",
     "notes.markAsRead": "mark as read",
     "notes.markAsUnread": "mark as unread",
     "notes.meta": "Vault: {vault} · Directory: {directory}",
