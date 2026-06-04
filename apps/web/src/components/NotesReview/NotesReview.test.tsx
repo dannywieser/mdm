@@ -112,6 +112,25 @@ describe("NotesReview", () => {
     expect(screen.getByText("review.complete")).toBeTruthy()
   })
 
+  test("uses component-local animation for completion state text", () => {
+    useNotesQueryMock.mockReturnValue({ data: { notes: [] } })
+    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    noReadStates()
+
+    renderComponent()
+
+    const completeText = screen.getByText("review.complete")
+    const backToHomeText = screen.getByText("review.backToHome").closest("p")
+
+    // Animation is applied via Emotion's css prop (injected as a class), not inline style.
+    // Verify neither element references the old global animation name inline.
+    expect(completeText.getAttribute("style") ?? "").not.toContain("review-item-in")
+    expect(backToHomeText?.getAttribute("style") ?? "").not.toContain("review-item-in")
+    // Emotion injects a generated class for the animation
+    expect(completeText.className).toBeTruthy()
+    expect(backToHomeText?.className).toBeTruthy()
+  })
+
   test("starts at the first unread note when read states are settled", () => {
     useNotesQueryMock.mockReturnValue({
       data: {

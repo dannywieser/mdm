@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useQueries } from "@tanstack/react-query"
 import { Box, Button, Flex, Text, VStack } from "@chakra-ui/react"
+import { keyframes } from "@emotion/react"
 import { BookCheck } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 
@@ -21,6 +22,11 @@ import {
 import { OpenInObsidianButton } from "../OpenInObsidianButton/OpenInObsidianButton"
 import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
 import type { NotesReviewProps } from "./NotesReview.types"
+
+const reviewItemIn = keyframes`
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+`
 
 export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
   const { view } = useParams<NotesReviewRouteParamKey>()
@@ -97,8 +103,8 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
                     key={note.id}
                     color="fg.muted"
                     fontSize="sm"
-                    style={{
-                      animation: "review-item-in 0.25s ease forwards",
+                    css={{
+                      animation: `${reviewItemIn} 0.25s ease forwards`,
                       animationDelay: `${i * 0.06}s`,
                       opacity: 0,
                     }}
@@ -111,8 +117,8 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
             <Text
               fontSize="lg"
               fontWeight="semibold"
-              style={{
-                animation: "review-item-in 0.25s ease forwards",
+              css={{
+                animation: `${reviewItemIn} 0.25s ease forwards`,
                 animationDelay: `${reviewedNotes.length * 0.06 + 0.1}s`,
                 opacity: 0,
               }}
@@ -121,8 +127,8 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
             </Text>
             <Text
               fontSize="sm"
-              style={{
-                animation: "review-item-in 0.25s ease forwards",
+              css={{
+                animation: `${reviewItemIn} 0.25s ease forwards`,
                 animationDelay: `${reviewedNotes.length * 0.06 + 0.3}s`,
                 opacity: 0,
               }}
