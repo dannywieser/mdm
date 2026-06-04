@@ -33,11 +33,15 @@ export const createImageHandler = (
     }
 
     const cacheKey = buildCacheKey(resolvedImagePath, config.maxWidth)
-    const cached = await redisClient.get(cacheKey)
 
-    if (cached) {
-      response.redirect(307, cached)
-      return
+    try {
+      const cached = await redisClient.get(cacheKey)
+      if (cached) {
+        response.redirect(307, cached)
+        return
+      }
+    } catch {
+      // treat Redis read failure as a cache miss
     }
 
     const upstreamPath = buildImgproxyUrlPath({
@@ -48,7 +52,11 @@ export const createImageHandler = (
 
     const redirectUrl = `${config.imgproxyPathPrefix}${upstreamPath}`
 
-    await redisClient.set(cacheKey, redirectUrl, { EX: config.cacheTtlSeconds })
+    try {
+      await redisClient.set(cacheKey, redirectUrl, { EX: config.cacheTtlSeconds })
+    } catch {
+      // non-fatal — redirect still works without caching
+    }
 
     response.redirect(307, redirectUrl)
   }

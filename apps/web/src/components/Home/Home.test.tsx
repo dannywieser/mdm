@@ -40,6 +40,10 @@ describe("Home", () => {
 })
 
 describe("getViewGridColumns", () => {
+  test("returns 1 for zero items", () => {
+    expect(getViewGridColumns(0)).toBe(1)
+  })
+
   test("returns 1 for one item", () => {
     expect(getViewGridColumns(1)).toBe(1)
   })

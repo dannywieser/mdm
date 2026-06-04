@@ -1,8 +1,20 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
 import { render, screen } from "@testing-library/react"
+import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { describe, expect, test, vi } from "vitest"
 
 import { NotesGallery } from "./NotesGallery"
+
+const renderGallery = () =>
+  render(
+    <ChakraProvider value={defaultSystem}>
+      <MemoryRouter initialEntries={["/notes/books"]}>
+        <Routes>
+          <Route path="/notes/:view" element={<NotesGallery />} />
+        </Routes>
+      </MemoryRouter>
+    </ChakraProvider>,
+  )
 
 const useNotesQueryMock = vi.fn()
 
@@ -22,11 +34,7 @@ describe("NotesGallery", () => {
       isLoading: true,
     })
 
-    render(
-      <ChakraProvider value={defaultSystem}>
-        <NotesGallery />
-      </ChakraProvider>,
-    )
+    renderGallery()
 
     expect(screen.getByTestId("loading-screen")).toBeTruthy()
   })
@@ -38,11 +46,7 @@ describe("NotesGallery", () => {
       isLoading: false,
     })
 
-    render(
-      <ChakraProvider value={defaultSystem}>
-        <NotesGallery />
-      </ChakraProvider>,
-    )
+    renderGallery()
 
     expect(screen.getByText("notes.errorTitle")).toBeTruthy()
     expect(screen.getByText("Request failed")).toBeTruthy()
@@ -70,11 +74,7 @@ describe("NotesGallery", () => {
       isLoading: false,
     })
 
-    render(
-      <ChakraProvider value={defaultSystem}>
-        <NotesGallery />
-      </ChakraProvider>,
-    )
+    renderGallery()
 
     expect(screen.getByText("With Cover")).toBeTruthy()
     expect(screen.queryByText("No Cover")).toBeNull()
@@ -98,11 +98,7 @@ describe("NotesGallery", () => {
       isLoading: false,
     })
 
-    render(
-      <ChakraProvider value={defaultSystem}>
-        <NotesGallery />
-      </ChakraProvider>,
-    )
+    renderGallery()
 
     const img = screen.getByRole("img", { name: "Array Cover" })
     expect(img.getAttribute("src")).toBe("https://example.com/first.jpg")

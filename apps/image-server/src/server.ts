@@ -13,7 +13,12 @@ type RuntimeRedisClient = ImageRedisClient & {
   on: (event: "error", listener: (error: unknown) => void) => void
 }
 
-export const createApp = (redisClient: ImageRedisClient) => {
+const noopRedisClient: ImageRedisClient = {
+  get: () => Promise.resolve(null),
+  set: () => Promise.resolve(),
+}
+
+export const createApp = (redisClient: ImageRedisClient = noopRedisClient) => {
   const app = express()
 
   app.use(morgan("combined"))
@@ -49,9 +54,15 @@ if (require.main === module) {
       console.error("Redis client error", toLoggableError(error))
     })
 
-    await redisClient.connect()
+    let cacheClient: ImageRedisClient = noopRedisClient
+    try {
+      await redisClient.connect()
+      cacheClient = redisClient
+    } catch (error) {
+      console.error("Redis unavailable, image caching disabled", toLoggableError(error))
+    }
 
-    const app = createApp(redisClient)
+    const app = createApp(cacheClient)
 
     app.listen(port, () => {
       console.log(`image-server listening on ${port}`)

@@ -4,6 +4,7 @@
  * - 4+ items: ceil(√n) so the grid stays roughly square
  */
 export function getViewGridColumns(count: number): number {
+  if (count <= 0) return 1
   if (count <= 3) return count
   return Math.ceil(Math.sqrt(count))
 }

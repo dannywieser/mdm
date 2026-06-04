@@ -33,9 +33,12 @@ export const NotesGallery = () => {
     )
   }
 
-  const notesWithCovers = (data?.notes ?? []).filter(
-    (note) => note.frontmatter?.cover != null,
-  )
+  const notesWithCovers = (data?.notes ?? []).filter((note) => {
+    const cover = note.frontmatter?.cover
+    if (cover == null) return false
+    if (Array.isArray(cover)) return cover.length > 0 && cover[0] !== ""
+    return cover !== ""
+  })
 
   return (
     <SimpleGrid columns={{ base: 2, md: 3, lg: 4 }} gap={4} p={6}>
