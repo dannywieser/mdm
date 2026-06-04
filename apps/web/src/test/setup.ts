@@ -7,6 +7,16 @@ vi.spyOn(console, "info").mockImplementation(() => {})
 
 Element.prototype.scrollIntoView = vi.fn()
 
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: vi.fn((query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  })),
+})
+
 vi.mock("../i18n", async () => {
   const actual = await vi.importActual<typeof import("../i18n")>("../i18n")
 
