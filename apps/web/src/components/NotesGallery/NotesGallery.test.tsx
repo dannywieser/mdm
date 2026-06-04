@@ -26,6 +26,10 @@ vi.mock("../LoadingScreen/LoadingScreen", () => ({
   LoadingScreen: () => <div data-testid="loading-screen" />,
 }))
 
+vi.mock("../AppError/AppError", () => ({
+  AppError: ({ message }: { message: string }) => <div data-testid="app-error">{message}</div>,
+}))
+
 vi.mock("../NoteBadges/NoteBadges", () => ({
   NoteBadges: ({ badges }: { badges: string[] }) => (
     <div data-testid="note-badges">{badges.join(",")}</div>
@@ -61,7 +65,7 @@ describe("NotesGallery", () => {
 
     renderGallery()
 
-    expect(screen.getByText("notes.errorTitle")).toBeTruthy()
+    expect(screen.getByTestId("app-error")).toBeTruthy()
     expect(screen.getByText("Request failed")).toBeTruthy()
   })
 

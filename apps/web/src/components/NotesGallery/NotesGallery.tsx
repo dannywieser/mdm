@@ -1,11 +1,11 @@
-import { Alert, Box, Card, Image, SimpleGrid, Text } from "@chakra-ui/react"
+import { Box, Card, Image, SimpleGrid, Text } from "@chakra-ui/react"
 import { useParams } from "react-router-dom"
 
 import type { FrontmatterValue } from "markdown"
 
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
-import { useI18n } from "../../i18n"
 
+import { AppError } from "../AppError/AppError"
 import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
 import { NoteBadges } from "../NoteBadges/NoteBadges"
 
@@ -19,21 +19,9 @@ function getCoverSrc(cover: FrontmatterValue): string {
 export const NotesGallery = ({ badges = [] }: NotesGalleryProps) => {
   const { view } = useParams<NotesGalleryRouteParamKey>()
   const { data, error, isLoading } = useNotesQuery({ view })
-  const { t } = useI18n()
 
   if (isLoading) return <LoadingScreen />
-
-  if (error) {
-    return (
-      <Alert.Root status="error">
-        <Alert.Indicator />
-        <Alert.Content>
-          <Alert.Title>{t("notes.errorTitle")}</Alert.Title>
-          <Alert.Description>{error.message}</Alert.Description>
-        </Alert.Content>
-      </Alert.Root>
-    )
-  }
+  if (error) return <AppError message={error.message} />
 
   const notesWithCovers = (data?.notes ?? []).filter((note) => {
     const cover = note.frontmatter?.cover
