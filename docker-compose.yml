@@ -42,10 +42,12 @@ services:
       dockerfile: infra/docker/image-server.Dockerfile
     depends_on:
       - imgproxy
+      - redis
     environment:
       PORT: "3002"
       IMGPROXY_PATH_PREFIX: "/imgproxy"
       IMAGES_ROOT: "/data/images"
+      REDIS_URL: "redis://redis:6379"
     expose:
       - "3002"
     volumes:
