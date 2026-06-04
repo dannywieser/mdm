@@ -11,7 +11,11 @@ import type {
   ViewComponentName,
 } from "./NotesView.types"
 
-const VIEW_COMPONENTS: Record<ViewComponentName, ComponentType> = {
+interface ViewComponentProps {
+  badges?: string[]
+}
+
+const VIEW_COMPONENTS: Record<ViewComponentName, ComponentType<ViewComponentProps>> = {
   NotesList,
   NotesReview,
 }
@@ -25,5 +29,5 @@ export const NotesView = () => {
   const SelectedComponent =
     (componentName && VIEW_COMPONENTS[componentName]) ?? NotesList
 
-  return <SelectedComponent key={view} />
+  return <SelectedComponent badges={configuredView?.badges} key={view} />
 }

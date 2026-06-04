@@ -48,6 +48,7 @@ const mockConfig = {
   timezone: "UTC",
   views: [
     {
+      badges: ["folder", "frontmatter.type"],
       component: "NotesList",
       filters: [{ "frontmatter.type": "book" }],
       id: "books",
@@ -74,7 +75,13 @@ describe("stats handler interface", () => {
     })
     countModifiedTodayMock.mockReturnValue(1)
     buildViewCountsMock.mockReturnValue([
-      { component: "NotesList", count: 5, id: "books", name: "Books" },
+      {
+        badges: ["folder", "frontmatter.type"],
+        component: "NotesList",
+        count: 5,
+        id: "books",
+        name: "Books",
+      },
     ])
   })
 
@@ -88,7 +95,15 @@ describe("stats handler interface", () => {
     expect(response.body).toEqual({
       modifiedToday: 1,
       totalNotes: 2,
-      views: [{ component: "NotesList", count: 5, id: "books", name: "Books" }],
+      views: [
+        {
+          badges: ["folder", "frontmatter.type"],
+          component: "NotesList",
+          count: 5,
+          id: "books",
+          name: "Books",
+        },
+      ],
     })
   })
 

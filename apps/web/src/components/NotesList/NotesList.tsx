@@ -7,9 +7,9 @@ import { useI18n } from "../../i18n"
 import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
 import { NotesCard } from "../NotesCard/NotesCard"
 
-import type { NotesRouteParamKey } from "./NotesList.types"
+import type { NotesListProps, NotesRouteParamKey } from "./NotesList.types"
 
-export const NotesList = () => {
+export const NotesList = ({ badges = [] }: NotesListProps) => {
   const { view } = useParams<NotesRouteParamKey>()
   const { data, error, isLoading } = useNotesQuery({ view })
   const { t } = useI18n()
@@ -34,7 +34,7 @@ export const NotesList = () => {
     <VStack align="stretch" gap="6" p="6">
       <VStack align="stretch" gap="4">
         {data?.notes.map((note) => (
-          <NotesCard key={note.id} note={note} />
+          <NotesCard badges={badges} key={note.id} note={note} />
         ))}
       </VStack>
     </VStack>

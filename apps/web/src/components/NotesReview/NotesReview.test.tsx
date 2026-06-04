@@ -80,10 +80,10 @@ afterEach(() => {
 })
 
 describe("NotesReview", () => {
-  const renderComponent = () =>
+  const renderComponent = (badges: string[] = []) =>
     render(
       <ChakraProvider value={defaultSystem}>
-        <NotesReview />
+        <NotesReview badges={badges} />
       </ChakraProvider>,
     )
 
@@ -197,5 +197,29 @@ describe("NotesReview", () => {
     renderComponent()
 
     expect(screen.getByText("1/2")).toBeTruthy()
+  })
+
+  test("renders configured badges for the current note", () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          {
+            id: "1",
+            folder: "daily",
+            frontmatter: { genre: ["thriller"], type: "book" },
+            obsidianUrl: "obsidian://note-1",
+            title: "Note 1",
+          },
+        ],
+      },
+    })
+    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    readStatesFor(["1"], [])
+
+    renderComponent(["folder", "frontmatter.type", "frontmatter.genre"])
+
+    expect(screen.getByText("daily")).toBeTruthy()
+    expect(screen.getByText("book")).toBeTruthy()
+    expect(screen.getByText("thriller")).toBeTruthy()
   })
 })

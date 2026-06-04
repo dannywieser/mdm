@@ -14,7 +14,8 @@
           "folder": "downtime",
           "frontmatter.type": "book"
         }
-      ]
+      ],
+      "badges": ["folder", "frontmatter.type", "frontmatter.genre"]
     }
   ],
   "flags": {

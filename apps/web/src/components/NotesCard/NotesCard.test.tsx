@@ -64,10 +64,10 @@ const linkedNoteFixture: Note = {
   title: "Linked Note Title",
 }
 
-const renderCard = (note: Note) =>
+const renderCard = (note: Note, badges: string[] = []) =>
   render(
     <ChakraProvider value={defaultSystem}>
-      <NotesCard note={note} />
+      <NotesCard badges={badges} note={note} />
     </ChakraProvider>,
   )
 
@@ -223,5 +223,23 @@ describe("NotesCard", () => {
     fireEvent.click(screen.getByRole("button", { name: "notes.markAsRead" }))
 
     expect(mutateMock).toHaveBeenCalledTimes(1)
+  })
+
+  test("renders configured badges for the note", () => {
+    renderCard(
+      {
+        ...noteFixture,
+        frontmatter: {
+          genre: ["thriller", "classic"],
+          type: "book",
+        },
+      },
+      ["folder", "frontmatter.type", "frontmatter.genre"],
+    )
+
+    expect(screen.getByText("daily")).toBeTruthy()
+    expect(screen.getByText("book")).toBeTruthy()
+    expect(screen.getByText("thriller")).toBeTruthy()
+    expect(screen.getByText("classic")).toBeTruthy()
   })
 })
