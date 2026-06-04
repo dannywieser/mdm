@@ -28,6 +28,7 @@ export const createImageHandler = (
     const resolvedImagePath = resolveImagePath(sourcePath)
 
     if (!resolvedImagePath) {
+      console.error("[image-server] invalid path rejected", { sourcePath })
       response.status(400).json({ error: "A valid local image path is required" })
       return
     }
@@ -37,6 +38,7 @@ export const createImageHandler = (
     try {
       const cached = await redisClient.get(cacheKey)
       if (cached) {
+        console.debug("[image-server] cache hit", { resolvedImagePath })
         response.redirect(307, cached)
         return
       }
@@ -51,6 +53,8 @@ export const createImageHandler = (
     })
 
     const redirectUrl = `${config.imgproxyPathPrefix}${upstreamPath}`
+
+    console.debug("[image-server] cache miss, redirecting", { resolvedImagePath, redirectUrl })
 
     try {
       await redisClient.set(cacheKey, redirectUrl, { EX: config.cacheTtlSeconds })
