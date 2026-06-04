@@ -1,8 +1,6 @@
 import { Box, Card, Image, SimpleGrid, Text } from "@chakra-ui/react"
 import { useParams } from "react-router-dom"
 
-import type { FrontmatterValue } from "markdown"
-
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 
 import { AppError } from "../AppError/AppError"
@@ -10,11 +8,7 @@ import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
 import { NoteBadges } from "../NoteBadges/NoteBadges"
 
 import type { NotesGalleryProps, NotesGalleryRouteParamKey } from "./NotesGallery.types"
-
-function getCoverSrc(cover: FrontmatterValue): string {
-  const path = Array.isArray(cover) ? cover[0] : cover
-  return `/images?path=${encodeURIComponent(path)}`
-}
+import { filterNotesWithCovers, getCoverSrc } from "./NotesGallery.util"
 
 export const NotesGallery = ({ badges = [] }: NotesGalleryProps) => {
   const { view } = useParams<NotesGalleryRouteParamKey>()
@@ -23,12 +17,7 @@ export const NotesGallery = ({ badges = [] }: NotesGalleryProps) => {
   if (isLoading) return <LoadingScreen />
   if (error) return <AppError message={error.message} />
 
-  const notesWithCovers = (data?.notes ?? []).filter((note) => {
-    const cover = note.frontmatter?.cover
-    if (cover == null) return false
-    if (Array.isArray(cover)) return cover.length > 0 && cover[0] !== ""
-    return cover !== ""
-  })
+  const notesWithCovers = filterNotesWithCovers(data?.notes ?? [])
 
   return (
     <SimpleGrid columns={{ base: 2, md: 3, lg: 4 }} gap={4} p={6}>
