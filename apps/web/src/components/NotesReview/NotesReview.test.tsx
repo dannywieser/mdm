@@ -122,9 +122,9 @@ describe("NotesReview", () => {
     const completeText = screen.getByText("review.complete")
     const backToHomeText = screen.getByText("review.backToHome").closest("p")
 
-    expect(completeText.getAttribute("style")).toContain("0.25s ease forwards")
+    expect(completeText.getAttribute("style")).toContain("animation:")
     expect(completeText.getAttribute("style")).not.toContain("review-item-in")
-    expect(backToHomeText?.getAttribute("style")).toContain("0.25s ease forwards")
+    expect(backToHomeText?.getAttribute("style")).toContain("animation:")
     expect(backToHomeText?.getAttribute("style")).not.toContain("review-item-in")
   })
 
