@@ -64,8 +64,10 @@ if (require.main === module) {
 
     const app = createApp(cacheClient)
 
+    const { imagesRoot } = resolveImageProxyConfig()
+
     app.listen(port, () => {
-      console.log(`image-server listening on ${port}`)
+      console.log(`image-server listening on ${port}`, { imagesRoot })
     })
   }
 
