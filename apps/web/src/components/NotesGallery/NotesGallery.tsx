@@ -27,6 +27,7 @@ export const NotesGallery = ({ aspectRatio, badges = [] }: NotesGalleryProps) =>
       {notesWithCovers.map((note) => (
         <Box
           key={note.id}
+          alignSelf="start"
           className="group"
           borderRadius="md"
           _focusWithin={{
