@@ -40,14 +40,11 @@ export const NotesGallery = () => {
   return (
     <SimpleGrid columns={{ base: 2, md: 3, lg: 4 }} gap={4} p={6}>
       {notesWithCovers.map((note) => (
+        <a href={note.obsidianUrl} key={note.id} style={{ textDecoration: "none" }}>
         <Card.Root
-          as="a"
-          href={note.obsidianUrl}
-          key={note.id}
           bg="app.panelBackground"
           borderColor="app.border"
           overflow="hidden"
-          style={{ textDecoration: "none" }}
           _hover={{ borderColor: "app.borderHover" }}
         >
           <Image
@@ -67,6 +64,7 @@ export const NotesGallery = () => {
             </Text>
           </Card.Body>
         </Card.Root>
+        </a>
       ))}
     </SimpleGrid>
   )
