@@ -1,0 +1,1 @@
+export type NotesGalleryRouteParamKey = "view"

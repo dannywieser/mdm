@@ -1,3 +1,3 @@
 export type NotesViewRouteParamKey = "view"
 
-export type ViewComponentName = "NotesList" | "NotesReview"
+export type ViewComponentName = "NotesList" | "NotesGallery" | "NotesReview"
