@@ -1,8 +1,14 @@
+export interface ExcludeViewFilter {
+  $exclude: Record<string, string>
+}
+
+export type ViewFilter = ExcludeViewFilter | Record<string, string>
+
 export interface NotesView {
   aspectRatio?: string
   badges?: string[]
   component: string
-  filters: Record<string, string>[]
+  filters: ViewFilter[]
   id: string
   name: string
 }
@@ -29,7 +35,7 @@ export interface AppConfigView {
   aspectRatio?: string
   badges?: string[]
   component: string
-  filters: Record<string, string>[]
+  filters: ViewFilter[]
   id: string
   name: string
 }
