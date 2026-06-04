@@ -36,6 +36,20 @@ export const ColorPaletteProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [palette])
 
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)")
+
+    const apply = (dark: boolean) => {
+      document.documentElement.classList.toggle("dark", dark)
+    }
+
+    apply(media.matches)
+
+    const onChange = (e: MediaQueryListEvent) => apply(e.matches)
+    media.addEventListener("change", onChange)
+    return () => media.removeEventListener("change", onChange)
+  }, [])
+
   const system = useMemo(
     () => colorPaletteSystems[palette] ?? defaultColorPaletteSystem,
     [palette],
