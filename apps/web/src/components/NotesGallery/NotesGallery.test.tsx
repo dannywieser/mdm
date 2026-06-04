@@ -101,6 +101,8 @@ describe("NotesGallery", () => {
     renderGallery()
 
     const img = screen.getByRole("img", { name: "Array Cover" })
-    expect(img.getAttribute("src")).toBe("https://example.com/first.jpg")
+    expect(img.getAttribute("src")).toBe(
+      `/images?path=${encodeURIComponent("https://example.com/first.jpg")}`,
+    )
   })
 })

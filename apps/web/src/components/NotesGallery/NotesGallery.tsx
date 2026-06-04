@@ -11,7 +11,8 @@ import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
 import type { NotesGalleryRouteParamKey } from "./NotesGallery.types"
 
 function getCoverSrc(cover: FrontmatterValue): string {
-  return Array.isArray(cover) ? cover[0] : cover
+  const path = Array.isArray(cover) ? cover[0] : cover
+  return `/images?path=${encodeURIComponent(path)}`
 }
 
 export const NotesGallery = () => {
