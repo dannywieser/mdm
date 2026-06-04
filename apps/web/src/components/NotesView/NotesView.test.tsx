@@ -23,6 +23,12 @@ vi.mock("../NotesReview/NotesReview", () => ({
   ),
 }))
 
+vi.mock("../NoteSummaryList/NoteSummaryList", () => ({
+  NoteSummaryList: ({ badges }: { badges?: string[] }) => (
+    <div>{`note-summary-list:${badges?.join(",") ?? ""}`}</div>
+  ),
+}))
+
 const renderNotesView = (path: string) =>
   render(
     <ChakraProvider value={defaultSystem}>
@@ -71,5 +77,27 @@ describe("NotesView", () => {
     renderNotesView("/notes/unknown")
 
     expect(screen.getByText("notes-list:")).toBeTruthy()
+  })
+
+  test("renders NoteSummaryList when configured component is NoteSummaryList", () => {
+    useStatsQueryMock.mockReturnValue({
+      data: {
+        modifiedToday: 0,
+        totalNotes: 1,
+        views: [
+          {
+            component: "NoteSummaryList",
+            count: 1,
+            badges: ["folder", "frontmatter.genre"],
+            id: "books",
+            name: "Books",
+          },
+        ],
+      },
+    })
+
+    renderNotesView("/notes/books")
+
+    expect(screen.getByText("note-summary-list:folder,frontmatter.genre")).toBeTruthy()
   })
 })
