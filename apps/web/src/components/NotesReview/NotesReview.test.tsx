@@ -112,6 +112,22 @@ describe("NotesReview", () => {
     expect(screen.getByText("review.complete")).toBeTruthy()
   })
 
+  test("uses component-local animation for completion state text", () => {
+    useNotesQueryMock.mockReturnValue({ data: { notes: [] } })
+    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    noReadStates()
+
+    renderComponent()
+
+    const completeText = screen.getByText("review.complete")
+    const backToHomeText = screen.getByText("review.backToHome").closest("p")
+
+    expect(completeText.getAttribute("style")).toContain("0.25s ease forwards")
+    expect(completeText.getAttribute("style")).not.toContain("review-item-in")
+    expect(backToHomeText?.getAttribute("style")).toContain("0.25s ease forwards")
+    expect(backToHomeText?.getAttribute("style")).not.toContain("review-item-in")
+  })
+
   test("starts at the first unread note when read states are settled", () => {
     useNotesQueryMock.mockReturnValue({
       data: {
