@@ -1,4 +1,5 @@
 export interface NotesView {
+  aspectRatio?: string
   badges?: string[]
   component: string
   filters: Record<string, string>[]
@@ -25,6 +26,7 @@ export interface AppConfig {
 }
 
 export interface AppConfigView {
+  aspectRatio?: string
   badges?: string[]
   component: string
   filters: Record<string, string>[]

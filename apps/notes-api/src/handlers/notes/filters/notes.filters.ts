@@ -128,11 +128,6 @@ const matchesViewFilters = <T extends FilterableNote>(
   Object.entries(filters).every(([filterPath, expectedValue]) => {
     const noteValue = getValueByPath(note, filterPath)
     const matches = isMatchingFilterValue(noteValue, expectedValue, context)
-    if (matches) {
-      console.log(
-        `[notes/filter] "${note.basename}" included: ${filterPath}=${JSON.stringify(noteValue)} matched expected="${expectedValue}"`,
-      )
-    }
     return matches
   })
 

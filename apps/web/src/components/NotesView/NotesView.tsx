@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom"
 
 import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
 
+import { NotesGallery } from "../NotesGallery/NotesGallery"
 import { NotesList } from "../NotesList/NotesList"
 import { NotesReview } from "../NotesReview/NotesReview"
 
@@ -12,11 +13,13 @@ import type {
 } from "./NotesView.types"
 
 interface ViewComponentProps {
+  aspectRatio?: string
   badges?: string[]
 }
 
 const VIEW_COMPONENTS: Record<ViewComponentName, ComponentType<ViewComponentProps>> = {
   NotesList,
+  NotesGallery,
   NotesReview,
 }
 
@@ -29,5 +32,5 @@ export const NotesView = () => {
   const SelectedComponent =
     (componentName && VIEW_COMPONENTS[componentName]) ?? NotesList
 
-  return <SelectedComponent badges={configuredView?.badges} key={view} />
+  return <SelectedComponent aspectRatio={configuredView?.aspectRatio} badges={configuredView?.badges} key={view} />
 }

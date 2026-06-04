@@ -9,11 +9,10 @@ import {
 import { Link } from "react-router-dom"
 
 import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
-import { useI18n } from "../../i18n"
 
 import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
+import { getViewGridColumns } from "./Home.util"
 export function Home() {
-  const { t } = useI18n()
   const { data, isLoading } = useStatsQuery({})
 
   return (
@@ -24,51 +23,40 @@ export function Home() {
       {data && (
         <SimpleGrid
           color="app.textMuted"
-          columns={{ base: 2, md: 4 }}
-          gap={1}
+          columns={{ base: Math.min(2, getViewGridColumns(data.views.length)), md: getViewGridColumns(data.views.length) }}
+          gap={2}
           textAlign="center"
         >
-          <StatRoot
-            borderColor="app.border"
-            borderRadius="md"
-            borderWidth="1px"
-            px={3}
-            py={2}
-            size="sm"
-          >
-            <StatLabel>{t("home.notes")}</StatLabel>
-            <StatValueText>{data.totalNotes}</StatValueText>
-          </StatRoot>
-          <StatRoot
-            borderColor="app.border"
-            borderRadius="md"
-            borderWidth="1px"
-            px={3}
-            py={2}
-            size="sm"
-          >
-            <StatLabel>{t("home.modifiedToday")}</StatLabel>
-            <StatValueText>{data.modifiedToday}</StatValueText>
-          </StatRoot>
           {data.views.map((view) => (
-            <Link
+            <Box
               key={view.id}
-              style={{ textDecoration: "none" }}
-              to={`/notes/${view.id}`}
+              borderRadius="md"
+              _focusWithin={{
+                outlineWidth: "2px",
+                outlineStyle: "solid",
+                outlineColor: "app.accent",
+                outlineOffset: "2px",
+              }}
             >
-              <StatRoot
-                borderColor="app.border"
-                borderRadius="md"
-                borderWidth="1px"
-                px={3}
-                py={2}
-                size="sm"
-                _hover={{ borderColor: "app.borderHover" }}
+              <Link
+                style={{ textDecoration: "none", outline: "none" }}
+                to={`/notes/${view.id}`}
               >
-                <StatLabel>{view.name}</StatLabel>
-                <StatValueText>{view.count}</StatValueText>
-              </StatRoot>
-            </Link>
+                <StatRoot
+                  borderColor="app.border"
+                  borderRadius="md"
+                  borderWidth="1px"
+                  backgroundColor="app.panelBackground"
+                  px={3}
+                  py={2}
+                  size="sm"
+                  _hover={{ borderColor: "app.borderHover" }}
+                >
+                  <StatLabel>{view.name}</StatLabel>
+                  <StatValueText>{view.count}</StatValueText>
+                </StatRoot>
+              </Link>
+            </Box>
           ))}
         </SimpleGrid>
       )}

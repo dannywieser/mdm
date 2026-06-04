@@ -17,6 +17,14 @@ const createPaletteSystem = (paletteName: ColorPaletteName) => {
       },
     },
     theme: {
+      slotRecipes: {
+        stat: {
+          slots: ["root", "indicator", "label", "valueText", "helpText", "valueUnit"],
+          base: {
+            label: { color: "app.text" },
+          },
+        },
+      },
       semanticTokens: {
         colors: {
           app: {
