@@ -2,6 +2,14 @@ import type { NoteFrontmatter, ParsedFrontMatter } from "../types"
 
 const FRONTMATTER_DELIMITER = "---"
 
+// Matches [[path]] and [[path|alias]], with or without surrounding double quotes
+const WIKILINK_RE = /^"?\[\[([^\]|]+)(?:\|[^\]]*)?]]"?$/
+
+export const resolveObsidianFrontmatterValue = (value: string): string => {
+  const match = WIKILINK_RE.exec(value)
+  return match ? match[1].trim() : value
+}
+
 export const parseFrontMatter = (source: string): ParsedFrontMatter => {
   const lines = source.split(/\r?\n/)
 
@@ -40,7 +48,7 @@ const toFrontmatter = (lines: string[]): NoteFrontmatter => {
     if (currentArrayKey && trimmedLine.startsWith("-")) {
       frontmatter[currentArrayKey] = [
         ...(frontmatter[currentArrayKey] as string[]),
-        trimmedLine.replace(/^-\s*/, "")
+        resolveObsidianFrontmatterValue(trimmedLine.replace(/^-\s*/, ""))
       ]
       continue
     }
@@ -61,7 +69,7 @@ const toFrontmatter = (lines: string[]): NoteFrontmatter => {
     }
 
     if (value) {
-      frontmatter[key] = value
+      frontmatter[key] = resolveObsidianFrontmatterValue(value)
       currentArrayKey = null
       continue
     }

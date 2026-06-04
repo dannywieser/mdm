@@ -1,4 +1,28 @@
-import { parseFrontMatter } from "./parseFrontMatter"
+import { parseFrontMatter, resolveObsidianFrontmatterValue } from "./parseFrontMatter"
+
+describe("resolveObsidianFrontmatterValue", () => {
+  test("returns plain values unchanged", () => {
+    expect(resolveObsidianFrontmatterValue("2026.05.26")).toBe("2026.05.26")
+  })
+
+  test("resolves an unquoted wikilink", () => {
+    expect(resolveObsidianFrontmatterValue("[[attachments/cover.jpg]]")).toBe("attachments/cover.jpg")
+  })
+
+  test("resolves a quoted wikilink", () => {
+    expect(resolveObsidianFrontmatterValue('"[[attachments/cover.jpg]]"')).toBe("attachments/cover.jpg")
+  })
+
+  test("resolves a wikilink with an alias, discarding the alias", () => {
+    expect(resolveObsidianFrontmatterValue("[[attachments/cover.jpg|My Image]]")).toBe("attachments/cover.jpg")
+  })
+
+  test("resolves a wikilink with spaces in the path", () => {
+    expect(resolveObsidianFrontmatterValue('"[[attachments/The Faith of Beasts/cover.jpg]]"')).toBe(
+      "attachments/The Faith of Beasts/cover.jpg"
+    )
+  })
+})
 
 describe("parseFrontMatter", () => {
   test("returns null frontmatter when no leading block exists", () => {
@@ -35,6 +59,20 @@ Body.`)
       body: "# Welcome\n\nBody.",
       frontmatter: {
         topic: ["AI"]
+      }
+    })
+  })
+
+  test("resolves obsidian wikilink values in frontmatter", () => {
+    expect(
+      parseFrontMatter(`---
+cover: "[[attachments/downtime/The Faith of Beasts/cover.jpg]]"
+---
+Body.`)
+    ).toEqual({
+      body: "Body.",
+      frontmatter: {
+        cover: "attachments/downtime/The Faith of Beasts/cover.jpg"
       }
     })
   })
