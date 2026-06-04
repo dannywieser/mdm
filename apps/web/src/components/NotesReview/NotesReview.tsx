@@ -103,7 +103,7 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
                     key={note.id}
                     color="fg.muted"
                     fontSize="sm"
-                    style={{
+                    css={{
                       animation: `${reviewItemIn} 0.25s ease forwards`,
                       animationDelay: `${i * 0.06}s`,
                       opacity: 0,
@@ -117,7 +117,7 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
             <Text
               fontSize="lg"
               fontWeight="semibold"
-              style={{
+              css={{
                 animation: `${reviewItemIn} 0.25s ease forwards`,
                 animationDelay: `${reviewedNotes.length * 0.06 + 0.1}s`,
                 opacity: 0,
@@ -127,7 +127,7 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
             </Text>
             <Text
               fontSize="sm"
-              style={{
+              css={{
                 animation: `${reviewItemIn} 0.25s ease forwards`,
                 animationDelay: `${reviewedNotes.length * 0.06 + 0.3}s`,
                 opacity: 0,
