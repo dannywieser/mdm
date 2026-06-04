@@ -45,7 +45,12 @@ export const NotesGallery = ({ badges = [] }: NotesGalleryProps) => {
   return (
     <SimpleGrid columns={{ base: 2, md: 3, lg: 4 }} gap={4} p={6}>
       {notesWithCovers.map((note) => (
-        <a href={note.obsidianUrl} key={note.id} style={{ textDecoration: "none" }}>
+        <Box
+          key={note.id}
+          borderRadius="md"
+          _focusWithin={{ outlineWidth: "2px", outlineStyle: "solid", outlineColor: "app.accent", outlineOffset: "2px" }}
+        >
+        <a href={note.obsidianUrl} style={{ textDecoration: "none", outline: "none" }}>
           <Card.Root
             data-group
             bg="app.panelBackground"
@@ -78,6 +83,7 @@ export const NotesGallery = ({ badges = [] }: NotesGalleryProps) => {
             </Box>
           </Card.Root>
         </a>
+        </Box>
       ))}
     </SimpleGrid>
   )
