@@ -47,12 +47,12 @@ export const NotesGallery = ({ badges = [] }: NotesGalleryProps) => {
       {notesWithCovers.map((note) => (
         <Box
           key={note.id}
+          className="group"
           borderRadius="md"
           _focusWithin={{ outlineWidth: "2px", outlineStyle: "solid", outlineColor: "app.accent", outlineOffset: "2px" }}
         >
         <a href={note.obsidianUrl} style={{ textDecoration: "none", outline: "none" }}>
           <Card.Root
-            className="group"
             bg="app.panelBackground"
             borderColor="app.border"
             overflow="hidden"
