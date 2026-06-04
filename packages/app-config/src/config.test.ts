@@ -95,6 +95,7 @@ describe("config", () => {
         obsidianVault: "vault",
         views: [
           {
+            badges: ["folder", "frontmatter.type"],
             component: "NotesList",
             filters: [
               {
@@ -117,6 +118,7 @@ describe("config", () => {
       timezone: "UTC",
       views: [
         {
+          badges: ["folder", "frontmatter.type"],
           component: "NotesList",
           filters: [
             {
@@ -327,7 +329,31 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json views must be an array of objects with non-empty id, name, component, and string filters",
+        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and string filters",
+      ),
+    )
+  })
+
+  test("throws when view badges is invalid", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault",
+        views: [
+          {
+            badges: ["folder", ""],
+            component: "NotesList",
+            filters: [{ folder: "downtime" }],
+            id: "books",
+            name: "Books",
+          },
+        ],
+      }),
+    )
+
+    await expect(resolveNotesDirectory()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and string filters",
       ),
     )
   })

@@ -1,4 +1,5 @@
 export interface NotesView {
+  badges?: string[]
   component: string
   filters: Record<string, string>[]
   id: string
@@ -24,6 +25,7 @@ export interface AppConfig {
 }
 
 export interface AppConfigView {
+  badges?: string[]
   component: string
   filters: Record<string, string>[]
   id: string

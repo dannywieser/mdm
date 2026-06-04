@@ -60,6 +60,7 @@ describe("stats util", () => {
       const notes = [createNote("2026-06-01T10:00:00.000Z")]
       const views = [
         {
+          badges: ["folder", "frontmatter.type"],
           component: "NotesList",
           filters: [{ "frontmatter.type": "book" }],
           id: "books",
@@ -81,7 +82,13 @@ describe("stats util", () => {
       const result = buildViewCounts(notes, views, context)
 
       expect(result).toEqual([
-        { component: "NotesList", count: 1, id: "books", name: "Books" },
+        {
+          badges: ["folder", "frontmatter.type"],
+          component: "NotesList",
+          count: 1,
+          id: "books",
+          name: "Books",
+        },
         {
           component: "NotesReview",
           count: 0,

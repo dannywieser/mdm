@@ -12,11 +12,15 @@ vi.mock("../../hooks/useStatsQuery/useStatsQuery", () => ({
 }))
 
 vi.mock("../NotesList/NotesList", () => ({
-  NotesList: () => <div>notes-list</div>,
+  NotesList: ({ badges }: { badges?: string[] }) => (
+    <div>{`notes-list:${badges?.join(",") ?? ""}`}</div>
+  ),
 }))
 
 vi.mock("../NotesReview/NotesReview", () => ({
-  NotesReview: () => <div>notes-review</div>,
+  NotesReview: ({ badges }: { badges?: string[] }) => (
+    <div>{`notes-review:${badges?.join(",") ?? ""}`}</div>
+  ),
 }))
 
 const renderNotesView = (path: string) =>
@@ -40,6 +44,7 @@ describe("NotesView", () => {
           {
             component: "NotesReview",
             count: 1,
+            badges: ["folder", "frontmatter.type"],
             id: "today",
             name: "Today",
           },
@@ -49,7 +54,7 @@ describe("NotesView", () => {
 
     renderNotesView("/notes/today")
 
-    expect(screen.getByText("notes-review")).toBeTruthy()
+    expect(screen.getByText("notes-review:folder,frontmatter.type")).toBeTruthy()
   })
 
   test("falls back to NotesList when component is missing", () => {
@@ -65,6 +70,6 @@ describe("NotesView", () => {
 
     renderNotesView("/notes/unknown")
 
-    expect(screen.getByText("notes-list")).toBeTruthy()
+    expect(screen.getByText("notes-list:")).toBeTruthy()
   })
 })

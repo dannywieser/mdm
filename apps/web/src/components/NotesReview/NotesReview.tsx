@@ -13,14 +13,16 @@ import { useI18n } from "../../i18n"
 import type { NotesReviewRouteParamKey } from "./NotesReview.types"
 import { LinkedNotesList } from "../LinkedNotesList/LinkedNotesList"
 import { MarkdownTree } from "../MarkdownTree/MarkdownTree"
+import { NoteBadges } from "../NoteBadges/NoteBadges"
 import {
   NotesReviewTableOfContentsMobileTrigger,
   NotesReviewTableOfContentsSidebar,
 } from "./NotesReviewTableOfContents"
 import { OpenInObsidianButton } from "../OpenInObsidianButton/OpenInObsidianButton"
 import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
+import type { NotesReviewProps } from "./NotesReview.types"
 
-export const NotesReview = () => {
+export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
   const { view } = useParams<NotesReviewRouteParamKey>()
   const { data } = useNotesQuery({ view })
   const { t } = useI18n()
@@ -156,6 +158,7 @@ export const NotesReview = () => {
         </Flex>
 
         <MarkdownTree content={currentNote!.content} />
+        <NoteBadges badges={badges} note={currentNote!} />
         <LinkedNotesList notes={currentNote!.linkedNotes ?? []} />
         <Flex
           flexDirection={{ base: "column", sm: "row" }}

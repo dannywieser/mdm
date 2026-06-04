@@ -11,7 +11,13 @@ vi.mock("../../hooks/useNotesQuery/useNotesQuery", () => ({
 }))
 
 vi.mock("../NotesCard/NotesCard", () => ({
-  NotesCard: ({ note }: { note: { title: string } }) => <div>{note.title}</div>,
+  NotesCard: ({
+    note,
+    badges,
+  }: {
+    badges?: string[]
+    note: { title: string }
+  }) => <div>{`${note.title}:${badges?.join(",") ?? ""}`}</div>,
 }))
 
 vi.mock("../LoadingScreen/LoadingScreen", () => ({
@@ -68,11 +74,11 @@ describe("NotesList", () => {
 
     render(
       <ChakraProvider value={defaultSystem}>
-        <NotesList />
+        <NotesList badges={["folder"]} />
       </ChakraProvider>,
     )
 
-    expect(screen.getByText("Note 1")).toBeTruthy()
-    expect(screen.getByText("Note 2")).toBeTruthy()
+    expect(screen.getByText("Note 1:folder")).toBeTruthy()
+    expect(screen.getByText("Note 2:folder")).toBeTruthy()
   })
 })

@@ -142,6 +142,7 @@ This repository is a Turborepo monorepo with this structure:
     - `name`: human-readable label shown in the UI
     - `component`: component name that the web app renders for that view (for example `NotesList` or `NotesReview`)
     - `filters`: array of filter groups. Within each group, conditions are ANDed; across groups, matches are ORed.
+    - `badges` (optional): array of note property paths to render as badges in the UI, such as `folder` or `frontmatter.type`
   - `flags`: object keyed by allowed flag names. Each flag definition supports optional `expiresInSeconds` (positive integer) to set Redis TTL, or omit it for non-expiring flags.
 
 ## Docker Compose deployment

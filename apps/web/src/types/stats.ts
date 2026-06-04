@@ -1,4 +1,5 @@
 export interface StatsViewCount {
+  badges?: string[]
   component: string
   count: number
   id: string

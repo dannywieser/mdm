@@ -10,11 +10,12 @@ import { useIsRead } from "../../hooks/useIsRead/useIsRead"
 import { LinkedNotesList } from "../LinkedNotesList/LinkedNotesList"
 import { OpenInObsidianButton } from "../OpenInObsidianButton/OpenInObsidianButton"
 import { MarkdownTree } from "../MarkdownTree/MarkdownTree"
+import { NoteBadges } from "../NoteBadges/NoteBadges"
 import { ToggleReadButton } from "../ToggleReadButton/ToggleReadButton"
 
 import type { NotesCardProps } from "./NotesCard.types"
 
-export const NotesCard = ({ note }: NotesCardProps) => {
+export const NotesCard = ({ note, badges = [] }: NotesCardProps) => {
   const { data: isRead } = useIsRead({ noteId: note.id })
   const isCollapsed = isRead ?? false
 
@@ -22,7 +23,10 @@ export const NotesCard = ({ note }: NotesCardProps) => {
     <Card.Root bg="app.panelBackground" color="app.text">
       <Card.Header py="2">
         <Flex align="center" justify="space-between">
-          <Heading size="md">{note.title}</Heading>
+          <Flex direction="column" gap="2" minWidth="0">
+            <Heading size="md">{note.title}</Heading>
+            <NoteBadges badges={badges} note={note} />
+          </Flex>
           <Flex gap="1" shrink={0}>
             <ToggleReadButton isRead={isCollapsed} noteId={note.id} />
             <OpenInObsidianButton note={note} />
