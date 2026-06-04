@@ -20,7 +20,7 @@ export const NotesGallery = ({ badges = [] }: NotesGalleryProps) => {
   const notesWithCovers = filterNotesWithCovers(data?.notes ?? [])
 
   return (
-    <SimpleGrid columns={{ base: 2, md: 3, lg: 4 }} gap={4} p={6}>
+    <SimpleGrid columns={{ base: 1, md: 3, lg: 4 }} gap={4} p={6}>
       {notesWithCovers.map((note) => (
         <Box
           key={note.id}
