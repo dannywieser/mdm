@@ -13,6 +13,7 @@ import type {
 } from "./NotesView.types"
 
 interface ViewComponentProps {
+  aspectRatio?: string
   badges?: string[]
 }
 
@@ -31,5 +32,5 @@ export const NotesView = () => {
   const SelectedComponent =
     (componentName && VIEW_COMPONENTS[componentName]) ?? NotesList
 
-  return <SelectedComponent badges={configuredView?.badges} key={view} />
+  return <SelectedComponent aspectRatio={configuredView?.aspectRatio} badges={configuredView?.badges} key={view} />
 }

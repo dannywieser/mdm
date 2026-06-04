@@ -1,4 +1,5 @@
 export interface StatsViewCount {
+  aspectRatio?: string
   badges?: string[]
   component: string
   count: number
