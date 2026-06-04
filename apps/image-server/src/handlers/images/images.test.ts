@@ -13,6 +13,7 @@ const makeRedisClient = (cached: string | null = null): ImageRedisClient => ({
 
 const testConfig = {
   cacheTtlSeconds: 86400,
+  imgproxyEnabled: true,
   imgproxyPathPrefix: "/imgproxy",
   imagesRoot: "/data/images",
   maxWidth: 1200,
@@ -44,6 +45,26 @@ describe("images handler", () => {
     expect(response.status).toBe(307)
     expect(response.header.location).toBe(expectedUrl)
     expect(redisClient.set).not.toHaveBeenCalled()
+  })
+
+  test("serves file directly when imgproxy is disabled", async () => {
+    const app = express()
+    app.get(
+      "/images",
+      createImageHandler(
+        { ...testConfig, imgproxyEnabled: false, imagesRoot: "/tmp" },
+        makeRedisClient(),
+      ),
+    )
+
+    const response = await request(app)
+      .get("/images")
+      .query({ path: "photo.jpg" })
+
+    // sendFile will 404 since /tmp/photo.jpg doesn't exist in tests,
+    // but the important thing is it never redirected to imgproxy
+    expect(response.status).not.toBe(307)
+    expect(response.header.location).toBeUndefined()
   })
 
   test("redirects and caches the url on cache miss", async () => {
