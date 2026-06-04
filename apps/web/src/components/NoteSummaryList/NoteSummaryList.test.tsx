@@ -1,7 +1,7 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
 import { render, screen } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
-import { describe, expect, test, vi } from "vitest"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 
 import { NoteSummaryList } from "./NoteSummaryList"
 
@@ -38,11 +38,13 @@ const renderSummaryList = (badges: string[] = []) =>
   )
 
 describe("NoteSummaryList", () => {
-  test("renders the loading screen while fetching", () => {
+  beforeEach(() => {
     resolveBadgeValuesMock.mockReset()
     getColumnLabelMock.mockReset()
     getColumnLabelMock.mockImplementation((badge: string) => badge)
+  })
 
+  test("renders the loading screen while fetching", () => {
     useNotesQueryMock.mockReturnValue({
       data: undefined,
       error: undefined,
@@ -55,10 +57,6 @@ describe("NoteSummaryList", () => {
   })
 
   test("renders an error state", () => {
-    resolveBadgeValuesMock.mockReset()
-    getColumnLabelMock.mockReset()
-    getColumnLabelMock.mockImplementation((badge: string) => badge)
-
     useNotesQueryMock.mockReturnValue({
       data: undefined,
       error: new Error("Request failed"),
@@ -72,8 +70,6 @@ describe("NoteSummaryList", () => {
   })
 
   test("renders summary table with dynamic badge columns", () => {
-    resolveBadgeValuesMock.mockReset()
-    getColumnLabelMock.mockReset()
     getColumnLabelMock.mockImplementation((badge: string) => badge.split(".").at(-1) ?? badge)
     resolveBadgeValuesMock.mockImplementation((note: { id: string }, badge: string) => {
       const values: Record<string, string[]> = {
@@ -130,6 +126,14 @@ describe("NoteSummaryList", () => {
     expect(getColumnLabelMock).toHaveBeenCalledWith("folder")
     expect(getColumnLabelMock).toHaveBeenCalledWith("frontmatter.type")
     expect(getColumnLabelMock).toHaveBeenCalledWith("frontmatter.genre")
-    expect(resolveBadgeValuesMock).toHaveBeenCalled()
+    expect(resolveBadgeValuesMock).toHaveBeenCalledTimes(6)
+    expect(resolveBadgeValuesMock).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "1", title: "Book One" }),
+      "folder",
+    )
+    expect(resolveBadgeValuesMock).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "2", title: "Book Two" }),
+      "frontmatter.genre",
+    )
   })
 })
