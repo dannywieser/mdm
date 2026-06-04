@@ -1,0 +1,19 @@
+{
+  "name": "habit-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/server.js",
+  "scripts": {
+    "prebuild": "turbo run build --filter=habit-tracker^...",
+    "predev": "turbo run build --filter=habit-tracker^...",
+    "pretest": "turbo run build --filter=habit-tracker^...",
+    "dev": "tsx watch --env-file=../../.env src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "express": "5.2.1",
+    "morgan": "1.10.1"
+  }
+}
