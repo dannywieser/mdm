@@ -52,7 +52,7 @@ export const NotesGallery = ({ badges = [] }: NotesGalleryProps) => {
         >
         <a href={note.obsidianUrl} style={{ textDecoration: "none", outline: "none" }}>
           <Card.Root
-            data-group
+            className="group"
             bg="app.panelBackground"
             borderColor="app.border"
             overflow="hidden"
