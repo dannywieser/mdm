@@ -1,5 +1,22 @@
 # notes-api
 
+## 1.5.0
+
+### Minor Changes
+
+- 7d451d4: Add optional `badges` support to view configuration and propagate it through stats/view rendering so NotesList and NotesReview can show note badges from note properties and frontmatter values (including frontmatter arrays).
+- 678abdf: Add support for exclusion filter groups via `$exclude` and missing-property matches via `$missing` in view filters.
+
+### Patch Changes
+
+- Updated dependencies [7d451d4]
+- Updated dependencies [678abdf]
+- Updated dependencies [bbc93bc]
+- Updated dependencies [28e9b81]
+  - app-config@1.5.0
+  - markdown@1.5.0
+  - mdm-util@1.5.0
+
 ## 1.4.0
 
 ### Patch Changes
