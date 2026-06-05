@@ -15,6 +15,10 @@ vi.mock("../PaletteSelector/PaletteSelector", () => ({
   PaletteSelector: () => <div data-testid="palette-selector" />,
 }))
 
+vi.mock("../../i18n", () => ({
+  useI18n: () => ({ t: (key: string) => key }),
+}))
+
 vi.mock("../../hooks/useStatsQuery/useStatsQuery", () => ({
   useStatsQuery: () => ({
     data: {
@@ -46,7 +50,7 @@ describe("Header", () => {
   test("renders app name and formatted date", () => {
     renderAt("/")
 
-    expect(screen.getByText("mdm")).toBeTruthy()
+    expect(screen.getByText("app.name")).toBeTruthy()
     expect(screen.getByText("2026-06-01")).toBeTruthy()
     expect(screen.getByTestId("palette-selector")).toBeTruthy()
   })
@@ -54,22 +58,22 @@ describe("Header", () => {
   test("shows app name as current breadcrumb on home route", () => {
     renderAt("/")
 
-    const mdmEl = screen.getByText("mdm")
-    expect(mdmEl).toBeTruthy()
-    expect(mdmEl.getAttribute("aria-current")).toBe("page")
+    const appNameEl = screen.getByText("app.name")
+    expect(appNameEl).toBeTruthy()
+    expect(appNameEl.getAttribute("aria-current")).toBe("page")
   })
 
-  test("shows mdm as a link and view name as current breadcrumb on notes route", () => {
+  test("shows app name as a link and view name as current breadcrumb on notes route", () => {
     renderAt("/notes/daily")
 
-    expect(screen.getByRole("link", { name: "mdm" })).toBeTruthy()
+    expect(screen.getByRole("link", { name: "app.name" })).toBeTruthy()
     expect(screen.getByText("daily review")).toBeTruthy()
   })
 
   test("shows correct view name for different views", () => {
     renderAt("/notes/downtime-active")
 
-    expect(screen.getByRole("link", { name: "mdm" })).toBeTruthy()
+    expect(screen.getByRole("link", { name: "app.name" })).toBeTruthy()
     expect(screen.getByText("active downtime")).toBeTruthy()
   })
 })
