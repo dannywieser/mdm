@@ -2,8 +2,8 @@ import path from "node:path"
 
 const EXTERNAL_SOURCE_PATTERN = /^[a-zA-Z][a-zA-Z\d+.-]*:/
 
-export const DEFAULT_MAX_WIDTH = 1600
-export const DEFAULT_MAX_HEIGHT = 1200
+export const DEFAULT_MAX_WIDTH = 1024
+export const DEFAULT_MAX_HEIGHT = 768
 
 interface BuildImgproxyUrlOptions {
   imagePath: string
