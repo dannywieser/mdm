@@ -58,7 +58,14 @@ Changesets are **not** required for:
 
 **Agent exit criteria**: before completing any task that touches production source files (`apps/`, `packages/`), you must either:
 
-1. Run `npm run changeset` from the repository root, select the appropriate bump type (`patch` / `minor` / `major`), write a concise summary of the user-visible change, and commit the generated `.changeset/*.md` file alongside your other changes, **or**
+1. Create the changeset file manually — do **not** run `npm run changeset` (the interactive CLI does not work in non-TTY agent environments). Instead, write a file directly to `.changeset/<descriptive-slug>.md` with this frontmatter format:
+   ```
+   ---
+   "web": patch
+   ---
+   One-sentence description of the user-visible change.
+   ```
+   Choose `patch`, `minor`, or `major` as appropriate, and commit the file alongside your other changes, **or**
 2. Explicitly state in your final response why no changeset was needed (e.g. "test-only change — no changeset required").
 
 ## express api guidelines
