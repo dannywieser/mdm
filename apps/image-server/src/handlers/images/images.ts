@@ -20,8 +20,8 @@ export interface ImageProxyConfig {
   maxHeight: number
 }
 
-const buildCacheKey = (resolvedPath: string, maxWidth: number): string =>
-  `image:${resolvedPath}:${maxWidth}`
+const buildCacheKey = (resolvedPath: string, maxWidth: number, maxHeight: number): string =>
+  `image:${resolvedPath}:${maxWidth}:${maxHeight}`
 
 export const createImageHandler = (
   config: ImageProxyConfig,
@@ -45,7 +45,7 @@ export const createImageHandler = (
       return
     }
 
-    const cacheKey = buildCacheKey(resolvedImagePath, config.maxWidth)
+    const cacheKey = buildCacheKey(resolvedImagePath, config.maxWidth, config.maxHeight)
 
     try {
       const cached = await redisClient.get(cacheKey)

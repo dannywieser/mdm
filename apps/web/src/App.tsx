@@ -28,9 +28,9 @@ class ErrorBoundary extends Component<
 function AppLayout() {
   return (
     <Box h="100vh" overflow="auto">
-      <Header />
       <ErrorBoundary>
         <Suspense fallback={<LoadingScreen />}>
+          <Header />
           <Outlet />
         </Suspense>
       </ErrorBoundary>

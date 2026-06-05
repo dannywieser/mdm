@@ -151,9 +151,9 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
 
   const appConfig = validateAppConfig(parsedAppConfig)
 
-  const noteRootDirectory = process.env.NOTES_ROOT
+  const noteRootDirectory = process.env.NOTES_ROOT?.trim()
 
-  if (!noteRootDirectory) {
+  if (!isNonEmptyString(noteRootDirectory)) {
     throw new AppConfigError(
       "NOTES_ROOT environment variable is required",
     )

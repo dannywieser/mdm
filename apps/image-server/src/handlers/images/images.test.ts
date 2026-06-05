@@ -80,7 +80,7 @@ describe("images handler", () => {
     expect(response.status).toBe(307)
     expect(response.header.location).toBe(expectedUrl)
     expect(redisClient.set).toHaveBeenCalledWith(
-      "image:daily/photo one.jpg:1200",
+      "image:daily/photo one.jpg:1200:900",
       expectedUrl,
       { EX: 86400 },
     )

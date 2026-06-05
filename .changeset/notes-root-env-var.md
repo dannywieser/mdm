@@ -2,4 +2,4 @@
 "app-config": minor
 ---
 
-`noteRootDirectory` is no longer required in `app.config.json`. Set the `NOTES_ROOT` environment variable instead (env var takes precedence if both are provided). The `imagesRoot` config key has been removed as it was unused — the image-server already reads `IMAGES_ROOT` from the environment.
+`noteRootDirectory` has been removed from `app.config.json` entirely. The notes directory is now configured exclusively via the `NOTES_ROOT` environment variable. The `imagesRoot` config key has also been removed as it was unused — the image-server already reads `IMAGES_ROOT` from the environment.
