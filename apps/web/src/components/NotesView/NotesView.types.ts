@@ -4,4 +4,4 @@ export type ViewComponentName =
   | "NotesList"
   | "NotesGallery"
   | "NotesReview"
-  | "NoteSummaryList"
+  | "NotesSummaryTable"

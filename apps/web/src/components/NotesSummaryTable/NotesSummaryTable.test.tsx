@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { beforeEach, describe, expect, test, vi } from "vitest"
 
-import { NoteSummaryList } from "./NoteSummaryList"
+import { NotesSummaryTable } from "./NotesSummaryTable"
 
 const useNotesQueryMock = vi.fn()
 const resolveBadgeValuesMock = vi.fn()
@@ -13,7 +13,7 @@ vi.mock("../../hooks/useNotesQuery/useNotesQuery", () => ({
   useNotesQuery: () => useNotesQueryMock(),
 }))
 
-vi.mock("./NoteSummaryList.util", () => ({
+vi.mock("./NotesSummaryTable.util", () => ({
   resolveBadgeValues: (...args: unknown[]) => resolveBadgeValuesMock(...args),
   getColumnLabel: (...args: unknown[]) => getColumnLabelMock(...args),
 }))
@@ -31,13 +31,13 @@ const renderSummaryList = (badges: string[] = []) =>
     <ChakraProvider value={defaultSystem}>
       <MemoryRouter initialEntries={["/notes/books"]}>
         <Routes>
-          <Route path="/notes/:view" element={<NoteSummaryList badges={badges} />} />
+          <Route path="/notes/:view" element={<NotesSummaryTable badges={badges} />} />
         </Routes>
       </MemoryRouter>
     </ChakraProvider>,
   )
 
-describe("NoteSummaryList", () => {
+describe("NotesSummaryTable", () => {
   beforeEach(() => {
     resolveBadgeValuesMock.mockReset()
     getColumnLabelMock.mockReset()
