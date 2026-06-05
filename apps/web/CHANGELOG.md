@@ -1,5 +1,18 @@
 # web
 
+## 1.5.0
+
+### Minor Changes
+
+- 7d451d4: Add optional `badges` support to view configuration and propagate it through stats/view rendering so NotesList and NotesReview can show note badges from note properties and frontmatter values (including frontmatter arrays).
+- 28e9b81: Add `NotesGallery` view component that renders notes as an image gallery using `frontmatter.cover` for the cover image. Notes without a cover are excluded. Configure a view with `"component": "NotesGallery"` in `app.config.json` to use it.
+- c8bccce: Add a new `NoteSummaryList` NotesView component that renders matched notes in a table with dynamic badge-driven columns, note links, matched-count header, and back-to-home navigation.
+
+### Patch Changes
+
+- bbc93bc: Replace the header title with a Chakra breadcrumb: on `/notes/:view` it shows `mdm > <view name>` with "mdm" linking home; on the home route it shows just "mdm". Removes the PageTitle context that was previously used to push the current note title into the header from NotesReview.
+  - mdm-util@1.5.0
+
 ## 1.4.0
 
 ### Minor Changes
