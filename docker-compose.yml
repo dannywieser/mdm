@@ -7,6 +7,7 @@ services:
       - notes-api
       - flag-manager
       - image-server
+      - habit-tracker
     ports:
       - "80:80"
 
@@ -35,6 +36,15 @@ services:
       - "3001"
     volumes:
       - ./app.config.json:/app/app.config.json:ro
+
+  habit-tracker:
+    build:
+      context: .
+      dockerfile: infra/docker/habit-tracker.Dockerfile
+    environment:
+      PORT: "3003"
+    expose:
+      - "3003"
 
   image-server:
     build:

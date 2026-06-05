@@ -130,6 +130,24 @@ This repository is a Turborepo monorepo with this structure:
       { "error": "A valid local image path is required" }
       ```
 
+- `apps/habit-tracker`: Express-based API stub for habit data.
+  - `GET /health`
+    - Purpose: basic service health check
+    - Success response: `200`
+      ```json
+      { "status": "ok" }
+      ```
+  - `GET /habit/:key`
+    - Purpose: placeholder route for loading a habit by key
+    - Current response: `200`
+      ```json
+      {}
+      ```
+    - Sample curl command:
+      ```bash
+      curl http://localhost/habit/morning-routine
+      ```
+
 ## Configuration
 
 - Copy `app.config.example.json` to `app.config.json` at repository root.
@@ -151,12 +169,14 @@ This repository is a Turborepo monorepo with this structure:
   - `web` (nginx) on `http://localhost` for static web hosting + `/api` proxy
   - `notes-api` as an internal service on port `3000`
   - `flag-manager` as an internal service on port `3001`
+  - `habit-tracker` as an internal service on port `3003`
   - `image-server` as an internal service on port `3002`
   - `imgproxy` as internal image optimizer used by `image-server`
   - `redis` as internal data storage for `flag-manager`
 - nginx routes:
   - `/api/*` → `notes-api:3000/*`
   - `/flags/*` → `flag-manager:3001/flags/*`
+  - `/habit/*` → `habit-tracker:3003/habit/*`
   - `/images*` → `image-server:3002/images*`
   - `/imgproxy/*` → `imgproxy:8080/*` (used by `image-server` redirects)
 - `app.config.json` is mounted into the API container as `/app/app.config.json` (read-only).
