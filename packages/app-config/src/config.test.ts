@@ -102,6 +102,11 @@ describe("config", () => {
                 folder: "downtime",
                 "frontmatter.type": "book",
               },
+              {
+                $exclude: {
+                  folder: "archive",
+                },
+              },
             ],
             id: "books",
             name: "books",
@@ -124,6 +129,11 @@ describe("config", () => {
             {
               folder: "downtime",
               "frontmatter.type": "book",
+            },
+            {
+              $exclude: {
+                folder: "archive",
+              },
             },
           ],
           id: "books",
@@ -329,7 +339,7 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and string filters",
+        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and filters as string records or $exclude objects",
       ),
     )
   })
@@ -353,7 +363,30 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and string filters",
+        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and filters as string records or $exclude objects",
+      ),
+    )
+  })
+
+  test("throws when exclude filter shape is invalid", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        noteRootDirectory: "/notes-root",
+        obsidianVault: "vault",
+        views: [
+          {
+            component: "NotesList",
+            filters: [{ $exclude: "archive" }],
+            id: "books",
+            name: "Books",
+          },
+        ],
+      }),
+    )
+
+    await expect(resolveNotesDirectory()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and filters as string records or $exclude objects",
       ),
     )
   })

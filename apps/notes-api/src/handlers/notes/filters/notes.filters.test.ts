@@ -168,6 +168,70 @@ describe("notes filter helpers", () => {
     expect(filtered).toEqual([notes[0], notes[1]])
   })
 
+  test("applyViewFilter applies exclusion filters as AND conditions", () => {
+    const notes = [
+      createMockNote("book.md", {
+        folder: "downtime",
+        frontmatter: { type: "book" },
+      }),
+      createMockNote("archive.md", {
+        folder: "archive",
+        frontmatter: { type: "book" },
+      }),
+      createMockNote("game.md", {
+        folder: "downtime",
+        frontmatter: { type: "game" },
+      }),
+    ]
+
+    const filtered = applyViewFilter(
+      notes,
+      [
+        {
+          component: "NotesList",
+          filters: [
+            { "frontmatter.type": "book" },
+            { $exclude: { folder: "archive" } },
+          ],
+          id: "books",
+          name: "books",
+        },
+      ],
+      "books",
+    )
+
+    expect(filtered).toEqual([notes[0]])
+  })
+
+  test("applyViewFilter supports $missing for absent frontmatter properties", () => {
+    const notes = [
+      createMockNote("no-type.md", {
+        frontmatter: { topic: "Reading" },
+      }),
+      createMockNote("has-type.md", {
+        frontmatter: { type: "book" },
+      }),
+      createMockNote("null-frontmatter.md", {
+        frontmatter: null,
+      }),
+    ]
+
+    const filtered = applyViewFilter(
+      notes,
+      [
+        {
+          component: "NotesList",
+          filters: [{ "frontmatter.type": "$missing" }],
+          id: "missing-type",
+          name: "missing-type",
+        },
+      ],
+      "missing-type",
+    )
+
+    expect(filtered).toEqual([notes[0], notes[2]])
+  })
+
   test("applyViewFilter returns all notes when view name is not configured", () => {
     const notes = [createMockNote("book.md"), createMockNote("movie.md")]
 

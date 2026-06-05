@@ -1,4 +1,4 @@
-import type { NotesView } from "app-config"
+import type { ExcludeViewFilter, NotesView, ViewFilter } from "app-config"
 
 import {
   getDateComponents,
@@ -8,7 +8,7 @@ import {
 
 import type { ViewFilterContext } from "./notes.filters.types"
 
-import { ON_THIS_DAY, TODAY } from "./constants"
+import { MISSING, ON_THIS_DAY, TODAY } from "./constants"
 
 type FilterableNote = {
   basename: string
@@ -101,6 +101,10 @@ const isMatchingFilterValue = (
   expectedValue: string,
   context: ViewFilterContext,
 ): boolean => {
+  if (expectedValue === MISSING) {
+    return noteValue === undefined || noteValue === null
+  }
+
   if (expectedValue === ON_THIS_DAY) {
     return matchesOnThisDay(noteValue, context)
   }
@@ -131,6 +135,31 @@ const matchesViewFilters = <T extends FilterableNote>(
     return matches
   })
 
+const isExcludeViewFilter = (filter: ViewFilter): filter is ExcludeViewFilter =>
+  "$exclude" in filter &&
+  filter["$exclude"] !== null &&
+  typeof filter["$exclude"] === "object" &&
+  !Array.isArray(filter["$exclude"])
+
+const splitViewFilters = (
+  viewFilters: readonly ViewFilter[],
+): { excludeFilters: Record<string, string>[]; includeFilters: Record<string, string>[] } =>
+  viewFilters.reduce<{
+    excludeFilters: Record<string, string>[]
+    includeFilters: Record<string, string>[]
+  }>(
+    (accumulator, filter) => {
+      if (isExcludeViewFilter(filter)) {
+        accumulator.excludeFilters.push(filter.$exclude)
+        return accumulator
+      }
+
+      accumulator.includeFilters.push(filter)
+      return accumulator
+    },
+    { excludeFilters: [], includeFilters: [] },
+  )
+
 export const applyViewFilter = <T extends FilterableNote>(
   notes: readonly T[],
   configuredViews: readonly NotesView[],
@@ -147,9 +176,19 @@ export const applyViewFilter = <T extends FilterableNote>(
     return [...notes]
   }
 
-  return notes.filter((note) =>
-    selectedView.filters.some((group) =>
-      matchesViewFilters(note, group, context),
-    ),
-  )
+  const { excludeFilters, includeFilters } = splitViewFilters(selectedView.filters)
+
+  return notes.filter((note) => {
+    const matchesIncludeFilter =
+      includeFilters.length === 0 ||
+      includeFilters.some((group) => matchesViewFilters(note, group, context))
+
+    if (!matchesIncludeFilter) {
+      return false
+    }
+
+    return excludeFilters.every(
+      (group) => !matchesViewFilters(note, group, context),
+    )
+  })
 }

@@ -13,6 +13,14 @@
         {
           "folder": "downtime",
           "frontmatter.type": "book"
+        },
+        {
+          "$exclude": {
+            "folder": "archive"
+          }
+        },
+        {
+          "frontmatter.series": "$missing"
         }
       ],
       "badges": ["folder", "frontmatter.type", "frontmatter.genre"]

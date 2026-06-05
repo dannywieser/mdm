@@ -159,7 +159,9 @@ This repository is a Turborepo monorepo with this structure:
     - `id`: route key used by `/notes/:view` and `GET /notes?view=<id>`
     - `name`: human-readable label shown in the UI
     - `component`: component name that the web app renders for that view (for example `NotesList` or `NotesReview`)
-    - `filters`: array of filter groups. Within each group, conditions are ANDed; across groups, matches are ORed.
+    - `filters`: array of filter groups. Within each standard group, conditions are ANDed; across standard groups, matches are ORed.
+      - Use `{"$exclude": { ... }}` to define exclusion groups; exclusion groups are ANDed against all other filters.
+      - Use `$missing` as a filter value to match notes where a property path is absent (for example `{"frontmatter.type": "$missing"}`).
     - `badges` (optional): array of note property paths to render as badges in the UI, such as `folder` or `frontmatter.type`
   - `flags`: object keyed by allowed flag names. Each flag definition supports optional `expiresInSeconds` (positive integer) to set Redis TTL, or omit it for non-expiring flags.
 

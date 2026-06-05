@@ -7,13 +7,20 @@ import {
 import { promises as fs } from "node:fs"
 import path from "node:path"
 
-import type { AppConfig, AppConfigView, ResolvedNotesConfig } from "./types"
+import type {
+  AppConfig,
+  AppConfigView,
+  ExcludeViewFilter,
+  ResolvedNotesConfig,
+} from "./types"
 
 export type {
   AppConfig,
   AppConfigView,
+  ExcludeViewFilter,
   NotesView,
   ResolvedNotesConfig,
+  ViewFilter,
 } from "./types"
 
 const APP_CONFIG_FILENAME = "app.config.json"
@@ -21,6 +28,29 @@ const APP_CONFIG_FILENAME = "app.config.json"
 export class AppConfigError extends Error {}
 
 let cachedNotesConfig: ResolvedNotesConfig | undefined
+
+const isExcludeViewFilter = (value: unknown): value is ExcludeViewFilter => {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return false
+  }
+
+  const obj = value as Record<string, unknown>
+  const keys = Object.keys(obj)
+
+  return keys.length === 1 && keys[0] === "$exclude" && isStringRecord(obj["$exclude"])
+}
+
+const isViewFilter = (value: unknown): boolean => {
+  if (isExcludeViewFilter(value)) {
+    return true
+  }
+
+  if (!isStringRecord(value)) {
+    return false
+  }
+
+  return !("$exclude" in value)
+}
 
 const isAppConfigView = (value: unknown): value is AppConfigView => {
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
@@ -33,7 +63,7 @@ const isAppConfigView = (value: unknown): value is AppConfigView => {
     isNonEmptyString(obj["component"]) &&
     (obj["badges"] === undefined || isStringArray(obj["badges"])) &&
     Array.isArray(obj["filters"]) &&
-    (obj["filters"] as unknown[]).every(isStringRecord)
+    (obj["filters"] as unknown[]).every(isViewFilter)
   )
 }
 
@@ -91,7 +121,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
     (!Array.isArray(views) || !views.every(isAppConfigView))
   ) {
     throw new AppConfigError(
-      "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and string filters",
+      "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and filters as string records or $exclude objects",
     )
   }
 
