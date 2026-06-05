@@ -69,10 +69,10 @@ export function Header() {
         </BreadcrumbList>
       </BreadcrumbRoot>
       <Flex alignItems="center" gap="2">
-        <PaletteSelector />
-        <Text fontSize="sm" color="app.text">
+        <Text fontSize="sm" color="app.text" fontWeight="bold">
           {formatDate(new Date())}
         </Text>
+        <PaletteSelector />
       </Flex>
     </Flex>
   )
