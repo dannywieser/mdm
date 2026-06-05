@@ -3,10 +3,19 @@ import { Box } from "@chakra-ui/react"
 import { Outlet, Route, Routes } from "react-router-dom"
 
 import { AppError } from "./components/AppError/AppError"
-import { Header } from "./components/Header/Header"
+import { Header, HeaderSkeleton } from "./components/Header/Header"
 import { Home } from "./components/Home/Home"
 import { LoadingScreen } from "./components/LoadingScreen/LoadingScreen"
 import { NotesView } from "./components/NotesView/NotesView"
+
+function LoadingLayout() {
+  return (
+    <>
+      <HeaderSkeleton />
+      <LoadingScreen />
+    </>
+  )
+}
 
 class ErrorBoundary extends Component<
   { children: ReactNode },
@@ -29,7 +38,7 @@ function AppLayout() {
   return (
     <Box h="100vh" overflow="auto">
       <ErrorBoundary>
-        <Suspense fallback={<LoadingScreen />}>
+        <Suspense fallback={<LoadingLayout />}>
           <Header />
           <Outlet />
         </Suspense>
