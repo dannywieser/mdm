@@ -24,7 +24,9 @@ export const NoteSummaryList = ({ badges = [] }: NoteSummaryListProps) => {
   return (
     <VStack align="stretch" gap="4" p="6">
       <Flex align="center" justify="space-between">
-        <Heading size="md">{t("notes.matchedCount", { count: data.notes.length })}</Heading>
+        <Heading size="md">
+          {t("notes.matchedCount", { count: data.notes.length })}
+        </Heading>
         <Link asChild color="app.accent">
           <RouterLink to="/">{t("review.backToHome")}</RouterLink>
         </Link>
@@ -38,12 +40,16 @@ export const NoteSummaryList = ({ badges = [] }: NoteSummaryListProps) => {
         overflow="hidden"
       >
         <Table.Header bg="app.panelBackgroundHover">
-          <Table.Row>
+          <Table.Row bg="app.panelBackgroundHover">
             <Table.ColumnHeader color="app.textMuted" borderColor="app.border">
               {t("notes.nameColumn")}
             </Table.ColumnHeader>
             {badges.map((badge) => (
-              <Table.ColumnHeader key={badge} color="app.textMuted" borderColor="app.border">
+              <Table.ColumnHeader
+                key={badge}
+                color="app.textMuted"
+                borderColor="app.border"
+              >
                 {getColumnLabel(badge)}
               </Table.ColumnHeader>
             ))}
@@ -51,9 +57,13 @@ export const NoteSummaryList = ({ badges = [] }: NoteSummaryListProps) => {
         </Table.Header>
         <Table.Body>
           {data.notes.map((note) => (
-            <Table.Row key={note.id} _hover={{ bg: "app.panelBackgroundHover" }}>
+            <Table.Row
+              key={note.id}
+              bg="app.panelBackground"
+              _hover={{ bg: "app.panelBackgroundHover" }}
+            >
               <Table.Cell borderColor="app.border">
-                <Link href={note.obsidianUrl} color="app.accent">
+                <Link href={note.obsidianUrl} color="app.accent" fontWeight="semibold" fontSize="md">
                   {note.title}
                 </Link>
               </Table.Cell>
@@ -61,7 +71,10 @@ export const NoteSummaryList = ({ badges = [] }: NoteSummaryListProps) => {
                 const values = resolveBadgeValues(note, badge)
 
                 return (
-                  <Table.Cell key={`${note.id}-${badge}`} borderColor="app.border">
+                  <Table.Cell
+                    key={`${note.id}-${badge}`}
+                    borderColor="app.border"
+                  >
                     <Flex gap="2" wrap="wrap">
                       {values.map((value) => (
                         <Badge

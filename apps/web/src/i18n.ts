@@ -16,7 +16,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "notes.header": "notes",
     "notes.linkedNotes": "linked notes",
     "notes.matchedCount": "{count} matched notes",
-    "notes.nameColumn": "Name",
+    "notes.nameColumn": "note title",
     "notes.markAsRead": "mark as read",
     "notes.markAsUnread": "mark as unread",
     "notes.meta": "Vault: {vault} · Directory: {directory}",
