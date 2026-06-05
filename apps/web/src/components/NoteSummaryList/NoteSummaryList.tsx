@@ -1,5 +1,5 @@
-import { Badge, Flex, Heading, Table, VStack } from "@chakra-ui/react"
-import { Link, useParams } from "react-router-dom"
+import { Badge, Flex, Heading, Link, Table, VStack } from "@chakra-ui/react"
+import { Link as RouterLink, useParams } from "react-router-dom"
 
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 import { useI18n } from "../../i18n"
@@ -25,28 +25,43 @@ export const NoteSummaryList = ({ badges = [] }: NoteSummaryListProps) => {
     <VStack align="stretch" gap="4" p="6">
       <Flex align="center" justify="space-between">
         <Heading size="md">{t("notes.matchedCount", { count: data.notes.length })}</Heading>
-        <Link to="/">{t("review.backToHome")}</Link>
+        <Link asChild color="app.accent">
+          <RouterLink to="/">{t("review.backToHome")}</RouterLink>
+        </Link>
       </Flex>
-      <Table.Root>
-        <Table.Header>
+      <Table.Root
+        bg="app.panelBackground"
+        color="app.text"
+        borderWidth="1px"
+        borderColor="app.border"
+        borderRadius="md"
+        overflow="hidden"
+      >
+        <Table.Header bg="app.panelBackgroundHover">
           <Table.Row>
-            <Table.ColumnHeader>{t("notes.nameColumn")}</Table.ColumnHeader>
+            <Table.ColumnHeader color="app.textMuted" borderColor="app.border">
+              {t("notes.nameColumn")}
+            </Table.ColumnHeader>
             {badges.map((badge) => (
-              <Table.ColumnHeader key={badge}>{getColumnLabel(badge)}</Table.ColumnHeader>
+              <Table.ColumnHeader key={badge} color="app.textMuted" borderColor="app.border">
+                {getColumnLabel(badge)}
+              </Table.ColumnHeader>
             ))}
           </Table.Row>
         </Table.Header>
         <Table.Body>
           {data.notes.map((note) => (
-            <Table.Row key={note.id}>
-              <Table.Cell>
-                <a href={note.obsidianUrl}>{note.title}</a>
+            <Table.Row key={note.id} _hover={{ bg: "app.panelBackgroundHover" }}>
+              <Table.Cell borderColor="app.border">
+                <Link href={note.obsidianUrl} color="app.accent">
+                  {note.title}
+                </Link>
               </Table.Cell>
               {badges.map((badge) => {
                 const values = resolveBadgeValues(note, badge)
 
                 return (
-                  <Table.Cell key={`${note.id}-${badge}`}>
+                  <Table.Cell key={`${note.id}-${badge}`} borderColor="app.border">
                     <Flex gap="2" wrap="wrap">
                       {values.map((value) => (
                         <Badge
