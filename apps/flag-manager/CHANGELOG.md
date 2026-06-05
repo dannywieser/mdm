@@ -1,5 +1,11 @@
 # flag-manager
 
+## 1.0.5
+
+### Patch Changes
+
+- mdm-util@1.5.0
+
 ## 1.0.4
 
 ### Patch Changes

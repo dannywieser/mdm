@@ -1,6 +1,6 @@
 {
   "name": "markdown",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "main": "dist/index.js",
   "types": "index.d.ts",
@@ -16,6 +16,6 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "mdm-util": "1.4.0"
+    "mdm-util": "1.5.0"
   }
 }

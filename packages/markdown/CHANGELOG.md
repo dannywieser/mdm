@@ -1,5 +1,15 @@
 # markdown
 
+## 1.5.0
+
+### Minor Changes
+
+- 28e9b81: Resolve Obsidian wikilink syntax (`[[path]]` and `"[[path|alias]]"`) in frontmatter values during parsing, so fields like `cover` produce a plain file path rather than a raw wikilink string.
+
+### Patch Changes
+
+- mdm-util@1.5.0
+
 ## 1.4.0
 
 ### Patch Changes
