@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest"
 import type { Note } from "markdown"
 
-import { getColumnLabel, resolveBadgeValues } from "./NoteSummaryList.util"
+import { getColumnLabel, resolveBadgeValues } from "./NotesSummaryTable.util"
 
 const createNote = (frontmatter: Note["frontmatter"]): Note => ({
   basename: "book",

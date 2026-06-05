@@ -2,7 +2,6 @@ import { Component, Suspense, type ReactNode } from "react"
 import { Box } from "@chakra-ui/react"
 import { Outlet, Route, Routes } from "react-router-dom"
 
-import { PageTitleProvider } from "./context/PageTitle/PageTitle"
 import { AppError } from "./components/AppError/AppError"
 import { Header } from "./components/Header/Header"
 import { Home } from "./components/Home/Home"
@@ -28,16 +27,14 @@ class ErrorBoundary extends Component<
 
 function AppLayout() {
   return (
-    <PageTitleProvider>
-      <Box h="100vh" overflow="auto">
-        <Header />
-        <ErrorBoundary>
-          <Suspense fallback={<LoadingScreen />}>
-            <Outlet />
-          </Suspense>
-        </ErrorBoundary>
-      </Box>
-    </PageTitleProvider>
+    <Box h="100vh" overflow="auto">
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingScreen />}>
+          <Header />
+          <Outlet />
+        </Suspense>
+      </ErrorBoundary>
+    </Box>
   )
 }
 

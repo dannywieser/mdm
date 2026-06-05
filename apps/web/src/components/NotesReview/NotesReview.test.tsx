@@ -41,10 +41,6 @@ vi.mock("../MarkdownTree/MarkdownTree", () => ({
 }))
 
 
-vi.mock("../../context/PageTitle/usePageTitle", () => ({
-  usePageTitle: () => ({ title: "", setTitle: vi.fn() }),
-}))
-
 vi.mock("../OpenInObsidianButton/OpenInObsidianButton", () => ({
   OpenInObsidianButton: ({ note }: { note: { obsidianUrl: string } }) => (
     <a href={note.obsidianUrl}>open</a>

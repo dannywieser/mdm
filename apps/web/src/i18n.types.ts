@@ -1,6 +1,7 @@
 export type Locale = "en"
 
 export type TranslationKey =
+  | "app.name"
   | "home.modifiedToday"
   | "home.notes"
   | "errors.unableToLoadNotes"

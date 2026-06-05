@@ -15,8 +15,8 @@ vi.mock("../../i18n", () => ({
 }))
 
 const notes = [
-  { id: "1", title: "Note One", isRead: true },
-  { id: "2", title: "Note Two", isRead: false },
+  { id: "1", title: "Note One", isRead: true, obsidianUrl: "obsidian://open?vault=test&file=note-one" },
+  { id: "2", title: "Note Two", isRead: false, obsidianUrl: "obsidian://open?vault=test&file=note-two" },
 ]
 
 afterEach(() => {

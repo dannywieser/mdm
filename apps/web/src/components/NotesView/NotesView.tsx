@@ -6,7 +6,7 @@ import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
 import { NotesGallery } from "../NotesGallery/NotesGallery"
 import { NotesList } from "../NotesList/NotesList"
 import { NotesReview } from "../NotesReview/NotesReview"
-import { NoteSummaryList } from "../NoteSummaryList/NoteSummaryList"
+import { NotesSummaryTable } from "../NotesSummaryTable/NotesSummaryTable"
 
 import type {
   NotesViewRouteParamKey,
@@ -22,7 +22,7 @@ const VIEW_COMPONENTS: Record<ViewComponentName, ComponentType<ViewComponentProp
   NotesList,
   NotesGallery,
   NotesReview,
-  NoteSummaryList,
+  NotesSummaryTable,
 }
 
 export const NotesView = () => {

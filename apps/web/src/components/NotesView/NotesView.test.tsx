@@ -23,8 +23,8 @@ vi.mock("../NotesReview/NotesReview", () => ({
   ),
 }))
 
-vi.mock("../NoteSummaryList/NoteSummaryList", () => ({
-  NoteSummaryList: ({ badges }: { badges?: string[] }) => (
+vi.mock("../NotesSummaryTable/NotesSummaryTable", () => ({
+  NotesSummaryTable: ({ badges }: { badges?: string[] }) => (
     <div>{`note-summary-list:${badges?.join(",") ?? ""}`}</div>
   ),
 }))
@@ -79,14 +79,14 @@ describe("NotesView", () => {
     expect(screen.getByText("notes-list:")).toBeTruthy()
   })
 
-  test("renders NoteSummaryList when configured component is NoteSummaryList", () => {
+  test("renders NotesSummaryTable when configured component is NotesSummaryTable", () => {
     useStatsQueryMock.mockReturnValue({
       data: {
         modifiedToday: 0,
         totalNotes: 1,
         views: [
           {
-            component: "NoteSummaryList",
+            component: "NotesSummaryTable",
             count: 1,
             badges: ["folder", "frontmatter.genre"],
             id: "books",

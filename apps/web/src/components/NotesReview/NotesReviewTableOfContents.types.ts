@@ -1,5 +1,6 @@
 export interface TocNote {
   id: string
+  obsidianUrl: string
   title: string
   isRead: boolean
 }

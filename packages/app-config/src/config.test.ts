@@ -39,6 +39,7 @@ describe("config", () => {
   beforeEach(() => {
     accessMock.mockResolvedValue(undefined)
     clearConfigCache()
+    process.env.NOTES_ROOT = "/notes-root"
 
     isNonEmptyStringMock.mockImplementation(
       (value): value is string =>
@@ -73,11 +74,10 @@ describe("config", () => {
     )
   })
 
-  test("resolves notes directory from noteRootDirectory", async () => {
+  test("resolves notes directory from NOTES_ROOT env var", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD"],
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
       }),
     )
@@ -91,7 +91,6 @@ describe("config", () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
         views: [
           {
@@ -146,7 +145,6 @@ describe("config", () => {
   test("defaults date formats to an empty array when omitted", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
       }),
     )
@@ -165,7 +163,6 @@ describe("config", () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD"],
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
       }),
     )
@@ -184,7 +181,6 @@ describe("config", () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
         attachmentsDirectory: "assets",
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
       }),
     )
@@ -197,7 +193,6 @@ describe("config", () => {
   test("defaults attachmentsDirectory to attachments when omitted", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
       }),
     )
@@ -211,7 +206,6 @@ describe("config", () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
         attachmentsDirectory: "",
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
       }),
     )
@@ -226,7 +220,6 @@ describe("config", () => {
   test("includes the configured timezone in resolved config", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
         timezone: "America/Toronto",
       }),
@@ -240,7 +233,6 @@ describe("config", () => {
   test("defaults timezone to UTC when omitted", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
       }),
     )
@@ -253,7 +245,6 @@ describe("config", () => {
   test("throws when timezone is not a valid IANA identifier", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
         timezone: "Not/A/Timezone",
       }),
@@ -293,11 +284,7 @@ describe("config", () => {
   })
 
   test("throws when required config fields are missing", async () => {
-    readFileMock.mockResolvedValue(
-      JSON.stringify({
-        noteRootDirectory: "/notes-root",
-      }),
-    )
+    readFileMock.mockResolvedValue(JSON.stringify({}))
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
@@ -310,7 +297,6 @@ describe("config", () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD", ""],
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
       }),
     )
@@ -325,7 +311,6 @@ describe("config", () => {
   test("throws when views is invalid", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
         views: [
           {
@@ -347,7 +332,6 @@ describe("config", () => {
   test("throws when view badges is invalid", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
         views: [
           {
@@ -371,7 +355,6 @@ describe("config", () => {
   test("throws when exclude filter shape is invalid", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
         views: [
           {
@@ -391,7 +374,8 @@ describe("config", () => {
     )
   })
 
-  test("throws when noteRootDirectory is missing", async () => {
+  test("throws when NOTES_ROOT env var is not set", async () => {
+    delete process.env.NOTES_ROOT
     readFileMock.mockResolvedValue(
       JSON.stringify({
         obsidianVault: "vault",
@@ -399,9 +383,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError(
-        "app.config.json requires a non-empty noteRootDirectory value",
-      ),
+      new AppConfigError("NOTES_ROOT environment variable is required"),
     )
   })
 
@@ -409,7 +391,6 @@ describe("config", () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD"],
-        noteRootDirectory: "/notes-root",
         obsidianVault: "vault",
       }),
     )

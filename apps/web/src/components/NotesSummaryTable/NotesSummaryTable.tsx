@@ -8,13 +8,13 @@ import { AppError } from "../AppError/AppError"
 import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
 
 import type {
-  NoteSummaryListProps,
-  NoteSummaryListRouteParamKey,
-} from "./NoteSummaryList.types"
-import { getColumnLabel, resolveBadgeValues } from "./NoteSummaryList.util"
+  NotesSummaryTableProps,
+  NotesSummaryTableRouteParamKey,
+} from "./NotesSummaryTable.types"
+import { getColumnLabel, resolveBadgeValues } from "./NotesSummaryTable.util"
 
-export const NoteSummaryList = ({ badges = [] }: NoteSummaryListProps) => {
-  const { view } = useParams<NoteSummaryListRouteParamKey>()
+export const NotesSummaryTable = ({ badges = [] }: NotesSummaryTableProps) => {
+  const { view } = useParams<NotesSummaryTableRouteParamKey>()
   const { data, error, isLoading } = useNotesQuery({ view })
   const { t } = useI18n()
 

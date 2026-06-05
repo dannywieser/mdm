@@ -1,4 +1,5 @@
 import { Box, Flex, Popover, Text } from "@chakra-ui/react"
+import { Palette } from "lucide-react"
 import { useState } from "react"
 
 import { useColorPalette } from "../../context/ColorPalette/useColorPalette"
@@ -25,27 +26,29 @@ export const PaletteSelector = () => {
           as="button"
           data-testid="palette-selector-trigger"
           aria-label="Select color palette"
-          w="4"
-          h="4"
-          borderRadius="full"
-          bg={colorPaletteDefinitions[palette].dark.accent}
-          border="2px solid"
-          borderColor="app.border"
+          display="flex"
+          alignItems="center"
           cursor="pointer"
           flexShrink={0}
-          _hover={{ borderColor: "app.borderHover" }}
-        />
+          color={colorPaletteDefinitions[palette].dark.accent}
+          _hover={{ opacity: 0.8 }}
+        >
+          <Palette size={16} />
+        </Box>
       </Popover.Trigger>
       <Popover.Positioner>
         <Popover.Content
           bg="app.panelBackground"
           borderColor="app.border"
+          borderWidth="1px"
+          borderRadius="md"
           p="3"
           w="auto"
         >
-          <Flex gap="3">
+          <Flex direction="column" gap="1">
             {colorPaletteOptions.map((option) => {
               const isActive = palette === option.value
+              const accentColor = colorPaletteDefinitions[option.value].dark.accent
               return (
                 <Box
                   key={option.value}
@@ -54,25 +57,22 @@ export const PaletteSelector = () => {
                   aria-label={option.i18nKey}
                   aria-pressed={isActive}
                   display="flex"
-                  flexDirection="column"
                   alignItems="center"
-                  gap="1.5"
+                  gap="2"
                   cursor="pointer"
+                  px="1"
+                  py="0.5"
+                  borderRadius="sm"
                   onClick={() => {
                     setPalette(option.value as ColorPaletteName)
                     setOpen(false)
                   }}
                   _hover={{ opacity: 0.8 }}
                 >
-                  <Box
-                    w="5"
-                    h="5"
-                    borderRadius="full"
-                    bg={colorPaletteDefinitions[option.value].dark.accent}
-                    border="2px solid"
-                    borderColor={isActive ? "app.text" : "app.border"}
-                  />
-                  <Text fontSize="2xs" color="app.textMuted">
+                  <Box as="span" color={accentColor} display="flex" alignItems="center">
+                    <Palette size={14} fill={isActive ? accentColor : "none"} />
+                  </Box>
+                  <Text fontSize="xs" color={isActive ? "app.text" : "app.textMuted"} fontWeight={isActive ? "semibold" : "normal"}>
                     {t(option.i18nKey)}
                   </Text>
                 </Box>

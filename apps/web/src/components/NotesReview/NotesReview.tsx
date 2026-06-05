@@ -8,7 +8,6 @@ import { Link, useParams } from "react-router-dom"
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 import { useToggleNoteRead } from "../../hooks/useToggleNoteRead/useToggleNoteRead"
 import { fetchIsRead } from "../../hooks/useIsRead/useIsRead"
-import { usePageTitle } from "../../context/PageTitle/usePageTitle"
 import { useI18n } from "../../i18n"
 
 import type { NotesReviewRouteParamKey } from "./NotesReview.types"
@@ -42,16 +41,12 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
   const currentNote = notes[currentIndex] as (typeof notes)[number] | undefined
   const toggleRead = useToggleNoteRead({ noteId: currentNote?.id ?? "" })
 
-  const { setTitle } = usePageTitle()
-
-  useEffect(() => {
-    setTitle(currentNote?.title ?? "")
-    return () => setTitle("")
-  }, [currentNote?.title, setTitle])
-
   useEffect(() => {
     if (currentIndex < 0) return
-    contentTopRef.current?.scrollIntoView({ behavior: "instant", block: "start" })
+    contentTopRef.current?.scrollIntoView({
+      behavior: "instant",
+      block: "start",
+    })
   }, [currentIndex])
 
   const readStates = useQueries({
@@ -74,6 +69,7 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
 
   const tocNotes = notes.map((note, i) => ({
     id: note.id,
+    obsidianUrl: note.obsidianUrl,
     title: note.title,
     isRead: readStates[i]?.data === true,
   }))
@@ -109,7 +105,12 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
                       opacity: 0,
                     }}
                   >
-                    {note.title}
+                    <a
+                      href={note.obsidianUrl}
+                      style={{ textDecoration: "none", color: "inherit" }}
+                    >
+                      {note.title}
+                    </a>
                   </Text>
                 ))}
               </VStack>
@@ -162,6 +163,10 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
             currentIndex={currentIndex}
           />
         </Flex>
+
+        <Text fontSize="xl" fontWeight="semibold" color="app.text">
+          {currentNote!.title}
+        </Text>
 
         <MarkdownTree content={currentNote!.content} />
         <NoteBadges badges={badges} note={currentNote!} />

@@ -17,6 +17,7 @@ services:
       dockerfile: infra/docker/notes-api.Dockerfile
     environment:
       PORT: "3000"
+      NOTES_ROOT: "/data/notes"
     expose:
       - "3000"
     volumes:
@@ -70,6 +71,8 @@ services:
       IMGPROXY_BIND: ":8080"
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: "/"
       IMGPROXY_USE_ETAG: "true"
+      IMGPROXY_QUALITY: "75"
+      IMGPROXY_ENFORCE_WEBP: "true"
     expose:
       - "8080"
     ports:

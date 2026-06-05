@@ -6,6 +6,7 @@ export type { TranslationKey } from "./i18n.types"
 
 const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
+    "app.name": "mdm",
     "home.modifiedToday": "modified today",
     "home.notes": "notes",
     "errors.unableToLoadNotes": "well, that didn't go as planned",

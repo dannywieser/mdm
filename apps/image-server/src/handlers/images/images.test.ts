@@ -17,10 +17,11 @@ const testConfig = {
   imgproxyPathPrefix: "/imgproxy",
   imagesRoot: "/data/images",
   maxWidth: 1200,
+  maxHeight: 900,
 }
 
 const expectedUrl =
-  "/imgproxy/unsafe/rs:fit:1200:0:0/plain/local:///data/images/daily/photo%20one.jpg"
+  "/imgproxy/unsafe/rs:fit:1200:900:0/plain/local:///data/images/daily/photo%20one.jpg"
 
 describe("images handler", () => {
   test("returns 400 when path query is missing", async () => {
@@ -79,7 +80,7 @@ describe("images handler", () => {
     expect(response.status).toBe(307)
     expect(response.header.location).toBe(expectedUrl)
     expect(redisClient.set).toHaveBeenCalledWith(
-      "image:daily/photo one.jpg:1200",
+      "image:daily/photo one.jpg:1200:900",
       expectedUrl,
       { EX: 86400 },
     )

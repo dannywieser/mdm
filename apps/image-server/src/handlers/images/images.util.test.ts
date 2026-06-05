@@ -20,9 +20,10 @@ describe("image util helpers", () => {
         imagePath: "daily/photo one.jpg",
         imagesRoot: "/data/images",
         maxWidth: 800,
+        maxHeight: 600,
       }),
     ).toBe(
-      "/unsafe/rs:fit:800:0:0/plain/local:///data/images/daily/photo%20one.jpg",
+      "/unsafe/rs:fit:800:600:0/plain/local:///data/images/daily/photo%20one.jpg",
     )
   })
 })
