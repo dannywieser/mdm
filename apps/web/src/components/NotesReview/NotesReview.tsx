@@ -43,7 +43,10 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
 
   useEffect(() => {
     if (currentIndex < 0) return
-    contentTopRef.current?.scrollIntoView({ behavior: "instant", block: "start" })
+    contentTopRef.current?.scrollIntoView({
+      behavior: "instant",
+      block: "start",
+    })
   }, [currentIndex])
 
   const readStates = useQueries({
@@ -102,7 +105,10 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
                       opacity: 0,
                     }}
                   >
-                    <a href={note.obsidianUrl} style={{ textDecoration: "none", color: "inherit" }}>
+                    <a
+                      href={note.obsidianUrl}
+                      style={{ textDecoration: "none", color: "inherit" }}
+                    >
                       {note.title}
                     </a>
                   </Text>
@@ -157,6 +163,10 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
             currentIndex={currentIndex}
           />
         </Flex>
+
+        <Text fontSize="xl" fontWeight="semibold" color="app.text">
+          {currentNote!.title}
+        </Text>
 
         <MarkdownTree content={currentNote!.content} />
         <NoteBadges badges={badges} note={currentNote!} />
