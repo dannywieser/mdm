@@ -1,5 +1,6 @@
 import { ChakraProvider } from "@chakra-ui/react"
 import { cleanup, render, screen } from "@testing-library/react"
+import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
 import { defaultColorPaletteSystem } from "../../theme/system"
@@ -14,48 +15,61 @@ vi.mock("../PaletteSelector/PaletteSelector", () => ({
   PaletteSelector: () => <div data-testid="palette-selector" />,
 }))
 
-const usePageTitleMock = vi.fn()
-
-vi.mock("../../context/PageTitle/usePageTitle", () => ({
-  usePageTitle: () => usePageTitleMock(),
+vi.mock("../../hooks/useStatsQuery/useStatsQuery", () => ({
+  useStatsQuery: () => ({
+    data: {
+      views: [
+        { id: "daily", name: "daily review" },
+        { id: "downtime-active", name: "active downtime" },
+      ],
+    },
+  }),
 }))
 
 afterEach(() => {
   cleanup()
 })
 
-const renderComponent = () =>
+const renderAt = (path: string) =>
   render(
     <ChakraProvider value={defaultColorPaletteSystem}>
-      <Header />
+      <MemoryRouter initialEntries={[path]}>
+        <Routes>
+          <Route path="/" element={<Header />} />
+          <Route path="/notes/:view" element={<Header />} />
+        </Routes>
+      </MemoryRouter>
     </ChakraProvider>,
   )
 
 describe("Header", () => {
   test("renders app name and formatted date", () => {
-    usePageTitleMock.mockReturnValue({ title: "", setTitle: vi.fn() })
-
-    renderComponent()
+    renderAt("/")
 
     expect(screen.getByText("mdm")).toBeTruthy()
     expect(screen.getByText("2026-06-01")).toBeTruthy()
     expect(screen.getByTestId("palette-selector")).toBeTruthy()
   })
 
-  test("renders page title alongside app name when set", () => {
-    usePageTitleMock.mockReturnValue({ title: "My Note", setTitle: vi.fn() })
+  test("shows app name as current breadcrumb on home route", () => {
+    renderAt("/")
 
-    renderComponent()
-
-    expect(screen.getByText("mdm")).toBeTruthy()
-    expect(screen.getByText("> My Note")).toBeTruthy()
+    const mdmEl = screen.getByText("mdm")
+    expect(mdmEl).toBeTruthy()
+    expect(mdmEl.getAttribute("aria-current")).toBe("page")
   })
 
-  test("does not render page title when empty", () => {
-    usePageTitleMock.mockReturnValue({ title: "", setTitle: vi.fn() })
+  test("shows mdm as a link and view name as current breadcrumb on notes route", () => {
+    renderAt("/notes/daily")
 
-    renderComponent()
+    expect(screen.getByRole("link", { name: "mdm" })).toBeTruthy()
+    expect(screen.getByText("daily review")).toBeTruthy()
+  })
 
-    expect(screen.queryByText("My Note")).toBeNull()
+  test("shows correct view name for different views", () => {
+    renderAt("/notes/downtime-active")
+
+    expect(screen.getByRole("link", { name: "mdm" })).toBeTruthy()
+    expect(screen.getByText("active downtime")).toBeTruthy()
   })
 })

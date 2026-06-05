@@ -8,7 +8,6 @@ import { Link, useParams } from "react-router-dom"
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 import { useToggleNoteRead } from "../../hooks/useToggleNoteRead/useToggleNoteRead"
 import { fetchIsRead } from "../../hooks/useIsRead/useIsRead"
-import { usePageTitle } from "../../context/PageTitle/usePageTitle"
 import { useI18n } from "../../i18n"
 
 import type { NotesReviewRouteParamKey } from "./NotesReview.types"
@@ -41,13 +40,6 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
   const notes = useMemo(() => data.notes, [data.notes])
   const currentNote = notes[currentIndex] as (typeof notes)[number] | undefined
   const toggleRead = useToggleNoteRead({ noteId: currentNote?.id ?? "" })
-
-  const { setTitle } = usePageTitle()
-
-  useEffect(() => {
-    setTitle(currentNote?.title ?? "")
-    return () => setTitle("")
-  }, [currentNote?.title, setTitle])
 
   useEffect(() => {
     if (currentIndex < 0) return
