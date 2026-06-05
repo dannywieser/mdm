@@ -66,6 +66,7 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
 
   const tocNotes = notes.map((note, i) => ({
     id: note.id,
+    obsidianUrl: note.obsidianUrl,
     title: note.title,
     isRead: readStates[i]?.data === true,
   }))
@@ -101,7 +102,9 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
                       opacity: 0,
                     }}
                   >
-                    {note.title}
+                    <a href={note.obsidianUrl} style={{ textDecoration: "none", color: "inherit" }}>
+                      {note.title}
+                    </a>
                   </Text>
                 ))}
               </VStack>

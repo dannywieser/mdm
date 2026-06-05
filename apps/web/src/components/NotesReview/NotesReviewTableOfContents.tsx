@@ -35,7 +35,13 @@ const TocList = ({ notes, currentIndex }: NotesReviewTableOfContentsProps) => {
           textOverflow="ellipsis"
           whiteSpace="nowrap"
         >
-          {note.title}
+          {note.isRead ? (
+            <a href={note.obsidianUrl} style={{ textDecoration: "none", color: "inherit" }}>
+              {note.title}
+            </a>
+          ) : (
+            note.title
+          )}
         </Text>
       ))}
     </VStack>
@@ -115,7 +121,13 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
                   }
                   fontSize="sm"
                 >
-                  {note.title}
+                  {note.isRead ? (
+                    <a href={note.obsidianUrl} style={{ textDecoration: "none", color: "inherit" }}>
+                      {note.title}
+                    </a>
+                  ) : (
+                    note.title
+                  )}
                 </Text>
               ))}
             </VStack>
