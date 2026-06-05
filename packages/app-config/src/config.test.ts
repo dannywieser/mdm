@@ -39,6 +39,7 @@ describe("config", () => {
   beforeEach(() => {
     accessMock.mockResolvedValue(undefined)
     clearConfigCache()
+    delete process.env.NOTES_ROOT
 
     isNonEmptyStringMock.mockImplementation(
       (value): value is string =>
@@ -391,7 +392,7 @@ describe("config", () => {
     )
   })
 
-  test("throws when noteRootDirectory is missing", async () => {
+  test("throws when neither NOTES_ROOT env var nor noteRootDirectory config key is set", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({
         obsidianVault: "vault",
@@ -400,8 +401,35 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json requires a non-empty noteRootDirectory value",
+        "noteRootDirectory must be set via the NOTES_ROOT environment variable or app.config.json",
       ),
+    )
+  })
+
+  test("resolves notes directory from NOTES_ROOT env var when noteRootDirectory is absent from config", async () => {
+    process.env.NOTES_ROOT = "/env/notes-root"
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesDirectory()).resolves.toBe(
+      path.resolve("/env/notes-root"),
+    )
+  })
+
+  test("NOTES_ROOT env var takes precedence over noteRootDirectory in config", async () => {
+    process.env.NOTES_ROOT = "/env/notes-root"
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        noteRootDirectory: "/config/notes-root",
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesDirectory()).resolves.toBe(
+      path.resolve("/env/notes-root"),
     )
   })
 

@@ -80,12 +80,6 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   const timezone = parsedConfig["timezone"]
   const views = parsedConfig["views"]
 
-  if (!isNonEmptyString(noteRootDirectory)) {
-    throw new AppConfigError(
-      "app.config.json requires a non-empty noteRootDirectory value",
-    )
-  }
-
   if (!isNonEmptyString(obsidianVault)) {
     throw new AppConfigError(
       "app.config.json requires a non-empty obsidianVault value",
@@ -128,7 +122,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   return {
     attachmentsDirectory,
     dateFormats,
-    noteRootDirectory,
+    noteRootDirectory: isNonEmptyString(noteRootDirectory) ? noteRootDirectory : undefined,
     obsidianVault,
     timezone: isNonEmptyString(timezone) ? timezone : undefined,
     views,
@@ -159,10 +153,18 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
 
   const appConfig = validateAppConfig(parsedAppConfig)
 
+  const noteRootDirectory = process.env.NOTES_ROOT ?? appConfig.noteRootDirectory
+
+  if (!noteRootDirectory) {
+    throw new AppConfigError(
+      "noteRootDirectory must be set via the NOTES_ROOT environment variable or app.config.json",
+    )
+  }
+
   cachedNotesConfig = {
     attachmentsDirectory: appConfig.attachmentsDirectory ?? "attachments",
     dateFormats: appConfig.dateFormats ?? [],
-    notesDirectory: path.resolve(appConfig.noteRootDirectory),
+    notesDirectory: path.resolve(noteRootDirectory),
     obsidianVault: appConfig.obsidianVault,
     timezone: appConfig.timezone ?? "UTC",
     views: appConfig.views ?? [],

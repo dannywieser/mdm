@@ -25,7 +25,7 @@ export interface ResolvedNotesConfig {
 export interface AppConfig {
   attachmentsDirectory?: string
   dateFormats?: string[]
-  noteRootDirectory: string
+  noteRootDirectory?: string
   obsidianVault: string
   timezone?: string
   views?: AppConfigView[]
