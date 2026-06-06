@@ -260,6 +260,36 @@ describe("config", () => {
     })
   })
 
+  test("throws when homeStats.show is null", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        homeStats: { show: null },
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json homeStats.show must be an object with boolean values for each display section",
+      ),
+    )
+  })
+
+  test("throws when homeStats.show contains a non-boolean value", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        homeStats: { show: { totalNotes: "yes" } },
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json homeStats.show must be an object with boolean values for each display section",
+      ),
+    )
+  })
+
   test("uses configured attachmentsDirectory when provided", async () => {
     readFileMock.mockResolvedValue(
       JSON.stringify({

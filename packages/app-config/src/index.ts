@@ -78,7 +78,7 @@ const isHomeStatsConfig = (
   }
   const obj = value as Record<string, unknown>
   if (obj["show"] === undefined) return true
-  if (typeof obj["show"] !== "object" || Array.isArray(obj["show"])) {
+  if (obj["show"] === null || typeof obj["show"] !== "object" || Array.isArray(obj["show"])) {
     return false
   }
   const show = obj["show"] as Record<string, unknown>
@@ -157,6 +157,12 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   ) {
     throw new AppConfigError(
       "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and filters as string records or $exclude objects",
+    )
+  }
+
+  if (homeStats !== undefined && !isHomeStatsConfig(homeStats)) {
+    throw new AppConfigError(
+      "app.config.json homeStats.show must be an object with boolean values for each display section",
     )
   }
 
