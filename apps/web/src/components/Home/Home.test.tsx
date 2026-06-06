@@ -12,6 +12,10 @@ vi.mock("../../hooks/useStatsQuery/useStatsQuery", () => ({
   useStatsQuery: () => useStatsQueryMock(),
 }))
 
+vi.mock("../HomeStats/HomeStats", () => ({
+  HomeStats: () => null,
+}))
+
 describe("Home", () => {
   test("renders view links with name and count", () => {
     useStatsQueryMock.mockReturnValue({

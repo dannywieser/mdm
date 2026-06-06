@@ -11,6 +11,7 @@ import type {
   AppConfig,
   AppConfigView,
   ExcludeViewFilter,
+  HomeStatsShowConfig,
   ResolvedNotesConfig,
 } from "./types"
 
@@ -18,6 +19,8 @@ export type {
   AppConfig,
   AppConfigView,
   ExcludeViewFilter,
+  HomeStatsConfig,
+  HomeStatsShowConfig,
   NotesView,
   ResolvedNotesConfig,
   ViewFilter,
@@ -67,6 +70,44 @@ const isAppConfigView = (value: unknown): value is AppConfigView => {
   )
 }
 
+const isHomeStatsConfig = (
+  value: unknown,
+): value is { show?: Partial<HomeStatsShowConfig> } => {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return false
+  }
+  const obj = value as Record<string, unknown>
+  if (obj["show"] === undefined) return true
+  if (typeof obj["show"] !== "object" || Array.isArray(obj["show"])) {
+    return false
+  }
+  const show = obj["show"] as Record<string, unknown>
+  const boolKeys: (keyof HomeStatsShowConfig)[] = [
+    "folderBreakdown",
+    "modifiedToday",
+    "notesCreated",
+    "notesPerDay",
+    "totalAttachments",
+    "totalFolders",
+    "totalNotes",
+    "trends",
+  ]
+  return boolKeys.every(
+    (key) => show[key] === undefined || typeof show[key] === "boolean",
+  )
+}
+
+const DEFAULT_HOME_STATS_SHOW: HomeStatsShowConfig = {
+  folderBreakdown: true,
+  modifiedToday: true,
+  notesCreated: true,
+  notesPerDay: true,
+  totalAttachments: true,
+  totalFolders: true,
+  totalNotes: true,
+  trends: true,
+}
+
 const validateAppConfig = (appConfig: unknown): AppConfig => {
   if (!appConfig || typeof appConfig !== "object") {
     throw new AppConfigError("app.config.json must be a JSON object")
@@ -75,6 +116,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   const parsedConfig = appConfig as Record<string, unknown>
   const attachmentsDirectory = parsedConfig["attachmentsDirectory"]
   const dateFormats = parsedConfig["dateFormats"]
+  const homeStats = parsedConfig["homeStats"]
   const obsidianVault = parsedConfig["obsidianVault"]
   const timezone = parsedConfig["timezone"]
   const views = parsedConfig["views"]
@@ -121,6 +163,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   return {
     attachmentsDirectory,
     dateFormats,
+    homeStats: isHomeStatsConfig(homeStats) ? homeStats : undefined,
     obsidianVault,
     timezone: isNonEmptyString(timezone) ? timezone : undefined,
     views,
@@ -162,6 +205,9 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
   cachedNotesConfig = {
     attachmentsDirectory: appConfig.attachmentsDirectory ?? "attachments",
     dateFormats: appConfig.dateFormats ?? [],
+    homeStats: {
+      show: { ...DEFAULT_HOME_STATS_SHOW, ...appConfig.homeStats?.show },
+    },
     notesDirectory: path.resolve(noteRootDirectory),
     obsidianVault: appConfig.obsidianVault,
     timezone: appConfig.timezone ?? "UTC",
