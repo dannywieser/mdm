@@ -4,16 +4,15 @@ import path from "node:path"
 export const countFilesRecursive = async (directory: string): Promise<number> => {
   try {
     const entries = await fs.readdir(directory, { withFileTypes: true })
-    const counts = await Promise.all(
-      entries.map(async (entry) => {
-        const fullPath = path.join(directory, entry.name)
-        if (entry.isDirectory()) {
-          return countFilesRecursive(fullPath)
-        }
-        return entry.isFile() ? 1 : 0
-      }),
-    )
-    return counts.reduce((sum, n) => sum + n, 0)
+    let count = 0
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        count += await countFilesRecursive(path.join(directory, entry.name))
+      } else if (entry.isFile()) {
+        count += 1
+      }
+    }
+    return count
   } catch {
     return 0
   }
