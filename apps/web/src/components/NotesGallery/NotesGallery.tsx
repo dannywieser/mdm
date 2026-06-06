@@ -1,9 +1,10 @@
-import { Box, Card, Image, SimpleGrid, Text } from "@chakra-ui/react"
+import { Box, Card, SimpleGrid, Text } from "@chakra-ui/react"
 import { useParams } from "react-router-dom"
 
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 
 import { AppError } from "../AppError/AppError"
+import { FadeImage } from "../FadeImage/FadeImage"
 import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
 import { NoteBadges } from "../NoteBadges/NoteBadges"
 
@@ -31,7 +32,7 @@ const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => (
       position="relative"
       _hover={{ borderColor: "app.borderHover" }}
     >
-      <Image
+      <FadeImage
         alt={note.title}
         aspectRatio={aspectRatio}
         objectFit="cover"

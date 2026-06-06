@@ -5,7 +5,6 @@ import {
   CodeBlock,
   HStack,
   Icon,
-  Image,
   Link,
   List,
   Separator,
@@ -15,6 +14,7 @@ import type { MarkdownNode } from "markdown"
 import { CircleCheck, CircleDashed } from "lucide-react"
 import { Fragment, type ReactNode } from "react"
 
+import { FadeImage } from "../FadeImage/FadeImage"
 import { MarkdownHeading } from "./MarkdownHeading"
 import type { MarkdownTreeProps } from "./MarkdownTree.types"
 
@@ -155,13 +155,16 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
     }
     case "image":
       return (
-        <Image
+        <FadeImage
           key={key}
           src={node.url}
           alt={node.alt ?? ""}
           borderRadius="md"
-          my="4"
+          display="block"
           maxW="full"
+          minH="12"
+          mx="auto"
+          my="4"
         />
       )
     case "thematicBreak":
