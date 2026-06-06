@@ -14,9 +14,25 @@ export interface NotesView {
   name: string
 }
 
+export interface HomeStatsShowConfig {
+  folderBreakdown: boolean
+  modifiedToday: boolean
+  notesCreated: boolean
+  notesPerDay: boolean
+  totalAttachments: boolean
+  totalFolders: boolean
+  totalNotes: boolean
+  trends: boolean
+}
+
+export interface HomeStatsConfig {
+  show: HomeStatsShowConfig
+}
+
 export interface ResolvedNotesConfig {
   attachmentsDirectory: string
   dateFormats: string[]
+  homeStats: HomeStatsConfig
   notesDirectory: string
   obsidianVault: string
   timezone: string
@@ -26,6 +42,9 @@ export interface ResolvedNotesConfig {
 export interface AppConfig {
   attachmentsDirectory?: string
   dateFormats?: string[]
+  homeStats?: {
+    show?: Partial<HomeStatsShowConfig>
+  }
   obsidianVault: string
   timezone?: string
   views?: AppConfigView[]

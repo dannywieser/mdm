@@ -41,6 +41,7 @@ const renderAt = (path: string) =>
         <Routes>
           <Route path="/" element={<Header />} />
           <Route path="/notes/:view" element={<Header />} />
+          <Route path="/stats" element={<Header />} />
         </Routes>
       </MemoryRouter>
     </ChakraProvider>,
@@ -53,6 +54,12 @@ describe("Header", () => {
     expect(screen.getByText("app.name")).toBeTruthy()
     expect(screen.getByText("2026-06-01")).toBeTruthy()
     expect(screen.getByTestId("palette-selector")).toBeTruthy()
+  })
+
+  test("renders stats icon link", () => {
+    renderAt("/")
+
+    expect(screen.getByRole("link", { name: /stats/i })).toBeTruthy()
   })
 
   test("shows app name as current breadcrumb on home route", () => {
@@ -75,5 +82,12 @@ describe("Header", () => {
 
     expect(screen.getByRole("link", { name: "app.name" })).toBeTruthy()
     expect(screen.getByText("active downtime")).toBeTruthy()
+  })
+
+  test("shows app name as a link and Stats as current breadcrumb on stats route", () => {
+    renderAt("/stats")
+
+    expect(screen.getByRole("link", { name: "app.name" })).toBeTruthy()
+    expect(screen.getByText("Stats")).toBeTruthy()
   })
 })

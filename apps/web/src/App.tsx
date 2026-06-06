@@ -5,6 +5,7 @@ import { Outlet, Route, Routes } from "react-router-dom"
 import { AppError } from "./components/AppError/AppError"
 import { Header, HeaderSkeleton } from "./components/Header/Header"
 import { Home } from "./components/Home/Home"
+import { HomeStats } from "./components/HomeStats/HomeStats"
 import { LoadingScreen } from "./components/LoadingScreen/LoadingScreen"
 import { NotesView } from "./components/NotesView/NotesView"
 
@@ -53,6 +54,7 @@ function App() {
       <Route element={<AppLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/notes/:view" element={<NotesView />} />
+        <Route path="/stats" element={<HomeStats />} />
       </Route>
     </Routes>
   )

@@ -117,6 +117,18 @@ describe("config", () => {
     await expect(resolveNotesConfig()).resolves.toEqual({
       attachmentsDirectory: "attachments",
       dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
+      homeStats: {
+        show: {
+          folderBreakdown: true,
+          modifiedToday: true,
+          notesCreated: true,
+          notesPerDay: true,
+          totalAttachments: true,
+          totalFolders: true,
+          totalNotes: true,
+          trends: true,
+        },
+      },
       notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
       timezone: "UTC",
@@ -152,6 +164,18 @@ describe("config", () => {
     await expect(resolveNotesConfig()).resolves.toEqual({
       attachmentsDirectory: "attachments",
       dateFormats: [],
+      homeStats: {
+        show: {
+          folderBreakdown: true,
+          modifiedToday: true,
+          notesCreated: true,
+          notesPerDay: true,
+          totalAttachments: true,
+          totalFolders: true,
+          totalNotes: true,
+          trends: true,
+        },
+      },
       notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
       timezone: "UTC",
@@ -170,11 +194,100 @@ describe("config", () => {
     await expect(resolveNotesConfig()).resolves.toEqual({
       attachmentsDirectory: "attachments",
       dateFormats: ["YYYY.MM.DD"],
+      homeStats: {
+        show: {
+          folderBreakdown: true,
+          modifiedToday: true,
+          notesCreated: true,
+          notesPerDay: true,
+          totalAttachments: true,
+          totalFolders: true,
+          totalNotes: true,
+          trends: true,
+        },
+      },
       notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
       timezone: "UTC",
       views: [],
     })
+  })
+
+  test("defaults homeStats show fields to true when homeStats is omitted", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      homeStats: {
+        show: {
+          folderBreakdown: true,
+          modifiedToday: true,
+          notesCreated: true,
+          notesPerDay: true,
+          totalAttachments: true,
+          totalFolders: true,
+          totalNotes: true,
+          trends: true,
+        },
+      },
+    })
+  })
+
+  test("merges configured homeStats show overrides with defaults", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        homeStats: { show: { folderBreakdown: false, totalAttachments: false } },
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      homeStats: {
+        show: {
+          folderBreakdown: false,
+          modifiedToday: true,
+          notesCreated: true,
+          notesPerDay: true,
+          totalAttachments: false,
+          totalFolders: true,
+          totalNotes: true,
+          trends: true,
+        },
+      },
+    })
+  })
+
+  test("throws when homeStats.show is null", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        homeStats: { show: null },
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json homeStats.show must be an object with boolean values for each display section",
+      ),
+    )
+  })
+
+  test("throws when homeStats.show contains a non-boolean value", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        homeStats: { show: { totalNotes: "yes" } },
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json homeStats.show must be an object with boolean values for each display section",
+      ),
+    )
   })
 
   test("uses configured attachmentsDirectory when provided", async () => {

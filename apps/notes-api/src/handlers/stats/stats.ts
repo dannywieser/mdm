@@ -3,17 +3,35 @@ import type { RequestHandler } from "express"
 
 import { AppConfigError, resolveNotesConfig } from "app-config"
 import { toLoggableError } from "mdm-util"
+import path from "node:path"
 
 import { collectMarkdownFiles } from "../notes/notes.files"
 import { scanMarkdownFile } from "../notes/notes.scan"
-import { buildViewCounts, countModifiedToday } from "./stats.util"
+import { countFilesRecursive } from "./stats.files"
+import {
+  buildFolderBreakdown,
+  buildNotesCreated,
+  buildNotesPerDay,
+  buildTrends,
+  buildViewCounts,
+  countFolders,
+  countModifiedToday,
+} from "./stats.util"
 
 export const statsHandler: RequestHandler = async (_request, response) => {
   let notesConfig: ResolvedNotesConfig | undefined
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { dateFormats, notesDirectory, obsidianVault, timezone, views } = notesConfig
+    const {
+      attachmentsDirectory,
+      dateFormats,
+      homeStats,
+      notesDirectory,
+      obsidianVault,
+      timezone,
+      views,
+    } = notesConfig
 
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).sort()
     const scannedNotes = await Promise.all(
@@ -22,11 +40,21 @@ export const statsHandler: RequestHandler = async (_request, response) => {
       ),
     )
 
+    const now = new Date()
     const context = { dateFormats, timezone }
+    const attachmentsPath = path.join(notesDirectory, attachmentsDirectory)
+    const totalAttachments = await countFilesRecursive(attachmentsPath)
 
     response.status(200).json({
+      folderBreakdown: buildFolderBreakdown(scannedNotes),
+      homeStats,
       modifiedToday: countModifiedToday(scannedNotes, timezone),
+      notesCreated: buildNotesCreated(scannedNotes, now),
+      notesPerDay: buildNotesPerDay(scannedNotes, timezone, now),
+      totalAttachments,
+      totalFolders: countFolders(scannedNotes),
       totalNotes: scannedNotes.length,
+      trends: buildTrends(scannedNotes, now),
       views: buildViewCounts(scannedNotes, views, context),
     })
   } catch (error) {

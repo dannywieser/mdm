@@ -12,6 +12,7 @@ import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
 
 import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
 import { getViewGridColumns } from "./Home.util"
+
 export function Home() {
   const { data, isLoading } = useStatsQuery({})
 
