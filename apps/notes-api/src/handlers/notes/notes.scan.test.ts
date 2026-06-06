@@ -4,7 +4,7 @@ import { parseFrontMatter, parseMarkdownBodyDates } from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
 
-import { FILE_ID_NAMESPACE, scanMarkdownFile } from "./notes.scan"
+import { FILE_ID_NAMESPACE, resolveCreatedDate, scanMarkdownFile } from "./notes.scan"
 
 vi.mock("node:fs", () => ({
   promises: {
@@ -27,6 +27,38 @@ const readFileMock = fs.readFile as Mock
 const statMock = fs.stat as Mock
 const parseFrontMatterMock = vi.mocked(parseFrontMatter)
 const parseMarkdownBodyDatesMock = vi.mocked(parseMarkdownBodyDates)
+
+describe("resolveCreatedDate", () => {
+  const birthtime = new Date("2026-01-01T00:00:00.000Z")
+
+  test("returns frontmatter created date when it is a valid ISO UTC string", () => {
+    expect(resolveCreatedDate({ created: "2025-06-15T10:00:00Z" }, birthtime)).toBe(
+      "2025-06-15T10:00:00.000Z",
+    )
+  })
+
+  test("returns frontmatter created date when it is a valid date-only string", () => {
+    expect(resolveCreatedDate({ created: "2025-06-15" }, birthtime)).toBe(
+      new Date("2025-06-15").toISOString(),
+    )
+  })
+
+  test("falls back to birthtime when frontmatter is null", () => {
+    expect(resolveCreatedDate(null, birthtime)).toBe("2026-01-01T00:00:00.000Z")
+  })
+
+  test("falls back to birthtime when frontmatter has no created field", () => {
+    expect(resolveCreatedDate({ type: "book" }, birthtime)).toBe("2026-01-01T00:00:00.000Z")
+  })
+
+  test("falls back to birthtime when frontmatter created is not a parseable date string", () => {
+    expect(resolveCreatedDate({ created: "not-a-date" }, birthtime)).toBe("2026-01-01T00:00:00.000Z")
+  })
+
+  test("falls back to birthtime when frontmatter created is an array", () => {
+    expect(resolveCreatedDate({ created: ["2026-01-15"] }, birthtime)).toBe("2026-01-01T00:00:00.000Z")
+  })
+})
 
 describe("notes scan helpers", () => {
   test("scanMarkdownFile returns filterable metadata without parsed markdown content", async () => {

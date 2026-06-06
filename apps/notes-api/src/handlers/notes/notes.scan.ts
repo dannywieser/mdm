@@ -9,6 +9,20 @@ import type { ScannedNote } from "./notes.types"
 
 export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 
+export const resolveCreatedDate = (
+  frontmatter: NoteFrontmatter | null,
+  birthtime: Date,
+): string => {
+  const created = frontmatter?.["created"]
+  if (typeof created === "string") {
+    const parsed = new Date(created)
+    if (!isNaN(parsed.getTime())) {
+      return parsed.toISOString()
+    }
+  }
+  return birthtime.toISOString()
+}
+
 const extractFrontmatterDates = (
   frontmatter: NoteFrontmatter,
   dateFormats: readonly string[],
@@ -50,7 +64,7 @@ export const scanMarkdownFile = async (
   return {
     basename,
     titleOrBodyDates,
-    createdDate: stats.birthtime.toISOString(),
+    createdDate: resolveCreatedDate(frontmatter, stats.birthtime),
     folder: path.relative(notesDirectory, path.dirname(filePath)).split(path.sep).join("/"),
     frontmatter,
     fullPath: filePath,
