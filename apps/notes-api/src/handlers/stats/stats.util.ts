@@ -34,5 +34,6 @@ export const buildViewCounts = (
     component: view.component,
     count: applyViewFilter(notes, views, view.id, context).length,
     id: view.id,
+    layout: view.layout,
     name: view.name,
   }))

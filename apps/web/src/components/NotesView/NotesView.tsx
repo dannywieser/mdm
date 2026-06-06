@@ -16,6 +16,7 @@ import type {
 interface ViewComponentProps {
   aspectRatio?: string
   badges?: string[]
+  layout?: string
 }
 
 const VIEW_COMPONENTS: Record<ViewComponentName, ComponentType<ViewComponentProps>> = {
@@ -34,5 +35,5 @@ export const NotesView = () => {
   const SelectedComponent =
     (componentName && VIEW_COMPONENTS[componentName]) ?? NotesList
 
-  return <SelectedComponent aspectRatio={configuredView?.aspectRatio} badges={configuredView?.badges} key={view} />
+  return <SelectedComponent aspectRatio={configuredView?.aspectRatio} badges={configuredView?.badges} layout={configuredView?.layout} key={view} />
 }

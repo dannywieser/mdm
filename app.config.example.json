@@ -7,7 +7,8 @@
     {
       "id": "books",
       "name": "Books",
-      "component": "NotesList",
+      "component": "NotesGallery",
+      "layout": "flex",
       "filters": [
         {
           "folder": "downtime",

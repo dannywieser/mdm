@@ -4,6 +4,7 @@ export interface StatsViewCount {
   component: string
   count: number
   id: string
+  layout?: string
   name: string
 }
 
