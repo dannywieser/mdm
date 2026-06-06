@@ -38,4 +38,34 @@ describe("parseDateString", () => {
   test("returns null for empty formats array", () => {
     expect(parseDateString("2026.06.05", [])).toBeNull()
   })
+
+  test("returns null when string has trailing characters", () => {
+    expect(parseDateString("2026.06.05 extra", ["YYYY.MM.DD"])).toBeNull()
+  })
+
+  test("returns null when day has fewer digits than expected", () => {
+    expect(parseDateString("2026.06.5", ["YYYY.MM.DD"])).toBeNull()
+  })
+
+  test("returns null for out-of-range month", () => {
+    expect(parseDateString("2026.13.01", ["YYYY.MM.DD"])).toBeNull()
+  })
+
+  test("returns null for out-of-range day", () => {
+    expect(parseDateString("2026.06.32", ["YYYY.MM.DD"])).toBeNull()
+  })
+
+  test("returns null for rollover date (Feb 31)", () => {
+    expect(parseDateString("2026.02.31", ["YYYY.MM.DD"])).toBeNull()
+  })
+
+  test("returns null for rollover date (Feb 29 in non-leap year)", () => {
+    expect(parseDateString("2025.02.29", ["YYYY.MM.DD"])).toBeNull()
+  })
+
+  test("accepts Feb 29 in a leap year", () => {
+    expect(parseDateString("2024.02.29", ["YYYY.MM.DD"])?.toISOString()).toBe(
+      "2024-02-29T00:00:00.000Z",
+    )
+  })
 })

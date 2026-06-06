@@ -9,6 +9,9 @@ const TOKEN_LENGTHS: Record<string, number> = {
 }
 
 const parseSingleFormat = (dateStr: string, format: string): Date | null => {
+  // Length must match exactly — rejects trailing/leading characters
+  if (dateStr.length !== format.length) return null
+
   let year: number | null = null
   let month: number | null = null
   let day: number | null = null
@@ -19,7 +22,10 @@ const parseSingleFormat = (dateStr: string, format: string): Date | null => {
 
     if (token) {
       const len = TOKEN_LENGTHS[token] ?? 0
-      const value = parseInt(dateStr.slice(index, index + len), 10)
+      const slice = dateStr.slice(index, index + len)
+      // Slice must be the full expected length — rejects short strings
+      if (slice.length !== len) return null
+      const value = parseInt(slice, 10)
       if (isNaN(value)) return null
 
       if (token === "YYYY") year = value
@@ -36,7 +42,21 @@ const parseSingleFormat = (dateStr: string, format: string): Date | null => {
 
   if (year === null || month === null || day === null) return null
 
-  return new Date(Date.UTC(year, month - 1, day))
+  // Validate ranges before constructing to catch obvious invalids
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null
+
+  const date = new Date(Date.UTC(year, month - 1, day))
+
+  // Round-trip verify to reject rollover cases (e.g. Feb 31 → Mar 3)
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() + 1 !== month ||
+    date.getUTCDate() !== day
+  ) {
+    return null
+  }
+
+  return date
 }
 
 export const parseDateString = (
