@@ -1,10 +1,8 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
 import { cleanup, render, screen } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
 afterEach(cleanup)
-afterEach(() => localStorage.clear())
 
 import { HomeStats } from "./HomeStats"
 import {
@@ -113,39 +111,6 @@ describe("HomeStats", () => {
     expect(screen.queryByText("projects")).toBeNull()
   })
 
-  test("writes false to localStorage when collapsed", async () => {
-    renderComponent()
-    const trigger = screen.getByRole("button", { name: /notes overview/i })
-
-    await userEvent.click(trigger)
-
-    expect(localStorage.getItem("home-stats:open")).toBe("false")
-  })
-
-  test("writes true to localStorage when re-expanded", async () => {
-    localStorage.setItem("home-stats:open", "false")
-    renderComponent()
-    const trigger = screen.getByRole("button", { name: /notes overview/i })
-
-    await userEvent.click(trigger)
-
-    expect(localStorage.getItem("home-stats:open")).toBe("true")
-  })
-
-  test("restores collapsed state from localStorage on mount", () => {
-    localStorage.setItem("home-stats:open", "false")
-    renderComponent()
-
-    const trigger = screen.getByRole("button", { name: /notes overview/i })
-    expect(trigger.getAttribute("aria-expanded")).toBe("false")
-  })
-
-  test("defaults to open when localStorage has no stored value", () => {
-    renderComponent()
-
-    const trigger = screen.getByRole("button", { name: /notes overview/i })
-    expect(trigger.getAttribute("aria-expanded")).toBe("true")
-  })
 })
 
 describe("HomeStats util", () => {

@@ -10,7 +10,8 @@ import {
 } from "@chakra-ui/react"
 import { formatDate } from "mdm-util"
 import { type ReactNode } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useMatch, useParams } from "react-router-dom"
+import { BarChart2 } from "lucide-react"
 
 import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
 import { useI18n } from "../../i18n"
@@ -60,6 +61,7 @@ export function HeaderSkeleton() {
 export function Header() {
   const { t } = useI18n()
   const { view } = useParams<{ view?: string }>()
+  const isStatsPage = useMatch("/stats")
   const { data } = useStatsQuery({})
   const currentView = view
     ? data.views.find(({ id }) => id === view)
@@ -75,7 +77,21 @@ export function Header() {
             listStyleType="none"
             gap={1}
           >
-            {currentView ? (
+            {isStatsPage ? (
+              <>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild fontWeight="semibold" color="app.text">
+                    <Link to="/">{t("app.name")}</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbCurrentLink color="app.textMuted">
+                    Stats
+                  </BreadcrumbCurrentLink>
+                </BreadcrumbItem>
+              </>
+            ) : currentView ? (
               <>
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild fontWeight="semibold" color="app.text">
@@ -104,6 +120,13 @@ export function Header() {
           <Text fontSize="sm" color="app.text" fontWeight="bold">
             {formatDate(new Date())}
           </Text>
+          <Link
+            to="/stats"
+            aria-label="Stats"
+            style={{ color: "inherit", display: "flex", alignItems: "center" }}
+          >
+            <BarChart2 size={18} />
+          </Link>
           <PaletteSelector />
         </Flex>
       }
