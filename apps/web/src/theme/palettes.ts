@@ -7,6 +7,7 @@ export type ColorPaletteName =
   | "catppuccin"
   | "solarized"
   | "gotham"
+  | "highContrast"
 
 export interface ColorPaletteVariant {
   background: string
@@ -197,6 +198,26 @@ export const colorPaletteDefinitions: Record<
     },
     get light() {
       return this.dark
+    },
+  },
+  highContrast: {
+    i18nKey: "palette.highContrast",
+    light: {
+      background: "#ffffff",
+      panelBackground: "#f0f3f6",
+      panelBackgroundHover: "#dde0e4",
+      text: "#0e1116",
+      mutedText: "#424a53",
+      accent: "#0349b4",
+      border: "#818b98",
+      borderHover: "#20252c",
+      successBackground: "#055d20",
+      successHoverBackground: "#024c1a",
+      successText: "#ffffff",
+      iconMuted: "#0a86b5",
+    },
+    get dark() {
+      return this.light
     },
   },
 }

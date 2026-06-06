@@ -27,6 +27,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "review.forReview": "for review ({count})",
     "palette.catppuccin": "catppuccin",
     "palette.dracula": "dracula",
+    "palette.highContrast": "high contrast",
     "palette.gotham": "gotham",
     "palette.gruvbox": "gruvbox",
     "palette.nord": "nord",

@@ -22,6 +22,7 @@ export type TranslationKey =
   | "review.forReview"
   | "palette.catppuccin"
   | "palette.dracula"
+  | "palette.highContrast"
   | "palette.gotham"
   | "palette.gruvbox"
   | "palette.nord"
