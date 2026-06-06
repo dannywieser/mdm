@@ -5,7 +5,13 @@ import { afterEach, describe, expect, test, vi } from "vitest"
 afterEach(cleanup)
 
 import { HomeStats } from "./HomeStats"
-import { formatChangePercent, formatDate, getChangeColor } from "./HomeStats.util"
+import {
+  formatChangePercent,
+  formatDate,
+  formatMonthLabel,
+  getChangeColor,
+  getMonthTicks,
+} from "./HomeStats.util"
 
 const useStatsQueryMock = vi.fn()
 
@@ -127,6 +133,12 @@ describe("HomeStats util", () => {
     })
   })
 
+  describe("formatMonthLabel", () => {
+    test("formats a YYYY-MM-DD string to abbreviated month name", () => {
+      expect(formatMonthLabel("2026-06-01")).toBe("Jun")
+    })
+  })
+
   describe("getChangeColor", () => {
     test("returns green for positive change", () => {
       expect(getChangeColor(10)).toBe("green.500")
@@ -138,6 +150,27 @@ describe("HomeStats util", () => {
 
     test("returns muted for zero change", () => {
       expect(getChangeColor(0)).toBe("app.textMuted")
+    })
+  })
+
+  describe("getMonthTicks", () => {
+    test("returns dates that fall on the first of the month", () => {
+      const data = [
+        { count: 0, date: "2026-05-30" },
+        { count: 0, date: "2026-05-31" },
+        { count: 2, date: "2026-06-01" },
+        { count: 1, date: "2026-06-02" },
+        { count: 0, date: "2026-07-01" },
+      ]
+      expect(getMonthTicks(data)).toEqual(["2026-06-01", "2026-07-01"])
+    })
+
+    test("returns an empty array when no dates fall on the first", () => {
+      const data = [
+        { count: 0, date: "2026-06-15" },
+        { count: 1, date: "2026-06-16" },
+      ]
+      expect(getMonthTicks(data)).toEqual([])
     })
   })
 })
