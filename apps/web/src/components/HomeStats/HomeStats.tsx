@@ -58,18 +58,15 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
         open={isOpen}
         onOpenChange={({ open }) => setIsOpen(open)}
       >
-        <Collapsible.Trigger asChild>
-          <HStack
-            as="button"
-            type="button"
-            justify="space-between"
-            w="full"
-            cursor="pointer"
-            background="transparent"
-            border="none"
-            p={0}
-            _hover={{ opacity: 0.8 }}
-          >
+        <Collapsible.Trigger
+          width="full"
+          background="transparent"
+          border="none"
+          p={0}
+          cursor="pointer"
+          _hover={{ opacity: 0.8 }}
+        >
+          <HStack justify="space-between" w="full">
             <Heading size="sm" color="app.textMuted" fontWeight="medium">
               Notes Overview
             </Heading>
