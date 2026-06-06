@@ -1,5 +1,5 @@
 import { Box, Image, Skeleton } from "@chakra-ui/react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import type { FadeImageProps } from "./FadeImage.types"
 
@@ -13,13 +13,9 @@ export const FadeImage = ({
   objectFit,
   src,
 }: FadeImageProps) => {
-  const [loaded, setLoaded] = useState(false)
-
-  useEffect(() => {
-    setLoaded(false)
-  }, [src])
-
-  const onSettled = () => setLoaded(true)
+  const [loadedSrc, setLoadedSrc] = useState<string | undefined>(undefined)
+  const loaded = loadedSrc === src
+  const onSettled = () => setLoadedSrc(src)
 
   return (
     <Box
