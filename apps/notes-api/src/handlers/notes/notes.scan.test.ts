@@ -1,6 +1,6 @@
 import type { Mock } from "vitest"
 
-import { parseFrontMatter, parseMarkdownBodyDates } from "markdown"
+import { parseDateString, parseFrontMatter, parseMarkdownBodyDates } from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
 
@@ -14,6 +14,7 @@ vi.mock("node:fs", () => ({
 }))
 
 vi.mock("markdown", () => ({
+  parseDateString: vi.fn(),
   parseFrontMatter: vi.fn(),
   parseMarkdownBodyDates: vi.fn(),
 }))
@@ -25,38 +26,69 @@ vi.mock("mdm-util", () => ({
 const createFileIDMock = vi.mocked(createFileID)
 const readFileMock = fs.readFile as Mock
 const statMock = fs.stat as Mock
+const parseDateStringMock = vi.mocked(parseDateString)
 const parseFrontMatterMock = vi.mocked(parseFrontMatter)
 const parseMarkdownBodyDatesMock = vi.mocked(parseMarkdownBodyDates)
 
 describe("resolveCreatedDate", () => {
-  const birthtime = new Date("2026-01-01T00:00:00.000Z")
-
-  test("returns frontmatter created date when it is a valid ISO UTC string", () => {
-    expect(resolveCreatedDate({ created: "2025-06-15T10:00:00Z" }, birthtime)).toBe(
-      "2025-06-15T10:00:00.000Z",
-    )
+  test("returns frontmatter value parsed by configured format", () => {
+    parseDateStringMock.mockReturnValueOnce(new Date("2025-06-15T00:00:00.000Z"))
+    expect(
+      resolveCreatedDate({ created: "2025.06.15" }, "", "created", false, ["YYYY.MM.DD"]),
+    ).toBe("2025-06-15T00:00:00.000Z")
   })
 
-  test("returns frontmatter created date when it is a valid date-only string", () => {
-    expect(resolveCreatedDate({ created: "2025-06-15" }, birthtime)).toBe(
-      new Date("2025-06-15").toISOString(),
-    )
+  test("falls back to ISO parse when no format matches frontmatter value", () => {
+    parseDateStringMock.mockReturnValueOnce(null)
+    expect(
+      resolveCreatedDate({ created: "2025-06-15T10:00:00Z" }, "", "created", false, []),
+    ).toBe("2025-06-15T10:00:00.000Z")
   })
 
-  test("falls back to birthtime when frontmatter is null", () => {
-    expect(resolveCreatedDate(null, birthtime)).toBe("2026-01-01T00:00:00.000Z")
+  test("respects a custom createdDateProperty", () => {
+    parseDateStringMock.mockReturnValueOnce(null)
+    expect(
+      resolveCreatedDate({ date_created: "2025-06-15T00:00:00Z" }, "", "date_created", false, []),
+    ).toBe("2025-06-15T00:00:00.000Z")
   })
 
-  test("falls back to birthtime when frontmatter has no created field", () => {
-    expect(resolveCreatedDate({ type: "book" }, birthtime)).toBe("2026-01-01T00:00:00.000Z")
+  test("returns null when frontmatter is null", () => {
+    expect(resolveCreatedDate(null, "", "created", false, [])).toBeNull()
   })
 
-  test("falls back to birthtime when frontmatter created is not a parseable date string", () => {
-    expect(resolveCreatedDate({ created: "not-a-date" }, birthtime)).toBe("2026-01-01T00:00:00.000Z")
+  test("returns null when frontmatter has no matching property", () => {
+    // parseDateString is not called when createdDateProperty is absent from frontmatter
+    expect(resolveCreatedDate({ type: "book" }, "", "created", false, [])).toBeNull()
   })
 
-  test("falls back to birthtime when frontmatter created is an array", () => {
-    expect(resolveCreatedDate({ created: ["2026-01-15"] }, birthtime)).toBe("2026-01-01T00:00:00.000Z")
+  test("returns null when frontmatter value is not parseable", () => {
+    // parseDateString returns undefined by default (falsy); new Date("not-a-date") is NaN
+    expect(resolveCreatedDate({ created: "not-a-date" }, "", "created", false, [])).toBeNull()
+  })
+
+  test("returns null when frontmatter value is an array", () => {
+    expect(resolveCreatedDate({ created: ["2026-01-15"] }, "", "created", false, [])).toBeNull()
+  })
+
+  test("derives created date from title when deriveTitleDate is true", () => {
+    parseMarkdownBodyDatesMock.mockReturnValueOnce(["2026.06.05"])
+    parseDateStringMock.mockReturnValueOnce(new Date("2026-06-05T00:00:00.000Z"))
+    expect(
+      resolveCreatedDate(null, "2026.06.05 My Note", "created", true, ["YYYY.MM.DD"]),
+    ).toBe("2026-06-05T00:00:00.000Z")
+  })
+
+  test("does not use title date when deriveTitleDate is false", () => {
+    expect(
+      resolveCreatedDate(null, "2026.06.05 My Note", "created", false, ["YYYY.MM.DD"]),
+    ).toBeNull()
+  })
+
+  test("returns null when deriveTitleDate is true but title has no parseable date", () => {
+    parseMarkdownBodyDatesMock.mockReturnValueOnce([])
+    expect(
+      resolveCreatedDate(null, "My Note", "created", true, ["YYYY.MM.DD"]),
+    ).toBeNull()
   })
 })
 
@@ -89,7 +121,7 @@ describe("notes scan helpers", () => {
     expect(note).toEqual({
       basename: "welcome.md",
       titleOrBodyDates: ["2026.05.26"],
-      createdDate: "2026-05-26T00:00:00.000Z",
+      createdDate: null,
       folder: "topic",
       frontmatter: null,
       fullPath: "/notes/topic/welcome.md",

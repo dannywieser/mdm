@@ -215,6 +215,15 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
             </Box>
           )}
 
+          {show.notesWithoutCreatedDate && data.notesWithoutCreatedDate > 0 && (
+            <Text fontSize="sm" color="app.textMuted">
+              Missing created date:{" "}
+              <Text as="span" fontWeight="semibold" color="app.text">
+                {data.notesWithoutCreatedDate.toLocaleString()}
+              </Text>
+            </Text>
+          )}
+
           {show.folderBreakdown && data.folderBreakdown.length > 0 && (
             <Box>
               <Text

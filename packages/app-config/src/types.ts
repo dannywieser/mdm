@@ -19,6 +19,7 @@ export interface HomeStatsShowConfig {
   modifiedToday: boolean
   notesCreated: boolean
   notesPerDay: boolean
+  notesWithoutCreatedDate: boolean
   totalAttachments: boolean
   totalFolders: boolean
   totalNotes: boolean
@@ -31,7 +32,9 @@ export interface HomeStatsConfig {
 
 export interface ResolvedNotesConfig {
   attachmentsDirectory: string
+  createdDateProperty: string
   dateFormats: string[]
+  deriveTitleDate: boolean
   homeStats: HomeStatsConfig
   notesDirectory: string
   obsidianVault: string
@@ -41,7 +44,9 @@ export interface ResolvedNotesConfig {
 
 export interface AppConfig {
   attachmentsDirectory?: string
+  createdDateProperty?: string
   dateFormats?: string[]
+  deriveTitleDate?: boolean
   homeStats?: {
     show?: Partial<HomeStatsShowConfig>
   }

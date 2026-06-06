@@ -15,6 +15,7 @@ import {
   buildViewCounts,
   countFolders,
   countModifiedToday,
+  countNotesWithoutCreatedDate,
 } from "./stats.util"
 
 vi.mock("app-config", async () => {
@@ -49,6 +50,7 @@ vi.mock("./stats.util", () => ({
   buildViewCounts: vi.fn(),
   countFolders: vi.fn(),
   countModifiedToday: vi.fn(),
+  countNotesWithoutCreatedDate: vi.fn(),
 }))
 
 const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
@@ -63,6 +65,7 @@ const buildTrendsMock = vi.mocked(buildTrends)
 const buildViewCountsMock = vi.mocked(buildViewCounts)
 const countFoldersMock = vi.mocked(countFolders)
 const countModifiedTodayMock = vi.mocked(countModifiedToday)
+const countNotesWithoutCreatedDateMock = vi.mocked(countNotesWithoutCreatedDate)
 
 const mockHomeStats = {
   show: {
@@ -70,6 +73,7 @@ const mockHomeStats = {
     modifiedToday: true,
     notesCreated: true,
     notesPerDay: true,
+    notesWithoutCreatedDate: true,
     totalAttachments: true,
     totalFolders: true,
     totalNotes: true,
@@ -79,7 +83,9 @@ const mockHomeStats = {
 
 const mockConfig = {
   attachmentsDirectory: "attachments",
+  createdDateProperty: "created",
   dateFormats: ["YYYY.MM.DD"],
+  deriveTitleDate: false,
   homeStats: mockHomeStats,
   notesDirectory: "/notes",
   obsidianVault: "vault",
@@ -139,6 +145,7 @@ describe("stats handler interface", () => {
       notesPrevious30Days: 2,
     })
     buildNotesPerDayMock.mockReturnValue([{ count: 1, date: "2026-06-01" }])
+    countNotesWithoutCreatedDateMock.mockReturnValue(5)
   })
 
   test("returns expanded stats response", async () => {
@@ -154,6 +161,7 @@ describe("stats handler interface", () => {
       modifiedToday: 1,
       notesCreated: { last30Days: 3, last365Days: 40, last90Days: 15 },
       notesPerDay: [{ count: 1, date: "2026-06-01" }],
+      notesWithoutCreatedDate: 5,
       totalAttachments: 12,
       totalFolders: 3,
       totalNotes: 2,

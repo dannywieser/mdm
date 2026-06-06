@@ -87,6 +87,7 @@ const isHomeStatsConfig = (
     "modifiedToday",
     "notesCreated",
     "notesPerDay",
+    "notesWithoutCreatedDate",
     "totalAttachments",
     "totalFolders",
     "totalNotes",
@@ -102,6 +103,7 @@ const DEFAULT_HOME_STATS_SHOW: HomeStatsShowConfig = {
   modifiedToday: true,
   notesCreated: true,
   notesPerDay: true,
+  notesWithoutCreatedDate: true,
   totalAttachments: true,
   totalFolders: true,
   totalNotes: true,
@@ -115,7 +117,9 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
 
   const parsedConfig = appConfig as Record<string, unknown>
   const attachmentsDirectory = parsedConfig["attachmentsDirectory"]
+  const createdDateProperty = parsedConfig["createdDateProperty"]
   const dateFormats = parsedConfig["dateFormats"]
+  const deriveTitleDate = parsedConfig["deriveTitleDate"]
   const homeStats = parsedConfig["homeStats"]
   const obsidianVault = parsedConfig["obsidianVault"]
   const timezone = parsedConfig["timezone"]
@@ -160,6 +164,18 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
     )
   }
 
+  if (createdDateProperty !== undefined && !isNonEmptyString(createdDateProperty)) {
+    throw new AppConfigError(
+      "app.config.json createdDateProperty must be a non-empty string",
+    )
+  }
+
+  if (deriveTitleDate !== undefined && typeof deriveTitleDate !== "boolean") {
+    throw new AppConfigError(
+      "app.config.json deriveTitleDate must be a boolean",
+    )
+  }
+
   if (homeStats !== undefined && !isHomeStatsConfig(homeStats)) {
     throw new AppConfigError(
       "app.config.json homeStats.show must be an object with boolean values for each display section",
@@ -168,7 +184,9 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
 
   return {
     attachmentsDirectory,
+    createdDateProperty: isNonEmptyString(createdDateProperty) ? createdDateProperty : undefined,
     dateFormats,
+    deriveTitleDate: typeof deriveTitleDate === "boolean" ? deriveTitleDate : undefined,
     homeStats: isHomeStatsConfig(homeStats) ? homeStats : undefined,
     obsidianVault,
     timezone: isNonEmptyString(timezone) ? timezone : undefined,
@@ -210,7 +228,9 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
 
   cachedNotesConfig = {
     attachmentsDirectory: appConfig.attachmentsDirectory ?? "attachments",
+    createdDateProperty: appConfig.createdDateProperty ?? "created",
     dateFormats: appConfig.dateFormats ?? [],
+    deriveTitleDate: appConfig.deriveTitleDate ?? false,
     homeStats: {
       show: { ...DEFAULT_HOME_STATS_SHOW, ...appConfig.homeStats?.show },
     },

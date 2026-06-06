@@ -40,6 +40,7 @@ export interface StatsResponse {
   modifiedToday: number
   notesCreated: NotesCreatedStats
   notesPerDay: NotePerDay[]
+  notesWithoutCreatedDate: number
   totalAttachments: number
   totalFolders: number
   totalNotes: number

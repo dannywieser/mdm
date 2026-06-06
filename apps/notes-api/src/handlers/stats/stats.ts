@@ -16,6 +16,7 @@ import {
   buildViewCounts,
   countFolders,
   countModifiedToday,
+  countNotesWithoutCreatedDate,
 } from "./stats.util"
 
 export const statsHandler: RequestHandler = async (_request, response) => {
@@ -25,7 +26,9 @@ export const statsHandler: RequestHandler = async (_request, response) => {
     notesConfig = await resolveNotesConfig()
     const {
       attachmentsDirectory,
+      createdDateProperty,
       dateFormats,
+      deriveTitleDate,
       homeStats,
       notesDirectory,
       obsidianVault,
@@ -36,7 +39,7 @@ export const statsHandler: RequestHandler = async (_request, response) => {
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).sort()
     const scannedNotes = await Promise.all(
       markdownFiles.map((filePath) =>
-        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats),
+        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, createdDateProperty, deriveTitleDate),
       ),
     )
 
@@ -51,6 +54,7 @@ export const statsHandler: RequestHandler = async (_request, response) => {
       modifiedToday: countModifiedToday(scannedNotes, timezone),
       notesCreated: buildNotesCreated(scannedNotes, now),
       notesPerDay: buildNotesPerDay(scannedNotes, timezone, now),
+      notesWithoutCreatedDate: countNotesWithoutCreatedDate(scannedNotes),
       totalAttachments,
       totalFolders: countFolders(scannedNotes),
       totalNotes: scannedNotes.length,

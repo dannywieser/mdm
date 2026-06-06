@@ -93,7 +93,9 @@ describe("notes handler interface", () => {
 
     resolveNotesConfigMock.mockResolvedValue({
       attachmentsDirectory: "attachments",
+      createdDateProperty: "created",
       dateFormats: ["YYYY.MM.DD"],
+      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -148,8 +150,8 @@ describe("notes handler interface", () => {
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(scanMarkdownFileMock.mock.calls).toEqual([
-      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"]],
-      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"]],
+      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"], "created", false],
+      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"], "created", false],
     ])
     expect(applyViewFilterMock).toHaveBeenCalledWith(
       scannedNotes,
@@ -192,7 +194,9 @@ describe("notes handler interface", () => {
 
     resolveNotesConfigMock.mockResolvedValue({
       attachmentsDirectory: "attachments",
+      createdDateProperty: "created",
       dateFormats: [],
+      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -249,7 +253,9 @@ describe("notes handler interface", () => {
   test("returns an error when util loading fails", async () => {
     resolveNotesConfigMock.mockResolvedValue({
       attachmentsDirectory: "attachments",
+      createdDateProperty: "created",
       dateFormats: [],
+      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -291,7 +297,9 @@ describe("notes handler interface", () => {
     expect(loggedPayload.error.message).toBe("boom")
     expect(loggedPayload.notesConfig).toEqual({
       attachmentsDirectory: "attachments",
+      createdDateProperty: "created",
       dateFormats: [],
+      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",

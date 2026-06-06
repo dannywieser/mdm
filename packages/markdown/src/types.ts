@@ -22,7 +22,7 @@ export interface NoteFrontmatter {
 export interface Note {
   basename: string
   titleOrBodyDates: string[]
-  createdDate: string
+  createdDate: string | null
   frontmatter: NoteFrontmatter | null
   folder: string
   fullPath: string

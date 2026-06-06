@@ -1,6 +1,6 @@
 import type { NoteFrontmatter } from "markdown"
 
-import { parseFrontMatter, parseMarkdownBodyDates } from "markdown"
+import { parseDateString, parseFrontMatter, parseMarkdownBodyDates } from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
 import path from "node:path"
@@ -11,16 +11,28 @@ export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 
 export const resolveCreatedDate = (
   frontmatter: NoteFrontmatter | null,
-  birthtime: Date,
-): string => {
-  const created = frontmatter?.["created"]
-  if (typeof created === "string") {
-    const parsed = new Date(created)
-    if (!isNaN(parsed.getTime())) {
-      return parsed.toISOString()
+  title: string,
+  createdDateProperty: string,
+  deriveTitleDate: boolean,
+  dateFormats: readonly string[],
+): string | null => {
+  const fmValue = frontmatter?.[createdDateProperty]
+  if (typeof fmValue === "string") {
+    const fmFormatParsed = parseDateString(fmValue, dateFormats)
+    if (fmFormatParsed) return fmFormatParsed.toISOString()
+    const isoDate = new Date(fmValue)
+    if (!isNaN(isoDate.getTime())) return isoDate.toISOString()
+  }
+
+  if (deriveTitleDate) {
+    const titleDates = parseMarkdownBodyDates(title, dateFormats)
+    if (titleDates.length > 0) {
+      const parsed = parseDateString(titleDates[0] ?? "", dateFormats)
+      if (parsed) return parsed.toISOString()
     }
   }
-  return birthtime.toISOString()
+
+  return null
 }
 
 const extractFrontmatterDates = (
@@ -36,6 +48,8 @@ export const scanMarkdownFile = async (
   notesDirectory: string,
   obsidianVault: string,
   dateFormats: readonly string[] = [],
+  createdDateProperty: string = "created",
+  deriveTitleDate: boolean = false,
 ): Promise<ScannedNote> => {
   const [source, stats] = await Promise.all([
     fs.readFile(filePath, "utf8"),
@@ -64,7 +78,7 @@ export const scanMarkdownFile = async (
   return {
     basename,
     titleOrBodyDates,
-    createdDate: resolveCreatedDate(frontmatter, stats.birthtime),
+    createdDate: resolveCreatedDate(frontmatter, title, createdDateProperty, deriveTitleDate, dateFormats),
     folder: path.relative(notesDirectory, path.dirname(filePath)).split(path.sep).join("/"),
     frontmatter,
     fullPath: filePath,
