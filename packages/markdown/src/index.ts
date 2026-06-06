@@ -1,3 +1,4 @@
+export { parseDateString } from "./parsers/parseDateString"
 export { parseFrontMatter } from "./parsers/parseFrontMatter"
 export { parseMarkdownBodyDates } from "./parsers/parseMarkdownBodyDates"
 

@@ -116,13 +116,16 @@ describe("config", () => {
 
     await expect(resolveNotesConfig()).resolves.toEqual({
       attachmentsDirectory: "attachments",
+      createdDateProperty: "created",
       dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
+      deriveTitleDate: false,
       homeStats: {
         show: {
           folderBreakdown: true,
           modifiedToday: true,
           notesCreated: true,
           notesPerDay: true,
+          notesWithoutCreatedDate: true,
           totalAttachments: true,
           totalFolders: true,
           totalNotes: true,
@@ -163,13 +166,16 @@ describe("config", () => {
 
     await expect(resolveNotesConfig()).resolves.toEqual({
       attachmentsDirectory: "attachments",
+      createdDateProperty: "created",
       dateFormats: [],
+      deriveTitleDate: false,
       homeStats: {
         show: {
           folderBreakdown: true,
           modifiedToday: true,
           notesCreated: true,
           notesPerDay: true,
+          notesWithoutCreatedDate: true,
           totalAttachments: true,
           totalFolders: true,
           totalNotes: true,
@@ -193,13 +199,16 @@ describe("config", () => {
 
     await expect(resolveNotesConfig()).resolves.toEqual({
       attachmentsDirectory: "attachments",
+      createdDateProperty: "created",
       dateFormats: ["YYYY.MM.DD"],
+      deriveTitleDate: false,
       homeStats: {
         show: {
           folderBreakdown: true,
           modifiedToday: true,
           notesCreated: true,
           notesPerDay: true,
+          notesWithoutCreatedDate: true,
           totalAttachments: true,
           totalFolders: true,
           totalNotes: true,
@@ -287,6 +296,62 @@ describe("config", () => {
       new AppConfigError(
         "app.config.json homeStats.show must be an object with boolean values for each display section",
       ),
+    )
+  })
+
+  test("defaults createdDateProperty to created when omitted", async () => {
+    readFileMock.mockResolvedValue(JSON.stringify({ obsidianVault: "vault" }))
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      createdDateProperty: "created",
+    })
+  })
+
+  test("uses configured createdDateProperty when provided", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({ createdDateProperty: "date_created", obsidianVault: "vault" }),
+    )
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      createdDateProperty: "date_created",
+    })
+  })
+
+  test("throws when createdDateProperty is not a non-empty string", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({ createdDateProperty: "", obsidianVault: "vault" }),
+    )
+
+    await expect(resolveNotesConfig()).rejects.toEqual(
+      new AppConfigError("app.config.json createdDateProperty must be a non-empty string"),
+    )
+  })
+
+  test("defaults deriveTitleDate to false when omitted", async () => {
+    readFileMock.mockResolvedValue(JSON.stringify({ obsidianVault: "vault" }))
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      deriveTitleDate: false,
+    })
+  })
+
+  test("uses configured deriveTitleDate when provided", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({ deriveTitleDate: true, obsidianVault: "vault" }),
+    )
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      deriveTitleDate: true,
+    })
+  })
+
+  test("throws when deriveTitleDate is not a boolean", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({ deriveTitleDate: "yes", obsidianVault: "vault" }),
+    )
+
+    await expect(resolveNotesConfig()).rejects.toEqual(
+      new AppConfigError("app.config.json deriveTitleDate must be a boolean"),
     )
   })
 

@@ -35,6 +35,7 @@ export interface HomeStatsShowConfig {
   modifiedToday: boolean
   notesCreated: boolean
   notesPerDay: boolean
+  notesWithoutCreatedDate: boolean
   totalAttachments: boolean
   totalFolders: boolean
   totalNotes: boolean
@@ -51,6 +52,7 @@ export interface StatsResponse {
   modifiedToday: number
   notesCreated: NotesCreatedStats
   notesPerDay: NotePerDay[]
+  notesWithoutCreatedDate: number
   totalAttachments: number
   totalFolders: number
   totalNotes: number

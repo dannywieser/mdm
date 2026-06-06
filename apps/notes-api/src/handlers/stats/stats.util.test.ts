@@ -11,6 +11,7 @@ import {
   buildViewCounts,
   countFolders,
   countModifiedToday,
+  countNotesWithoutCreatedDate,
 } from "./stats.util"
 
 vi.mock("mdm-util", () => ({ getDateComponents: vi.fn() }))
@@ -275,6 +276,43 @@ describe("stats util", () => {
       const result = buildNotesPerDay(notes, "UTC", now)
 
       expect(result.every((d) => d.count === 0)).toBe(true)
+    })
+
+    test("skips notes with null createdDate", () => {
+      getDateComponentsMock.mockImplementation((date) => {
+        const d = new Date(date)
+        return { day: d.getUTCDate(), month: d.getUTCMonth() + 1, year: d.getUTCFullYear() }
+      })
+
+      const notes = [
+        createNote({ createdDate: "2026-06-01T00:00:00.000Z", modifiedDate: "2026-06-01T00:00:00.000Z" }),
+        createNote({ createdDate: null, modifiedDate: "2026-06-01T00:00:00.000Z" }),
+      ]
+
+      const result = buildNotesPerDay(notes, "UTC", now)
+      const jun1 = result.find((d) => d.date === "2026-06-01")
+
+      expect(jun1?.count).toBe(1)
+    })
+  })
+
+  describe("countNotesWithoutCreatedDate", () => {
+    test("returns count of notes where createdDate is null", () => {
+      const notes = [
+        createNote({ createdDate: "2026-06-01T00:00:00.000Z", modifiedDate: "2026-06-01T00:00:00.000Z" }),
+        createNote({ createdDate: null, modifiedDate: "2026-06-01T00:00:00.000Z" }),
+        createNote({ createdDate: null, modifiedDate: "2026-06-01T00:00:00.000Z" }),
+      ]
+
+      expect(countNotesWithoutCreatedDate(notes)).toBe(2)
+    })
+
+    test("returns 0 when all notes have a createdDate", () => {
+      const notes = [
+        createNote({ createdDate: "2026-06-01T00:00:00.000Z", modifiedDate: "2026-06-01T00:00:00.000Z" }),
+      ]
+
+      expect(countNotesWithoutCreatedDate(notes)).toBe(0)
     })
   })
 })

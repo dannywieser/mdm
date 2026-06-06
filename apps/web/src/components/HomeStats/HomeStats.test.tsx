@@ -24,6 +24,7 @@ const defaultShow = {
   modifiedToday: true,
   notesCreated: true,
   notesPerDay: true,
+  notesWithoutCreatedDate: true,
   totalAttachments: true,
   totalFolders: true,
   totalNotes: true,
@@ -39,6 +40,7 @@ const defaultData = {
   modifiedToday: 3,
   notesCreated: { last30Days: 11, last365Days: 80, last90Days: 45 },
   notesPerDay: [{ count: 2, date: "2026-06-01" }],
+  notesWithoutCreatedDate: 7,
   totalAttachments: 50,
   totalFolders: 8,
   totalNotes: 200,
@@ -111,6 +113,27 @@ describe("HomeStats", () => {
     expect(screen.queryByText("projects")).toBeNull()
   })
 
+  test("renders notesWithoutCreatedDate when count is greater than zero", () => {
+    renderComponent()
+
+    expect(screen.getByText("7")).toBeTruthy()
+    expect(screen.getByText("Missing created date:")).toBeTruthy()
+  })
+
+  test("hides notesWithoutCreatedDate when count is zero", () => {
+    renderComponent({ ...defaultData, notesWithoutCreatedDate: 0 })
+
+    expect(screen.queryByText("Missing created date:")).toBeNull()
+  })
+
+  test("hides notesWithoutCreatedDate when show.notesWithoutCreatedDate is false", () => {
+    renderComponent({
+      ...defaultData,
+      homeStats: { show: { ...defaultShow, notesWithoutCreatedDate: false } },
+    })
+
+    expect(screen.queryByText("Missing created date:")).toBeNull()
+  })
 })
 
 describe("HomeStats util", () => {

@@ -64,6 +64,9 @@ const toDateString = (date: Date, timezone: string): string => {
   return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
 }
 
+export const countNotesWithoutCreatedDate = (notes: readonly ScannedNote[]): number =>
+  notes.filter((note) => note.createdDate === null).length
+
 const countNotesCreatedSince = (
   notes: readonly ScannedNote[],
   days: number,
@@ -71,7 +74,9 @@ const countNotesCreatedSince = (
 ): number => {
   const cutoff = new Date(now)
   cutoff.setDate(cutoff.getDate() - days)
-  return notes.filter((note) => new Date(note.createdDate) >= cutoff).length
+  return notes.filter(
+    (note) => note.createdDate !== null && new Date(note.createdDate) >= cutoff,
+  ).length
 }
 
 const countNotesCreatedInRange = (
@@ -85,6 +90,7 @@ const countNotesCreatedInRange = (
   const newerCutoff = new Date(now)
   newerCutoff.setDate(newerCutoff.getDate() - newerDays)
   return notes.filter((note) => {
+    if (note.createdDate === null) return false
     const created = new Date(note.createdDate)
     return created >= olderCutoff && created < newerCutoff
   }).length
@@ -132,6 +138,7 @@ export const buildNotesPerDay = (
   }
 
   for (const note of notes) {
+    if (note.createdDate === null) continue
     const dateStr = toDateString(new Date(note.createdDate), timezone)
     const current = counts.get(dateStr)
     if (current !== undefined) {
