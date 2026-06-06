@@ -56,7 +56,7 @@ export const colorPaletteSystems: Record<ColorPaletteName, ReturnType<typeof cre
   catppuccin: createPaletteSystem("catppuccin"),
   solarized: createPaletteSystem("solarized"),
   gotham: createPaletteSystem("gotham"),
-  githubHighContrast: createPaletteSystem("githubHighContrast"),
+  highContrast: createPaletteSystem("highContrast"),
 }
 
 export const defaultColorPaletteSystem =

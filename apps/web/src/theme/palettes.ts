@@ -7,7 +7,7 @@ export type ColorPaletteName =
   | "catppuccin"
   | "solarized"
   | "gotham"
-  | "githubHighContrast"
+  | "highContrast"
 
 export interface ColorPaletteVariant {
   background: string
@@ -200,8 +200,8 @@ export const colorPaletteDefinitions: Record<
       return this.dark
     },
   },
-  githubHighContrast: {
-    i18nKey: "palette.githubHighContrast",
+  highContrast: {
+    i18nKey: "palette.highContrast",
     light: {
       background: "#ffffff",
       panelBackground: "#f0f3f6",
