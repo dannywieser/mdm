@@ -160,10 +160,8 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
           src={node.url}
           alt={node.alt ?? ""}
           borderRadius="md"
-          display="block"
           maxW="full"
           minH="12"
-          mx="auto"
           my="4"
         />
       )

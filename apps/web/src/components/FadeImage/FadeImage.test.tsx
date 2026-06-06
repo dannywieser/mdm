@@ -36,10 +36,12 @@ describe("FadeImage", () => {
     expect(screen.queryByTestId("fade-image-skeleton")).toBeNull()
   })
 
-  test("shows a skeleton without minH before load", () => {
-    renderFadeImage()
+  test("hides the skeleton after a load error", () => {
+    renderFadeImage({ minH: "12" })
 
-    expect(screen.getByTestId("fade-image-skeleton")).toBeTruthy()
+    fireEvent.error(screen.getByRole("img", { name: "test image" }))
+
+    expect(screen.queryByTestId("fade-image-skeleton")).toBeNull()
   })
 
   test("image remains in the DOM after load", () => {
@@ -48,5 +50,24 @@ describe("FadeImage", () => {
     fireEvent.load(screen.getByRole("img", { name: "test image" }))
 
     expect(screen.getByRole("img", { name: "test image" })).toBeTruthy()
+  })
+
+  test("resets to skeleton state when src changes", () => {
+    const { rerender } = render(
+      <ChakraProvider value={defaultSystem}>
+        <FadeImage alt="test image" src="/first.jpg" minH="12" />
+      </ChakraProvider>,
+    )
+
+    fireEvent.load(screen.getByRole("img", { name: "test image" }))
+    expect(screen.queryByTestId("fade-image-skeleton")).toBeNull()
+
+    rerender(
+      <ChakraProvider value={defaultSystem}>
+        <FadeImage alt="test image" src="/second.jpg" minH="12" />
+      </ChakraProvider>,
+    )
+
+    expect(screen.getByTestId("fade-image-skeleton")).toBeTruthy()
   })
 })
