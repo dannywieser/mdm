@@ -39,7 +39,14 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
   const { homeStats } = data
   const show = homeStats.show
 
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(
+    () => localStorage.getItem("home-stats:open") !== "false",
+  )
+
+  const handleOpenChange = ({ open }: { open: boolean }) => {
+    setIsOpen(open)
+    localStorage.setItem("home-stats:open", String(open))
+  }
 
   const hasTopStats =
     show.totalNotes || show.totalFolders || show.totalAttachments
@@ -56,7 +63,7 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
     >
       <Collapsible.Root
         open={isOpen}
-        onOpenChange={({ open }) => setIsOpen(open)}
+        onOpenChange={handleOpenChange}
       >
         <Collapsible.Trigger
           width="full"
