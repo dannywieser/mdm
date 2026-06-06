@@ -10,6 +10,7 @@ export interface NotesView {
   component: string
   filters: ViewFilter[]
   id: string
+  layout?: string
   name: string
 }
 
@@ -36,5 +37,6 @@ export interface AppConfigView {
   component: string
   filters: ViewFilter[]
   id: string
+  layout?: string
   name: string
 }
