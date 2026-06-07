@@ -641,7 +641,7 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive trackingWindowDays number",
+        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive integer trackingWindowDays",
       ),
     )
   })
@@ -664,7 +664,30 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive trackingWindowDays number",
+        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive integer trackingWindowDays",
+      ),
+    )
+  })
+
+  test("throws when habit trackingWindowDays is not an integer", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        habits: [
+          {
+            id: "exercise",
+            name: "Exercise",
+            mode: "do-more",
+            frontmatterProperty: "exercise",
+            trackingWindowDays: 30.5,
+          },
+        ],
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesDirectory()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive integer trackingWindowDays",
       ),
     )
   })

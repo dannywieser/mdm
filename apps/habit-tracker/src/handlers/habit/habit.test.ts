@@ -135,9 +135,10 @@ describe("getWindowEntries", () => {
   })
 
   test("excludes entries outside window", () => {
+    // 10-day window ending 2025-01-20 spans 2025-01-11 through 2025-01-20
     const result = getWindowEntries(entries, "2025-01-20", 10)
     expect(result.map((e) => e.date)).not.toContain("2025-01-01")
-    expect(result.map((e) => e.date)).toContain("2025-01-10")
+    expect(result.map((e) => e.date)).not.toContain("2025-01-10")
     expect(result.map((e) => e.date)).toContain("2025-01-20")
   })
 
@@ -152,7 +153,7 @@ describe("getWindowEntries", () => {
   })
 
   test("window boundary is inclusive on both ends", () => {
-    // 10-day window from 2025-01-10 back to 2024-12-31
+    // 10-day window ending 2025-01-10 spans 2025-01-01 through 2025-01-10
     const result = getWindowEntries(entries, "2025-01-10", 10)
     expect(result.map((e) => e.date)).toContain("2025-01-01")
     expect(result.map((e) => e.date)).toContain("2025-01-10")
@@ -436,9 +437,9 @@ describe("calculateHabitScore", () => {
     expect(recentEntryAdditions).toBe(0)
   })
 
-  test("windowStart is trackingWindowDays before referenceDate", () => {
+  test("windowStart begins the trackingWindowDays-day window ending on referenceDate", () => {
     const { windowStart } = calculateHabitScore([], "2025-03-31", 90, "do-more")
-    expect(windowStart).toBe("2024-12-31")
+    expect(windowStart).toBe("2025-01-01")
   })
 
   test("entries outside tracking window are excluded", () => {
@@ -790,11 +791,11 @@ describe("year-long dataset (2025)", () => {
     }
   })
 
-  test("windowStart is always exactly trackingWindowDays before the entry date", () => {
+  test("windowStart always begins a trackingWindowDays-day window ending on the entry date", () => {
     const windowDays = 90
     const history = buildHistory(YEAR_ENTRIES, windowDays, "do-more", YEAR_REFERENCE_DATE)
     for (const h of history) {
-      expect(h.windowStart).toBe(addDays(h.date, -windowDays))
+      expect(h.windowStart).toBe(addDays(h.date, -(windowDays - 1)))
     }
   })
 
@@ -894,7 +895,7 @@ describe("habitHandler", () => {
     // do-more: habitScore = 230 * (1 + 0.015) * (1 + 0.015) = 230 * 1.030225 = 236.95..., floored to 236
     expect(result.habitScore).toBe(Math.floor(230 * (1 + 0.015) * (1 + 0.015)))
     expect(result.streak).toBe(3)
-    expect(result.totalEntries).toBe(3)
+    expect(result.windowEntries).toBe(3)
   })
 
   test("returns all-time high stats derived from history", async () => {
@@ -924,11 +925,11 @@ describe("habitHandler", () => {
     expect(json).toHaveBeenCalledWith({ error: "Unable to load habit" })
   })
 
-  test("windowStart is trackingWindowDays before today", async () => {
+  test("windowStart begins the trackingWindowDays-day window ending today", async () => {
     const { response, json } = makeResponse()
     await habitHandler(makeRequest("exercise"), response, vi.fn())
     const result = getJsonResult(json)
-    // today = 2025-01-03, trackingWindowDays = 30
-    expect(result.windowStart).toBe("2024-12-04")
+    // today = 2025-01-03, trackingWindowDays = 30 → window spans 2024-12-05..2025-01-03
+    expect(result.windowStart).toBe("2024-12-05")
   })
 })

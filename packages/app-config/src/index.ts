@@ -112,6 +112,7 @@ const isHabitConfig = (value: unknown): value is HabitConfig => {
     (obj["mode"] === "do-more" || obj["mode"] === "do-less") &&
     isNonEmptyString(obj["frontmatterProperty"]) &&
     typeof obj["trackingWindowDays"] === "number" &&
+    Number.isInteger(obj["trackingWindowDays"]) &&
     obj["trackingWindowDays"] > 0
   )
 }
@@ -206,7 +207,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
     (!Array.isArray(habits) || !habits.every(isHabitConfig))
   ) {
     throw new AppConfigError(
-      "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive trackingWindowDays number",
+      "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive integer trackingWindowDays",
     )
   }
 

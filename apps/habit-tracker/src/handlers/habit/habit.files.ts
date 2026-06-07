@@ -66,8 +66,14 @@ export const scanHabitEntries = async (
         return null
       }
 
-      const numValue = parseFloat(rawValue.replace(/^"(.*)"$/, "$1"))
-      if (isNaN(numValue) || numValue < 1 || numValue > 10) {
+      const cleanedValue = rawValue.replace(/^"(.*)"$/, "$1")
+      if (!/^-?\d+(\.\d+)?$/.test(cleanedValue)) {
+        console.debug(`[habit] skipping ${basename}: "${frontmatterProperty}" is not a numeric value`, { rawValue })
+        return null
+      }
+
+      const numValue = parseFloat(cleanedValue)
+      if (numValue < 1 || numValue > 10) {
         console.debug(`[habit] skipping ${basename}: "${frontmatterProperty}" value out of 1-10 range`, { rawValue })
         return null
       }

@@ -45,7 +45,7 @@ export interface HabitResult {
   habitScore: number
   streak: number
   streaks: HabitStreak[]
-  totalEntries: number
+  windowEntries: number
   windowStart: string
   rawScore: number
   scoreBeforeMultipliers: number

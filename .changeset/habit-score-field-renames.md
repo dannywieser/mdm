@@ -2,4 +2,4 @@
 "habit-tracker": patch
 ---
 
-Rename `score` to `habitScore` and `totalScore` to `scoreBeforeMultipliers` in the `GET /habit/:id` response — both at the top level and in each `history` entry — to better reflect what each value represents.
+Rename `score` to `habitScore`, `totalScore` to `scoreBeforeMultipliers`, and `totalEntries` to `windowEntries` in the `GET /habit/:id` response — both at the top level and (where applicable) in each `history` entry — to better reflect what each value represents.

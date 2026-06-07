@@ -8,12 +8,15 @@ const RECENT_WINDOW_DAYS = 14
 const RECENT_MULTIPLIER = 10
 const BONUS_PER_UNIT = 0.005
 
+// A `windowDays`-day window ending on (and including) `referenceDate` spans
+// `windowDays - 1` days before it, so the inclusive [windowStart, referenceDate]
+// range contains exactly `windowDays` calendar days.
 export const getWindowEntries = (
   entries: HabitEntry[],
   referenceDate: string,
   windowDays: number,
 ): HabitEntry[] => {
-  const windowStart = getDateWindowStart(referenceDate, windowDays)
+  const windowStart = getDateWindowStart(referenceDate, windowDays - 1)
   return entries.filter((e) => e.date >= windowStart && e.date <= referenceDate)
 }
 
@@ -79,7 +82,7 @@ export const calculateHabitScore = (
   windowDays: number,
   mode: HabitMode,
 ): HabitScoreResult => {
-  const windowStart = getDateWindowStart(referenceDate, windowDays)
+  const windowStart = getDateWindowStart(referenceDate, windowDays - 1)
   const windowEntries = getWindowEntries(entries, referenceDate, windowDays)
   const rawScore = calculateRawScore(windowEntries)
   const recentEntryAdditions = calculateRecentEntryAdditions(windowEntries, referenceDate)
@@ -123,6 +126,13 @@ export const buildHistory = (
 
   const dates = buildDateRange(sortedEntries[0].date, referenceDate)
 
+  // Sum entry values per date once up front, rather than re-filtering the
+  // full entry list for every day in the (potentially long) history range.
+  const valueByDate = new Map<string, number>()
+  for (const entry of sortedEntries) {
+    valueByDate.set(entry.date, (valueByDate.get(entry.date) ?? 0) + entry.value)
+  }
+
   return dates.map((date) => {
     const {
       habitScore,
@@ -136,9 +146,7 @@ export const buildHistory = (
       recentEntryAdditions,
     } = calculateHabitScore(sortedEntries, date, windowDays, mode)
 
-    const value = sortedEntries
-      .filter((e) => e.date === date)
-      .reduce((sum, e) => sum + e.value, 0)
+    const value = valueByDate.get(date) ?? 0
 
     return {
       date,

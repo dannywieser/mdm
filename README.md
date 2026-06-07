@@ -163,7 +163,7 @@ This repository is a Turborepo monorepo with this structure:
         "windowStart": "2026-03-08",
         "habitScore": 525,
         "streak": 5,
-        "totalEntries": 5,
+        "windowEntries": 5,
         "rawScore": 50,
         "recentEntryAdditions": 450,
         "scoreBeforeMultipliers": 500,
@@ -234,9 +234,9 @@ This repository is a Turborepo monorepo with this structure:
   - `habits` (optional): array of habit configs consumed by `apps/habit-tracker`'s `GET /habit/:id`. Each habit has:
     - `id`: route key used by `GET /habit/:id`
     - `name`: human-readable label returned in the response
-    - `mode`: `"do-more"` or `"do-less"` — controls whether the bonus from days-with-entries is added to or subtracted from the score
+    - `mode`: `"do-more"` or `"do-less"` — controls whether the streak adjustment (`streakMultiplier`) boosts or lowers the score; the days-with-entries adjustment (`dayMultiplier`) is always positive in both modes (see scoring details above)
     - `frontmatterProperty`: frontmatter key holding a numeric value from 1–10 to track
-    - `trackingWindowDays`: size (in days) of the rolling window used to score the habit
+    - `trackingWindowDays`: size (in days) of the rolling window used to score the habit — must be a positive integer
 
 ## Docker Compose deployment
 

@@ -79,7 +79,7 @@ export const habitHandler: RequestHandler = async (request, response) => {
       habitScore,
       streak,
       streaks,
-      totalEntries: uniqueWindowDays,
+      windowEntries: uniqueWindowDays,
       windowStart,
       rawScore,
       scoreBeforeMultipliers,
