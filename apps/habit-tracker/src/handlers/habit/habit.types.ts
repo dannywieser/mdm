@@ -3,6 +3,7 @@ import type { HabitMode } from "app-config"
 export interface HabitEntry {
   date: string
   value: number
+  obsidianUrl: string
 }
 
 export interface HabitScoreResult {
@@ -41,6 +42,7 @@ export interface HabitScoreEntry {
   date: string
   value: number
   recentMultiplier: number | undefined
+  obsidianUrl: string
 }
 
 export interface HabitResult {

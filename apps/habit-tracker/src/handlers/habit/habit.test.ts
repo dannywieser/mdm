@@ -44,7 +44,11 @@ vi.mock("mdm-util", async (importOriginal) => {
 // Test data helpers
 // ---------------------------------------------------------------------------
 
-const makeEntry = (date: string, value: number): HabitEntry => ({ date, value })
+const makeEntry = (date: string, value: number): HabitEntry => ({
+  date,
+  value,
+  obsidianUrl: `obsidian://open?vault=vault&file=${date}`,
+})
 
 const makeRequest = (id: string) => ({ params: { id } }) as never
 
@@ -367,7 +371,12 @@ describe("buildScoreEntries", () => {
     // recentCutoff = addDays("2025-01-20", -14) = "2025-01-06"
     const entries = [makeEntry("2025-01-07", 4)]
     expect(buildScoreEntries(entries, refDate)).toEqual([
-      { date: "2025-01-07", value: 4, recentMultiplier: 10 },
+      {
+        date: "2025-01-07",
+        value: 4,
+        recentMultiplier: 10,
+        obsidianUrl: "obsidian://open?vault=vault&file=2025-01-07",
+      },
     ])
   })
 
@@ -376,7 +385,12 @@ describe("buildScoreEntries", () => {
     // recentCutoff = addDays("2025-01-20", -14) = "2025-01-06"
     const entries = [makeEntry("2025-01-05", 3)]
     expect(buildScoreEntries(entries, refDate)).toEqual([
-      { date: "2025-01-05", value: 3, recentMultiplier: undefined },
+      {
+        date: "2025-01-05",
+        value: 3,
+        recentMultiplier: undefined,
+        obsidianUrl: "obsidian://open?vault=vault&file=2025-01-05",
+      },
     ])
   })
 
@@ -961,9 +975,24 @@ describe("habitHandler", () => {
     // today = 2025-01-03; entries on 2025-01-01, 2025-01-02, 2025-01-03 are all within
     // the 14-day recent window, so each gets the 10x recency multiplier
     expect(result.scoreEntries).toEqual([
-      { date: "2025-01-03", value: 9, recentMultiplier: 10 },
-      { date: "2025-01-02", value: 6, recentMultiplier: 10 },
-      { date: "2025-01-01", value: 8, recentMultiplier: 10 },
+      {
+        date: "2025-01-03",
+        value: 9,
+        recentMultiplier: 10,
+        obsidianUrl: "obsidian://open?vault=vault&file=2025-01-03",
+      },
+      {
+        date: "2025-01-02",
+        value: 6,
+        recentMultiplier: 10,
+        obsidianUrl: "obsidian://open?vault=vault&file=2025-01-02",
+      },
+      {
+        date: "2025-01-01",
+        value: 8,
+        recentMultiplier: 10,
+        obsidianUrl: "obsidian://open?vault=vault&file=2025-01-01",
+      },
     ])
   })
 

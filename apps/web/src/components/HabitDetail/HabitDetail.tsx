@@ -1,5 +1,8 @@
 import {
   Box,
+  Flex,
+  Link,
+  Popover,
   SimpleGrid,
   StatLabel,
   StatRoot,
@@ -8,6 +11,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react"
+import { Info } from "lucide-react"
 import {
   CartesianGrid,
   ComposedChart,
@@ -25,7 +29,7 @@ import { useI18n } from "../../i18n"
 
 import { HabitScoreValue } from "../HabitScoreValue/HabitScoreValue"
 import type { HabitDetailRouteParamKey } from "./HabitDetail.types"
-import { formatChartDate, formatRecentMultiplier } from "./HabitDetail.util"
+import { calculateHeatDotCount, formatChartDate, formatRecentMultiplier } from "./HabitDetail.util"
 
 const TOOLTIP_STYLE = {
   backgroundColor: "var(--chakra-colors-chakra-body-bg, #fff)",
@@ -40,6 +44,7 @@ export function HabitDetail() {
   const { habitId } = useParams<HabitDetailRouteParamKey>()
   const { t } = useI18n()
   const { data } = useHabitQuery({ habitId: habitId ?? "" })
+  const heatDotCount = calculateHeatDotCount(data.mode, data.habitScore, data.targetScore)
 
   return (
     <VStack align="center" gap={6} pt={16} px={4} pb={16}>
@@ -54,12 +59,59 @@ export function HabitDetail() {
       >
         <VStack align="stretch" gap={4}>
           <Text fontSize="lg" fontWeight="semibold" color="app.text">
-            {data.habitName}
+            {t(data.mode === "do-more" ? "habit.modeDoMore" : "habit.modeDoLess")}: {data.habitName}
           </Text>
 
           <StatRoot size="lg" textAlign="center">
-            <StatLabel color="app.textMuted">{t("habit.score")}</StatLabel>
-            <HabitScoreValue mode={data.mode} score={data.habitScore} targetScore={data.targetScore} />
+            <Flex align="center" justify="center" gap={1.5}>
+              <StatLabel color="app.textMuted">{t("habit.score")}</StatLabel>
+              <Popover.Root positioning={{ placement: "top" }}>
+                <Popover.Trigger asChild>
+                  <Box
+                    as="button"
+                    aria-label={t("habit.scoreInfoLabel")}
+                    display="flex"
+                    alignItems="center"
+                    cursor="pointer"
+                    color="app.textMuted"
+                    _hover={{ color: "app.text" }}
+                  >
+                    <Info size={14} />
+                  </Box>
+                </Popover.Trigger>
+                <Popover.Positioner>
+                  <Popover.Content
+                    bg="app.panelBackground"
+                    borderColor="app.border"
+                    borderWidth="1px"
+                    borderRadius="md"
+                    p={3}
+                    maxW="xs"
+                  >
+                    <VStack align="start" gap={1}>
+                      {data.targetScore !== undefined && (
+                        <Text fontSize="xs" color="app.textMuted">
+                          {t("habit.scoreInfoTarget", { target: data.targetScore })}
+                        </Text>
+                      )}
+                      <Text fontSize="xs" color="app.textMuted">
+                        {t(data.mode === "do-less" ? "habit.scoreInfoDoLess" : "habit.scoreInfoDoMore")}
+                      </Text>
+                    </VStack>
+                  </Popover.Content>
+                </Popover.Positioner>
+              </Popover.Root>
+            </Flex>
+            <Flex align="center" justify="center" gap={2}>
+              <HabitScoreValue mode={data.mode} score={data.habitScore} targetScore={data.targetScore} />
+              {heatDotCount > 0 && (
+                <Flex aria-label={t("habit.heatLevel", { count: heatDotCount })} gap={1}>
+                  {Array.from({ length: heatDotCount }, (_, index) => (
+                    <Box key={index} w="8px" h="8px" borderRadius="full" bg="red.500" />
+                  ))}
+                </Flex>
+              )}
+            </Flex>
           </StatRoot>
 
           <SimpleGrid columns={{ base: 2, md: 3 }} gap={3}>
@@ -199,7 +251,11 @@ export function HabitDetail() {
                       bg="app.panelBackground"
                       _hover={{ bg: "app.panelBackgroundHover" }}
                     >
-                      <Table.Cell borderColor="app.border">{formatChartDate(entry.date)}</Table.Cell>
+                      <Table.Cell borderColor="app.border">
+                        <Link href={entry.obsidianUrl} color="app.accent">
+                          {formatChartDate(entry.date)}
+                        </Link>
+                      </Table.Cell>
                       <Table.Cell borderColor="app.border">{entry.value}</Table.Cell>
                       <Table.Cell borderColor="app.border">
                         {formatRecentMultiplier(entry.recentMultiplier)}

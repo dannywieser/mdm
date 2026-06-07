@@ -81,9 +81,13 @@ describe("scanHabitEntries", () => {
       "created",
       false,
       DATE_FORMATS,
+      "/notes",
+      "vault",
     )
 
-    expect(entries).toEqual([{ date: "2026-05-31", value: 3 }])
+    expect(entries).toEqual([
+      { date: "2026-05-31", value: 3, obsidianUrl: "obsidian://open?vault=vault&file=2026.05.31" },
+    ])
   })
 
   test("parses unquoted numeric frontmatter values", async () => {
@@ -100,16 +104,20 @@ describe("scanHabitEntries", () => {
       "created",
       false,
       DATE_FORMATS,
+      "/notes",
+      "vault",
     )
 
-    expect(entries).toEqual([{ date: "2026-05-13", value: 5 }])
+    expect(entries).toEqual([
+      { date: "2026-05-13", value: 5, obsidianUrl: "obsidian://open?vault=vault&file=2026.05.13" },
+    ])
   })
 
   test("skips notes without frontmatter", async () => {
     readFileMock.mockResolvedValue("body only")
     parseFrontMatterMock.mockReturnValue({ body: "body only", frontmatter: null })
 
-    const entries = await scanHabitEntries(["/notes/no-frontmatter.md"], "drinking", "created", false, DATE_FORMATS)
+    const entries = await scanHabitEntries(["/notes/no-frontmatter.md"], "drinking", "created", false, DATE_FORMATS, "/notes", "vault")
 
     expect(entries).toEqual([])
   })
@@ -121,7 +129,7 @@ describe("scanHabitEntries", () => {
       frontmatter: { topic: "drinking" },
     })
 
-    const entries = await scanHabitEntries(["/notes/missing-property.md"], "drinking", "created", false, DATE_FORMATS)
+    const entries = await scanHabitEntries(["/notes/missing-property.md"], "drinking", "created", false, DATE_FORMATS, "/notes", "vault")
 
     expect(entries).toEqual([])
   })
@@ -133,7 +141,7 @@ describe("scanHabitEntries", () => {
       frontmatter: { created: "2026.05.31", drinking: '"15"' },
     })
 
-    const entries = await scanHabitEntries(["/notes/out-of-range.md"], "drinking", "created", false, DATE_FORMATS)
+    const entries = await scanHabitEntries(["/notes/out-of-range.md"], "drinking", "created", false, DATE_FORMATS, "/notes", "vault")
 
     expect(entries).toEqual([])
   })
@@ -145,7 +153,7 @@ describe("scanHabitEntries", () => {
       frontmatter: { drinking: '"3"' },
     })
 
-    const entries = await scanHabitEntries(["/notes/no-date.md"], "drinking", "created", false, DATE_FORMATS)
+    const entries = await scanHabitEntries(["/notes/no-date.md"], "drinking", "created", false, DATE_FORMATS, "/notes", "vault")
 
     expect(entries).toEqual([])
   })
@@ -165,8 +173,12 @@ describe("scanHabitEntries", () => {
       "created",
       true,
       DATE_FORMATS,
+      "/notes",
+      "vault",
     )
 
-    expect(entries).toEqual([{ date: "2026-05-31", value: 3 }])
+    expect(entries).toEqual([
+      { date: "2026-05-31", value: 3, obsidianUrl: "obsidian://open?vault=vault&file=2026.05.31%20(Sun)" },
+    ])
   })
 })

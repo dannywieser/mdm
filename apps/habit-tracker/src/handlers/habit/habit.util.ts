@@ -84,6 +84,7 @@ export const buildScoreEntries = (
       date: entry.date,
       value: entry.value,
       recentMultiplier: entry.date > recentCutoff ? RECENT_MULTIPLIER : undefined,
+      obsidianUrl: entry.obsidianUrl,
     }))
 }
 

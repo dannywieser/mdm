@@ -19,6 +19,17 @@ export const collectMarkdownFiles = async (directory: string): Promise<string[]>
   return nestedPaths.flat()
 }
 
+const buildObsidianUrl = (obsidianVault: string, notesDirectory: string, filePath: string): string => {
+  const relativePath = path.relative(notesDirectory, filePath)
+  const normalizedRelativePath = relativePath.split(path.sep).join("/")
+  const relativePathWithoutExtension = normalizedRelativePath.replace(/\.[^.]+$/, "")
+  const escapedFilePath = relativePathWithoutExtension
+    .split("/")
+    .map((segment) => encodeURI(segment))
+    .join("%2F")
+  return `obsidian://open?vault=${encodeURIComponent(obsidianVault)}&file=${escapedFilePath}`
+}
+
 const resolveNoteDate = (
   frontmatter: Record<string, string | string[]> | null,
   basename: string,
@@ -50,6 +61,8 @@ export const scanHabitEntries = async (
   createdDateProperty: string,
   deriveTitleDate: boolean,
   dateFormats: readonly string[],
+  notesDirectory: string,
+  obsidianVault: string,
 ): Promise<HabitEntry[]> => {
   const results = await Promise.all(
     filePaths.map(async (filePath) => {
@@ -95,7 +108,7 @@ export const scanHabitEntries = async (
       }
 
       console.debug(`[habit] matched ${basename}`, { date, value: numValue })
-      return { date, value: numValue }
+      return { date, value: numValue, obsidianUrl: buildObsidianUrl(obsidianVault, notesDirectory, filePath) }
     }),
   )
   return results.filter((entry): entry is HabitEntry => entry !== null)

@@ -14,7 +14,7 @@ export const habitHandler: RequestHandler = async (request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { createdDateProperty, dateFormats, deriveTitleDate, habits, notesDirectory, timezone } =
+    const { createdDateProperty, dateFormats, deriveTitleDate, habits, notesDirectory, obsidianVault, timezone } =
       notesConfig
 
     const habitId = String(request.params["id"])
@@ -46,6 +46,8 @@ export const habitHandler: RequestHandler = async (request, response) => {
       createdDateProperty,
       deriveTitleDate,
       dateFormats,
+      notesDirectory,
+      obsidianVault,
     )
     console.log(`[habit] scanHabitEntries matched ${entries.length} entr${entries.length === 1 ? "y" : "ies"} for "${frontmatterProperty}"`)
 

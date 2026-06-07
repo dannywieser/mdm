@@ -26,6 +26,7 @@ export interface HabitScoreEntry {
   date: string
   value: number
   recentMultiplier?: number
+  obsidianUrl: string
 }
 
 export interface HabitResult {
