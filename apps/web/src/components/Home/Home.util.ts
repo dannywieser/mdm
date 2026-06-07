@@ -16,6 +16,11 @@ export interface ViewGroupSection {
   views: StatsViewCount[]
 }
 
+/**
+ * Splits view cards into ungrouped cards and grouped sections for dashboard rendering.
+ * Group insertion order is preserved based on the first time each group appears.
+ * Missing or whitespace-only group values are treated as ungrouped views.
+ */
 export const groupViewsByGroup = (
   views: StatsViewCount[],
 ): { groups: ViewGroupSection[]; ungroupedViews: StatsViewCount[] } => {

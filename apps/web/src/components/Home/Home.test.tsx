@@ -1,5 +1,5 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { describe, expect, test, vi } from "vitest"
 
@@ -87,7 +87,7 @@ describe("Home", () => {
     })
     useHabitsQueryMock.mockReturnValue({ data: [] })
 
-    render(
+    const { container: groupedContainer } = render(
       <ChakraProvider value={defaultSystem}>
         <MemoryRouter>
           <Home />
@@ -95,8 +95,12 @@ describe("Home", () => {
       </ChakraProvider>,
     )
 
-    expect(screen.getByText("Library")).toBeTruthy()
-    expect(screen.getAllByRole("separator").length).toBe(1)
+    const libraryHeading = screen.getByRole("heading", { name: "Library" })
+    const librarySection = libraryHeading.parentElement as HTMLElement
+
+    expect(libraryHeading).toBeTruthy()
+    expect(within(librarySection).getByRole("separator")).toBeTruthy()
+    expect(within(groupedContainer).getByRole("link", { name: /books/i })).toBeTruthy()
   })
 
   test("does not render section heading when views are ungrouped", () => {
@@ -110,7 +114,7 @@ describe("Home", () => {
     })
     useHabitsQueryMock.mockReturnValue({ data: [] })
 
-    render(
+    const { container } = render(
       <ChakraProvider value={defaultSystem}>
         <MemoryRouter>
           <Home />
@@ -118,7 +122,7 @@ describe("Home", () => {
       </ChakraProvider>,
     )
 
-    expect(screen.queryByRole("separator")).toBeNull()
+    expect(within(container).queryByRole("separator")).toBeNull()
   })
 })
 

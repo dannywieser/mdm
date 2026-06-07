@@ -1,11 +1,11 @@
 import {
   Box,
+  Heading,
   Separator,
   SimpleGrid,
   StatLabel,
   StatRoot,
   StatValueText,
-  Text,
   VStack,
 } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
@@ -76,9 +76,9 @@ export function Home() {
           )}
           {groupedViews.groups.map((groupedSection) => (
             <VStack key={groupedSection.group} align="stretch" gap={2}>
-              <Text color="app.textMuted" fontWeight="medium">
+              <Heading as="h2" size="sm" color="app.textMuted" fontWeight="medium">
                 {groupedSection.group}
-              </Text>
+              </Heading>
               <Separator borderColor="app.border" />
               <SimpleGrid
                 color="app.textMuted"
@@ -127,9 +127,9 @@ export function Home() {
       )}
       {habits.length > 0 && (
         <VStack align="stretch" gap={2}>
-          <Text color="app.textMuted" fontWeight="medium">
+          <Heading as="h2" size="sm" color="app.textMuted" fontWeight="medium">
             {t("home.habits")}
-          </Text>
+          </Heading>
           <Separator borderColor="app.border" />
           <SimpleGrid
             color="app.textMuted"
