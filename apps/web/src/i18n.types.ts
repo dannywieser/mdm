@@ -8,6 +8,7 @@ export type TranslationKey =
   | "habit.newHigh"
   | "habit.score"
   | "habit.scoreOverTime"
+  | "habit.streak"
   | "home.habits"
   | "home.modifiedToday"
   | "home.notes"

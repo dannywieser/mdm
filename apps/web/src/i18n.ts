@@ -13,6 +13,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "habit.newHigh": "new high!",
     "habit.score": "score",
     "habit.scoreOverTime": "score over time",
+    "habit.streak": "streak",
     "home.habits": "habits",
     "home.modifiedToday": "modified today",
     "home.notes": "notes",

@@ -122,20 +122,20 @@ export function HabitDetail() {
                     type="monotone"
                     dataKey="habitScore"
                     name={t("habit.score")}
-                    stroke="var(--chakra-colors-blue-400)"
-                    strokeWidth={1.5}
+                    stroke="var(--chakra-colors-app-accent)"
+                    strokeWidth={2.5}
                     dot={false}
-                    activeDot={{ r: 3 }}
+                    activeDot={{ r: 4 }}
                   />
                   <Line
                     yAxisId="streak"
                     type="monotone"
                     dataKey="streak"
-                    name={t("habit.currentStreak")}
-                    stroke="var(--chakra-colors-orange-400)"
-                    strokeWidth={1.5}
+                    name={t("habit.streak")}
+                    stroke="var(--chakra-colors-app-success-background)"
+                    strokeWidth={2.5}
                     dot={false}
-                    activeDot={{ r: 3 }}
+                    activeDot={{ r: 4 }}
                   />
                 </ComposedChart>
               </ResponsiveContainer>
