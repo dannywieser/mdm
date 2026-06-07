@@ -24,9 +24,9 @@ describe("HomeViewGroupSection", () => {
     const heading = screen.getByRole("heading", { name: "Library" })
     const section = heading.parentElement as HTMLElement
 
-    expect(heading).toBeTruthy()
-    expect(within(section).getByRole("separator")).toBeTruthy()
+    expect(heading).toBeDefined()
+    expect(within(section).getByRole("separator")).toBeDefined()
     expect(screen.getByRole("link", { name: /books/i }).getAttribute("href")).toBe("/notes/books")
-    expect(within(container).getByRole("link", { name: /movies/i })).toBeTruthy()
+    expect(within(container).getByRole("link", { name: /movies/i }).getAttribute("href")).toBe("/notes/movies")
   })
 })
