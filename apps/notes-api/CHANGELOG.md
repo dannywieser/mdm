@@ -1,5 +1,24 @@
 # notes-api
 
+## 1.6.0
+
+### Minor Changes
+
+- 6e3255f: Add configurable created-date resolution for notes: `createdDateProperty` sets the frontmatter key to read (default `"created"`), and `deriveTitleDate` enables extracting the date from the note title using configured `dateFormats`. Notes without a resolved created date return `null` for `createdDate` and are excluded from notes-per-day and trend calculations. A new `notesWithoutCreatedDate` stat counts them. Fixes incorrect notes-per-day chart data on Linux Docker deployments where `stat.birthtime` was unreliable.
+- f97b7a0: Expand the stats endpoint with folder counts, attachment counts, folder breakdown, notes created over 30/90/365-day windows, 30-day trend comparison, and daily note counts for the past year. Add `homeStats` config section to `app.config.json` to control which sections are visible.
+
+### Patch Changes
+
+- Updated dependencies [1edfc02]
+- Updated dependencies [6e3255f]
+- Updated dependencies [be835c4]
+- Updated dependencies [be835c4]
+- Updated dependencies [ceb2a80]
+- Updated dependencies [f97b7a0]
+  - app-config@1.6.0
+  - mdm-util@1.6.0
+  - markdown@1.6.0
+
 ## 1.5.0
 
 ### Minor Changes

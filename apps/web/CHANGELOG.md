@@ -1,5 +1,23 @@
 # web
 
+## 1.6.0
+
+### Minor Changes
+
+- 1edfc02: Add habit cards to the home page (color-coded green/yellow/red for do-less habits based on `targetScore`, accent-colored for do-more habits) and a new habit detail route showing the habit's mode in its title, a prominent current score with an info popover explaining the target and how to read it (plus "heat" dots for do-less habits scoring well above target), days logged, current streak, tracking window start, all-time highs (best score, streak, and days logged), a chart of score and streak over time, and a table of the entries contributing to the current score (date — linked to the source note in Obsidian — raw value, and recency multiplier).
+- 05cf558: Add GitHub Light High Contrast color palette based on the GitHub light high contrast terminal palette.
+- f97b7a0: Add HomeStats card to the home page displaying vault overview stats (totals, notes created by period, trends, and a notes-per-day area chart for the past year). Display is configurable via the `homeStats.show` section in `app.config.json`.
+- 25b10b2: NotesGallery now defaults to a flex (CSS multi-column masonry) layout where each card takes its natural height; the previous grid layout is still available by setting `layout: "grid"` on the view in `app.config.json`.
+
+### Patch Changes
+
+- 6e3255f: Add configurable created-date resolution for notes: `createdDateProperty` sets the frontmatter key to read (default `"created"`), and `deriveTitleDate` enables extracting the date from the note title using configured `dateFormats`. Notes without a resolved created date return `null` for `createdDate` and are excluded from notes-per-day and trend calculations. A new `notesWithoutCreatedDate` stat counts them. Fixes incorrect notes-per-day chart data on Linux Docker deployments where `stat.birthtime` was unreliable.
+- ceb2a80: Replace the header title with a Chakra breadcrumb: on `/notes/:view` it shows `mdm > <view name>` with "mdm" linking home; on the home route it shows just "mdm". Removes the PageTitle context that was previously used to push the current note title into the header from NotesReview.
+- cab244f: Center MarkdownTree images and add graceful fade-in loading for images across MarkdownTree and the cover image gallery.
+- 4bd579c: Fix viewport height on mobile Safari (iPad): replace `100vh` with `100dvh` so the app shell correctly accounts for browser chrome. Also switch the root layout from a fixed-height overflow container to a natural-scroll `min-height` container, which improves scroll behaviour on iOS.
+- Updated dependencies [be835c4]
+  - mdm-util@1.6.0
+
 ## 1.5.0
 
 ### Minor Changes
