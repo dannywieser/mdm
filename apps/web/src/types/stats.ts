@@ -3,6 +3,7 @@ export interface StatsViewCount {
   badges?: string[]
   component: string
   count: number
+  group?: string
   id: string
   layout?: string
   name: string
