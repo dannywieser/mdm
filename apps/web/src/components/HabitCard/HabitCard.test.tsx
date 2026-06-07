@@ -42,8 +42,10 @@ describe("HabitCard", () => {
   test("links to the habit detail route", () => {
     renderCard(HABIT)
 
-    expect(
-      screen.getByRole("link", { name: /daily exercise/i }).getAttribute("href"),
-    ).toBe("/tracking/exercise")
+    const link = screen.getByRole("link", { name: /daily exercise/i })
+
+    expect(link.getAttribute("href")).toBe("/tracking/exercise")
+    expect(link.getAttribute("style")).toContain("display: block")
+    expect(link.getAttribute("style")).toContain("width: 100%")
   })
 })
