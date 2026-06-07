@@ -26,6 +26,22 @@
       "badges": ["folder", "frontmatter.type", "frontmatter.genre"]
     }
   ],
+  "habits": [
+    {
+      "id": "exercise",
+      "name": "Daily Exercise",
+      "mode": "do-more",
+      "frontmatterProperty": "exercise",
+      "trackingWindowDays": 90
+    },
+    {
+      "id": "stress",
+      "name": "Stress Level",
+      "mode": "do-less",
+      "frontmatterProperty": "stress",
+      "trackingWindowDays": 30
+    }
+  ],
   "flags": {
     "read": {
       "expiresInSeconds": 3600

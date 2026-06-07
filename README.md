@@ -130,22 +130,40 @@ This repository is a Turborepo monorepo with this structure:
       { "error": "A valid local image path is required" }
       ```
 
-- `apps/habit-tracker`: Express-based API stub for habit data.
+- `apps/habit-tracker`: Express-based API for tracking configurable habits scored from note frontmatter.
   - `GET /health`
     - Purpose: basic service health check
     - Success response: `200`
       ```json
       { "status": "ok" }
       ```
-  - `GET /habit/:key`
-    - Purpose: placeholder route for loading a habit by key
-    - Current response: `200`
+  - `GET /habit/:id`
+    - Purpose: load the habit configured under `habits` in `app.config.json` (matched by `id`), scan notes for the configured `frontmatterProperty` (a numeric value from 1–10), and return the current score, streak, entry count, point-in-time history for every matching note, and all-time highs
+    - Scoring: sums frontmatter values from notes within the rolling `trackingWindowDays` window (entries from the last 14 days count at a 10x multiplier), then applies a 0.5%-per-day streak bonus and either a 0.5%-per-entry bonus (`do-more` mode) or penalty (`do-less` mode) based on the number of days with entries in the window
+    - Success response: `200`
       ```json
-      {}
+      {
+        "habitId": "exercise",
+        "habitName": "Daily Exercise",
+        "windowStart": "2026-03-08",
+        "score": 525,
+        "streak": 5,
+        "totalEntries": 5,
+        "history": [
+          { "date": "2026-01-01", "score": 100, "streak": 1, "windowEntries": 1, "windowStart": "2025-10-03" }
+        ],
+        "allTimeHighScore": 525,
+        "allTimeHighStreak": 5,
+        "allTimeHighWindowEntries": 5
+      }
+      ```
+    - Error response (unknown habit id): `404`
+      ```json
+      { "error": "Habit not found: <id>" }
       ```
     - Sample curl command:
       ```bash
-      curl http://localhost/habit/morning-routine
+      curl http://localhost/habit/exercise
       ```
 
 ## Configuration
@@ -165,6 +183,12 @@ This repository is a Turborepo monorepo with this structure:
     - `badges` (optional): array of note property paths to render as badges in the UI, such as `folder` or `frontmatter.type`
     - `layout` (optional): gallery layout mode — `"flex"` (default, CSS multi-column masonry where each card takes its natural height) or `"grid"` (uniform grid where all cards in a row share the same height). Only used by the `NotesGallery` component.
   - `flags`: object keyed by allowed flag names. Each flag definition supports optional `expiresInSeconds` (positive integer) to set Redis TTL, or omit it for non-expiring flags.
+  - `habits` (optional): array of habit configs consumed by `apps/habit-tracker`'s `GET /habit/:id`. Each habit has:
+    - `id`: route key used by `GET /habit/:id`
+    - `name`: human-readable label returned in the response
+    - `mode`: `"do-more"` or `"do-less"` — controls whether the bonus from days-with-entries is added to or subtracted from the score
+    - `frontmatterProperty`: frontmatter key holding a numeric value from 1–10 to track
+    - `trackingWindowDays`: size (in days) of the rolling window used to score the habit
 
 ## Docker Compose deployment
 
@@ -182,9 +206,9 @@ This repository is a Turborepo monorepo with this structure:
   - `/habit/*` → `habit-tracker:3003/habit/*`
   - `/images*` → `image-server:3002/images*`
   - `/imgproxy/*` → `imgproxy:8080/*` (used by `image-server` redirects)
-- `app.config.json` is mounted into the API container as `/app/app.config.json` (read-only).
+- `app.config.json` is mounted into the `notes-api` and `habit-tracker` containers as `/app/app.config.json` (read-only).
 - Configure `noteRootDirectory` in `app.config.json` using a path valid inside the container (for example `/data/notes`).
-- Host notes are mounted into the API container with `NOTES_ROOT`:
+- Host notes are mounted into the `notes-api` and `habit-tracker` containers with `NOTES_ROOT`:
   - default: `./notes` on the host maps to `/data/notes`
   - override: `NOTES_ROOT=/absolute/path/on/host docker compose up --build`
 - Host images are mounted into the image services with `IMAGES_ROOT`:

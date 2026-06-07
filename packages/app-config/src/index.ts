@@ -11,6 +11,7 @@ import type {
   AppConfig,
   AppConfigView,
   ExcludeViewFilter,
+  HabitConfig,
   HomeStatsShowConfig,
   ResolvedNotesConfig,
 } from "./types"
@@ -19,6 +20,8 @@ export type {
   AppConfig,
   AppConfigView,
   ExcludeViewFilter,
+  HabitConfig,
+  HabitMode,
   HomeStatsConfig,
   HomeStatsShowConfig,
   NotesView,
@@ -98,6 +101,21 @@ const isHomeStatsConfig = (
   )
 }
 
+const isHabitConfig = (value: unknown): value is HabitConfig => {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return false
+  }
+  const obj = value as Record<string, unknown>
+  return (
+    isNonEmptyString(obj["id"]) &&
+    isNonEmptyString(obj["name"]) &&
+    (obj["mode"] === "do-more" || obj["mode"] === "do-less") &&
+    isNonEmptyString(obj["frontmatterProperty"]) &&
+    typeof obj["trackingWindowDays"] === "number" &&
+    obj["trackingWindowDays"] > 0
+  )
+}
+
 const DEFAULT_HOME_STATS_SHOW: HomeStatsShowConfig = {
   folderBreakdown: true,
   modifiedToday: true,
@@ -120,6 +138,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   const createdDateProperty = parsedConfig["createdDateProperty"]
   const dateFormats = parsedConfig["dateFormats"]
   const deriveTitleDate = parsedConfig["deriveTitleDate"]
+  const habits = parsedConfig["habits"]
   const homeStats = parsedConfig["homeStats"]
   const obsidianVault = parsedConfig["obsidianVault"]
   const timezone = parsedConfig["timezone"]
@@ -182,11 +201,21 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
     )
   }
 
+  if (
+    habits !== undefined &&
+    (!Array.isArray(habits) || !habits.every(isHabitConfig))
+  ) {
+    throw new AppConfigError(
+      "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive trackingWindowDays number",
+    )
+  }
+
   return {
     attachmentsDirectory,
     createdDateProperty: isNonEmptyString(createdDateProperty) ? createdDateProperty : undefined,
     dateFormats,
     deriveTitleDate: typeof deriveTitleDate === "boolean" ? deriveTitleDate : undefined,
+    habits: Array.isArray(habits) && habits.every(isHabitConfig) ? habits : undefined,
     homeStats: isHomeStatsConfig(homeStats) ? homeStats : undefined,
     obsidianVault,
     timezone: isNonEmptyString(timezone) ? timezone : undefined,
@@ -231,6 +260,7 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
     createdDateProperty: appConfig.createdDateProperty ?? "created",
     dateFormats: appConfig.dateFormats ?? [],
     deriveTitleDate: appConfig.deriveTitleDate ?? false,
+    habits: appConfig.habits ?? [],
     homeStats: {
       show: { ...DEFAULT_HOME_STATS_SHOW, ...appConfig.homeStats?.show },
     },

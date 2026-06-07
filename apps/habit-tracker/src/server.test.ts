@@ -32,7 +32,7 @@ describe("habit-tracker server interface", () => {
     expect(healthHandlerMock).toHaveBeenCalledTimes(1)
   })
 
-  test("wires GET /habit/:key to the habit handler", async () => {
+  test("wires GET /habit/:id to the habit handler", async () => {
     const handler: RequestHandler = (_request, response) => {
       response.status(200).json({})
     }
