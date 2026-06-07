@@ -399,7 +399,7 @@ describe("calculateHabitScore", () => {
     // scoreBeforeMultipliers = rawScore + recentEntryAdditions = 50 + 450 = 500
     // streak = 5 → streakMultiplier = 5 * 0.005 = 0.025
     // uniqueWindowDays = 5 → dayMultiplier (do-more, positive) = 5 * 0.005 = 0.025
-    // habitScore = 500 * (1 + 0.025 + 0.025) = 500 * 1.05 = 525, floored to 525
+    // habitScore = 500 * (1 + 0.025) * (1 + 0.025) = 500 * 1.050625 = 525.3125, floored to 525
     expect(streak).toBe(5)
     expect(uniqueWindowDays).toBe(5)
     expect(rawScore).toBe(50)
@@ -423,11 +423,11 @@ describe("calculateHabitScore", () => {
     // baseScore = 5 * 10 * 10 = 500 (all within the recent 14-day window)
     // streak = days since last entry (2025-01-05 → 2025-01-10) = 5 → streakMultiplier (do-less, negative) = -0.025
     // uniqueWindowDays = 5 → dayMultiplier (always positive) = 0.025
-    // habitScore = 500 * (1 - 0.025 + 0.025) = 500 * 1.0 = 500, floored to 500
+    // habitScore = 500 * (1 + 0.025) * (1 - 0.025) = 500 * 0.999375 = 499.6875, floored to 499
     expect(streak).toBe(5)
     expect(streakMultiplier).toBe(-0.025)
     expect(dayMultiplier).toBe(0.025)
-    expect(habitScore).toBe(500)
+    expect(habitScore).toBe(499)
   })
 
   test("do-less: a fresh entry on the reference date resets the streak to 0", () => {
@@ -469,18 +469,18 @@ describe("calculateHabitScore", () => {
     // 2025-01-15 < recentCutoff → 5 * 1 = 5
     // 2025-01-31 > recentCutoff → 8 * 10 = 80
     // baseScore = 85, streak = 1 (Jan 30 missing), uniqueWindowDays = 2
-    // streakBonus = 0.005, modeAdjustment = 0.01
-    // habitScore = 85 * 1.015 = 86.275, floored to 86
+    // streakMultiplier = 0.005, dayMultiplier = 0.01
+    // habitScore = 85 * (1 + 0.01) * (1 + 0.005) = 85 * 1.01505 = 86.27925, floored to 86
     expect(uniqueWindowDays).toBe(2)
-    expect(habitScore).toBe(Math.floor(85 * (1 + 0.005 + 0.01)))
+    expect(habitScore).toBe(Math.floor(85 * (1 + 0.01) * (1 + 0.005)))
   })
 
   test("streak bonus example from spec: 10-day streak contributes a 5% bonus", () => {
     // 10 consecutive days with value 1, all recent, do-more with 30 window days
     // baseScore = 10 * 1 * 10 = 100
-    // streak = 10 consecutive days with entries → streakBonus = 10 * 0.005 = 0.05 (the spec's "5% bonus")
-    // uniqueWindowDays = 10 → modeAdjustment (do-more) = 10 * 0.005 = 0.05
-    // final = 100 * (1 + 0.05 + 0.05) = 100 * 1.10 = 110
+    // streak = 10 consecutive days with entries → streakMultiplier = 10 * 0.005 = 0.05 (the spec's "5% bonus")
+    // uniqueWindowDays = 10 → dayMultiplier (do-more) = 10 * 0.005 = 0.05
+    // final = 100 * (1 + 0.05) * (1 + 0.05) = 100 * 1.1025 = 110.25, floored to 110
     const refDate = addDays(YEAR_START, 9)
     const entries = Array.from({ length: 10 }, (_, i) =>
       makeEntry(addDays(YEAR_START, i), 1),
@@ -495,12 +495,12 @@ describe("calculateHabitScore", () => {
     // baseScore = 1 * 10 = 10 (within the recent 14-day window)
     // streak = days since last entry = 10 → streakMultiplier (do-less, negative) = -(10 * 0.005) = -0.05
     // uniqueWindowDays = 1 → dayMultiplier (always positive) = 1 * 0.005 = 0.005
-    // final = 10 * (1 - 0.05 + 0.005) = 10 * 0.955 = 9.55, floored to 9
+    // final = 10 * (1 + 0.005) * (1 - 0.05) = 10 * 0.95475 = 9.5475, floored to 9
     const lastEntryDate = addDays(YEAR_START, 0)
     const refDate = addDays(YEAR_START, 10)
     const { habitScore, streak } = calculateHabitScore([makeEntry(lastEntryDate, 1)], refDate, 30, "do-less")
     expect(streak).toBe(10)
-    expect(habitScore).toBe(Math.floor(10 * (1 - 0.05 + 0.005)))
+    expect(habitScore).toBe(Math.floor(10 * (1 + 0.005) * (1 - 0.05)))
   })
 })
 
@@ -906,8 +906,8 @@ describe("habitHandler", () => {
     // today = 2025-01-03, entries on 2025-01-01, 2025-01-02, 2025-01-03 are all recent
     // baseScore = (8 + 6 + 9) * 10 = 230
     // streak = 3, uniqueWindowDays = 3 (all within 30-day window)
-    // do-more: habitScore = 230 * (1 + 3*0.005 + 3*0.005) = 230 * 1.03 = 236.9, floored to 236
-    expect(result.habitScore).toBe(Math.floor(230 * 1.03))
+    // do-more: habitScore = 230 * (1 + 0.015) * (1 + 0.015) = 230 * 1.030225 = 236.95..., floored to 236
+    expect(result.habitScore).toBe(Math.floor(230 * (1 + 0.015) * (1 + 0.015)))
     expect(result.streak).toBe(3)
     expect(result.totalEntries).toBe(3)
   })

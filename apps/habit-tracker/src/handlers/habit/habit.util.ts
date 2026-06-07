@@ -107,7 +107,9 @@ export const calculateHabitScore = (
   // toFixed rounds away floating-point representation noise (e.g. 524.9999999999999)
   // before flooring, so the result reflects the mathematically exact score.
   const habitScore = Math.floor(
-    Number((scoreBeforeMultipliers * (1 + streakMultiplier + dayMultiplier)).toFixed(6)),
+    Number(
+      (scoreBeforeMultipliers * (1 + dayMultiplier) * (1 + streakMultiplier)).toFixed(6),
+    ),
   )
 
   return {

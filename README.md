@@ -139,7 +139,7 @@ This repository is a Turborepo monorepo with this structure:
       ```
   - `GET /habit/:id`
     - Purpose: load the habit configured under `habits` in `app.config.json` (matched by `id`), scan notes for the configured `frontmatterProperty` (a numeric value from 1–10), and return the current score, streak, entry count, a point-in-time history for every day from the first matching note through today, a dedicated streak-period breakdown, and all-time highs
-    - Scoring: sums frontmatter values from notes within the rolling `trackingWindowDays` window (entries from the last 14 days count at a 10x multiplier), then applies a 0.5%-per-day-with-an-entry bonus and either a 0.5%-per-streak-day bonus (`do-more` mode) or penalty (`do-less` mode). Final scores are floored to whole numbers.
+    - Scoring: sums frontmatter values from notes within the rolling `trackingWindowDays` window (entries from the last 14 days count at a 10x multiplier) to get a base total, then multiplies it by `(1 + dayMultiplier) * (1 + streakMultiplier)` — a 0.5%-per-day-with-an-entry adjustment and either a 0.5%-per-streak-day bonus (`do-more` mode) or penalty (`do-less` mode). Final scores are floored to whole numbers.
     - The top-level `streak` reflects the current streak as of the reference date. Its definition depends on mode:
       - `do-more` habits: the number of consecutive days (ending on the reference date) with an entry.
       - `do-less` habits: the number of days since the most recent entry (an entry on today's date resets it to `0`).
@@ -150,9 +150,10 @@ This repository is a Turborepo monorepo with this structure:
     - The current `habitScore` and each `history` entry's `habitScore` also include a score breakdown:
       - `rawScore`: the sum of entry values in the tracking window with no recency multiplier applied
       - `recentEntryAdditions`: the extra amount contributed by entries within the last 14 days (each counts at 10x, so this is `entry.value * 9` summed across those entries)
-      - `scoreBeforeMultipliers`: `rawScore + recentEntryAdditions` — the multiplied base total before streak/day bonuses are applied
-      - `streakMultiplier`: the streak contribution (`streak * 0.5%`) — positive for `do-more` habits (a long streak boosts the score) and negative for `do-less` habits (a long streak, i.e. going a long time without logging the habit, lowers the score)
-      - `dayMultiplier`: the days-with-entries contribution (`daysWithEntries * 0.5%`) — always positive in both modes; for `do-more` habits a high score is the goal, while for `do-less` habits a high score from frequent entries is undesirable
+      - `scoreBeforeMultipliers`: `rawScore + recentEntryAdditions` — the base total before the day/streak adjustments are applied
+      - `streakMultiplier`: the streak adjustment (`streak * 0.5%`) — positive for `do-more` habits (a long streak boosts the score) and negative for `do-less` habits (a long streak, i.e. going a long time without logging the habit, lowers the score)
+      - `dayMultiplier`: the days-with-entries adjustment (`daysWithEntries * 0.5%`) — always positive in both modes; for `do-more` habits a high score is the goal, while for `do-less` habits a high score from frequent entries is undesirable
+      - The final `habitScore` is `floor(scoreBeforeMultipliers * (1 + dayMultiplier) * (1 + streakMultiplier))` — the two adjustments are applied as multiplicative factors, not summed
     - `history` contains one entry for every calendar day from the first matching note through the reference date (inclusive) — not just days with a logged entry — so it can be plotted as a continuous score-over-time graph. Each entry also includes `streak` (the streak as of that day, using the same mode-specific definition as the top-level `streak`) and `value`, the frontmatter value logged that day (`0` on days with no entry; entries on the same date are summed)
     - Success response: `200`
       ```json
