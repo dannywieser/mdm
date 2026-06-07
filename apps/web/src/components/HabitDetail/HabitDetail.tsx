@@ -218,7 +218,6 @@ export function HabitDetail() {
                 fontSize="xs"
                 color="app.textMuted"
                 mb={2}
-                textTransform="uppercase"
                 letterSpacing="wide"
               >
                 {t("habit.scoreEntries")}
