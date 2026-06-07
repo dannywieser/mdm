@@ -57,15 +57,16 @@ export const calculateStreak = (entries: HabitEntry[], referenceDate: string, mo
 export const calculateRawScore = (windowEntries: HabitEntry[]): number =>
   windowEntries.reduce((sum, entry) => sum + entry.value, 0)
 
-// The extra amount each recent entry (within the last RECENT_WINDOW_DAYS)
-// contributes on top of its raw value, i.e. (entry.value * RECENT_MULTIPLIER) - entry.value.
+// The extra amount each recent entry (the last RECENT_WINDOW_DAYS, inclusive of
+// the day exactly RECENT_WINDOW_DAYS ago) contributes on top of its raw value,
+// i.e. (entry.value * RECENT_MULTIPLIER) - entry.value.
 export const calculateRecentEntryAdditions = (
   windowEntries: HabitEntry[],
   referenceDate: string,
 ): number => {
   const recentCutoff = addDays(referenceDate, -RECENT_WINDOW_DAYS)
   return windowEntries.reduce((sum, entry) => {
-    if (entry.date <= recentCutoff) return sum
+    if (entry.date < recentCutoff) return sum
     return sum + entry.value * (RECENT_MULTIPLIER - 1)
   }, 0)
 }
@@ -83,7 +84,7 @@ export const buildScoreEntries = (
     .map((entry) => ({
       date: entry.date,
       value: entry.value,
-      recentMultiplier: entry.date > recentCutoff ? RECENT_MULTIPLIER : undefined,
+      recentMultiplier: entry.date >= recentCutoff ? RECENT_MULTIPLIER : undefined,
       obsidianUrl: entry.obsidianUrl,
     }))
 }
