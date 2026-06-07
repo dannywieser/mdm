@@ -84,6 +84,7 @@ const HABIT_DO_LESS = {
   mode: "do-less" as const,
   frontmatterProperty: "stress",
   trackingWindowDays: 30,
+  targetScore: 100,
 }
 
 // ---------------------------------------------------------------------------
@@ -875,6 +876,18 @@ describe("habitHandler", () => {
       "2025-01-02",
       "2025-01-03",
     ])
+  })
+
+  test("returns mode and targetScore from habit config", async () => {
+    const { response, json } = makeResponse()
+    await habitHandler(makeRequest("exercise"), response, vi.fn())
+    expect(getJsonResult(json).mode).toBe("do-more")
+    expect(getJsonResult(json).targetScore).toBeUndefined()
+
+    const stressResponse = makeResponse()
+    await habitHandler(makeRequest("stress"), stressResponse.response, vi.fn())
+    expect(getJsonResult(stressResponse.json).mode).toBe("do-less")
+    expect(getJsonResult(stressResponse.json).targetScore).toBe(100)
   })
 
   test("returns 404 for unknown habit id", async () => {

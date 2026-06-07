@@ -2,6 +2,7 @@ import express from "express"
 import morgan from "morgan"
 
 import { habitHandler } from "./handlers/habit/habit"
+import { habitsHandler } from "./handlers/habits/habits"
 import { healthHandler } from "./handlers/health/health"
 
 export const createApp = () => {
@@ -10,6 +11,7 @@ export const createApp = () => {
   app.use(morgan("combined"))
 
   app.get("/health", healthHandler)
+  app.get("/habits", habitsHandler)
   app.get("/habit/:id", habitHandler)
 
   return app

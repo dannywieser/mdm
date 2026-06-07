@@ -3,6 +3,7 @@ import { Box } from "@chakra-ui/react"
 import { Outlet, Route, Routes } from "react-router-dom"
 
 import { AppError } from "./components/AppError/AppError"
+import { HabitDetail } from "./components/HabitDetail/HabitDetail"
 import { Header, HeaderSkeleton } from "./components/Header/Header"
 import { Home } from "./components/Home/Home"
 import { HomeStats } from "./components/HomeStats/HomeStats"
@@ -53,6 +54,7 @@ function App() {
     <Routes>
       <Route element={<AppLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/tracking/:habitId" element={<HabitDetail />} />
         <Route path="/notes/:view" element={<NotesView />} />
         <Route path="/stats" element={<HomeStats />} />
       </Route>

@@ -7,9 +7,18 @@ import { Home } from "./Home"
 import { getViewGridColumns } from "./Home.util"
 
 const useStatsQueryMock = vi.fn()
+const useHabitsQueryMock = vi.fn()
 
 vi.mock("../../hooks/useStatsQuery/useStatsQuery", () => ({
   useStatsQuery: () => useStatsQueryMock(),
+}))
+
+vi.mock("../../hooks/useHabitsQuery/useHabitsQuery", () => ({
+  useHabitsQuery: () => useHabitsQueryMock(),
+}))
+
+vi.mock("../../i18n", () => ({
+  useI18n: () => ({ t: (key: string) => key }),
 }))
 
 describe("Home", () => {
@@ -22,6 +31,7 @@ describe("Home", () => {
         ],
       },
     })
+    useHabitsQueryMock.mockReturnValue({ data: [] })
 
     render(
       <ChakraProvider value={defaultSystem}>
@@ -36,6 +46,32 @@ describe("Home", () => {
     expect(
       screen.getByRole("link", { name: /books/i }).getAttribute("href"),
     ).toBe("/notes/books")
+  })
+
+  test("renders habit cards linking to the habit detail route", () => {
+    useStatsQueryMock.mockReturnValue({
+      isLoading: false,
+      data: { views: [] },
+    })
+    useHabitsQueryMock.mockReturnValue({
+      data: [
+        { habitId: "drinking", habitName: "drinking", habitScore: 38, mode: "do-less", streak: 2, targetScore: 100 },
+      ],
+    })
+
+    render(
+      <ChakraProvider value={defaultSystem}>
+        <MemoryRouter>
+          <Home />
+        </MemoryRouter>
+      </ChakraProvider>,
+    )
+
+    expect(screen.getByText("drinking")).toBeTruthy()
+    expect(screen.getByText("38")).toBeTruthy()
+    expect(
+      screen.getByRole("link", { name: /drinking/i }).getAttribute("href"),
+    ).toBe("/tracking/drinking")
   })
 })
 

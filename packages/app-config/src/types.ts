@@ -5,6 +5,7 @@ export interface HabitConfig {
   id: string
   mode: HabitMode
   name: string
+  targetScore?: number
   trackingWindowDays: number
 }
 

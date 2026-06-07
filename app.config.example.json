@@ -39,7 +39,8 @@
       "name": "Stress Level",
       "mode": "do-less",
       "frontmatterProperty": "stress",
-      "trackingWindowDays": 30
+      "trackingWindowDays": 30,
+      "targetScore": 100
     }
   ],
   "flags": {

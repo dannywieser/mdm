@@ -25,7 +25,7 @@ export const habitHandler: RequestHandler = async (request, response) => {
       return
     }
 
-    const { id, name, mode, frontmatterProperty, trackingWindowDays } = habitConfig
+    const { id, name, mode, frontmatterProperty, targetScore, trackingWindowDays } = habitConfig
 
     console.log("[habit] config resolved", {
       habitId: id,
@@ -77,8 +77,10 @@ export const habitHandler: RequestHandler = async (request, response) => {
       habitName: name,
       history,
       habitScore,
+      mode,
       streak,
       streaks,
+      targetScore,
       windowEntries: uniqueWindowDays,
       windowStart,
       rawScore,

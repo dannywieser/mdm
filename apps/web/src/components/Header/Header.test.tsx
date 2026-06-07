@@ -40,6 +40,7 @@ const renderAt = (path: string) =>
       <MemoryRouter initialEntries={[path]}>
         <Routes>
           <Route path="/" element={<Header />} />
+          <Route path="/tracking/:habitId" element={<Header />} />
           <Route path="/notes/:view" element={<Header />} />
           <Route path="/stats" element={<Header />} />
         </Routes>
@@ -89,5 +90,12 @@ describe("Header", () => {
 
     expect(screen.getByRole("link", { name: "app.name" })).toBeTruthy()
     expect(screen.getByText("Stats")).toBeTruthy()
+  })
+
+  test("shows app name as a link and habit id as current breadcrumb on habit route", () => {
+    renderAt("/tracking/drinking")
+
+    expect(screen.getByRole("link", { name: "app.name" })).toBeTruthy()
+    expect(screen.getByText("drinking")).toBeTruthy()
   })
 })

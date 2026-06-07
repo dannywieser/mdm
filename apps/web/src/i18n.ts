@@ -7,8 +7,17 @@ export type { TranslationKey } from "./i18n.types"
 const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
     "app.name": "mdm",
+    "habit.backToHome": "back to home",
+    "habit.currentStreak": "current streak",
+    "habit.daysLogged": "days logged",
+    "habit.newHigh": "new high!",
+    "habit.score": "score",
+    "habit.scoreOverTime": "score over time",
+    "home.habits": "habits",
     "home.modifiedToday": "modified today",
     "home.notes": "notes",
+    "errors.unableToLoadHabit": "unable to load habit",
+    "errors.unableToLoadHabits": "unable to load habits",
     "errors.unableToLoadNotes": "well, that didn't go as planned",
     "errors.unableToLoadReadState": "unable to load read state",
     "errors.unableToLoadStats": "unable to load stats",

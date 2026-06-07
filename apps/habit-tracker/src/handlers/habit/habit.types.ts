@@ -1,3 +1,5 @@
+import type { HabitMode } from "app-config"
+
 export interface HabitEntry {
   date: string
   value: number
@@ -43,8 +45,10 @@ export interface HabitResult {
   habitName: string
   history: HabitHistoryEntry[]
   habitScore: number
+  mode: HabitMode
   streak: number
   streaks: HabitStreak[]
+  targetScore: number | undefined
   windowEntries: number
   windowStart: string
   rawScore: number

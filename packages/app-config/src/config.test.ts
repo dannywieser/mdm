@@ -585,6 +585,7 @@ describe("config", () => {
             mode: "do-less",
             frontmatterProperty: "stress",
             trackingWindowDays: 30,
+            targetScore: 100,
           },
         ],
         obsidianVault: "vault",
@@ -607,6 +608,7 @@ describe("config", () => {
         mode: "do-less",
         frontmatterProperty: "stress",
         trackingWindowDays: 30,
+        targetScore: 100,
       },
     ])
   })
@@ -641,7 +643,7 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive integer trackingWindowDays",
+        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), a positive integer trackingWindowDays, and an optional positive targetScore",
       ),
     )
   })
@@ -664,7 +666,7 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive integer trackingWindowDays",
+        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), a positive integer trackingWindowDays, and an optional positive targetScore",
       ),
     )
   })
@@ -687,7 +689,31 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive integer trackingWindowDays",
+        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), a positive integer trackingWindowDays, and an optional positive targetScore",
+      ),
+    )
+  })
+
+  test("throws when habit targetScore is not a positive number", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        habits: [
+          {
+            id: "stress",
+            name: "Stress",
+            mode: "do-less",
+            frontmatterProperty: "stress",
+            trackingWindowDays: 30,
+            targetScore: 0,
+          },
+        ],
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesDirectory()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), a positive integer trackingWindowDays, and an optional positive targetScore",
       ),
     )
   })
