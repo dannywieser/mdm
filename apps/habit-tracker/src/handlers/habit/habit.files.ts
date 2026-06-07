@@ -53,14 +53,25 @@ export const scanHabitEntries = async (
 ): Promise<HabitEntry[]> => {
   const results = await Promise.all(
     filePaths.map(async (filePath) => {
+      const basename = path.basename(filePath)
       const source = await fs.readFile(filePath, "utf8")
       const { frontmatter } = parseFrontMatter(source)
       if (!frontmatter) return null
+
       const rawValue = frontmatter[frontmatterProperty]
-      if (typeof rawValue !== "string") return null
+      if (rawValue === undefined) return null
+
+      if (typeof rawValue !== "string") {
+        console.debug(`[habit] skipping ${basename}: "${frontmatterProperty}" is not a string`, { rawValue })
+        return null
+      }
+
       const numValue = parseFloat(rawValue.replace(/^"(.*)"$/, "$1"))
-      if (isNaN(numValue) || numValue < 1 || numValue > 10) return null
-      const basename = path.basename(filePath)
+      if (isNaN(numValue) || numValue < 1 || numValue > 10) {
+        console.debug(`[habit] skipping ${basename}: "${frontmatterProperty}" value out of 1-10 range`, { rawValue })
+        return null
+      }
+
       const date = resolveNoteDate(
         frontmatter,
         basename,
@@ -68,7 +79,16 @@ export const scanHabitEntries = async (
         deriveTitleDate,
         dateFormats,
       )
-      if (!date) return null
+      if (!date) {
+        console.debug(`[habit] skipping ${basename}: unable to resolve a note date`, {
+          createdDateProperty,
+          deriveTitleDate,
+          frontmatterCreatedValue: frontmatter[createdDateProperty],
+        })
+        return null
+      }
+
+      console.debug(`[habit] matched ${basename}`, { date, value: numValue })
       return { date, value: numValue }
     }),
   )

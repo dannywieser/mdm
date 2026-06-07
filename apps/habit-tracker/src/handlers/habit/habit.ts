@@ -27,7 +27,19 @@ export const habitHandler: RequestHandler = async (request, response) => {
 
     const { id, name, mode, frontmatterProperty, trackingWindowDays } = habitConfig
 
+    console.log("[habit] config resolved", {
+      habitId: id,
+      frontmatterProperty,
+      mode,
+      trackingWindowDays,
+      createdDateProperty,
+      deriveTitleDate,
+      notesDirectory,
+    })
+
     const filePaths = await collectMarkdownFiles(notesDirectory)
+    console.log(`[habit] collectMarkdownFiles found ${filePaths.length} file(s) in ${notesDirectory}`)
+
     const entries = await scanHabitEntries(
       filePaths,
       frontmatterProperty,
@@ -35,6 +47,7 @@ export const habitHandler: RequestHandler = async (request, response) => {
       deriveTitleDate,
       dateFormats,
     )
+    console.log(`[habit] scanHabitEntries matched ${entries.length} entr${entries.length === 1 ? "y" : "ies"} for "${frontmatterProperty}"`)
 
     const today = new Date().toLocaleDateString("en-CA", { timeZone: timezone })
     const { score, streak, uniqueWindowDays, windowStart } = calculateHabitScore(
