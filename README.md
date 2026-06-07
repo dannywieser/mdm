@@ -183,6 +183,7 @@ This repository is a Turborepo monorepo with this structure:
       - `dayMultiplier`: the days-with-entries adjustment (`daysWithEntries * 0.5%`) — always positive in both modes; for `do-more` habits a high score is the goal, while for `do-less` habits a high score from frequent entries is undesirable
       - The final `habitScore` is `floor(scoreBeforeMultipliers * (1 + dayMultiplier) * (1 + streakMultiplier))` — the two adjustments are applied as multiplicative factors, not summed
     - `history` contains one entry for every calendar day from the first matching note through the reference date (inclusive) — not just days with a logged entry — so it can be plotted as a continuous score-over-time graph. Each entry also includes `streak` (the streak as of that day, using the same mode-specific definition as the top-level `streak`) and `value`, the frontmatter value logged that day (`0` on days with no entry; entries on the same date are summed)
+    - `scoreEntries` is a per-entry breakdown of the entries contributing to the current `habitScore`, most recent first. Each entry has `date`, `value` (the raw frontmatter value logged that day), and `recentMultiplier` — `10` if the entry falls within the last 14 days (and so contributes to `recentEntryAdditions`), or omitted otherwise
     - Success response: `200`
       ```json
       {
@@ -228,6 +229,10 @@ This repository is a Turborepo monorepo with this structure:
         ],
         "streaks": [
           { "start": "2026-01-01", "end": "2026-01-05", "length": 5 }
+        ],
+        "scoreEntries": [
+          { "date": "2026-03-12", "value": 10, "recentMultiplier": 10 },
+          { "date": "2026-03-08", "value": 10 }
         ],
         "allTimeHighScore": 525,
         "allTimeHighStreak": 5,

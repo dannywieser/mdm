@@ -7,6 +7,7 @@ import { habitHandler } from "./habit"
 import { collectMarkdownFiles, scanHabitEntries } from "./habit.files"
 import {
   buildHistory,
+  buildScoreEntries,
   buildStreaks,
   calculateBaseScore,
   calculateConsecutiveEntryStreak,
@@ -353,6 +354,48 @@ describe("calculateRecentEntryAdditions", () => {
     expect(calculateRawScore(entries) + calculateRecentEntryAdditions(entries, refDate)).toBe(
       calculateBaseScore(entries, refDate),
     )
+  })
+})
+
+// ---------------------------------------------------------------------------
+// buildScoreEntries
+// ---------------------------------------------------------------------------
+
+describe("buildScoreEntries", () => {
+  test("annotates entries within the recent window with the recency multiplier", () => {
+    const refDate = "2025-01-20"
+    // recentCutoff = addDays("2025-01-20", -14) = "2025-01-06"
+    const entries = [makeEntry("2025-01-07", 4)]
+    expect(buildScoreEntries(entries, refDate)).toEqual([
+      { date: "2025-01-07", value: 4, recentMultiplier: 10 },
+    ])
+  })
+
+  test("omits the recency multiplier for entries older than the recent window", () => {
+    const refDate = "2025-01-20"
+    // recentCutoff = addDays("2025-01-20", -14) = "2025-01-06"
+    const entries = [makeEntry("2025-01-05", 3)]
+    expect(buildScoreEntries(entries, refDate)).toEqual([
+      { date: "2025-01-05", value: 3, recentMultiplier: undefined },
+    ])
+  })
+
+  test("orders entries most-recent-first", () => {
+    const refDate = "2025-01-20"
+    const entries = [
+      makeEntry("2025-01-05", 3),
+      makeEntry("2025-01-20", 2),
+      makeEntry("2025-01-07", 4),
+    ]
+    expect(buildScoreEntries(entries, refDate).map((e) => e.date)).toEqual([
+      "2025-01-20",
+      "2025-01-07",
+      "2025-01-05",
+    ])
+  })
+
+  test("returns an empty array for no entries", () => {
+    expect(buildScoreEntries([], "2025-01-20")).toHaveLength(0)
   })
 })
 
@@ -909,6 +952,19 @@ describe("habitHandler", () => {
     expect(result.habitScore).toBe(Math.floor(230 * (1 + 0.015) * (1 + 0.015)))
     expect(result.streak).toBe(3)
     expect(result.windowEntries).toBe(3)
+  })
+
+  test("returns score entries with raw values and recency multipliers, most recent first", async () => {
+    const { response, json } = makeResponse()
+    await habitHandler(makeRequest("exercise"), response, vi.fn())
+    const result = getJsonResult(json)
+    // today = 2025-01-03; entries on 2025-01-01, 2025-01-02, 2025-01-03 are all within
+    // the 14-day recent window, so each gets the 10x recency multiplier
+    expect(result.scoreEntries).toEqual([
+      { date: "2025-01-03", value: 9, recentMultiplier: 10 },
+      { date: "2025-01-02", value: 6, recentMultiplier: 10 },
+      { date: "2025-01-01", value: 8, recentMultiplier: 10 },
+    ])
   })
 
   test("returns all-time high stats derived from history", async () => {

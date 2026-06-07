@@ -22,6 +22,7 @@ vi.mock("../../i18n", () => ({
 const HABIT: HabitResult = {
   allTimeHighScore: 600,
   allTimeHighStreak: 6,
+  allTimeHighWindowEntries: 7,
   habitId: "exercise",
   habitName: "Daily Exercise",
   habitScore: 525,
@@ -30,9 +31,14 @@ const HABIT: HabitResult = {
     { date: "2026-01-02", habitScore: 200, streak: 2, value: 7 },
   ],
   mode: "do-more",
+  scoreEntries: [
+    { date: "2026-01-02", value: 9, recentMultiplier: 10 },
+    { date: "2026-01-01", value: 4 },
+  ],
   streak: 5,
   streaks: [{ start: "2026-01-01", end: "2026-01-05", length: 5 }],
   windowEntries: 5,
+  windowStart: "2025-12-29",
 }
 
 const renderDetail = (data: HabitResult = HABIT) => {
@@ -75,5 +81,36 @@ describe("HabitDetail", () => {
     renderDetail({ ...HABIT, history: [] })
 
     expect(screen.queryByText("habit.scoreOverTime")).toBeNull()
+  })
+
+  test("displays the window start and all-time highs", () => {
+    renderDetail()
+
+    expect(screen.getByText("habit.windowStart")).toBeTruthy()
+    expect(screen.getByText("Dec 29")).toBeTruthy()
+    expect(screen.getByText("habit.highestScore")).toBeTruthy()
+    expect(screen.getByText("600")).toBeTruthy()
+    expect(screen.getByText("habit.bestStreak")).toBeTruthy()
+    expect(screen.getByText("6")).toBeTruthy()
+    expect(screen.getByText("habit.mostDaysLogged")).toBeTruthy()
+    expect(screen.getByText("7")).toBeTruthy()
+  })
+
+  test("renders a table of score entries with their values and recency multipliers", () => {
+    renderDetail()
+
+    expect(screen.getByText("habit.scoreEntries")).toBeTruthy()
+    expect(screen.getByText("Jan 2")).toBeTruthy()
+    expect(screen.getByText("9")).toBeTruthy()
+    expect(screen.getByText("10×")).toBeTruthy()
+    expect(screen.getByText("Jan 1")).toBeTruthy()
+    expect(screen.getByText("4")).toBeTruthy()
+    expect(screen.getByText("—")).toBeTruthy()
+  })
+
+  test("omits the score entries table when there are no entries", () => {
+    renderDetail({ ...HABIT, scoreEntries: [] })
+
+    expect(screen.queryByText("habit.scoreEntries")).toBeNull()
   })
 })

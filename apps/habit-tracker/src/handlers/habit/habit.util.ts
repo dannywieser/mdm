@@ -2,7 +2,7 @@ import type { HabitMode } from "app-config"
 
 import { addDays, buildDateRange, daysBetween, getDateWindowStart } from "mdm-util"
 
-import type { HabitEntry, HabitHistoryEntry, HabitScoreResult, HabitStreak } from "./habit.types"
+import type { HabitEntry, HabitHistoryEntry, HabitScoreEntry, HabitScoreResult, HabitStreak } from "./habit.types"
 
 const RECENT_WINDOW_DAYS = 14
 const RECENT_MULTIPLIER = 10
@@ -68,6 +68,23 @@ export const calculateRecentEntryAdditions = (
     if (entry.date <= recentCutoff) return sum
     return sum + entry.value * (RECENT_MULTIPLIER - 1)
   }, 0)
+}
+
+// Per-entry breakdown of the entries contributing to the current score, most
+// recent first, each annotated with the recency multiplier applied to it (if
+// any) so the UI can explain how the score was derived.
+export const buildScoreEntries = (
+  windowEntries: HabitEntry[],
+  referenceDate: string,
+): HabitScoreEntry[] => {
+  const recentCutoff = addDays(referenceDate, -RECENT_WINDOW_DAYS)
+  return [...windowEntries]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .map((entry) => ({
+      date: entry.date,
+      value: entry.value,
+      recentMultiplier: entry.date > recentCutoff ? RECENT_MULTIPLIER : undefined,
+    }))
 }
 
 export const calculateBaseScore = (

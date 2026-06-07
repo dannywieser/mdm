@@ -22,16 +22,25 @@ export interface HabitStreak {
   length: number
 }
 
+export interface HabitScoreEntry {
+  date: string
+  value: number
+  recentMultiplier?: number
+}
+
 export interface HabitResult {
   allTimeHighScore: number
   allTimeHighStreak: number
+  allTimeHighWindowEntries: number
   habitId: string
   habitName: string
   habitScore: number
   history: HabitHistoryEntry[]
   mode: HabitMode
+  scoreEntries: HabitScoreEntry[]
   streak: number
   streaks: HabitStreak[]
   targetScore?: number
   windowEntries: number
+  windowStart: string
 }

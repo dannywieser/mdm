@@ -4,6 +4,7 @@ import {
   StatLabel,
   StatRoot,
   StatValueText,
+  Table,
   Text,
   VStack,
 } from "@chakra-ui/react"
@@ -24,7 +25,7 @@ import { useI18n } from "../../i18n"
 
 import { HabitScoreValue } from "../HabitScoreValue/HabitScoreValue"
 import type { HabitDetailRouteParamKey } from "./HabitDetail.types"
-import { formatChartDate } from "./HabitDetail.util"
+import { formatChartDate, formatRecentMultiplier } from "./HabitDetail.util"
 
 const TOOLTIP_STYLE = {
   backgroundColor: "var(--chakra-colors-chakra-body-bg, #fff)",
@@ -49,18 +50,19 @@ export function HabitDetail() {
         backgroundColor="app.panelBackground"
         p={4}
         w="full"
-        maxW="2xl"
+        maxW="3xl"
       >
         <VStack align="stretch" gap={4}>
           <Text fontSize="lg" fontWeight="semibold" color="app.text">
             {data.habitName}
           </Text>
 
-          <SimpleGrid columns={3} gap={3}>
-            <StatRoot size="sm">
-              <StatLabel color="app.textMuted">{t("habit.score")}</StatLabel>
-              <HabitScoreValue mode={data.mode} score={data.habitScore} targetScore={data.targetScore} />
-            </StatRoot>
+          <StatRoot size="lg" textAlign="center">
+            <StatLabel color="app.textMuted">{t("habit.score")}</StatLabel>
+            <HabitScoreValue mode={data.mode} score={data.habitScore} targetScore={data.targetScore} />
+          </StatRoot>
+
+          <SimpleGrid columns={{ base: 2, md: 3 }} gap={3}>
             <StatRoot size="sm">
               <StatLabel color="app.textMuted">{t("habit.daysLogged")}</StatLabel>
               <StatValueText>{data.windowEntries}</StatValueText>
@@ -68,6 +70,22 @@ export function HabitDetail() {
             <StatRoot size="sm">
               <StatLabel color="app.textMuted">{t("habit.currentStreak")}</StatLabel>
               <StatValueText>{data.streak}</StatValueText>
+            </StatRoot>
+            <StatRoot size="sm">
+              <StatLabel color="app.textMuted">{t("habit.windowStart")}</StatLabel>
+              <StatValueText>{formatChartDate(data.windowStart)}</StatValueText>
+            </StatRoot>
+            <StatRoot size="sm">
+              <StatLabel color="app.textMuted">{t("habit.highestScore")}</StatLabel>
+              <StatValueText>{data.allTimeHighScore}</StatValueText>
+            </StatRoot>
+            <StatRoot size="sm">
+              <StatLabel color="app.textMuted">{t("habit.bestStreak")}</StatLabel>
+              <StatValueText>{data.allTimeHighStreak}</StatValueText>
+            </StatRoot>
+            <StatRoot size="sm">
+              <StatLabel color="app.textMuted">{t("habit.mostDaysLogged")}</StatLabel>
+              <StatValueText>{data.allTimeHighWindowEntries}</StatValueText>
             </StatRoot>
           </SimpleGrid>
 
@@ -139,6 +157,57 @@ export function HabitDetail() {
                   />
                 </ComposedChart>
               </ResponsiveContainer>
+            </Box>
+          )}
+
+          {data.scoreEntries.length > 0 && (
+            <Box>
+              <Text
+                fontSize="xs"
+                color="app.textMuted"
+                mb={2}
+                textTransform="uppercase"
+                letterSpacing="wide"
+              >
+                {t("habit.scoreEntries")}
+              </Text>
+              <Table.Root
+                bg="app.panelBackground"
+                color="app.text"
+                borderWidth="1px"
+                borderColor="app.border"
+                borderRadius="md"
+                overflow="hidden"
+              >
+                <Table.Header bg="app.panelBackgroundHover">
+                  <Table.Row bg="app.panelBackgroundHover">
+                    <Table.ColumnHeader color="app.textMuted" borderColor="app.border">
+                      {t("habit.entryDate")}
+                    </Table.ColumnHeader>
+                    <Table.ColumnHeader color="app.textMuted" borderColor="app.border">
+                      {t("habit.entryValue")}
+                    </Table.ColumnHeader>
+                    <Table.ColumnHeader color="app.textMuted" borderColor="app.border">
+                      {t("habit.entryMultiplier")}
+                    </Table.ColumnHeader>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                  {data.scoreEntries.map((entry) => (
+                    <Table.Row
+                      key={entry.date}
+                      bg="app.panelBackground"
+                      _hover={{ bg: "app.panelBackgroundHover" }}
+                    >
+                      <Table.Cell borderColor="app.border">{formatChartDate(entry.date)}</Table.Cell>
+                      <Table.Cell borderColor="app.border">{entry.value}</Table.Cell>
+                      <Table.Cell borderColor="app.border">
+                        {formatRecentMultiplier(entry.recentMultiplier)}
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table.Root>
             </Box>
           )}
         </VStack>
