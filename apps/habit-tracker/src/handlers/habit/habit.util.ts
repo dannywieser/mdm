@@ -1,33 +1,20 @@
 import type { HabitMode } from "app-config"
 
+import { addDays, buildDateRange, daysBetween, getDateWindowStart } from "mdm-util"
+
 import type { HabitEntry, HabitHistoryEntry, HabitScoreResult, HabitStreak } from "./habit.types"
 
 const RECENT_WINDOW_DAYS = 14
 const RECENT_MULTIPLIER = 10
 const BONUS_PER_UNIT = 0.005
 
-export const addDays = (dateStr: string, days: number): string => {
-  const date = new Date(dateStr + "T00:00:00Z")
-  date.setUTCDate(date.getUTCDate() + days)
-  return date.toISOString().slice(0, 10)
-}
-
-export const getWindowStart = (referenceDate: string, windowDays: number): string =>
-  addDays(referenceDate, -windowDays)
-
 export const getWindowEntries = (
   entries: HabitEntry[],
   referenceDate: string,
   windowDays: number,
 ): HabitEntry[] => {
-  const windowStart = getWindowStart(referenceDate, windowDays)
+  const windowStart = getDateWindowStart(referenceDate, windowDays)
   return entries.filter((e) => e.date >= windowStart && e.date <= referenceDate)
-}
-
-const daysBetween = (fromDate: string, toDate: string): number => {
-  const from = new Date(fromDate + "T00:00:00Z")
-  const to = new Date(toDate + "T00:00:00Z")
-  return Math.round((to.getTime() - from.getTime()) / (24 * 60 * 60 * 1000))
 }
 
 export const calculateConsecutiveEntryStreak = (entries: HabitEntry[], referenceDate: string): number => {
@@ -92,7 +79,7 @@ export const calculateHabitScore = (
   windowDays: number,
   mode: HabitMode,
 ): HabitScoreResult => {
-  const windowStart = getWindowStart(referenceDate, windowDays)
+  const windowStart = getDateWindowStart(referenceDate, windowDays)
   const windowEntries = getWindowEntries(entries, referenceDate, windowDays)
   const rawScore = calculateRawScore(windowEntries)
   const recentEntryAdditions = calculateRecentEntryAdditions(windowEntries, referenceDate)
@@ -123,15 +110,6 @@ export const calculateHabitScore = (
     dayMultiplier,
     recentEntryAdditions,
   }
-}
-
-// Every date from `fromDate` to `toDate`, inclusive, in ascending order.
-const buildDateRange = (fromDate: string, toDate: string): string[] => {
-  const dates: string[] = []
-  for (let date = fromDate; date <= toDate; date = addDays(date, 1)) {
-    dates.push(date)
-  }
-  return dates
 }
 
 export const buildHistory = (

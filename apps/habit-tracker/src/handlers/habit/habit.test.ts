@@ -1,11 +1,11 @@
 import { AppConfigError, resolveNotesConfig } from "app-config"
+import { addDays } from "mdm-util"
 
 import type { HabitEntry, HabitResult } from "./habit.types"
 
 import { habitHandler } from "./habit"
 import { collectMarkdownFiles, scanHabitEntries } from "./habit.files"
 import {
-  addDays,
   buildHistory,
   buildStreaks,
   calculateBaseScore,
@@ -27,6 +27,17 @@ vi.mock("./habit.files", () => ({
   collectMarkdownFiles: vi.fn(),
   scanHabitEntries: vi.fn(),
 }))
+
+vi.mock("mdm-util", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("mdm-util")>()
+  return {
+    ...actual,
+    addDays: vi.fn(actual.addDays),
+    buildDateRange: vi.fn(actual.buildDateRange),
+    daysBetween: vi.fn(actual.daysBetween),
+    getDateWindowStart: vi.fn(actual.getDateWindowStart),
+  }
+})
 
 // ---------------------------------------------------------------------------
 // Test data helpers
@@ -103,32 +114,6 @@ const generateYearEntries = (): HabitEntry[] => {
 
 const YEAR_ENTRIES = generateYearEntries()
 const YEAR_REFERENCE_DATE = "2025-12-31"
-
-// ---------------------------------------------------------------------------
-// addDays
-// ---------------------------------------------------------------------------
-
-describe("addDays", () => {
-  test("adds positive days", () => {
-    expect(addDays("2025-01-01", 10)).toBe("2025-01-11")
-  })
-
-  test("subtracts negative days", () => {
-    expect(addDays("2025-01-11", -10)).toBe("2025-01-01")
-  })
-
-  test("crosses month boundary", () => {
-    expect(addDays("2025-01-31", 1)).toBe("2025-02-01")
-  })
-
-  test("crosses year boundary", () => {
-    expect(addDays("2024-12-31", 1)).toBe("2025-01-01")
-  })
-
-  test("handles zero days", () => {
-    expect(addDays("2025-06-15", 0)).toBe("2025-06-15")
-  })
-})
 
 // ---------------------------------------------------------------------------
 // getWindowEntries
