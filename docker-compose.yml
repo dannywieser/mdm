@@ -44,8 +44,12 @@ services:
       dockerfile: infra/docker/habit-tracker.Dockerfile
     environment:
       PORT: "3003"
+      NOTES_ROOT: "/data/notes"
     expose:
       - "3003"
+    volumes:
+      - ./app.config.json:/app/app.config.json:ro
+      - ${NOTES_ROOT:-./notes}:/data/notes:ro
 
   image-server:
     build:

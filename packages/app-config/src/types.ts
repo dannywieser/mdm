@@ -1,3 +1,13 @@
+export type HabitMode = "do-more" | "do-less"
+
+export interface HabitConfig {
+  frontmatterProperty: string
+  id: string
+  mode: HabitMode
+  name: string
+  trackingWindowDays: number
+}
+
 export interface ExcludeViewFilter {
   $exclude: Record<string, string>
 }
@@ -35,6 +45,7 @@ export interface ResolvedNotesConfig {
   createdDateProperty: string
   dateFormats: string[]
   deriveTitleDate: boolean
+  habits: HabitConfig[]
   homeStats: HomeStatsConfig
   notesDirectory: string
   obsidianVault: string
@@ -47,6 +58,7 @@ export interface AppConfig {
   createdDateProperty?: string
   dateFormats?: string[]
   deriveTitleDate?: boolean
+  habits?: HabitConfig[]
   homeStats?: {
     show?: Partial<HomeStatsShowConfig>
   }

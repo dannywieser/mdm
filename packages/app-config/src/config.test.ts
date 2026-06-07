@@ -119,6 +119,7 @@ describe("config", () => {
       createdDateProperty: "created",
       dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
       deriveTitleDate: false,
+      habits: [],
       homeStats: {
         show: {
           folderBreakdown: true,
@@ -169,6 +170,7 @@ describe("config", () => {
       createdDateProperty: "created",
       dateFormats: [],
       deriveTitleDate: false,
+      habits: [],
       homeStats: {
         show: {
           folderBreakdown: true,
@@ -202,6 +204,7 @@ describe("config", () => {
       createdDateProperty: "created",
       dateFormats: ["YYYY.MM.DD"],
       deriveTitleDate: false,
+      habits: [],
       homeStats: {
         show: {
           folderBreakdown: true,
@@ -562,6 +565,130 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError("NOTES_ROOT environment variable is required"),
+    )
+  })
+
+  test("resolves configured habits", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        habits: [
+          {
+            id: "exercise",
+            name: "Exercise",
+            mode: "do-more",
+            frontmatterProperty: "exercise",
+            trackingWindowDays: 90,
+          },
+          {
+            id: "stress",
+            name: "Stress",
+            mode: "do-less",
+            frontmatterProperty: "stress",
+            trackingWindowDays: 30,
+          },
+        ],
+        obsidianVault: "vault",
+      }),
+    )
+
+    const config = await resolveNotesConfig()
+
+    expect(config.habits).toEqual([
+      {
+        id: "exercise",
+        name: "Exercise",
+        mode: "do-more",
+        frontmatterProperty: "exercise",
+        trackingWindowDays: 90,
+      },
+      {
+        id: "stress",
+        name: "Stress",
+        mode: "do-less",
+        frontmatterProperty: "stress",
+        trackingWindowDays: 30,
+      },
+    ])
+  })
+
+  test("defaults habits to an empty array when omitted", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        obsidianVault: "vault",
+      }),
+    )
+
+    const config = await resolveNotesConfig()
+
+    expect(config.habits).toEqual([])
+  })
+
+  test("throws when habits is invalid", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        habits: [
+          {
+            id: "exercise",
+            name: "Exercise",
+            mode: "sometimes",
+            frontmatterProperty: "exercise",
+            trackingWindowDays: 90,
+          },
+        ],
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesDirectory()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive integer trackingWindowDays",
+      ),
+    )
+  })
+
+  test("throws when habit trackingWindowDays is not a positive number", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        habits: [
+          {
+            id: "exercise",
+            name: "Exercise",
+            mode: "do-more",
+            frontmatterProperty: "exercise",
+            trackingWindowDays: 0,
+          },
+        ],
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesDirectory()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive integer trackingWindowDays",
+      ),
+    )
+  })
+
+  test("throws when habit trackingWindowDays is not an integer", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        habits: [
+          {
+            id: "exercise",
+            name: "Exercise",
+            mode: "do-more",
+            frontmatterProperty: "exercise",
+            trackingWindowDays: 30.5,
+          },
+        ],
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesDirectory()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), and a positive integer trackingWindowDays",
+      ),
     )
   })
 

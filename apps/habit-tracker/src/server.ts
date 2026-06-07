@@ -10,7 +10,7 @@ export const createApp = () => {
   app.use(morgan("combined"))
 
   app.get("/health", healthHandler)
-  app.get("/habit/:key", habitHandler)
+  app.get("/habit/:id", habitHandler)
 
   return app
 }
