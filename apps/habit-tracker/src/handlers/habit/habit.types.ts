@@ -4,18 +4,35 @@ export interface HabitEntry {
 }
 
 export interface HabitScoreResult {
-  score: number
+  habitScore: number
   streak: number
   uniqueWindowDays: number
   windowStart: string
+  rawScore: number
+  scoreBeforeMultipliers: number
+  streakMultiplier: number
+  dayMultiplier: number
+  recentEntryAdditions: number
 }
 
 export interface HabitHistoryEntry {
   date: string
-  score: number
+  habitScore: number
   streak: number
   windowEntries: number
   windowStart: string
+  rawScore: number
+  scoreBeforeMultipliers: number
+  streakMultiplier: number
+  dayMultiplier: number
+  recentEntryAdditions: number
+  value: number
+}
+
+export interface HabitStreak {
+  start: string
+  end: string
+  length: number
 }
 
 export interface HabitResult {
@@ -25,8 +42,14 @@ export interface HabitResult {
   habitId: string
   habitName: string
   history: HabitHistoryEntry[]
-  score: number
+  habitScore: number
   streak: number
+  streaks: HabitStreak[]
   totalEntries: number
   windowStart: string
+  rawScore: number
+  scoreBeforeMultipliers: number
+  streakMultiplier: number
+  dayMultiplier: number
+  recentEntryAdditions: number
 }

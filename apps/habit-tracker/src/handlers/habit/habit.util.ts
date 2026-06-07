@@ -1,6 +1,6 @@
 import type { HabitMode } from "app-config"
 
-import type { HabitEntry, HabitHistoryEntry, HabitScoreResult } from "./habit.types"
+import type { HabitEntry, HabitHistoryEntry, HabitScoreResult, HabitStreak } from "./habit.types"
 
 const RECENT_WINDOW_DAYS = 14
 const RECENT_MULTIPLIER = 10
@@ -50,88 +50,172 @@ const mostRecentDateOnOrBefore = (dates: string[], referenceDate: string): strin
   return candidates.reduce((latest, date) => (date > latest ? date : latest))
 }
 
-// "Current" do-less streak: how long it's been since the habit was last logged,
-// as of the reference date. An entry on the reference date itself resets this to 0.
+// "do-less" streak: how long it's been since the habit was last logged, as of
+// the reference date. An entry on the reference date itself resets this to 0.
 export const calculateDaysSinceLastEntry = (entries: HabitEntry[], referenceDate: string): number => {
   const mostRecentDate = mostRecentDateOnOrBefore(entries.map((e) => e.date), referenceDate)
   if (!mostRecentDate) return 0
   return daysBetween(mostRecentDate, referenceDate)
 }
 
-// "Historical" do-less streak: the gap between this entry and the previous one,
-// i.e. how long the habit went unlogged leading up to this entry.
-export const calculateDaysBetweenEntries = (entries: HabitEntry[], referenceDate: string): number => {
-  const priorDates = entries.filter((e) => e.date < referenceDate).map((e) => e.date)
-  const mostRecentPriorDate = mostRecentDateOnOrBefore(priorDates, referenceDate)
-  if (!mostRecentPriorDate) return 0
-  return daysBetween(mostRecentPriorDate, referenceDate)
-}
+export const calculateStreak = (entries: HabitEntry[], referenceDate: string, mode: HabitMode): number =>
+  mode === "do-more"
+    ? calculateConsecutiveEntryStreak(entries, referenceDate)
+    : calculateDaysSinceLastEntry(entries, referenceDate)
 
-export const calculateStreak = (
-  entries: HabitEntry[],
-  referenceDate: string,
-  mode: HabitMode,
-  streakContext: "current" | "history",
-): number => {
-  if (mode === "do-more") return calculateConsecutiveEntryStreak(entries, referenceDate)
-  return streakContext === "current"
-    ? calculateDaysSinceLastEntry(entries, referenceDate)
-    : calculateDaysBetweenEntries(entries, referenceDate)
-}
+// Sum of entry values with no recency multiplier applied.
+export const calculateRawScore = (windowEntries: HabitEntry[]): number =>
+  windowEntries.reduce((sum, entry) => sum + entry.value, 0)
 
-export const calculateBaseScore = (
+// The extra amount each recent entry (within the last RECENT_WINDOW_DAYS)
+// contributes on top of its raw value, i.e. (entry.value * RECENT_MULTIPLIER) - entry.value.
+export const calculateRecentEntryAdditions = (
   windowEntries: HabitEntry[],
   referenceDate: string,
 ): number => {
   const recentCutoff = addDays(referenceDate, -RECENT_WINDOW_DAYS)
   return windowEntries.reduce((sum, entry) => {
-    const multiplier = entry.date > recentCutoff ? RECENT_MULTIPLIER : 1
-    return sum + entry.value * multiplier
+    if (entry.date <= recentCutoff) return sum
+    return sum + entry.value * (RECENT_MULTIPLIER - 1)
   }, 0)
 }
+
+export const calculateBaseScore = (
+  windowEntries: HabitEntry[],
+  referenceDate: string,
+): number =>
+  calculateRawScore(windowEntries) + calculateRecentEntryAdditions(windowEntries, referenceDate)
 
 export const calculateHabitScore = (
   entries: HabitEntry[],
   referenceDate: string,
   windowDays: number,
   mode: HabitMode,
-  streakContext: "current" | "history",
 ): HabitScoreResult => {
   const windowStart = getWindowStart(referenceDate, windowDays)
   const windowEntries = getWindowEntries(entries, referenceDate, windowDays)
-  const baseScore = calculateBaseScore(windowEntries, referenceDate)
-  const streak = calculateStreak(entries, referenceDate, mode, streakContext)
+  const rawScore = calculateRawScore(windowEntries)
+  const recentEntryAdditions = calculateRecentEntryAdditions(windowEntries, referenceDate)
+  const scoreBeforeMultipliers = rawScore + recentEntryAdditions
+  const streak = calculateStreak(entries, referenceDate, mode)
 
   const uniqueWindowDays = new Set(windowEntries.map((e) => e.date)).size
-  const streakBonus = streak * BONUS_PER_UNIT
-  const modeAdjustment =
-    mode === "do-more"
-      ? uniqueWindowDays * BONUS_PER_UNIT
-      : -(uniqueWindowDays * BONUS_PER_UNIT)
+  const streakMultiplier =
+    mode === "do-more" ? streak * BONUS_PER_UNIT : -(streak * BONUS_PER_UNIT)
+  const dayMultiplier = uniqueWindowDays * BONUS_PER_UNIT
 
   // toFixed rounds away floating-point representation noise (e.g. 524.9999999999999)
   // before flooring, so the result reflects the mathematically exact score.
-  const score = Math.floor(Number((baseScore * (1 + streakBonus + modeAdjustment)).toFixed(6)))
+  const habitScore = Math.floor(
+    Number((scoreBeforeMultipliers * (1 + streakMultiplier + dayMultiplier)).toFixed(6)),
+  )
 
-  return { score, streak, uniqueWindowDays, windowStart }
+  return {
+    habitScore,
+    streak,
+    uniqueWindowDays,
+    windowStart,
+    rawScore,
+    scoreBeforeMultipliers,
+    streakMultiplier,
+    dayMultiplier,
+    recentEntryAdditions,
+  }
+}
+
+// Every date from `fromDate` to `toDate`, inclusive, in ascending order.
+const buildDateRange = (fromDate: string, toDate: string): string[] => {
+  const dates: string[] = []
+  for (let date = fromDate; date <= toDate; date = addDays(date, 1)) {
+    dates.push(date)
+  }
+  return dates
 }
 
 export const buildHistory = (
   entries: HabitEntry[],
   windowDays: number,
   mode: HabitMode,
+  referenceDate: string,
 ): HabitHistoryEntry[] => {
   const sortedEntries = [...entries].sort((a, b) => a.date.localeCompare(b.date))
-  const uniqueDates = [...new Set(sortedEntries.map((e) => e.date))]
+  if (sortedEntries.length === 0) return []
 
-  return uniqueDates.map((date) => {
-    const { score, streak, uniqueWindowDays, windowStart } = calculateHabitScore(
-      sortedEntries,
+  const dates = buildDateRange(sortedEntries[0].date, referenceDate)
+
+  return dates.map((date) => {
+    const {
+      habitScore,
+      streak,
+      uniqueWindowDays,
+      windowStart,
+      rawScore,
+      scoreBeforeMultipliers,
+      streakMultiplier,
+      dayMultiplier,
+      recentEntryAdditions,
+    } = calculateHabitScore(sortedEntries, date, windowDays, mode)
+
+    const value = sortedEntries
+      .filter((e) => e.date === date)
+      .reduce((sum, e) => sum + e.value, 0)
+
+    return {
       date,
-      windowDays,
-      mode,
-      "history",
-    )
-    return { date, score, streak, windowEntries: uniqueWindowDays, windowStart }
+      habitScore,
+      streak,
+      windowEntries: uniqueWindowDays,
+      windowStart,
+      rawScore,
+      scoreBeforeMultipliers,
+      streakMultiplier,
+      dayMultiplier,
+      recentEntryAdditions,
+      value,
+    }
   })
+}
+
+// "do-more" streaks: periods of consecutive days with a logged entry.
+const buildConsecutiveEntryStreaks = (sortedDates: string[]): HabitStreak[] => {
+  const streaks: HabitStreak[] = []
+  let runStart: string | undefined
+
+  sortedDates.forEach((date, index) => {
+    if (runStart === undefined) runStart = date
+
+    const nextDate = sortedDates[index + 1]
+    if (nextDate === undefined || nextDate !== addDays(date, 1)) {
+      streaks.push({ start: runStart, end: date, length: daysBetween(runStart, date) + 1 })
+      runStart = undefined
+    }
+  })
+
+  return streaks
+}
+
+// "do-less" streaks: gaps of consecutive days without a logged entry that fall
+// strictly between two logged entries (excludes the time before the first entry
+// and the ongoing gap after the most recent entry).
+const buildGapStreaks = (sortedDates: string[]): HabitStreak[] => {
+  const streaks: HabitStreak[] = []
+
+  for (let index = 1; index < sortedDates.length; index++) {
+    const previousDate = sortedDates[index - 1]
+    const currentDate = sortedDates[index]
+    const gap = daysBetween(previousDate, currentDate)
+
+    if (gap > 1) {
+      const start = addDays(previousDate, 1)
+      const end = addDays(currentDate, -1)
+      streaks.push({ start, end, length: gap - 1 })
+    }
+  }
+
+  return streaks
+}
+
+export const buildStreaks = (entries: HabitEntry[], mode: HabitMode): HabitStreak[] => {
+  const sortedDates = [...new Set(entries.map((e) => e.date))].sort((a, b) => a.localeCompare(b))
+  return mode === "do-more" ? buildConsecutiveEntryStreaks(sortedDates) : buildGapStreaks(sortedDates)
 }

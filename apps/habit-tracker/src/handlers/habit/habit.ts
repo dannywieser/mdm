@@ -7,7 +7,7 @@ import { toLoggableError } from "mdm-util"
 import type { HabitResult } from "./habit.types"
 
 import { collectMarkdownFiles, scanHabitEntries } from "./habit.files"
-import { buildHistory, calculateHabitScore } from "./habit.util"
+import { buildHistory, buildStreaks, calculateHabitScore } from "./habit.util"
 
 export const habitHandler: RequestHandler = async (request, response) => {
   let notesConfig: ResolvedNotesConfig | undefined
@@ -50,18 +50,23 @@ export const habitHandler: RequestHandler = async (request, response) => {
     console.log(`[habit] scanHabitEntries matched ${entries.length} entr${entries.length === 1 ? "y" : "ies"} for "${frontmatterProperty}"`)
 
     const today = new Date().toLocaleDateString("en-CA", { timeZone: timezone })
-    const { score, streak, uniqueWindowDays, windowStart } = calculateHabitScore(
-      entries,
-      today,
-      trackingWindowDays,
-      mode,
-      "current",
-    )
+    const {
+      habitScore,
+      streak,
+      uniqueWindowDays,
+      windowStart,
+      rawScore,
+      scoreBeforeMultipliers,
+      streakMultiplier,
+      dayMultiplier,
+      recentEntryAdditions,
+    } = calculateHabitScore(entries, today, trackingWindowDays, mode)
 
-    const history = buildHistory(entries, trackingWindowDays, mode)
+    const history = buildHistory(entries, trackingWindowDays, mode, today)
+    const streaks = buildStreaks(entries, mode)
 
-    const allTimeHighScore = history.reduce((max, h) => Math.max(max, h.score), 0)
-    const allTimeHighStreak = history.reduce((max, h) => Math.max(max, h.streak), 0)
+    const allTimeHighScore = history.reduce((max, h) => Math.max(max, h.habitScore), 0)
+    const allTimeHighStreak = streaks.reduce((max, s) => Math.max(max, s.length), 0)
     const allTimeHighWindowEntries = history.reduce((max, h) => Math.max(max, h.windowEntries), 0)
 
     const result: HabitResult = {
@@ -71,10 +76,16 @@ export const habitHandler: RequestHandler = async (request, response) => {
       habitId: id,
       habitName: name,
       history,
-      score,
+      habitScore,
       streak,
+      streaks,
       totalEntries: uniqueWindowDays,
       windowStart,
+      rawScore,
+      scoreBeforeMultipliers,
+      streakMultiplier,
+      dayMultiplier,
+      recentEntryAdditions,
     }
 
     response.status(200).json(result)
