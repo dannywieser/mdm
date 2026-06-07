@@ -58,7 +58,7 @@ export const scanHabitEntries = async (
       if (!frontmatter) return null
       const rawValue = frontmatter[frontmatterProperty]
       if (typeof rawValue !== "string") return null
-      const numValue = parseFloat(rawValue)
+      const numValue = parseFloat(rawValue.replace(/^"(.*)"$/, "$1"))
       if (isNaN(numValue) || numValue < 1 || numValue > 10) return null
       const basename = path.basename(filePath)
       const date = resolveNoteDate(
