@@ -24,7 +24,13 @@ export const getWindowEntries = (
   return entries.filter((e) => e.date >= windowStart && e.date <= referenceDate)
 }
 
-export const calculateStreak = (entries: HabitEntry[], referenceDate: string): number => {
+const daysBetween = (fromDate: string, toDate: string): number => {
+  const from = new Date(fromDate + "T00:00:00Z")
+  const to = new Date(toDate + "T00:00:00Z")
+  return Math.round((to.getTime() - from.getTime()) / (24 * 60 * 60 * 1000))
+}
+
+export const calculateConsecutiveEntryStreak = (entries: HabitEntry[], referenceDate: string): number => {
   const entryDates = new Set(
     entries.filter((e) => e.date <= referenceDate).map((e) => e.date),
   )
@@ -37,6 +43,22 @@ export const calculateStreak = (entries: HabitEntry[], referenceDate: string): n
   }
   return streak
 }
+
+export const calculateDaysSinceLastEntry = (entries: HabitEntry[], referenceDate: string): number => {
+  const pastDates = entries.filter((e) => e.date <= referenceDate).map((e) => e.date)
+  if (pastDates.length === 0) return 0
+  const mostRecentDate = pastDates.reduce((latest, date) => (date > latest ? date : latest))
+  return daysBetween(mostRecentDate, referenceDate)
+}
+
+export const calculateStreak = (
+  entries: HabitEntry[],
+  referenceDate: string,
+  mode: HabitMode,
+): number =>
+  mode === "do-more"
+    ? calculateConsecutiveEntryStreak(entries, referenceDate)
+    : calculateDaysSinceLastEntry(entries, referenceDate)
 
 export const calculateBaseScore = (
   windowEntries: HabitEntry[],
@@ -58,7 +80,7 @@ export const calculateHabitScore = (
   const windowStart = getWindowStart(referenceDate, windowDays)
   const windowEntries = getWindowEntries(entries, referenceDate, windowDays)
   const baseScore = calculateBaseScore(windowEntries, referenceDate)
-  const streak = calculateStreak(entries, referenceDate)
+  const streak = calculateStreak(entries, referenceDate, mode)
 
   const uniqueWindowDays = new Set(windowEntries.map((e) => e.date)).size
   const streakBonus = streak * BONUS_PER_UNIT
@@ -67,7 +89,9 @@ export const calculateHabitScore = (
       ? uniqueWindowDays * BONUS_PER_UNIT
       : -(uniqueWindowDays * BONUS_PER_UNIT)
 
-  const score = baseScore * (1 + streakBonus + modeAdjustment)
+  // toFixed rounds away floating-point representation noise (e.g. 524.9999999999999)
+  // before flooring, so the result reflects the mathematically exact score.
+  const score = Math.floor(Number((baseScore * (1 + streakBonus + modeAdjustment)).toFixed(6)))
 
   return { score, streak, uniqueWindowDays, windowStart }
 }
