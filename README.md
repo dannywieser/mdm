@@ -140,7 +140,9 @@ This repository is a Turborepo monorepo with this structure:
   - `GET /habit/:id`
     - Purpose: load the habit configured under `habits` in `app.config.json` (matched by `id`), scan notes for the configured `frontmatterProperty` (a numeric value from 1–10), and return the current score, streak, entry count, point-in-time history for every matching note, and all-time highs
     - Scoring: sums frontmatter values from notes within the rolling `trackingWindowDays` window (entries from the last 14 days count at a 10x multiplier), then applies a 0.5%-per-day streak bonus and either a 0.5%-per-entry bonus (`do-more` mode) or penalty (`do-less` mode) based on the number of days with entries in the window. Final scores are floored to whole numbers.
-    - Streak definition depends on mode: for `do-more` habits, the streak is the number of consecutive days (ending on the reference date) with an entry; for `do-less` habits, the streak is the number of days since the most recent entry (an entry on the reference date itself resets the streak to `0`).
+    - Streak definition depends on mode:
+      - `do-more` habits: the streak is the number of consecutive days (ending on the reference date) with an entry, in both the current score and history.
+      - `do-less` habits: the *current* streak is the number of days since the most recent entry (an entry on today's date resets it to `0`); each *history* entry's streak is instead the number of days between that entry and the one before it (how long the habit went unlogged leading up to that entry).
     - Success response: `200`
       ```json
       {

@@ -55,6 +55,7 @@ export const habitHandler: RequestHandler = async (request, response) => {
       today,
       trackingWindowDays,
       mode,
+      "current",
     )
 
     const history = buildHistory(entries, trackingWindowDays, mode)

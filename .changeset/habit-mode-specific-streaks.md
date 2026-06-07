@@ -2,4 +2,4 @@
 "habit-tracker": patch
 ---
 
-Make the `GET /habit/:id` streak calculation mode-specific. For `do-more` habits, the streak is still the number of consecutive days (ending on the reference date) with a logged entry. For `do-less` habits, the streak is now the number of days since the most recent entry — reflecting how long it's been since the habit was last logged — rather than consecutive days with entries (an entry on the reference date itself resets the streak to `0`).
+Make the `GET /habit/:id` streak calculation mode- and context-specific. For `do-more` habits, the streak is still the number of consecutive days (ending on the reference date) with a logged entry, in both the current score and history. For `do-less` habits, the streak now reflects how long the habit went unlogged: the *current* streak is the number of days since the most recent entry (an entry logged today resets it to `0`), while each *history* entry's streak is the number of days between that entry and the previous one — rather than consecutive days with entries.

@@ -9,6 +9,7 @@ import {
   buildHistory,
   calculateBaseScore,
   calculateConsecutiveEntryStreak,
+  calculateDaysBetweenEntries,
   calculateDaysSinceLastEntry,
   calculateHabitScore,
   calculateStreak,
@@ -254,18 +255,57 @@ describe("calculateDaysSinceLastEntry (do-less streak)", () => {
   })
 })
 
+describe("calculateDaysBetweenEntries (do-less historical streak)", () => {
+  test("counts days between this entry and the previous one", () => {
+    const entries = [makeEntry("2025-01-05", 5), makeEntry("2025-01-12", 3)]
+    expect(calculateDaysBetweenEntries(entries, "2025-01-12")).toBe(7)
+  })
+
+  test("returns 0 for the earliest entry (no previous entry to compare against)", () => {
+    const entries = [makeEntry("2025-01-05", 5), makeEntry("2025-01-12", 3)]
+    expect(calculateDaysBetweenEntries(entries, "2025-01-05")).toBe(0)
+  })
+
+  test("ignores entries on the reference date itself when finding the previous entry", () => {
+    const entries = [
+      makeEntry("2025-01-05", 5),
+      makeEntry("2025-01-12", 3),
+      makeEntry("2025-01-12", 1), // duplicate date, should not be treated as "previous"
+    ]
+    expect(calculateDaysBetweenEntries(entries, "2025-01-12")).toBe(7)
+  })
+
+  test("ignores future entries when finding the previous entry", () => {
+    const entries = [
+      makeEntry("2025-01-05", 5),
+      makeEntry("2025-01-12", 3),
+      makeEntry("2025-01-20", 1), // after the reference date
+    ]
+    expect(calculateDaysBetweenEntries(entries, "2025-01-12")).toBe(7)
+  })
+})
+
 describe("calculateStreak (mode dispatch)", () => {
   const entries = [makeEntry("2025-01-05", 5), makeEntry("2025-01-10", 3)]
 
-  test("uses the consecutive-entry streak for do-more habits", () => {
-    expect(calculateStreak(entries, "2025-01-10", "do-more")).toBe(
+  test("uses the consecutive-entry streak for do-more habits regardless of streak context", () => {
+    expect(calculateStreak(entries, "2025-01-10", "do-more", "current")).toBe(
+      calculateConsecutiveEntryStreak(entries, "2025-01-10"),
+    )
+    expect(calculateStreak(entries, "2025-01-10", "do-more", "history")).toBe(
       calculateConsecutiveEntryStreak(entries, "2025-01-10"),
     )
   })
 
-  test("uses the days-since-last-entry streak for do-less habits", () => {
-    expect(calculateStreak(entries, "2025-01-12", "do-less")).toBe(
+  test("uses the days-since-last-entry streak for do-less habits in the current context", () => {
+    expect(calculateStreak(entries, "2025-01-12", "do-less", "current")).toBe(
       calculateDaysSinceLastEntry(entries, "2025-01-12"),
+    )
+  })
+
+  test("uses the days-between-entries streak for do-less habits in the history context", () => {
+    expect(calculateStreak(entries, "2025-01-10", "do-less", "history")).toBe(
+      calculateDaysBetweenEntries(entries, "2025-01-10"),
     )
   })
 })
@@ -336,6 +376,7 @@ describe("calculateHabitScore", () => {
       refDate,
       30,
       "do-more",
+      "current",
     )
     // baseScore = 5 * 10 * 10 = 500 (all recent)
     // streak = 5 → streakBonus = 5 * 0.005 = 0.025
@@ -355,7 +396,7 @@ describe("calculateHabitScore", () => {
       makeEntry("2025-01-04", 10),
       makeEntry("2025-01-05", 10), // most recent entry, 5 days before refDate
     ]
-    const { score, streak } = calculateHabitScore(entries, refDate, 30, "do-less")
+    const { score, streak } = calculateHabitScore(entries, refDate, 30, "do-less", "current")
     // baseScore = 5 * 10 * 10 = 500 (all within the recent 14-day window)
     // streak = days since last entry (2025-01-05 → 2025-01-10) = 5 → streakBonus = 0.025
     // uniqueWindowDays = 5 → modeAdjustment = -0.025
@@ -370,7 +411,7 @@ describe("calculateHabitScore", () => {
       makeEntry("2025-01-05", 10),
       makeEntry("2025-01-10", 10),
     ]
-    const { streak } = calculateHabitScore(entries, refDate, 30, "do-less")
+    const { streak } = calculateHabitScore(entries, refDate, 30, "do-less", "current")
     expect(streak).toBe(0)
   })
 
@@ -380,6 +421,7 @@ describe("calculateHabitScore", () => {
       "2025-01-10",
       30,
       "do-more",
+      "current",
     )
     expect(score).toBe(0)
     expect(streak).toBe(0)
@@ -387,7 +429,7 @@ describe("calculateHabitScore", () => {
   })
 
   test("windowStart is trackingWindowDays before referenceDate", () => {
-    const { windowStart } = calculateHabitScore([], "2025-03-31", 90, "do-more")
+    const { windowStart } = calculateHabitScore([], "2025-03-31", 90, "do-more", "current")
     expect(windowStart).toBe("2024-12-31")
   })
 
@@ -398,7 +440,7 @@ describe("calculateHabitScore", () => {
       makeEntry("2025-01-15", 5),  // inside window, but older than 14 days → 1x
       makeEntry("2025-01-31", 8),  // inside window, recent → 10x
     ]
-    const { score, uniqueWindowDays } = calculateHabitScore(entries, refDate, 30, "do-more")
+    const { score, uniqueWindowDays } = calculateHabitScore(entries, refDate, 30, "do-more", "current")
     // windowStart = addDays("2025-01-31", -30) = "2025-01-01"
     // recentCutoff = addDays("2025-01-31", -14) = "2025-01-17"
     // 2025-01-15 < recentCutoff → 5 * 1 = 5
@@ -420,7 +462,7 @@ describe("calculateHabitScore", () => {
     const entries = Array.from({ length: 10 }, (_, i) =>
       makeEntry(addDays(YEAR_START, i), 1),
     )
-    const { score, streak } = calculateHabitScore(entries, refDate, 30, "do-more")
+    const { score, streak } = calculateHabitScore(entries, refDate, 30, "do-more", "current")
     expect(streak).toBe(10)
     expect(score).toBe(110)
   })
@@ -433,7 +475,7 @@ describe("calculateHabitScore", () => {
     // final = 10 * (1 + 0.05 - 0.005) = 10 * 1.045 = 10.45, floored to 10
     const lastEntryDate = addDays(YEAR_START, 0)
     const refDate = addDays(YEAR_START, 10)
-    const { score, streak } = calculateHabitScore([makeEntry(lastEntryDate, 1)], refDate, 30, "do-less")
+    const { score, streak } = calculateHabitScore([makeEntry(lastEntryDate, 1)], refDate, 30, "do-less", "current")
     expect(streak).toBe(10)
     expect(score).toBe(Math.floor(10 * (1 + 0.05 - 0.005)))
   })
@@ -483,6 +525,22 @@ describe("buildHistory", () => {
     // At 2025-01-10: three entries in window, but streak=1 (no Jan 9)
     expect(history[2]?.windowEntries).toBe(3)
     expect(history[2]?.streak).toBe(1)
+  })
+
+  test("do-less history streak is the gap between consecutive entries, not days-since-last", () => {
+    const entries = [
+      makeEntry("2025-01-01", 5),
+      makeEntry("2025-01-08", 3), // 7 days after the previous entry
+      makeEntry("2025-01-10", 1), // 2 days after the previous entry
+    ]
+    const history = buildHistory(entries, 30, "do-less")
+
+    // First entry has no previous entry to compare against → gap is 0
+    expect(history[0]?.streak).toBe(0)
+    // Second entry: gap since 2025-01-01 → 7 days
+    expect(history[1]?.streak).toBe(7)
+    // Third entry: gap since 2025-01-08 → 2 days (NOT 0, even though an entry exists on this date)
+    expect(history[2]?.streak).toBe(2)
   })
 
   test("returns empty array for no entries", () => {
@@ -608,6 +666,7 @@ describe("year-long dataset (2025)", () => {
       refDate,
       90,
       "do-more",
+      "current",
     )
     // With 90-day window ending Dec 30, all entries in the window are counted
     expect(uniqueWindowDays).toBeGreaterThan(0)
