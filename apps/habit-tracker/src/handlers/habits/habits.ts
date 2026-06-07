@@ -1,0 +1,59 @@
+import type { ResolvedNotesConfig } from "app-config"
+import type { RequestHandler } from "express"
+
+import { AppConfigError, resolveNotesConfig } from "app-config"
+import { toLoggableError } from "mdm-util"
+
+import type { HabitSummary } from "./habits.types"
+
+import { collectMarkdownFiles, scanHabitEntries } from "../habit/habit.files"
+import { calculateHabitScore } from "../habit/habit.util"
+
+export const habitsHandler: RequestHandler = async (_request, response) => {
+  let notesConfig: ResolvedNotesConfig | undefined
+
+  try {
+    notesConfig = await resolveNotesConfig()
+    const { createdDateProperty, dateFormats, deriveTitleDate, habits, notesDirectory, obsidianVault, timezone } =
+      notesConfig
+
+    const filePaths = await collectMarkdownFiles(notesDirectory)
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: timezone })
+
+    const summaries: HabitSummary[] = await Promise.all(
+      habits.map(async ({ id, name, mode, frontmatterProperty, targetScore, trackingWindowDays }) => {
+        const entries = await scanHabitEntries(
+          filePaths,
+          frontmatterProperty,
+          createdDateProperty,
+          deriveTitleDate,
+          dateFormats,
+          notesDirectory,
+          obsidianVault,
+        )
+        const { habitScore, streak } = calculateHabitScore(entries, today, trackingWindowDays, mode)
+
+        return {
+          habitId: id,
+          habitName: name,
+          habitScore,
+          mode,
+          streak,
+          targetScore,
+        }
+      }),
+    )
+
+    response.status(200).json(summaries)
+  } catch (error) {
+    if (error instanceof AppConfigError) {
+      response.status(500).json({ error: error.message })
+      return
+    }
+    console.error("Unable to load habits", {
+      error: toLoggableError(error),
+      notesConfig: notesConfig ?? null,
+    })
+    response.status(500).json({ error: "Unable to load habits" })
+  }
+}

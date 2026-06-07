@@ -8,13 +8,16 @@ import {
 } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
 
+import { useHabitsQuery } from "../../hooks/useHabitsQuery/useHabitsQuery"
 import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
 
+import { HabitCard } from "../HabitCard/HabitCard"
 import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
 import { getViewGridColumns } from "./Home.util"
 
 export function Home() {
   const { data, isLoading } = useStatsQuery({})
+  const { data: habits } = useHabitsQuery()
 
   return (
     <VStack align="center" gap={6} pt={16}>
@@ -58,6 +61,18 @@ export function Home() {
                 </StatRoot>
               </Link>
             </Box>
+          ))}
+        </SimpleGrid>
+      )}
+      {habits.length > 0 && (
+        <SimpleGrid
+          color="app.textMuted"
+          columns={{ base: Math.min(2, getViewGridColumns(habits.length)), md: getViewGridColumns(habits.length) }}
+          gap={2}
+          textAlign="center"
+        >
+          {habits.map((habit) => (
+            <HabitCard key={habit.habitId} habit={habit} />
           ))}
         </SimpleGrid>
       )}

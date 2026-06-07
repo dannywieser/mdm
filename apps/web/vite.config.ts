@@ -19,6 +19,9 @@ export default defineConfig({
       "/flags": {
         target: "http://localhost:3001",
       },
+      "/habit": {
+        target: "http://localhost:3003",
+      },
       "/images": {
         target: "http://localhost:3002",
       },

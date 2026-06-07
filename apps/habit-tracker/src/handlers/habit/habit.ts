@@ -7,14 +7,14 @@ import { toLoggableError } from "mdm-util"
 import type { HabitResult } from "./habit.types"
 
 import { collectMarkdownFiles, scanHabitEntries } from "./habit.files"
-import { buildHistory, buildStreaks, calculateHabitScore } from "./habit.util"
+import { buildHistory, buildScoreEntries, buildStreaks, calculateHabitScore, getWindowEntries } from "./habit.util"
 
 export const habitHandler: RequestHandler = async (request, response) => {
   let notesConfig: ResolvedNotesConfig | undefined
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { createdDateProperty, dateFormats, deriveTitleDate, habits, notesDirectory, timezone } =
+    const { createdDateProperty, dateFormats, deriveTitleDate, habits, notesDirectory, obsidianVault, timezone } =
       notesConfig
 
     const habitId = String(request.params["id"])
@@ -25,7 +25,7 @@ export const habitHandler: RequestHandler = async (request, response) => {
       return
     }
 
-    const { id, name, mode, frontmatterProperty, trackingWindowDays } = habitConfig
+    const { id, name, mode, frontmatterProperty, targetScore, trackingWindowDays } = habitConfig
 
     console.log("[habit] config resolved", {
       habitId: id,
@@ -46,6 +46,8 @@ export const habitHandler: RequestHandler = async (request, response) => {
       createdDateProperty,
       deriveTitleDate,
       dateFormats,
+      notesDirectory,
+      obsidianVault,
     )
     console.log(`[habit] scanHabitEntries matched ${entries.length} entr${entries.length === 1 ? "y" : "ies"} for "${frontmatterProperty}"`)
 
@@ -64,6 +66,7 @@ export const habitHandler: RequestHandler = async (request, response) => {
 
     const history = buildHistory(entries, trackingWindowDays, mode, today)
     const streaks = buildStreaks(entries, mode)
+    const scoreEntries = buildScoreEntries(getWindowEntries(entries, today, trackingWindowDays), today)
 
     const allTimeHighScore = history.reduce((max, h) => Math.max(max, h.habitScore), 0)
     const allTimeHighStreak = streaks.reduce((max, s) => Math.max(max, s.length), 0)
@@ -77,8 +80,11 @@ export const habitHandler: RequestHandler = async (request, response) => {
       habitName: name,
       history,
       habitScore,
+      mode,
+      scoreEntries,
       streak,
       streaks,
+      targetScore,
       windowEntries: uniqueWindowDays,
       windowStart,
       rawScore,

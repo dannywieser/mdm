@@ -62,6 +62,7 @@ export function Header() {
   const { t } = useI18n()
   const { view } = useParams<{ view?: string }>()
   const isStatsPage = useMatch("/stats")
+  const habitMatch = useMatch("/tracking/:habitId")
   const { data } = useStatsQuery({})
   const currentView = view
     ? data.views.find(({ id }) => id === view)
@@ -102,6 +103,20 @@ export function Header() {
                 <BreadcrumbItem>
                   <BreadcrumbCurrentLink color="app.textMuted">
                     {currentView.name}
+                  </BreadcrumbCurrentLink>
+                </BreadcrumbItem>
+              </>
+            ) : habitMatch ? (
+              <>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild fontWeight="semibold" color="app.text">
+                    <Link to="/">{t("app.name")}</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbCurrentLink color="app.textMuted">
+                    {habitMatch.params.habitId}
                   </BreadcrumbCurrentLink>
                 </BreadcrumbItem>
               </>
