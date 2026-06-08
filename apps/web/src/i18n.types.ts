@@ -23,6 +23,7 @@ export type TranslationKey =
   | "habit.scoreInfoTarget"
   | "habit.scoreOverTime"
   | "habit.streak"
+  | "habit.totalDays"
   | "habit.windowStart"
   | "home.habits"
   | "home.modifiedToday"

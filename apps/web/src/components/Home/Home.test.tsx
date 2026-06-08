@@ -55,7 +55,15 @@ describe("Home", () => {
     })
     useHabitsQueryMock.mockReturnValue({
       data: [
-        { habitId: "drinking", habitName: "drinking", habitScore: 38, mode: "do-less", streak: 2, targetScore: 100 },
+        {
+          habitId: "drinking",
+          habitName: "drinking",
+          habitScore: 38,
+          mode: "do-less",
+          streak: 2,
+          targetScore: 100,
+          windowEntries: 4,
+        },
       ],
     })
 
@@ -67,7 +75,7 @@ describe("Home", () => {
       </ChakraProvider>,
     )
 
-    expect(screen.getByText("drinking")).toBeTruthy()
+    expect(screen.getByText("habit.modeDoLess: drinking")).toBeTruthy()
     expect(screen.getByText("38")).toBeTruthy()
     expect(screen.getByText("home.habits")).toBeTruthy()
     expect(

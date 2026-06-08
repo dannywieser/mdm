@@ -28,8 +28,10 @@ import { useHabitQuery } from "../../hooks/useHabitQuery/useHabitQuery"
 import { useI18n } from "../../i18n"
 
 import { HabitScoreValue } from "../HabitScoreValue/HabitScoreValue"
+import { HeatDots } from "../HeatDots/HeatDots"
+import { calculateHeatDotCount } from "../HeatDots/HeatDots.util"
 import type { HabitDetailRouteParamKey } from "./HabitDetail.types"
-import { calculateHeatDotCount, formatChartDate, formatRecentMultiplier } from "./HabitDetail.util"
+import { formatChartDate, formatRecentMultiplier } from "./HabitDetail.util"
 
 const TOOLTIP_STYLE = {
   backgroundColor: "var(--chakra-colors-chakra-body-bg, #fff)",
@@ -104,13 +106,7 @@ export function HabitDetail() {
             </Flex>
             <Flex align="center" justify="center" gap={2}>
               <HabitScoreValue mode={data.mode} score={data.habitScore} targetScore={data.targetScore} />
-              {heatDotCount > 0 && (
-                <Flex aria-label={t("habit.heatLevel", { count: heatDotCount })} gap={1}>
-                  {Array.from({ length: heatDotCount }, (_, index) => (
-                    <Box key={index} w="8px" h="8px" borderRadius="full" bg="red.500" />
-                  ))}
-                </Flex>
-              )}
+              <HeatDots count={heatDotCount} />
             </Flex>
           </StatRoot>
 
