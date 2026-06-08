@@ -19,6 +19,7 @@ const HABIT: HabitSummary = {
   habitScore: 525,
   mode: "do-more",
   streak: 5,
+  windowEntries: 12,
 }
 
 const renderCard = (habit: HabitSummary) =>
@@ -31,12 +32,27 @@ const renderCard = (habit: HabitSummary) =>
   )
 
 describe("HabitCard", () => {
-  test("renders the habit name, score, and streak", () => {
+  test("renders the title prefixed with its mode", () => {
     renderCard(HABIT)
 
-    expect(screen.getByText("Daily Exercise")).toBeTruthy()
+    expect(screen.getByText("habit.modeDoMore: Daily Exercise")).toBeTruthy()
+  })
+
+  test("renders the do-less mode label for do-less habits", () => {
+    renderCard({ ...HABIT, mode: "do-less" })
+
+    expect(screen.getByText("habit.modeDoLess: Daily Exercise")).toBeTruthy()
+  })
+
+  test("renders the habit score, streak, and total days stats", () => {
+    renderCard(HABIT)
+
+    expect(screen.getByText("habit.score")).toBeTruthy()
     expect(screen.getByText("525")).toBeTruthy()
-    expect(screen.getByText("habit.currentStreak: 5")).toBeTruthy()
+    expect(screen.getByText("habit.currentStreak")).toBeTruthy()
+    expect(screen.getByText("habit.totalDays")).toBeTruthy()
+    expect(screen.getAllByText("5")).toHaveLength(1)
+    expect(screen.getByText("12")).toBeTruthy()
   })
 
   test("links to the habit detail route", () => {

@@ -7,4 +7,5 @@ export interface HabitSummary {
   mode: HabitMode
   streak: number
   targetScore: number | undefined
+  windowEntries: number
 }

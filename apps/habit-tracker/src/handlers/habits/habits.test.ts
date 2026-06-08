@@ -96,6 +96,7 @@ describe("habitsHandler", () => {
         mode: "do-more",
         streak: 3,
         targetScore: undefined,
+        windowEntries: 3,
       },
       {
         habitId: "stress",
@@ -106,6 +107,7 @@ describe("habitsHandler", () => {
         mode: "do-less",
         streak: 2,
         targetScore: 100,
+        windowEntries: 1,
       },
     ])
   })

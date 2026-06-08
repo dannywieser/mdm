@@ -1046,11 +1046,12 @@ describe("habitHandler", () => {
     ])
   })
 
-  test("returns mode and targetScore from habit config", async () => {
+  test("returns mode, targetScore, and trackingWindowDays from habit config", async () => {
     const { response, json } = makeResponse()
     await habitHandler(makeRequest("exercise"), response, vi.fn())
     expect(getJsonResult(json).mode).toBe("do-more")
     expect(getJsonResult(json).targetScore).toBeUndefined()
+    expect(getJsonResult(json).trackingWindowDays).toBe(30)
 
     const stressResponse = makeResponse()
     await habitHandler(makeRequest("stress"), stressResponse.response, vi.fn())

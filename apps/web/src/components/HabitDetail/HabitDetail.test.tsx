@@ -1,5 +1,5 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
-import { cleanup, fireEvent, render, screen } from "@testing-library/react"
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
@@ -37,13 +37,14 @@ const HABIT: HabitResult = {
   ],
   streak: 5,
   streaks: [{ start: "2026-01-01", end: "2026-01-05", length: 5 }],
+  trackingWindowDays: 30,
   windowEntries: 5,
   windowStart: "2025-12-29",
 }
 
 const renderDetail = (data: HabitResult = HABIT) => {
   useHabitQueryMock.mockReturnValue({ data })
-  render(
+  return render(
     <ChakraProvider value={defaultSystem}>
       <MemoryRouter initialEntries={["/tracking/exercise"]}>
         <Routes>
@@ -77,6 +78,13 @@ describe("HabitDetail", () => {
     expect(screen.getByText("habit.currentStreak")).toBeTruthy()
   })
 
+  test("renders the tracking window fill percentage as a badge next to days logged", () => {
+    renderDetail()
+
+    // windowEntries = 5, trackingWindowDays = 30 → round(5 / 30 * 100) = 17
+    expect(screen.getByText("habit.windowFillPercentage")).toBeTruthy()
+  })
+
   test("fetches the habit by the route's habitId param", () => {
     renderDetail()
 
@@ -95,11 +103,10 @@ describe("HabitDetail", () => {
     expect(screen.queryByText("habit.scoreOverTime")).toBeNull()
   })
 
-  test("displays the window start and all-time highs", () => {
+  test("displays the current tracking window and all-time highs", () => {
     renderDetail()
 
-    expect(screen.getByText("habit.windowStart")).toBeTruthy()
-    expect(screen.getByText("Dec 29")).toBeTruthy()
+    expect(screen.getByText("habit.currentTrackingWindow")).toBeTruthy()
     expect(screen.getByText("habit.highestScore")).toBeTruthy()
     expect(screen.getByText("600")).toBeTruthy()
     expect(screen.getByText("habit.bestStreak")).toBeTruthy()
@@ -108,16 +115,26 @@ describe("HabitDetail", () => {
     expect(screen.getByText("7")).toBeTruthy()
   })
 
-  test("renders a table of score entries with their values and recency multipliers", () => {
+  test("renders a table of score entries with their values and recency multipliers inline", () => {
     renderDetail()
 
     expect(screen.getByText("habit.scoreEntries")).toBeTruthy()
+    fireEvent.click(screen.getByText("habit.scoreEntries"))
     expect(screen.getByText("Jan 2")).toBeTruthy()
-    expect(screen.getByText("9")).toBeTruthy()
-    expect(screen.getByText("10×")).toBeTruthy()
+    expect(screen.getByText("9 (x10)")).toBeTruthy()
     expect(screen.getByText("Jan 1")).toBeTruthy()
     expect(screen.getByText("4")).toBeTruthy()
-    expect(screen.getByText("—")).toBeTruthy()
+  })
+
+  test("collapses the score entries table by default and expands it on click", async () => {
+    const { container } = renderDetail()
+    const content = container.querySelector("[data-collapsible]")
+
+    expect(content?.hasAttribute("hidden")).toBe(true)
+
+    fireEvent.click(screen.getByText("habit.scoreEntries"))
+
+    await waitFor(() => expect(content?.hasAttribute("hidden")).toBe(false))
   })
 
   test("omits the score entries table when there are no entries", () => {
@@ -129,6 +146,7 @@ describe("HabitDetail", () => {
   test("links score entry dates to their notes via the obsidian url", () => {
     renderDetail()
 
+    fireEvent.click(screen.getByText("habit.scoreEntries"))
     expect(screen.getByText("Jan 2").closest("a")).toHaveProperty(
       "href",
       "obsidian://open?vault=v&file=2026.01.02",

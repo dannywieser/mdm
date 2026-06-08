@@ -31,7 +31,12 @@ export const habitsHandler: RequestHandler = async (_request, response) => {
           notesDirectory,
           obsidianVault,
         )
-        const { habitScore, streak } = calculateHabitScore(entries, today, trackingWindowDays, mode)
+        const { habitScore, streak, uniqueWindowDays } = calculateHabitScore(
+          entries,
+          today,
+          trackingWindowDays,
+          mode,
+        )
 
         return {
           habitId: id,
@@ -40,6 +45,7 @@ export const habitsHandler: RequestHandler = async (_request, response) => {
           mode,
           streak,
           targetScore,
+          windowEntries: uniqueWindowDays,
         }
       }),
     )

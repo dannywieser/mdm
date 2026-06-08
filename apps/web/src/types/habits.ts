@@ -7,6 +7,7 @@ export interface HabitSummary {
   mode: HabitMode
   streak: number
   targetScore?: number
+  windowEntries: number
 }
 
 export interface HabitHistoryEntry {
@@ -42,6 +43,7 @@ export interface HabitResult {
   streak: number
   streaks: HabitStreak[]
   targetScore?: number
+  trackingWindowDays: number
   windowEntries: number
   windowStart: string
 }
