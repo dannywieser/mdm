@@ -95,11 +95,10 @@ describe("HabitDetail", () => {
     expect(screen.queryByText("habit.scoreOverTime")).toBeNull()
   })
 
-  test("displays the window start and all-time highs", () => {
+  test("displays the current tracking window and all-time highs", () => {
     renderDetail()
 
-    expect(screen.getByText("habit.windowStart")).toBeTruthy()
-    expect(screen.getByText("Dec 29")).toBeTruthy()
+    expect(screen.getByText("habit.currentTrackingWindow")).toBeTruthy()
     expect(screen.getByText("habit.highestScore")).toBeTruthy()
     expect(screen.getByText("600")).toBeTruthy()
     expect(screen.getByText("habit.bestStreak")).toBeTruthy()

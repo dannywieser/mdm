@@ -67,6 +67,9 @@ export function HabitDetail() {
 
           <Box borderColor="app.border" borderWidth="1px" borderRadius="md" p={3}>
             <VStack align="stretch" gap={3}>
+              <Text fontSize="xs" color="app.textMuted" letterSpacing="wide">
+                {t("habit.currentTrackingWindow", { date: data.windowStart.replaceAll("-", ".") })}
+              </Text>
               <StatRoot size="lg" textAlign="center">
                 <Flex align="center" justify="center" gap={1.5}>
                   <StatLabel color="app.textMuted">{t("habit.score")}</StatLabel>
@@ -116,7 +119,7 @@ export function HabitDetail() {
                 </Box>
               </StatRoot>
 
-              <SimpleGrid columns={{ base: 1, sm: 3 }} gap={3}>
+              <SimpleGrid columns={{ base: 1, sm: 2 }} gap={3}>
                 <StatRoot size="sm">
                   <StatLabel color="app.textMuted">{t("habit.daysLogged")}</StatLabel>
                   <StatValueText>{data.windowEntries}</StatValueText>
@@ -124,10 +127,6 @@ export function HabitDetail() {
                 <StatRoot size="sm">
                   <StatLabel color="app.textMuted">{t("habit.currentStreak")}</StatLabel>
                   <StatValueText>{data.streak}</StatValueText>
-                </StatRoot>
-                <StatRoot size="sm">
-                  <StatLabel color="app.textMuted">{t("habit.windowStart")}</StatLabel>
-                  <StatValueText>{formatChartDate(data.windowStart)}</StatValueText>
                 </StatRoot>
               </SimpleGrid>
             </VStack>
