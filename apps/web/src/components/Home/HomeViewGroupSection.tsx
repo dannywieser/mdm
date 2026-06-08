@@ -6,7 +6,7 @@ import type { HomeViewGroupSectionProps } from "./HomeViewGroupSection.types"
 
 export function HomeViewGroupSection({ group, views }: HomeViewGroupSectionProps) {
   return (
-    <VStack align="stretch" gap={2}>
+    <VStack align="stretch" gap={2} width="full">
       <Heading as="h2" size="sm" color="app.textMuted" fontWeight="medium">
         {group}
       </Heading>

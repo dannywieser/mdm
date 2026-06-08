@@ -26,12 +26,12 @@ export function Home() {
   const groupedViews = data ? groupViewsByGroup(data.views) : undefined
 
   return (
-    <VStack align="center" gap={6} pt={16}>
+    <VStack align="center" gap={6} pt={16} px={{ base: 4, md: "100px" }}>
       <Box color="app.iconMuted">
         <NotebookIcon animating={isLoading} size={80} />
       </Box>
       {groupedViews && (
-        <VStack align="stretch" gap={4}>
+        <VStack align="stretch" gap={4} width="full">
           {groupedViews.ungroupedViews.length > 0 && (
             <SimpleGrid
               color="app.textMuted"
@@ -81,7 +81,7 @@ export function Home() {
         </VStack>
       )}
       {habits.length > 0 && (
-        <VStack align="stretch" gap={2}>
+        <VStack align="stretch" gap={2} width="full">
           <Heading as="h2" size="sm" color="app.textMuted" fontWeight="medium">
             {t("home.habits")}
           </Heading>
