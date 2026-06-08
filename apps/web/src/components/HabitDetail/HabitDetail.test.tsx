@@ -1,5 +1,5 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
-import { cleanup, fireEvent, render, screen } from "@testing-library/react"
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
@@ -44,7 +44,7 @@ const HABIT: HabitResult = {
 
 const renderDetail = (data: HabitResult = HABIT) => {
   useHabitQueryMock.mockReturnValue({ data })
-  render(
+  return render(
     <ChakraProvider value={defaultSystem}>
       <MemoryRouter initialEntries={["/tracking/exercise"]}>
         <Routes>
@@ -119,10 +119,22 @@ describe("HabitDetail", () => {
     renderDetail()
 
     expect(screen.getByText("habit.scoreEntries")).toBeTruthy()
+    fireEvent.click(screen.getByText("habit.scoreEntries"))
     expect(screen.getByText("Jan 2")).toBeTruthy()
     expect(screen.getByText("9 (x10)")).toBeTruthy()
     expect(screen.getByText("Jan 1")).toBeTruthy()
     expect(screen.getByText("4")).toBeTruthy()
+  })
+
+  test("collapses the score entries table by default and expands it on click", async () => {
+    const { container } = renderDetail()
+    const content = container.querySelector("[data-collapsible]")
+
+    expect(content?.hasAttribute("hidden")).toBe(true)
+
+    fireEvent.click(screen.getByText("habit.scoreEntries"))
+
+    await waitFor(() => expect(content?.hasAttribute("hidden")).toBe(false))
   })
 
   test("omits the score entries table when there are no entries", () => {
@@ -134,6 +146,7 @@ describe("HabitDetail", () => {
   test("links score entry dates to their notes via the obsidian url", () => {
     renderDetail()
 
+    fireEvent.click(screen.getByText("habit.scoreEntries"))
     expect(screen.getByText("Jan 2").closest("a")).toHaveProperty(
       "href",
       "obsidian://open?vault=v&file=2026.01.02",
