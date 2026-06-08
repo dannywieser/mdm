@@ -23,13 +23,15 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "habit.personalRecords": "personal records",
     "habit.score": "score",
     "habit.scoreEntries": "entries in current score",
-    "habit.scoreInfoDoLess": "lower scores are better — staying under the target keeps this habit in check",
-    "habit.scoreInfoDoMore": "higher scores are better — aim to beat your target",
+    "habit.scoreInfoDoLess":
+      "lower scores are better — staying under the target keeps this habit in check",
+    "habit.scoreInfoDoMore":
+      "higher scores are better — aim to beat your target",
     "habit.scoreInfoLabel": "about this score",
     "habit.scoreInfoTarget": "target: {target}",
     "habit.scoreOverTime": "score over time",
     "habit.streak": "streak",
-    "habit.totalDays": "total days",
+    "habit.totalDays": "days logged",
     "habit.windowFillPercentage": "{percentage}%",
     "home.habits": "habits",
     "home.modifiedToday": "modified today",
