@@ -13,7 +13,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react"
-import { Info } from "lucide-react"
+import { ChevronRight, Info } from "lucide-react"
 import {
   CartesianGrid,
   ComposedChart,
@@ -295,17 +295,27 @@ export function HabitDetail() {
           {data.scoreEntries.length > 0 && (
             <Collapsible.Root>
               <Collapsible.Trigger asChild>
-                <Text
-                  fontSize="xs"
-                  color="app.textMuted"
+                <Flex
+                  align="center"
+                  gap={1}
                   mb={2}
-                  letterSpacing="wide"
                   cursor="pointer"
+                  color="app.textMuted"
                   _hover={{ color: "app.text" }}
-                  css={{ "&[data-state=closed]": { bg: "app.background" } }}
+                  css={{
+                    "& .habit-score-entries-chevron": {
+                      transition: "transform 0.2s",
+                    },
+                    '&[data-state="open"] .habit-score-entries-chevron': {
+                      transform: "rotate(90deg)",
+                    },
+                  }}
                 >
-                  {t("habit.scoreEntries")}
-                </Text>
+                  <ChevronRight size={14} className="habit-score-entries-chevron" />
+                  <Text fontSize="xs" letterSpacing="wide">
+                    {t("habit.scoreEntries")}
+                  </Text>
+                </Flex>
               </Collapsible.Trigger>
               <Collapsible.Content>
                 <Table.Root
