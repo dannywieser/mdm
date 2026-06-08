@@ -302,6 +302,7 @@ export function HabitDetail() {
                   letterSpacing="wide"
                   cursor="pointer"
                   _hover={{ color: "app.text" }}
+                  css={{ "&[data-state=closed]": { bg: "app.background" } }}
                 >
                   {t("habit.scoreEntries")}
                 </Text>
