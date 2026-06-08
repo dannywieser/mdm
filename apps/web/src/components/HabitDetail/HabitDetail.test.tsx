@@ -37,6 +37,7 @@ const HABIT: HabitResult = {
   ],
   streak: 5,
   streaks: [{ start: "2026-01-01", end: "2026-01-05", length: 5 }],
+  trackingWindowDays: 30,
   windowEntries: 5,
   windowStart: "2025-12-29",
 }
@@ -75,6 +76,13 @@ describe("HabitDetail", () => {
     expect(screen.getAllByText("5")).toHaveLength(2)
     expect(screen.getByText("habit.daysLogged")).toBeTruthy()
     expect(screen.getByText("habit.currentStreak")).toBeTruthy()
+  })
+
+  test("renders the tracking window fill percentage as a badge next to days logged", () => {
+    renderDetail()
+
+    // windowEntries = 5, trackingWindowDays = 30 → round(5 / 30 * 100) = 17
+    expect(screen.getByText("habit.windowFillPercentage")).toBeTruthy()
   })
 
   test("fetches the habit by the route's habitId param", () => {

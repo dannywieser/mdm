@@ -58,6 +58,7 @@ export interface HabitResult {
   streak: number
   streaks: HabitStreak[]
   targetScore: number | undefined
+  trackingWindowDays: number
   windowEntries: number
   windowStart: string
   rawScore: number

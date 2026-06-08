@@ -25,6 +25,7 @@ export type TranslationKey =
   | "habit.scoreOverTime"
   | "habit.streak"
   | "habit.totalDays"
+  | "habit.windowFillPercentage"
   | "home.habits"
   | "home.modifiedToday"
   | "home.notes"

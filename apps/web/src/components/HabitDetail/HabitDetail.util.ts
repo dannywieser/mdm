@@ -5,3 +5,6 @@ export const formatChartDate = (dateStr: string): string => {
 
 export const formatEntryValue = (value: number, recentMultiplier: number | undefined): string =>
   recentMultiplier === undefined ? `${value}` : `${value} (x${recentMultiplier})`
+
+export const calculateWindowFillPercentage = (windowEntries: number, trackingWindowDays: number): number =>
+  Math.round((windowEntries / trackingWindowDays) * 100)

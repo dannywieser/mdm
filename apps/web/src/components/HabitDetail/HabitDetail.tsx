@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Flex,
   Link,
@@ -32,7 +33,7 @@ import { HabitScoreValue } from "../HabitScoreValue/HabitScoreValue"
 import { HeatDots } from "../HeatDots/HeatDots"
 import { calculateHeatDotCount } from "../HeatDots/HeatDots.util"
 import type { HabitDetailRouteParamKey } from "./HabitDetail.types"
-import { formatChartDate, formatEntryValue } from "./HabitDetail.util"
+import { calculateWindowFillPercentage, formatChartDate, formatEntryValue } from "./HabitDetail.util"
 
 const TOOLTIP_STYLE = {
   backgroundColor: "var(--chakra-colors-chakra-body-bg, #fff)",
@@ -48,6 +49,7 @@ export function HabitDetail() {
   const { t } = useI18n()
   const { data } = useHabitQuery({ habitId: habitId ?? "" })
   const heatDotCount = calculateHeatDotCount(data.mode, data.habitScore, data.targetScore)
+  const windowFillPercentage = calculateWindowFillPercentage(data.windowEntries, data.trackingWindowDays)
 
   return (
     <VStack align="center" gap={6} pt={16} px={4} pb={16}>
@@ -122,7 +124,12 @@ export function HabitDetail() {
               <SimpleGrid columns={{ base: 1, sm: 2 }} gap={3}>
                 <StatRoot size="sm">
                   <StatLabel color="app.textMuted">{t("habit.daysLogged")}</StatLabel>
-                  <StatValueText>{data.windowEntries}</StatValueText>
+                  <Flex align="baseline" gap={2}>
+                    <StatValueText>{data.windowEntries}</StatValueText>
+                    <Badge variant="subtle" bg="app.panelBackgroundHover" color="app.textMuted">
+                      {t("habit.windowFillPercentage", { percentage: windowFillPercentage })}
+                    </Badge>
+                  </Flex>
                 </StatRoot>
                 <StatRoot size="sm">
                   <StatLabel color="app.textMuted">{t("habit.currentStreak")}</StatLabel>

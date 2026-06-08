@@ -30,6 +30,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "habit.scoreOverTime": "score over time",
     "habit.streak": "streak",
     "habit.totalDays": "total days",
+    "habit.windowFillPercentage": "{percentage}%",
     "home.habits": "habits",
     "home.modifiedToday": "modified today",
     "home.notes": "notes",
