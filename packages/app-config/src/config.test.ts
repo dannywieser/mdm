@@ -107,6 +107,7 @@ describe("config", () => {
                 },
               },
             ],
+            group: "library",
             id: "books",
             name: "books",
           },
@@ -151,6 +152,7 @@ describe("config", () => {
               },
             },
           ],
+          group: "library",
           id: "books",
           name: "books",
         },
@@ -505,7 +507,7 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and filters as string records or $exclude objects",
+        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges/group, and filters as string records or $exclude objects",
       ),
     )
   })
@@ -528,7 +530,7 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and filters as string records or $exclude objects",
+        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges/group, and filters as string records or $exclude objects",
       ),
     )
   })
@@ -550,7 +552,30 @@ describe("config", () => {
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
-        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and filters as string records or $exclude objects",
+        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges/group, and filters as string records or $exclude objects",
+      ),
+    )
+  })
+
+  test("throws when view group is invalid", async () => {
+    readFileMock.mockResolvedValue(
+      JSON.stringify({
+        obsidianVault: "vault",
+        views: [
+          {
+            component: "NotesList",
+            filters: [{ folder: "downtime" }],
+            group: "",
+            id: "books",
+            name: "Books",
+          },
+        ],
+      }),
+    )
+
+    await expect(resolveNotesDirectory()).rejects.toEqual(
+      new AppConfigError(
+        "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges/group, and filters as string records or $exclude objects",
       ),
     )
   })

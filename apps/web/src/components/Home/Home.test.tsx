@@ -1,10 +1,10 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { describe, expect, test, vi } from "vitest"
 
 import { Home } from "./Home"
-import { getViewGridColumns } from "./Home.util"
+import { getViewGridColumns, groupViewsByGroup } from "./Home.util"
 
 const useStatsQueryMock = vi.fn()
 const useHabitsQueryMock = vi.fn()
@@ -69,9 +69,60 @@ describe("Home", () => {
 
     expect(screen.getByText("drinking")).toBeTruthy()
     expect(screen.getByText("38")).toBeTruthy()
+    expect(screen.getByText("home.habits")).toBeTruthy()
     expect(
       screen.getByRole("link", { name: /drinking/i }).getAttribute("href"),
     ).toBe("/tracking/drinking")
+  })
+
+  test("renders grouped views with section heading", () => {
+    useStatsQueryMock.mockReturnValue({
+      isLoading: false,
+      data: {
+        views: [
+          { component: "NotesList", count: 4, group: "Library", id: "books", name: "Books" },
+          { component: "NotesList", count: 3, group: "Library", id: "movies", name: "Movies" },
+        ],
+      },
+    })
+    useHabitsQueryMock.mockReturnValue({ data: [] })
+
+    const { container: groupedContainer } = render(
+      <ChakraProvider value={defaultSystem}>
+        <MemoryRouter>
+          <Home />
+        </MemoryRouter>
+      </ChakraProvider>,
+    )
+
+    const libraryHeading = screen.getByRole("heading", { name: "Library" })
+    const librarySection = libraryHeading.parentElement as HTMLElement
+
+    expect(libraryHeading).toBeTruthy()
+    expect(within(librarySection).getByRole("separator")).toBeTruthy()
+    expect(within(groupedContainer).getByRole("link", { name: /books/i })).toBeTruthy()
+  })
+
+  test("does not render section heading when views are ungrouped", () => {
+    useStatsQueryMock.mockReturnValue({
+      isLoading: false,
+      data: {
+        views: [
+          { component: "NotesList", count: 4, id: "books", name: "Books" },
+        ],
+      },
+    })
+    useHabitsQueryMock.mockReturnValue({ data: [] })
+
+    const { container } = render(
+      <ChakraProvider value={defaultSystem}>
+        <MemoryRouter>
+          <Home />
+        </MemoryRouter>
+      </ChakraProvider>,
+    )
+
+    expect(within(container).queryByRole("separator")).toBeNull()
   })
 })
 
@@ -106,5 +157,33 @@ describe("getViewGridColumns", () => {
 
   test("returns 4 for ten items", () => {
     expect(getViewGridColumns(10)).toBe(4)
+  })
+})
+
+describe("groupViewsByGroup", () => {
+  test("returns ungrouped views and grouped sections preserving order", () => {
+    const grouped = groupViewsByGroup([
+      { component: "NotesList", count: 1, id: "all", name: "All Notes" },
+      { component: "NotesList", count: 2, group: "Library", id: "books", name: "Books" },
+      { component: "NotesList", count: 3, group: "Writing", id: "drafts", name: "Drafts" },
+      { component: "NotesList", count: 4, group: "Library", id: "movies", name: "Movies" },
+    ])
+
+    expect(grouped.ungroupedViews.map((view) => view.id)).toEqual(["all"])
+    expect(grouped.groups).toEqual([
+      {
+        group: "Library",
+        views: [
+          { component: "NotesList", count: 2, group: "Library", id: "books", name: "Books" },
+          { component: "NotesList", count: 4, group: "Library", id: "movies", name: "Movies" },
+        ],
+      },
+      {
+        group: "Writing",
+        views: [
+          { component: "NotesList", count: 3, group: "Writing", id: "drafts", name: "Drafts" },
+        ],
+      },
+    ])
   })
 })

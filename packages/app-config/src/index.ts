@@ -68,6 +68,7 @@ const isAppConfigView = (value: unknown): value is AppConfigView => {
     isNonEmptyString(obj["name"]) &&
     isNonEmptyString(obj["component"]) &&
     (obj["badges"] === undefined || isStringArray(obj["badges"])) &&
+    (obj["group"] === undefined || isNonEmptyString(obj["group"])) &&
     Array.isArray(obj["filters"]) &&
     (obj["filters"] as unknown[]).every(isViewFilter)
   )
@@ -182,7 +183,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
     (!Array.isArray(views) || !views.every(isAppConfigView))
   ) {
     throw new AppConfigError(
-      "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges, and filters as string records or $exclude objects",
+      "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges/group, and filters as string records or $exclude objects",
     )
   }
 

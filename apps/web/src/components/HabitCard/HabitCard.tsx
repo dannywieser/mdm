@@ -20,7 +20,7 @@ export function HabitCard({ habit }: HabitCardProps) {
       }}
     >
       <Link
-        style={{ textDecoration: "none", outline: "none" }}
+        style={{ textDecoration: "none", outline: "none", display: "block", width: "100%" }}
         to={`/tracking/${habit.habitId}`}
       >
         <StatRoot
@@ -31,6 +31,7 @@ export function HabitCard({ habit }: HabitCardProps) {
           px={3}
           py={2}
           size="sm"
+          width="full"
           _hover={{ borderColor: "app.borderHover" }}
         >
           <StatLabel>{habit.habitName}</StatLabel>

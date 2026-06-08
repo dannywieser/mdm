@@ -20,6 +20,7 @@ export interface NotesView {
   badges?: string[]
   component: string
   filters: ViewFilter[]
+  group?: string
   id: string
   layout?: string
   name: string
@@ -73,6 +74,7 @@ export interface AppConfigView {
   badges?: string[]
   component: string
   filters: ViewFilter[]
+  group?: string
   id: string
   layout?: string
   name: string

@@ -39,6 +39,7 @@ export const buildViewCounts = (
     badges: view.badges,
     component: view.component,
     count: applyViewFilter(notes, views, view.id, context).length,
+    group: view.group,
     id: view.id,
     layout: view.layout,
     name: view.name,
