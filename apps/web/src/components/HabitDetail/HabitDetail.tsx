@@ -65,81 +65,95 @@ export function HabitDetail() {
             {t(data.mode === "do-more" ? "habit.modeDoMore" : "habit.modeDoLess")}: {data.habitName}
           </Text>
 
-          <StatRoot size="lg" textAlign="center">
-            <Flex align="center" justify="center" gap={1.5}>
-              <StatLabel color="app.textMuted">{t("habit.score")}</StatLabel>
-              <Popover.Root positioning={{ placement: "top" }}>
-                <Popover.Trigger asChild>
-                  <Box
-                    as="button"
-                    aria-label={t("habit.scoreInfoLabel")}
-                    display="flex"
-                    alignItems="center"
-                    cursor="pointer"
-                    color="app.textMuted"
-                    _hover={{ color: "app.text" }}
-                  >
-                    <Info size={14} />
-                  </Box>
-                </Popover.Trigger>
-                <Popover.Positioner>
-                  <Popover.Content
-                    bg="app.panelBackground"
-                    borderColor="app.border"
-                    borderWidth="1px"
-                    borderRadius="md"
-                    p={3}
-                    maxW="xs"
-                  >
-                    <VStack align="start" gap={1}>
-                      {data.targetScore !== undefined && (
-                        <Text fontSize="xs" color="app.textMuted">
-                          {t("habit.scoreInfoTarget", { target: data.targetScore })}
-                        </Text>
-                      )}
-                      <Text fontSize="xs" color="app.textMuted">
-                        {t(data.mode === "do-less" ? "habit.scoreInfoDoLess" : "habit.scoreInfoDoMore")}
-                      </Text>
-                    </VStack>
-                  </Popover.Content>
-                </Popover.Positioner>
-              </Popover.Root>
-            </Flex>
-            <Flex align="center" justify="center" gap={2}>
-              <HabitScoreValue mode={data.mode} score={data.habitScore} targetScore={data.targetScore} />
-              <HeatDots count={heatDotCount} />
-            </Flex>
-            <Box mt={2} px={6}>
-              <HabitScoreProgress score={data.habitScore} targetScore={data.targetScore} />
-            </Box>
-          </StatRoot>
+          <Box borderColor="app.border" borderWidth="1px" borderRadius="md" p={3}>
+            <VStack align="stretch" gap={3}>
+              <StatRoot size="lg" textAlign="center">
+                <Flex align="center" justify="center" gap={1.5}>
+                  <StatLabel color="app.textMuted">{t("habit.score")}</StatLabel>
+                  <Popover.Root positioning={{ placement: "top" }}>
+                    <Popover.Trigger asChild>
+                      <Box
+                        as="button"
+                        aria-label={t("habit.scoreInfoLabel")}
+                        display="flex"
+                        alignItems="center"
+                        cursor="pointer"
+                        color="app.textMuted"
+                        _hover={{ color: "app.text" }}
+                      >
+                        <Info size={14} />
+                      </Box>
+                    </Popover.Trigger>
+                    <Popover.Positioner>
+                      <Popover.Content
+                        bg="app.panelBackground"
+                        borderColor="app.border"
+                        borderWidth="1px"
+                        borderRadius="md"
+                        p={3}
+                        maxW="xs"
+                      >
+                        <VStack align="start" gap={1}>
+                          {data.targetScore !== undefined && (
+                            <Text fontSize="xs" color="app.textMuted">
+                              {t("habit.scoreInfoTarget", { target: data.targetScore })}
+                            </Text>
+                          )}
+                          <Text fontSize="xs" color="app.textMuted">
+                            {t(data.mode === "do-less" ? "habit.scoreInfoDoLess" : "habit.scoreInfoDoMore")}
+                          </Text>
+                        </VStack>
+                      </Popover.Content>
+                    </Popover.Positioner>
+                  </Popover.Root>
+                </Flex>
+                <Flex align="center" justify="center" gap={2}>
+                  <HabitScoreValue mode={data.mode} score={data.habitScore} targetScore={data.targetScore} />
+                  <HeatDots count={heatDotCount} />
+                </Flex>
+                <Box mt={2} px={6}>
+                  <HabitScoreProgress score={data.habitScore} targetScore={data.targetScore} />
+                </Box>
+              </StatRoot>
 
-          <SimpleGrid columns={{ base: 2, md: 3 }} gap={3}>
-            <StatRoot size="sm">
-              <StatLabel color="app.textMuted">{t("habit.daysLogged")}</StatLabel>
-              <StatValueText>{data.windowEntries}</StatValueText>
-            </StatRoot>
-            <StatRoot size="sm">
-              <StatLabel color="app.textMuted">{t("habit.currentStreak")}</StatLabel>
-              <StatValueText>{data.streak}</StatValueText>
-            </StatRoot>
-            <StatRoot size="sm">
-              <StatLabel color="app.textMuted">{t("habit.windowStart")}</StatLabel>
-              <StatValueText>{formatChartDate(data.windowStart)}</StatValueText>
-            </StatRoot>
-            <StatRoot size="sm">
-              <StatLabel color="app.textMuted">{t("habit.highestScore")}</StatLabel>
-              <StatValueText>{data.allTimeHighScore}</StatValueText>
-            </StatRoot>
-            <StatRoot size="sm">
-              <StatLabel color="app.textMuted">{t("habit.bestStreak")}</StatLabel>
-              <StatValueText>{data.allTimeHighStreak}</StatValueText>
-            </StatRoot>
-            <StatRoot size="sm">
-              <StatLabel color="app.textMuted">{t("habit.mostDaysLogged")}</StatLabel>
-              <StatValueText>{data.allTimeHighWindowEntries}</StatValueText>
-            </StatRoot>
-          </SimpleGrid>
+              <SimpleGrid columns={{ base: 1, sm: 3 }} gap={3}>
+                <StatRoot size="sm">
+                  <StatLabel color="app.textMuted">{t("habit.daysLogged")}</StatLabel>
+                  <StatValueText>{data.windowEntries}</StatValueText>
+                </StatRoot>
+                <StatRoot size="sm">
+                  <StatLabel color="app.textMuted">{t("habit.currentStreak")}</StatLabel>
+                  <StatValueText>{data.streak}</StatValueText>
+                </StatRoot>
+                <StatRoot size="sm">
+                  <StatLabel color="app.textMuted">{t("habit.windowStart")}</StatLabel>
+                  <StatValueText>{formatChartDate(data.windowStart)}</StatValueText>
+                </StatRoot>
+              </SimpleGrid>
+            </VStack>
+          </Box>
+
+          <Box borderColor="app.border" borderWidth="1px" borderRadius="md" p={3}>
+            <VStack align="stretch" gap={3}>
+              <Text fontSize="xs" color="app.textMuted" textTransform="uppercase" letterSpacing="wide">
+                {t("habit.personalRecords")}
+              </Text>
+              <SimpleGrid columns={{ base: 1, sm: 3 }} gap={3}>
+                <StatRoot size="sm">
+                  <StatLabel color="app.textMuted">{t("habit.highestScore")}</StatLabel>
+                  <StatValueText>{data.allTimeHighScore}</StatValueText>
+                </StatRoot>
+                <StatRoot size="sm">
+                  <StatLabel color="app.textMuted">{t("habit.bestStreak")}</StatLabel>
+                  <StatValueText>{data.allTimeHighStreak}</StatValueText>
+                </StatRoot>
+                <StatRoot size="sm">
+                  <StatLabel color="app.textMuted">{t("habit.mostDaysLogged")}</StatLabel>
+                  <StatValueText>{data.allTimeHighWindowEntries}</StatValueText>
+                </StatRoot>
+              </SimpleGrid>
+            </VStack>
+          </Box>
 
           {data.history.length > 0 && (
             <Box>

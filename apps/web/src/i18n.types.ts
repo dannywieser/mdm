@@ -14,6 +14,7 @@ export type TranslationKey =
   | "habit.modeDoMore"
   | "habit.mostDaysLogged"
   | "habit.newHigh"
+  | "habit.personalRecords"
   | "habit.score"
   | "habit.scoreEntries"
   | "habit.scoreInfoDoLess"

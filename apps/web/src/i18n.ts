@@ -19,6 +19,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "habit.modeDoMore": "do more",
     "habit.mostDaysLogged": "most days logged",
     "habit.newHigh": "new high!",
+    "habit.personalRecords": "personal records",
     "habit.score": "score",
     "habit.scoreEntries": "entries in current score",
     "habit.scoreInfoDoLess": "lower scores are better — staying under the target keeps this habit in check",
