@@ -135,7 +135,7 @@ export function HabitDetail() {
 
           <Box borderColor="app.border" borderWidth="1px" borderRadius="md" p={3}>
             <VStack align="stretch" gap={3}>
-              <Text fontSize="xs" color="app.textMuted" textTransform="uppercase" letterSpacing="wide">
+              <Text fontSize="xs" color="app.textMuted" letterSpacing="wide">
                 {t("habit.personalRecords")}
               </Text>
               <SimpleGrid columns={{ base: 1, sm: 3 }} gap={3}>
@@ -157,13 +157,7 @@ export function HabitDetail() {
 
           {data.history.length > 0 && (
             <Box>
-              <Text
-                fontSize="xs"
-                color="app.textMuted"
-                mb={2}
-                textTransform="uppercase"
-                letterSpacing="wide"
-              >
+              <Text fontSize="xs" color="app.textMuted" mb={2} letterSpacing="wide">
                 {t("habit.scoreOverTime")}
               </Text>
               <ResponsiveContainer width="100%" height={260}>
