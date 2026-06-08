@@ -124,7 +124,7 @@ export function HabitDetail() {
               <SimpleGrid columns={{ base: 1, sm: 2 }} gap={3}>
                 <StatRoot size="sm">
                   <StatLabel color="app.textMuted">{t("habit.daysLogged")}</StatLabel>
-                  <Flex align="baseline" gap={2}>
+                  <Flex align="center" gap={2}>
                     <StatValueText>{data.windowEntries}</StatValueText>
                     <Badge variant="subtle" bg="app.panelBackgroundHover" color="app.textMuted">
                       {t("habit.windowFillPercentage", { percentage: windowFillPercentage })}
