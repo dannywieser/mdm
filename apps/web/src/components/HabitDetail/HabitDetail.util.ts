@@ -3,5 +3,5 @@ export const formatChartDate = (dateStr: string): string => {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
 }
 
-export const formatRecentMultiplier = (multiplier: number | undefined): string =>
-  multiplier === undefined ? "—" : `${multiplier}×`
+export const formatEntryValue = (value: number, recentMultiplier: number | undefined): string =>
+  recentMultiplier === undefined ? `${value}` : `${value} (x${recentMultiplier})`

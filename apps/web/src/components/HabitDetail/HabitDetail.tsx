@@ -31,7 +31,7 @@ import { HabitScoreValue } from "../HabitScoreValue/HabitScoreValue"
 import { HeatDots } from "../HeatDots/HeatDots"
 import { calculateHeatDotCount } from "../HeatDots/HeatDots.util"
 import type { HabitDetailRouteParamKey } from "./HabitDetail.types"
-import { formatChartDate, formatRecentMultiplier } from "./HabitDetail.util"
+import { formatChartDate, formatEntryValue } from "./HabitDetail.util"
 
 const TOOLTIP_STYLE = {
   backgroundColor: "var(--chakra-colors-chakra-body-bg, #fff)",
@@ -234,9 +234,6 @@ export function HabitDetail() {
                     <Table.ColumnHeader color="app.textMuted" borderColor="app.border">
                       {t("habit.entryValue")}
                     </Table.ColumnHeader>
-                    <Table.ColumnHeader color="app.textMuted" borderColor="app.border">
-                      {t("habit.entryMultiplier")}
-                    </Table.ColumnHeader>
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -251,9 +248,8 @@ export function HabitDetail() {
                           {formatChartDate(entry.date)}
                         </Link>
                       </Table.Cell>
-                      <Table.Cell borderColor="app.border">{entry.value}</Table.Cell>
                       <Table.Cell borderColor="app.border">
-                        {formatRecentMultiplier(entry.recentMultiplier)}
+                        {formatEntryValue(entry.value, entry.recentMultiplier)}
                       </Table.Cell>
                     </Table.Row>
                   ))}

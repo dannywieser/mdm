@@ -7,7 +7,6 @@ export type TranslationKey =
   | "habit.currentStreak"
   | "habit.daysLogged"
   | "habit.entryDate"
-  | "habit.entryMultiplier"
   | "habit.entryValue"
   | "habit.heatLevel"
   | "habit.highestScore"

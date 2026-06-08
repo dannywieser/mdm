@@ -12,7 +12,6 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "habit.currentStreak": "current streak",
     "habit.daysLogged": "days logged",
     "habit.entryDate": "date",
-    "habit.entryMultiplier": "recent multiplier",
     "habit.entryValue": "value",
     "habit.heatLevel": "{count} heat",
     "habit.highestScore": "highest score",

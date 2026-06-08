@@ -108,16 +108,14 @@ describe("HabitDetail", () => {
     expect(screen.getByText("7")).toBeTruthy()
   })
 
-  test("renders a table of score entries with their values and recency multipliers", () => {
+  test("renders a table of score entries with their values and recency multipliers inline", () => {
     renderDetail()
 
     expect(screen.getByText("habit.scoreEntries")).toBeTruthy()
     expect(screen.getByText("Jan 2")).toBeTruthy()
-    expect(screen.getByText("9")).toBeTruthy()
-    expect(screen.getByText("10×")).toBeTruthy()
+    expect(screen.getByText("9 (x10)")).toBeTruthy()
     expect(screen.getByText("Jan 1")).toBeTruthy()
     expect(screen.getByText("4")).toBeTruthy()
-    expect(screen.getByText("—")).toBeTruthy()
   })
 
   test("omits the score entries table when there are no entries", () => {
