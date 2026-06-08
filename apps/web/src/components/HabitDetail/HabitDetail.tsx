@@ -27,6 +27,7 @@ import { useParams } from "react-router-dom"
 import { useHabitQuery } from "../../hooks/useHabitQuery/useHabitQuery"
 import { useI18n } from "../../i18n"
 
+import { HabitScoreProgress } from "../HabitScoreProgress/HabitScoreProgress"
 import { HabitScoreValue } from "../HabitScoreValue/HabitScoreValue"
 import { HeatDots } from "../HeatDots/HeatDots"
 import { calculateHeatDotCount } from "../HeatDots/HeatDots.util"
@@ -108,6 +109,9 @@ export function HabitDetail() {
               <HabitScoreValue mode={data.mode} score={data.habitScore} targetScore={data.targetScore} />
               <HeatDots count={heatDotCount} />
             </Flex>
+            <Box mt={2} px={6}>
+              <HabitScoreProgress score={data.habitScore} targetScore={data.targetScore} />
+            </Box>
           </StatRoot>
 
           <SimpleGrid columns={{ base: 2, md: 3 }} gap={3}>
