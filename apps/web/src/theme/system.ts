@@ -57,6 +57,7 @@ export const colorPaletteSystems: Record<ColorPaletteName, ReturnType<typeof cre
   solarized: createPaletteSystem("solarized"),
   gotham: createPaletteSystem("gotham"),
   highContrast: createPaletteSystem("highContrast"),
+  ocean: createPaletteSystem("ocean"),
 }
 
 export const defaultColorPaletteSystem =

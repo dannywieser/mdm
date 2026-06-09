@@ -57,6 +57,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "header.stats": "stats",
     "header.colorPalette": "colors",
     "colors.backToHome": "back to home",
+    "palette.ocean": "ocean",
     "palette.catppuccin": "catppuccin",
     "palette.dracula": "dracula",
     "palette.highContrast": "high contrast",

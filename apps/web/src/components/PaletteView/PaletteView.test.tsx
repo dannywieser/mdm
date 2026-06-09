@@ -47,6 +47,7 @@ describe("PaletteView", () => {
     expect(screen.getByTestId("palette-option-catppuccin")).toBeTruthy()
     expect(screen.getByTestId("palette-option-solarized")).toBeTruthy()
     expect(screen.getByTestId("palette-option-highContrast")).toBeTruthy()
+    expect(screen.getByTestId("palette-option-ocean")).toBeTruthy()
   })
 
   test("labels palette options with i18n keys", () => {
