@@ -1,14 +1,8 @@
 import type { FrontmatterValue, Note } from "markdown"
 
-import type { NotesGalleryLayout } from "./NotesGallery.types"
-
 export function getCoverSrc(cover: FrontmatterValue): string {
   const path = Array.isArray(cover) ? cover[0] : cover
   return `/images?path=${encodeURIComponent(path)}`
-}
-
-export function resolveLayout(layout?: string): NotesGalleryLayout {
-  return layout === "grid" ? "grid" : "flex"
 }
 
 export function filterNotesWithCovers(notes: Note[]): Note[] {

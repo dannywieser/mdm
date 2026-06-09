@@ -263,7 +263,6 @@ This repository is a Turborepo monorepo with this structure:
       - Use `{"$exclude": { ... }}` to define exclusion groups; exclusion groups are ANDed against all other filters.
       - Use `$missing` as a filter value to match notes where a property path is absent (for example `{"frontmatter.type": "$missing"}`).
     - `badges` (optional): array of note property paths to render as badges in the UI, such as `folder` or `frontmatter.type`
-    - `layout` (optional): gallery layout mode — `"flex"` (default, CSS multi-column masonry where each card takes its natural height) or `"grid"` (uniform grid where all cards in a row share the same height). Only used by the `NotesGallery` component.
   - `flags`: object keyed by allowed flag names. Each flag definition supports optional `expiresInSeconds` (positive integer) to set Redis TTL, or omit it for non-expiring flags.
   - `habits` (optional): array of habit configs consumed by `apps/habit-tracker`'s `GET /habits` and `GET /habit/:id`. Each habit has:
     - `id`: route key used by `GET /habit/:id`
