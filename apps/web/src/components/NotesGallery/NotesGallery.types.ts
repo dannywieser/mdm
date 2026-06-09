@@ -1,6 +1,5 @@
 import type { Note } from "markdown"
 
-export type NotesGalleryLayout = "flex" | "grid"
 export type NotesGalleryRouteParamKey = "view"
 
 export interface GalleryCardProps {
@@ -12,5 +11,4 @@ export interface GalleryCardProps {
 export interface NotesGalleryProps {
   aspectRatio?: string
   badges?: string[]
-  layout?: string
 }

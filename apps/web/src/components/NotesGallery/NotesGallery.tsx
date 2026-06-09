@@ -1,6 +1,7 @@
-import { Box, Card, SimpleGrid, Text } from "@chakra-ui/react"
+import { Box, Card, Text } from "@chakra-ui/react"
 import { useParams } from "react-router-dom"
 
+import { useMasonryRowSpan } from "../../hooks/useMasonryRowSpan/useMasonryRowSpan"
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 
 import { AppError } from "../AppError/AppError"
@@ -8,13 +9,8 @@ import { FadeImage } from "../FadeImage/FadeImage"
 import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
 import { NoteBadges } from "../NoteBadges/NoteBadges"
 
-import type {
-  GalleryCardProps,
-  NotesGalleryLayout,
-  NotesGalleryProps,
-  NotesGalleryRouteParamKey,
-} from "./NotesGallery.types"
-import { filterNotesWithCovers, getCoverSrc, resolveLayout } from "./NotesGallery.util"
+import type { GalleryCardProps, NotesGalleryProps, NotesGalleryRouteParamKey } from "./NotesGallery.types"
+import { filterNotesWithCovers, getCoverSrc } from "./NotesGallery.util"
 
 const CARD_FOCUS_STYLE = {
   outlineWidth: "2px",
@@ -22,6 +18,10 @@ const CARD_FOCUS_STYLE = {
   outlineColor: "app.accent",
   outlineOffset: "2px",
 }
+
+const MASONRY_GAP_PX = 16
+const MASONRY_ROW_HEIGHT_PX = 8
+const MASONRY_COLUMNS = { base: 1, md: 3, lg: 4 }
 
 const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => (
   <a href={note.obsidianUrl} style={{ textDecoration: "none", outline: "none" }}>
@@ -65,12 +65,24 @@ const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => (
   </a>
 )
 
-const COLUMN_COUNT: Record<NotesGalleryLayout, { base: number; md: number; lg: number }> = {
-  flex: { base: 1, md: 3, lg: 4 },
-  grid: { base: 1, md: 3, lg: 4 },
+const MasonryGalleryCard = ({ aspectRatio, badges, note }: GalleryCardProps) => {
+  const { ref, rowSpan } = useMasonryRowSpan({ gapPx: MASONRY_GAP_PX, rowHeightPx: MASONRY_ROW_HEIGHT_PX })
+
+  return (
+    <Box
+      ref={ref}
+      alignSelf="start"
+      borderRadius="md"
+      className="group"
+      style={{ gridRowEnd: `span ${rowSpan}` }}
+      _focusWithin={CARD_FOCUS_STYLE}
+    >
+      <GalleryCard aspectRatio={aspectRatio} badges={badges} note={note} />
+    </Box>
+  )
 }
 
-export const NotesGallery = ({ aspectRatio, badges = [], layout }: NotesGalleryProps) => {
+export const NotesGallery = ({ aspectRatio, badges = [] }: NotesGalleryProps) => {
   const { view } = useParams<NotesGalleryRouteParamKey>()
   const { data, error, isLoading } = useNotesQuery({ view })
 
@@ -78,49 +90,23 @@ export const NotesGallery = ({ aspectRatio, badges = [], layout }: NotesGalleryP
   if (error) return <AppError message={error.message} />
 
   const notesWithCovers = filterNotesWithCovers(data?.notes ?? [])
-  const activeLayout = resolveLayout(layout)
-
-  if (activeLayout === "grid") {
-    return (
-      <SimpleGrid
-        columns={COLUMN_COUNT.grid}
-        data-testid="gallery-grid"
-        gap={4}
-        p={6}
-      >
-        {notesWithCovers.map((note) => (
-          <Box
-            key={note.id}
-            alignSelf="start"
-            borderRadius="md"
-            className="group"
-            _focusWithin={CARD_FOCUS_STYLE}
-          >
-            <GalleryCard aspectRatio={aspectRatio} badges={badges} note={note} />
-          </Box>
-        ))}
-      </SimpleGrid>
-    )
-  }
 
   return (
     <Box
-      columnCount={COLUMN_COUNT.flex}
-      columnGap={4}
-      data-testid="gallery-flex"
+      data-testid="gallery-grid"
+      display="grid"
+      gap={`${MASONRY_GAP_PX}px`}
+      gridAutoFlow="dense"
+      gridAutoRows={`${MASONRY_ROW_HEIGHT_PX}px`}
+      gridTemplateColumns={{
+        base: `repeat(${MASONRY_COLUMNS.base}, 1fr)`,
+        md: `repeat(${MASONRY_COLUMNS.md}, 1fr)`,
+        lg: `repeat(${MASONRY_COLUMNS.lg}, 1fr)`,
+      }}
       p={6}
     >
       {notesWithCovers.map((note) => (
-        <Box
-          key={note.id}
-          borderRadius="md"
-          breakInside="avoid"
-          className="group"
-          mb={4}
-          _focusWithin={CARD_FOCUS_STYLE}
-        >
-          <GalleryCard aspectRatio={aspectRatio} badges={badges} note={note} />
-        </Box>
+        <MasonryGalleryCard key={note.id} aspectRatio={aspectRatio} badges={badges} note={note} />
       ))}
     </Box>
   )

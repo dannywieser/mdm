@@ -6,14 +6,14 @@ import { afterEach, describe, expect, test, vi } from "vitest"
 afterEach(cleanup)
 
 import { NotesGallery } from "./NotesGallery"
-import { filterNotesWithCovers, getCoverSrc, resolveLayout } from "./NotesGallery.util"
+import { filterNotesWithCovers, getCoverSrc } from "./NotesGallery.util"
 
-const renderGallery = (badges: string[] = [], layout?: string) =>
+const renderGallery = (badges: string[] = []) =>
   render(
     <ChakraProvider value={defaultSystem}>
       <MemoryRouter initialEntries={["/notes/books"]}>
         <Routes>
-          <Route path="/notes/:view" element={<NotesGallery badges={badges} layout={layout} />} />
+          <Route path="/notes/:view" element={<NotesGallery badges={badges} />} />
         </Routes>
       </MemoryRouter>
     </ChakraProvider>,
@@ -134,7 +134,7 @@ describe("NotesGallery", () => {
     expect(screen.getAllByText("frontmatter.genre,frontmatter.status").length).toBeGreaterThan(0)
   })
 
-  test("defaults to flex layout", () => {
+  test("renders notes in a masonry grid", () => {
     useNotesQueryMock.mockReturnValue({
       data: { notes: [noteWithCover] },
       error: undefined,
@@ -143,46 +143,7 @@ describe("NotesGallery", () => {
 
     renderGallery()
 
-    expect(screen.getByTestId("gallery-flex")).toBeTruthy()
-    expect(screen.queryByTestId("gallery-grid")).toBeNull()
-  })
-
-  test("renders flex layout when layout is set to flex", () => {
-    useNotesQueryMock.mockReturnValue({
-      data: { notes: [noteWithCover] },
-      error: undefined,
-      isLoading: false,
-    })
-
-    renderGallery([], "flex")
-
-    expect(screen.getByTestId("gallery-flex")).toBeTruthy()
-    expect(screen.queryByTestId("gallery-grid")).toBeNull()
-  })
-
-  test("renders grid layout when layout is set to grid", () => {
-    useNotesQueryMock.mockReturnValue({
-      data: { notes: [noteWithCover] },
-      error: undefined,
-      isLoading: false,
-    })
-
-    renderGallery([], "grid")
-
     expect(screen.getByTestId("gallery-grid")).toBeTruthy()
-    expect(screen.queryByTestId("gallery-flex")).toBeNull()
-  })
-
-  test("defaults to flex layout for an unrecognised layout value", () => {
-    useNotesQueryMock.mockReturnValue({
-      data: { notes: [noteWithCover] },
-      error: undefined,
-      isLoading: false,
-    })
-
-    renderGallery([], "masonry")
-
-    expect(screen.getByTestId("gallery-flex")).toBeTruthy()
   })
 })
 
@@ -197,24 +158,6 @@ describe("getCoverSrc", () => {
     expect(getCoverSrc(["attachments/first.jpg", "attachments/second.jpg"])).toBe(
       `/images?path=${encodeURIComponent("attachments/first.jpg")}`,
     )
-  })
-})
-
-describe("resolveLayout", () => {
-  test("returns flex when no layout is provided", () => {
-    expect(resolveLayout()).toBe("flex")
-  })
-
-  test("returns flex when layout is flex", () => {
-    expect(resolveLayout("flex")).toBe("flex")
-  })
-
-  test("returns grid when layout is grid", () => {
-    expect(resolveLayout("grid")).toBe("grid")
-  })
-
-  test("returns flex for an unrecognised value", () => {
-    expect(resolveLayout("masonry")).toBe("flex")
   })
 })
 

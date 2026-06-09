@@ -7,6 +7,14 @@ vi.spyOn(console, "info").mockImplementation(() => {})
 
 Element.prototype.scrollIntoView = vi.fn()
 
+class ResizeObserverStub {
+  observe = vi.fn()
+  unobserve = vi.fn()
+  disconnect = vi.fn()
+}
+
+vi.stubGlobal("ResizeObserver", ResizeObserverStub)
+
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn((query: string) => ({
