@@ -1,17 +1,22 @@
 import {
+  Box,
   BreadcrumbCurrentLink,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbRoot,
   BreadcrumbSeparator,
+  chakra,
   Flex,
   Text,
+  Tooltip,
 } from "@chakra-ui/react"
 import { formatDate } from "mdm-util"
 import { type ReactNode } from "react"
-import { Link, useMatch, useParams } from "react-router-dom"
-import { BarChart2 } from "lucide-react"
+import { Link, useLocation, useMatch, useNavigate, useParams } from "react-router-dom"
+
+const RouterLink = chakra(Link)
+import { BarChart2, X } from "lucide-react"
 
 import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
 import { useI18n } from "../../i18n"
@@ -61,7 +66,10 @@ export function HeaderSkeleton() {
 export function Header() {
   const { t } = useI18n()
   const { view } = useParams<{ view?: string }>()
+  const location = useLocation()
+  const navigate = useNavigate()
   const isStatsPage = useMatch("/stats")
+  const isColorsPage = useMatch("/colors")
   const habitMatch = useMatch("/tracking/:habitId")
   const { data } = useStatsQuery({})
   const currentView = view
@@ -89,6 +97,20 @@ export function Header() {
                 <BreadcrumbItem>
                   <BreadcrumbCurrentLink color="app.textMuted">
                     Stats
+                  </BreadcrumbCurrentLink>
+                </BreadcrumbItem>
+              </>
+            ) : isColorsPage ? (
+              <>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild fontWeight="semibold" color="app.text">
+                    <Link to="/">{t("app.name")}</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbCurrentLink color="app.textMuted">
+                    colors
                   </BreadcrumbCurrentLink>
                 </BreadcrumbItem>
               </>
@@ -131,19 +153,54 @@ export function Header() {
         </BreadcrumbRoot>
       }
       right={
-        <Flex alignItems="center" gap="2">
-          <Text fontSize="sm" color="app.text" fontWeight="bold">
-            {formatDate(new Date())}
-          </Text>
-          <Link
-            to="/stats"
-            aria-label="Stats"
-            style={{ color: "inherit", display: "flex", alignItems: "center" }}
+        isColorsPage ? (
+          <Box
+            as="button"
+            aria-label="Close"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            p="1.5"
+            borderRadius="md"
+            color="app.textMuted"
+            cursor="pointer"
+            _hover={{ bg: "app.panelBackgroundHover", color: "app.text" }}
+            transition="background 0.15s, color 0.15s"
+            onClick={() =>
+              location.key !== "default" ? navigate(-1) : navigate("/")
+            }
           >
-            <BarChart2 size={18} />
-          </Link>
-          <PaletteSelector />
-        </Flex>
+            <X size={20} />
+          </Box>
+        ) : (
+          <Flex alignItems="center" gap="1">
+            <Text fontSize="sm" color="app.text" fontWeight="bold">
+              {formatDate(new Date())}
+            </Text>
+            <Tooltip.Root openDelay={300} positioning={{ placement: "bottom" }}>
+              <Tooltip.Trigger asChild>
+                <RouterLink
+                  to="/stats"
+                  aria-label="Stats"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  p="1.5"
+                  borderRadius="md"
+                  color="app.text"
+                  _hover={{ bg: "app.panelBackgroundHover" }}
+                  transition="background 0.15s"
+                >
+                  <BarChart2 size={20} />
+                </RouterLink>
+              </Tooltip.Trigger>
+              <Tooltip.Positioner>
+                <Tooltip.Content>{t("header.stats")}</Tooltip.Content>
+              </Tooltip.Positioner>
+            </Tooltip.Root>
+            <PaletteSelector />
+          </Flex>
+        )
       }
     />
   )

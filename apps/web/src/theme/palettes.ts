@@ -8,6 +8,7 @@ export type ColorPaletteName =
   | "solarized"
   | "gotham"
   | "highContrast"
+  | "ocean"
 
 export interface ColorPaletteVariant {
   background: string
@@ -195,6 +196,26 @@ export const colorPaletteDefinitions: Record<
       successHoverBackground: "#218f87",
       successText: "#0c1014",
       iconMuted: "#195465",
+    },
+    get light() {
+      return this.dark
+    },
+  },
+  ocean: {
+    i18nKey: "palette.ocean",
+    dark: {
+      background: "#0d1b2e",
+      panelBackground: "#112340",
+      panelBackgroundHover: "#1a2f52",
+      text: "#e2f0fb",
+      mutedText: "#7bafd4",
+      accent: "#38c4e8",
+      border: "#1c3354",
+      borderHover: "#2a4f7a",
+      successBackground: "#22d07a",
+      successHoverBackground: "#1ab868",
+      successText: "#071018",
+      iconMuted: "#56c0e0",
     },
     get light() {
       return this.dark
