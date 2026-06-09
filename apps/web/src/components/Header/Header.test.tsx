@@ -90,7 +90,7 @@ describe("Header", () => {
     renderAt("/stats")
 
     expect(screen.getByRole("link", { name: "app.name" })).toBeTruthy()
-    expect(screen.getByText("Stats")).toBeTruthy()
+    expect(screen.getByText("header.stats")).toBeTruthy()
   })
 
   test("shows app name as a link and habit id as current breadcrumb on habit route", () => {
@@ -109,6 +109,14 @@ describe("Header", () => {
 
   test("shows close button instead of date/stats/palette on colors route", () => {
     renderAt("/colors")
+
+    expect(screen.getByRole("button", { name: "Close" })).toBeTruthy()
+    expect(screen.queryByText("2026-06-01")).toBeNull()
+    expect(screen.queryByTestId("palette-selector")).toBeNull()
+  })
+
+  test("shows close button instead of date/stats/palette on stats route", () => {
+    renderAt("/stats")
 
     expect(screen.getByRole("button", { name: "Close" })).toBeTruthy()
     expect(screen.queryByText("2026-06-01")).toBeNull()

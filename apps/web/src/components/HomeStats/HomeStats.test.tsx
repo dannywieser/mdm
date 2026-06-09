@@ -19,6 +19,10 @@ vi.mock("../../hooks/useStatsQuery/useStatsQuery", () => ({
   useStatsQuery: () => useStatsQueryMock(),
 }))
 
+vi.mock("../../i18n", () => ({
+  useI18n: () => ({ t: (key: string) => key }),
+}))
+
 const defaultShow = {
   folderBreakdown: true,
   modifiedToday: true,
@@ -88,7 +92,7 @@ describe("HomeStats", () => {
       },
     })
 
-    expect(screen.queryByText("Total notes")).toBeNull()
+    expect(screen.queryByText("stats.totalNotes")).toBeNull()
   })
 
   test("hides modifiedToday when show.modifiedToday is false", () => {
@@ -99,7 +103,7 @@ describe("HomeStats", () => {
       },
     })
 
-    expect(screen.queryByText("Modified today:")).toBeNull()
+    expect(screen.queryByText("stats.modifiedToday")).toBeNull()
   })
 
   test("hides folderBreakdown when show.folderBreakdown is false", () => {
@@ -117,13 +121,13 @@ describe("HomeStats", () => {
     renderComponent()
 
     expect(screen.getByText("7")).toBeTruthy()
-    expect(screen.getByText("Missing created date:")).toBeTruthy()
+    expect(screen.getByText("stats.missingCreatedDate")).toBeTruthy()
   })
 
   test("hides notesWithoutCreatedDate when count is zero", () => {
     renderComponent({ ...defaultData, notesWithoutCreatedDate: 0 })
 
-    expect(screen.queryByText("Missing created date:")).toBeNull()
+    expect(screen.queryByText("stats.missingCreatedDate")).toBeNull()
   })
 
   test("hides notesWithoutCreatedDate when show.notesWithoutCreatedDate is false", () => {
@@ -132,7 +136,7 @@ describe("HomeStats", () => {
       homeStats: { show: { ...defaultShow, notesWithoutCreatedDate: false } },
     })
 
-    expect(screen.queryByText("Missing created date:")).toBeNull()
+    expect(screen.queryByText("stats.missingCreatedDate")).toBeNull()
   })
 })
 

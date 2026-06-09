@@ -17,6 +17,7 @@ import {
 } from "recharts"
 
 import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
+import { useI18n } from "../../i18n"
 
 import type { HomeStatsProps } from "./HomeStats.types"
 
@@ -29,6 +30,7 @@ import {
 } from "./HomeStats.util"
 
 export function HomeStats({ staleTime }: HomeStatsProps) {
+  const { t } = useI18n()
   const { data } = useStatsQuery({ staleTime })
   const { homeStats } = data
   const show = homeStats.show
@@ -52,7 +54,9 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
             <SimpleGrid columns={3} gap={3}>
               {show.totalNotes && (
                 <StatRoot size="sm">
-                  <StatLabel color="app.textMuted">Total notes</StatLabel>
+                  <StatLabel color="app.textMuted">
+                    {t("stats.totalNotes")}
+                  </StatLabel>
                   <StatValueText>
                     {data.totalNotes.toLocaleString()}
                   </StatValueText>
@@ -60,7 +64,9 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
               )}
               {show.totalFolders && (
                 <StatRoot size="sm">
-                  <StatLabel color="app.textMuted">Folders</StatLabel>
+                  <StatLabel color="app.textMuted">
+                    {t("stats.folders")}
+                  </StatLabel>
                   <StatValueText>
                     {data.totalFolders.toLocaleString()}
                   </StatValueText>
@@ -68,7 +74,9 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
               )}
               {show.totalAttachments && (
                 <StatRoot size="sm">
-                  <StatLabel color="app.textMuted">Attachments</StatLabel>
+                  <StatLabel color="app.textMuted">
+                    {t("stats.attachments")}
+                  </StatLabel>
                   <StatValueText>
                     {data.totalAttachments.toLocaleString()}
                   </StatValueText>
@@ -79,7 +87,7 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
 
           {show.modifiedToday && (
             <Text fontSize="sm" color="app.textMuted">
-              Modified today:{" "}
+              {t("stats.modifiedToday")}{" "}
               <Text as="span" fontWeight="semibold" color="app.text">
                 {data.modifiedToday}
               </Text>
@@ -88,26 +96,26 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
 
           {show.notesCreated && (
             <Box>
-              <Text
-                fontSize="xs"
-                color="app.textMuted"
-                mb={2}
-                textTransform="uppercase"
-                letterSpacing="wide"
-              >
-                Created
+              <Text fontSize="xs" color="app.textMuted" mb={2}>
+                {t("stats.created")}
               </Text>
               <SimpleGrid columns={3} gap={3}>
                 <StatRoot size="sm">
-                  <StatLabel color="app.textMuted">Last 30 days</StatLabel>
+                  <StatLabel color="app.textMuted">
+                    {t("stats.last30Days")}
+                  </StatLabel>
                   <StatValueText>{data.notesCreated.last30Days}</StatValueText>
                 </StatRoot>
                 <StatRoot size="sm">
-                  <StatLabel color="app.textMuted">Last 90 days</StatLabel>
+                  <StatLabel color="app.textMuted">
+                    {t("stats.last90Days")}
+                  </StatLabel>
                   <StatValueText>{data.notesCreated.last90Days}</StatValueText>
                 </StatRoot>
                 <StatRoot size="sm">
-                  <StatLabel color="app.textMuted">Last year</StatLabel>
+                  <StatLabel color="app.textMuted">
+                    {t("stats.lastYear")}
+                  </StatLabel>
                   <StatValueText>
                     {data.notesCreated.last365Days}
                   </StatValueText>
@@ -118,14 +126,8 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
 
           {show.trends && (
             <Box>
-              <Text
-                fontSize="xs"
-                color="app.textMuted"
-                mb={1}
-                textTransform="uppercase"
-                letterSpacing="wide"
-              >
-                Trend vs previous 30 days
+              <Text fontSize="xs" color="app.textMuted" mb={1}>
+                {t("stats.trend")}
               </Text>
               <Text fontSize="sm">
                 <Text
@@ -146,14 +148,8 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
 
           {show.notesPerDay && data.notesPerDay.length > 0 && (
             <Box>
-              <Text
-                fontSize="xs"
-                color="app.textMuted"
-                mb={2}
-                textTransform="uppercase"
-                letterSpacing="wide"
-              >
-                Notes per day — past year
+              <Text fontSize="xs" color="app.textMuted" mb={2}>
+                {t("stats.notesPerDay")}
               </Text>
               <ResponsiveContainer width="100%" height={130}>
                 <AreaChart
@@ -199,7 +195,7 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
                       fontSize: "12px",
                     }}
                     labelFormatter={formatDate}
-                    formatter={(value: number) => [value, "notes"]}
+                    formatter={(value: number) => [value, t("stats.notes")]}
                   />
                   <Area
                     type="monotone"
@@ -217,7 +213,7 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
 
           {show.notesWithoutCreatedDate && data.notesWithoutCreatedDate > 0 && (
             <Text fontSize="sm" color="app.textMuted">
-              Missing created date:{" "}
+              {t("stats.missingCreatedDate")}{" "}
               <Text as="span" fontWeight="semibold" color="app.text">
                 {data.notesWithoutCreatedDate.toLocaleString()}
               </Text>
@@ -226,14 +222,8 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
 
           {show.folderBreakdown && data.folderBreakdown.length > 0 && (
             <Box>
-              <Text
-                fontSize="xs"
-                color="app.textMuted"
-                mb={2}
-                textTransform="uppercase"
-                letterSpacing="wide"
-              >
-                By folder
+              <Text fontSize="xs" color="app.textMuted" mb={2}>
+                {t("stats.byFolder")}
               </Text>
               <VStack align="stretch" gap={1}>
                 {data.folderBreakdown.slice(0, 8).map(({ folder, count }) => (

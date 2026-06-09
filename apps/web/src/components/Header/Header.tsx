@@ -96,7 +96,7 @@ export function Header() {
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbCurrentLink color="app.textMuted">
-                    Stats
+                    {t("header.stats")}
                   </BreadcrumbCurrentLink>
                 </BreadcrumbItem>
               </>
@@ -153,7 +153,7 @@ export function Header() {
         </BreadcrumbRoot>
       }
       right={
-        isColorsPage ? (
+        isStatsPage || isColorsPage ? (
           <Box
             as="button"
             aria-label="Close"
