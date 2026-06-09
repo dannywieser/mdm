@@ -42,8 +42,9 @@ export function PaletteView() {
               textAlign="left"
               cursor="pointer"
               w="full"
-              _hover={{ borderColor: isActive ? "app.accent" : "app.borderHover" }}
-              transition="border-color 0.15s"
+              _hover={{ borderColor: isActive ? "app.accent" : "app.borderHover", bg: "app.panelBackground" }}
+              _focusVisible={{ borderColor: isActive ? "app.accent" : "app.borderHover", bg: "app.panelBackground", outline: "none" }}
+              transition="border-color 0.15s, background 0.15s"
             >
               <PalettePreview paletteName={option.value} colors={colors} />
               <Box mt={2.5} display="flex" alignItems="center" gap={2}>
