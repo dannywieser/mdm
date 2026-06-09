@@ -1,4 +1,5 @@
 import {
+  Box,
   BreadcrumbCurrentLink,
   BreadcrumbItem,
   BreadcrumbLink,
@@ -7,6 +8,7 @@ import {
   BreadcrumbSeparator,
   Flex,
   Text,
+  Tooltip,
 } from "@chakra-ui/react"
 import { formatDate } from "mdm-util"
 import { type ReactNode } from "react"
@@ -131,17 +133,32 @@ export function Header() {
         </BreadcrumbRoot>
       }
       right={
-        <Flex alignItems="center" gap="2">
+        <Flex alignItems="center" gap="1">
           <Text fontSize="sm" color="app.text" fontWeight="bold">
             {formatDate(new Date())}
           </Text>
-          <Link
-            to="/stats"
-            aria-label="Stats"
-            style={{ color: "inherit", display: "flex", alignItems: "center" }}
-          >
-            <BarChart2 size={18} />
-          </Link>
+          <Tooltip.Root openDelay={300} positioning={{ placement: "bottom" }}>
+            <Tooltip.Trigger asChild>
+              <Box
+                as={Link}
+                to="/stats"
+                aria-label="Stats"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                p="1.5"
+                borderRadius="md"
+                color="app.text"
+                _hover={{ bg: "app.panelBackgroundHover" }}
+                transition="background 0.15s"
+              >
+                <BarChart2 size={20} />
+              </Box>
+            </Tooltip.Trigger>
+            <Tooltip.Positioner>
+              <Tooltip.Content>{t("header.stats")}</Tooltip.Content>
+            </Tooltip.Positioner>
+          </Tooltip.Root>
           <PaletteSelector />
         </Flex>
       }

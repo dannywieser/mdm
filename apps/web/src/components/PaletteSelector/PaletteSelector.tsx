@@ -1,4 +1,4 @@
-import { Box, Flex, Popover, Text } from "@chakra-ui/react"
+import { Box, Flex, Popover, Text, Tooltip } from "@chakra-ui/react"
 import { Palette } from "lucide-react"
 import { useState } from "react"
 
@@ -21,21 +21,32 @@ export const PaletteSelector = () => {
       onOpenChange={({ open: nextOpen }) => setOpen(nextOpen)}
       positioning={{ placement: "bottom-end" }}
     >
-      <Popover.Trigger asChild>
-        <Box
-          as="button"
-          data-testid="palette-selector-trigger"
-          aria-label="Select color palette"
-          display="flex"
-          alignItems="center"
-          cursor="pointer"
-          flexShrink={0}
-          color={colorPaletteDefinitions[palette].dark.accent}
-          _hover={{ opacity: 0.8 }}
-        >
-          <Palette size={16} />
-        </Box>
-      </Popover.Trigger>
+      <Tooltip.Root openDelay={300} positioning={{ placement: "bottom" }}>
+        <Tooltip.Trigger asChild>
+          <Popover.Trigger asChild>
+            <Box
+              as="button"
+              data-testid="palette-selector-trigger"
+              aria-label="Select color palette"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              cursor="pointer"
+              flexShrink={0}
+              p="1.5"
+              borderRadius="md"
+              color={colorPaletteDefinitions[palette].dark.accent}
+              _hover={{ bg: "app.panelBackgroundHover" }}
+              transition="background 0.15s"
+            >
+              <Palette size={20} />
+            </Box>
+          </Popover.Trigger>
+        </Tooltip.Trigger>
+        <Tooltip.Positioner>
+          <Tooltip.Content>{t("header.colorPalette")}</Tooltip.Content>
+        </Tooltip.Positioner>
+      </Tooltip.Root>
       <Popover.Positioner>
         <Popover.Content
           bg="app.panelBackground"

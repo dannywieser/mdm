@@ -54,3 +54,5 @@ export type TranslationKey =
   | "palette.gruvbox"
   | "palette.nord"
   | "palette.solarized"
+  | "header.stats"
+  | "header.colorPalette"
