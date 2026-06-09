@@ -1,6 +1,6 @@
 {
   "name": "flag-manager",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "private": true,
   "main": "dist/server.js",
   "scripts": {
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "express": "5.2.1",
-    "mdm-util": "1.6.0",
+    "mdm-util": "1.6.1",
     "morgan": "1.10.1",
     "redis": "5.10.0"
   }

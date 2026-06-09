@@ -1,5 +1,23 @@
 # web
 
+## 1.6.1
+
+### Patch Changes
+
+- 4894c0a: Add optional view groups in app config and render grouped dashboard sections on home.
+- 4894c0a: Make home dashboard sections (view groups and habits) span the full available width with consistent margins instead of shrinking to fit their card count.
+- 077d2eb: Rename the home habit card's "total days" stat label to "days logged" to match the habit detail page's terminology.
+- 077d2eb: Redesign the home page habit cards as multi-stat boxes showing habit score, streak, and total days, prefix the title with "do more"/"do less", and show heat dots for over-target do-less habits (matching the detail page). Add `windowEntries` to the `/habits` list response to support the new "total days" stat.
+- 077d2eb: Stop force-uppercasing the "score over time" and "personal records" section headers on the habit detail page so they render in their natural lowercase, matching the rest of the page's section labels.
+- 077d2eb: Split the habit detail page into two bordered sections — current score/streak details and personal records (highest score, best streak, most days logged) — for clearer visual separation.
+- 077d2eb: Replace the "window start" stat card on the habit detail page with a section title reading "current tracking window (since YYYY.MM.DD)".
+- 077d2eb: Make the score entries table on the habit detail page collapsible, collapsed by default.
+- 077d2eb: Make the habit detail score entries table more concise by combining the value and recency multiplier into a single column, e.g. "9 (x10)".
+- 077d2eb: Show a progress bar below the habit score on the detail page comparing it to the target score — the bar fills proportionally when under target, and grows with a red overflow segment when over target.
+- 077d2eb: Add a percentage badge next to "days logged" on the habit detail page showing how full the current tracking window is (logged days / window size). The `/habit/:id` response now includes `trackingWindowDays` to support this.
+- d41bf25: Replace the NotesGallery flex/grid layout toggle with a single CSS grid masonry layout that uses `grid-auto-flow: dense` and per-card row spans to pack covers of varying heights without leaving gaps.
+  - mdm-util@1.6.1
+
 ## 1.6.0
 
 ### Minor Changes

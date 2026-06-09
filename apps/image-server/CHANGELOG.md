@@ -1,5 +1,11 @@
 # image-server
 
+## 1.1.2
+
+### Patch Changes
+
+- mdm-util@1.6.1
+
 ## 1.1.1
 
 ### Patch Changes
