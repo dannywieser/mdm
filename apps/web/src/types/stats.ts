@@ -51,6 +51,7 @@ export interface StatsResponse {
   folderBreakdown: FolderCount[]
   homeStats: HomeStatsConfig
   modifiedToday: number
+  timezone: string
   notesCreated: NotesCreatedStats
   notesPerDay: NotePerDay[]
   notesWithoutCreatedDate: number

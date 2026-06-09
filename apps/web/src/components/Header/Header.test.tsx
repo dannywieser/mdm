@@ -22,6 +22,7 @@ vi.mock("../../i18n", () => ({
 vi.mock("../../hooks/useStatsQuery/useStatsQuery", () => ({
   useStatsQuery: () => ({
     data: {
+      timezone: "UTC",
       views: [
         { id: "daily", name: "daily review" },
         { id: "downtime-active", name: "active downtime" },

@@ -4,10 +4,11 @@ import { afterEach, describe, expect, test, vi } from "vitest"
 
 afterEach(cleanup)
 
+import { formatDateLabel } from "mdm-util"
+
 import { HomeStats } from "./HomeStats"
 import {
   formatChangePercent,
-  formatDate,
   formatMonthLabel,
   getChangeColor,
   getMonthTicks,
@@ -41,6 +42,7 @@ const defaultData = {
   notesCreated: { last30Days: 11, last365Days: 80, last90Days: 45 },
   notesPerDay: [{ count: 2, date: "2026-06-01" }],
   notesWithoutCreatedDate: 7,
+  timezone: "UTC",
   totalAttachments: 50,
   totalFolders: 8,
   totalNotes: 200,
@@ -151,15 +153,15 @@ describe("HomeStats util", () => {
     })
   })
 
-  describe("formatDate", () => {
+  describe("formatDateLabel", () => {
     test("formats a YYYY-MM-DD string to short month and day", () => {
-      expect(formatDate("2026-06-01")).toMatch(/Jun\s*1/)
+      expect(formatDateLabel("2026-06-01", "UTC")).toMatch(/Jun\s*1/)
     })
   })
 
   describe("formatMonthLabel", () => {
     test("formats a YYYY-MM-DD string to abbreviated month name", () => {
-      expect(formatMonthLabel("2026-06-01")).toBe("Jun")
+      expect(formatMonthLabel("2026-06-01", "UTC")).toBe("Jun")
     })
   })
 

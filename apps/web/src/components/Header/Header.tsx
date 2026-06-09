@@ -51,7 +51,7 @@ export function HeaderSkeleton() {
       }
       right={
         <Text fontSize="sm" color="app.text" fontWeight="bold">
-          {formatDate(new Date())}
+          {formatDate(new Date(), Intl.DateTimeFormat().resolvedOptions().timeZone)}
         </Text>
       }
     />
@@ -133,7 +133,7 @@ export function Header() {
       right={
         <Flex alignItems="center" gap="2">
           <Text fontSize="sm" color="app.text" fontWeight="bold">
-            {formatDate(new Date())}
+            {formatDate(new Date(), data.timezone)}
           </Text>
           <Link
             to="/stats"

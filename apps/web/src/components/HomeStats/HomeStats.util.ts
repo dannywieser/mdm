@@ -3,13 +3,8 @@ export const formatChangePercent = (changePercent: number): string => {
   return `${sign}${changePercent}%`
 }
 
-export const formatDate = (dateStr: string): string => {
-  const date = new Date(`${dateStr}T00:00:00`)
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-}
-
-export const formatMonthLabel = (dateStr: string): string =>
-  new Date(`${dateStr}T00:00:00`).toLocaleDateString("en-US", { month: "short" })
+export const formatMonthLabel = (dateStr: string, timeZone: string): string =>
+  new Date(`${dateStr}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", timeZone })
 
 export const getChangeColor = (changePercent: number): string => {
   if (changePercent > 0) return "green.500"

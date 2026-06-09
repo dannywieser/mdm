@@ -162,6 +162,7 @@ describe("stats handler interface", () => {
       notesCreated: { last30Days: 3, last365Days: 40, last90Days: 15 },
       notesPerDay: [{ count: 1, date: "2026-06-01" }],
       notesWithoutCreatedDate: 5,
+      timezone: "UTC",
       totalAttachments: 12,
       totalFolders: 3,
       totalNotes: 2,

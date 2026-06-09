@@ -16,13 +16,14 @@ import {
   YAxis,
 } from "recharts"
 
+import { formatDateLabel } from "mdm-util"
+
 import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
 
 import type { HomeStatsProps } from "./HomeStats.types"
 
 import {
   formatChangePercent,
-  formatDate,
   formatMonthLabel,
   getChangeColor,
   getMonthTicks,
@@ -30,7 +31,7 @@ import {
 
 export function HomeStats({ staleTime }: HomeStatsProps) {
   const { data } = useStatsQuery({ staleTime })
-  const { homeStats } = data
+  const { homeStats, timezone } = data
   const show = homeStats.show
 
   const hasTopStats =
@@ -183,7 +184,7 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
                   <XAxis
                     dataKey="date"
                     ticks={getMonthTicks(data.notesPerDay)}
-                    tickFormatter={formatMonthLabel}
+                    tickFormatter={(dateStr: string) => formatMonthLabel(dateStr, timezone)}
                     tick={{ fill: "var(--chakra-colors-gray-500)", fontSize: 10 }}
                     axisLine={false}
                     tickLine={false}
@@ -198,7 +199,7 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
                       borderRadius: "6px",
                       fontSize: "12px",
                     }}
-                    labelFormatter={formatDate}
+                    labelFormatter={(dateStr: string) => formatDateLabel(dateStr, timezone)}
                     formatter={(value: number) => [value, "notes"]}
                   />
                   <Area

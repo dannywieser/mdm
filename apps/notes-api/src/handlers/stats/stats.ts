@@ -52,6 +52,7 @@ export const statsHandler: RequestHandler = async (_request, response) => {
       folderBreakdown: buildFolderBreakdown(scannedNotes),
       homeStats,
       modifiedToday: countModifiedToday(scannedNotes, timezone),
+      timezone,
       notesCreated: buildNotesCreated(scannedNotes, now),
       notesPerDay: buildNotesPerDay(scannedNotes, timezone, now),
       notesWithoutCreatedDate: countNotesWithoutCreatedDate(scannedNotes),
