@@ -107,10 +107,10 @@ describe("Header", () => {
     expect(screen.getByText("colors")).toBeTruthy()
   })
 
-  test("shows back to home link instead of date/stats/palette on colors route", () => {
+  test("shows close button instead of date/stats/palette on colors route", () => {
     renderAt("/colors")
 
-    expect(screen.getByRole("link", { name: "colors.backToHome" })).toBeTruthy()
+    expect(screen.getByRole("button", { name: "Close" })).toBeTruthy()
     expect(screen.queryByText("2026-06-01")).toBeNull()
     expect(screen.queryByTestId("palette-selector")).toBeNull()
   })

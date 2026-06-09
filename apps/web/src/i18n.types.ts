@@ -57,4 +57,3 @@ export type TranslationKey =
   | "palette.ocean"
   | "header.stats"
   | "header.colorPalette"
-  | "colors.backToHome"

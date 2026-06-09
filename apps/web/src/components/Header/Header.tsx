@@ -12,8 +12,8 @@ import {
 } from "@chakra-ui/react"
 import { formatDate } from "mdm-util"
 import { type ReactNode } from "react"
-import { Link, useMatch, useParams } from "react-router-dom"
-import { BarChart2 } from "lucide-react"
+import { Link, useLocation, useMatch, useNavigate, useParams } from "react-router-dom"
+import { BarChart2, X } from "lucide-react"
 
 import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
 import { useI18n } from "../../i18n"
@@ -63,6 +63,8 @@ export function HeaderSkeleton() {
 export function Header() {
   const { t } = useI18n()
   const { view } = useParams<{ view?: string }>()
+  const location = useLocation()
+  const navigate = useNavigate()
   const isStatsPage = useMatch("/stats")
   const isColorsPage = useMatch("/colors")
   const habitMatch = useMatch("/tracking/:habitId")
@@ -150,14 +152,22 @@ export function Header() {
       right={
         isColorsPage ? (
           <Box
-            as={Link}
-            to="/"
-            fontSize="sm"
+            as="button"
+            aria-label="Close"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            p="1.5"
+            borderRadius="md"
             color="app.textMuted"
-            _hover={{ color: "app.text" }}
-            transition="color 0.15s"
+            cursor="pointer"
+            _hover={{ bg: "app.panelBackgroundHover", color: "app.text" }}
+            transition="background 0.15s, color 0.15s"
+            onClick={() =>
+              location.key !== "default" ? navigate(-1) : navigate("/")
+            }
           >
-            {t("colors.backToHome")}
+            <X size={20} />
           </Box>
         ) : (
           <Flex alignItems="center" gap="1">
