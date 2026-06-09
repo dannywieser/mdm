@@ -1,5 +1,15 @@
 # notes-api
 
+## 1.6.1
+
+### Patch Changes
+
+- 4894c0a: Add optional view groups in app config and render grouped dashboard sections on home.
+- Updated dependencies [4894c0a]
+  - app-config@1.6.1
+  - markdown@1.6.1
+  - mdm-util@1.6.1
+
 ## 1.6.0
 
 ### Minor Changes

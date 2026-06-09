@@ -1,5 +1,16 @@
 # habit-tracker
 
+## 1.1.1
+
+### Patch Changes
+
+- 077d2eb: Redesign the home page habit cards as multi-stat boxes showing habit score, streak, and total days, prefix the title with "do more"/"do less", and show heat dots for over-target do-less habits (matching the detail page). Add `windowEntries` to the `/habits` list response to support the new "total days" stat.
+- 077d2eb: Add a percentage badge next to "days logged" on the habit detail page showing how full the current tracking window is (logged days / window size). The `/habit/:id` response now includes `trackingWindowDays` to support this.
+- Updated dependencies [4894c0a]
+  - app-config@1.6.1
+  - markdown@1.6.1
+  - mdm-util@1.6.1
+
 ## 1.1.0
 
 ### Minor Changes
