@@ -64,6 +64,7 @@ export function Header() {
   const { t } = useI18n()
   const { view } = useParams<{ view?: string }>()
   const isStatsPage = useMatch("/stats")
+  const isColorsPage = useMatch("/colors")
   const habitMatch = useMatch("/tracking/:habitId")
   const { data } = useStatsQuery({})
   const currentView = view
@@ -91,6 +92,20 @@ export function Header() {
                 <BreadcrumbItem>
                   <BreadcrumbCurrentLink color="app.textMuted">
                     Stats
+                  </BreadcrumbCurrentLink>
+                </BreadcrumbItem>
+              </>
+            ) : isColorsPage ? (
+              <>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild fontWeight="semibold" color="app.text">
+                    <Link to="/">{t("app.name")}</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbCurrentLink color="app.textMuted">
+                    colors
                   </BreadcrumbCurrentLink>
                 </BreadcrumbItem>
               </>
@@ -133,34 +148,47 @@ export function Header() {
         </BreadcrumbRoot>
       }
       right={
-        <Flex alignItems="center" gap="1">
-          <Text fontSize="sm" color="app.text" fontWeight="bold">
-            {formatDate(new Date())}
-          </Text>
-          <Tooltip.Root openDelay={300} positioning={{ placement: "bottom" }}>
-            <Tooltip.Trigger asChild>
-              <Box
-                as={Link}
-                to="/stats"
-                aria-label="Stats"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                p="1.5"
-                borderRadius="md"
-                color="app.text"
-                _hover={{ bg: "app.panelBackgroundHover" }}
-                transition="background 0.15s"
-              >
-                <BarChart2 size={20} />
-              </Box>
-            </Tooltip.Trigger>
-            <Tooltip.Positioner>
-              <Tooltip.Content>{t("header.stats")}</Tooltip.Content>
-            </Tooltip.Positioner>
-          </Tooltip.Root>
-          <PaletteSelector />
-        </Flex>
+        isColorsPage ? (
+          <Box
+            as={Link}
+            to="/"
+            fontSize="sm"
+            color="app.textMuted"
+            _hover={{ color: "app.text" }}
+            transition="color 0.15s"
+          >
+            {t("colors.backToHome")}
+          </Box>
+        ) : (
+          <Flex alignItems="center" gap="1">
+            <Text fontSize="sm" color="app.text" fontWeight="bold">
+              {formatDate(new Date())}
+            </Text>
+            <Tooltip.Root openDelay={300} positioning={{ placement: "bottom" }}>
+              <Tooltip.Trigger asChild>
+                <Box
+                  as={Link}
+                  to="/stats"
+                  aria-label="Stats"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  p="1.5"
+                  borderRadius="md"
+                  color="app.text"
+                  _hover={{ bg: "app.panelBackgroundHover" }}
+                  transition="background 0.15s"
+                >
+                  <BarChart2 size={20} />
+                </Box>
+              </Tooltip.Trigger>
+              <Tooltip.Positioner>
+                <Tooltip.Content>{t("header.stats")}</Tooltip.Content>
+              </Tooltip.Positioner>
+            </Tooltip.Root>
+            <PaletteSelector />
+          </Flex>
+        )
       }
     />
   )

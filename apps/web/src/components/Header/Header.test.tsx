@@ -43,6 +43,7 @@ const renderAt = (path: string) =>
           <Route path="/tracking/:habitId" element={<Header />} />
           <Route path="/notes/:view" element={<Header />} />
           <Route path="/stats" element={<Header />} />
+          <Route path="/colors" element={<Header />} />
         </Routes>
       </MemoryRouter>
     </ChakraProvider>,
@@ -97,5 +98,20 @@ describe("Header", () => {
 
     expect(screen.getByRole("link", { name: "app.name" })).toBeTruthy()
     expect(screen.getByText("drinking")).toBeTruthy()
+  })
+
+  test("shows app name as a link and colors as current breadcrumb on colors route", () => {
+    renderAt("/colors")
+
+    expect(screen.getByRole("link", { name: "app.name" })).toBeTruthy()
+    expect(screen.getByText("colors")).toBeTruthy()
+  })
+
+  test("shows back to home link instead of date/stats/palette on colors route", () => {
+    renderAt("/colors")
+
+    expect(screen.getByRole("link", { name: "colors.backToHome" })).toBeTruthy()
+    expect(screen.queryByText("2026-06-01")).toBeNull()
+    expect(screen.queryByTestId("palette-selector")).toBeNull()
   })
 })

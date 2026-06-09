@@ -56,3 +56,4 @@ export type TranslationKey =
   | "palette.solarized"
   | "header.stats"
   | "header.colorPalette"
+  | "colors.backToHome"

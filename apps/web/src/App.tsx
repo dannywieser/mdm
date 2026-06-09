@@ -9,6 +9,7 @@ import { Home } from "./components/Home/Home"
 import { HomeStats } from "./components/HomeStats/HomeStats"
 import { LoadingScreen } from "./components/LoadingScreen/LoadingScreen"
 import { NotesView } from "./components/NotesView/NotesView"
+import { PaletteView } from "./components/PaletteView/PaletteView"
 
 function LoadingLayout() {
   return (
@@ -57,6 +58,7 @@ function App() {
         <Route path="/tracking/:habitId" element={<HabitDetail />} />
         <Route path="/notes/:view" element={<NotesView />} />
         <Route path="/stats" element={<HomeStats />} />
+        <Route path="/colors" element={<PaletteView />} />
       </Route>
     </Routes>
   )
