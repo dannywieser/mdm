@@ -6,6 +6,7 @@ import {
   BreadcrumbList,
   BreadcrumbRoot,
   BreadcrumbSeparator,
+  chakra,
   Flex,
   Text,
   Tooltip,
@@ -13,6 +14,8 @@ import {
 import { formatDate } from "mdm-util"
 import { type ReactNode } from "react"
 import { Link, useLocation, useMatch, useNavigate, useParams } from "react-router-dom"
+
+const RouterLink = chakra(Link)
 import { BarChart2, X } from "lucide-react"
 
 import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
@@ -176,8 +179,7 @@ export function Header() {
             </Text>
             <Tooltip.Root openDelay={300} positioning={{ placement: "bottom" }}>
               <Tooltip.Trigger asChild>
-                <Box
-                  as={Link}
+                <RouterLink
                   to="/stats"
                   aria-label="Stats"
                   display="flex"
@@ -190,7 +192,7 @@ export function Header() {
                   transition="background 0.15s"
                 >
                   <BarChart2 size={20} />
-                </Box>
+                </RouterLink>
               </Tooltip.Trigger>
               <Tooltip.Positioner>
                 <Tooltip.Content>{t("header.stats")}</Tooltip.Content>

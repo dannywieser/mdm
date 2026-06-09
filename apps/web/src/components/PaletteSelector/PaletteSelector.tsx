@@ -1,6 +1,8 @@
-import { Box, Tooltip } from "@chakra-ui/react"
+import { chakra, Tooltip } from "@chakra-ui/react"
 import { Palette } from "lucide-react"
 import { Link } from "react-router-dom"
+
+const RouterLink = chakra(Link)
 
 import { useColorPalette } from "../../context/ColorPalette/useColorPalette"
 import { useI18n } from "../../i18n"
@@ -13,8 +15,7 @@ export const PaletteSelector = () => {
   return (
     <Tooltip.Root openDelay={300} positioning={{ placement: "bottom" }}>
       <Tooltip.Trigger asChild>
-        <Box
-          as={Link}
+        <RouterLink
           to="/colors"
           data-testid="palette-selector-trigger"
           aria-label="Select color palette"
@@ -28,7 +29,7 @@ export const PaletteSelector = () => {
           transition="background 0.15s"
         >
           <Palette size={20} />
-        </Box>
+        </RouterLink>
       </Tooltip.Trigger>
       <Tooltip.Positioner>
         <Tooltip.Content>{t("header.colorPalette")}</Tooltip.Content>

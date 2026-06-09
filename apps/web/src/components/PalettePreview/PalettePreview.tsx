@@ -1,155 +1,64 @@
+import { Box, Flex } from "@chakra-ui/react"
+
 import type { PalettePreviewProps } from "./PalettePreview.types"
+
+function Bar({ w, bg, opacity = 1 }: { w: number; bg: string; opacity?: number }) {
+  return <Box h="3px" w={`${w}px`} bg={bg} borderRadius="2px" opacity={opacity} />
+}
 
 export function PalettePreview({ paletteName, colors }: PalettePreviewProps) {
   const gradientId = `palette-preview-gradient-${paletteName}`
+  const panelProps = {
+    bg: colors.panelBackground,
+    borderWidth: "1px",
+    borderColor: colors.border,
+    borderRadius: "4px",
+  }
 
   return (
-    <div
-      style={{
-        backgroundColor: colors.background,
-        borderRadius: "6px",
-        padding: "8px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "6px",
-      }}
-    >
+    <Flex direction="column" gap={1.5} bg={colors.background} borderRadius="md" p={2}>
       {/* Mini card */}
-      <div
-        style={{
-          backgroundColor: colors.panelBackground,
-          border: `1px solid ${colors.border}`,
-          borderRadius: "4px",
-          padding: "6px 8px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-          <div
-            style={{
-              height: "4px",
-              width: "60px",
-              backgroundColor: colors.text,
-              borderRadius: "2px",
-              opacity: 0.85,
-            }}
-          />
-          <div
-            style={{
-              height: "3px",
-              width: "40px",
-              backgroundColor: colors.mutedText,
-              borderRadius: "2px",
-              opacity: 0.6,
-            }}
-          />
-        </div>
-        <div style={{ display: "flex", gap: "10px" }}>
+      <Flex justifyContent="space-between" alignItems="center" px={2} py={1.5} {...panelProps}>
+        <Flex direction="column" gap={1}>
+          <Box h="4px" w="60px" bg={colors.text} borderRadius="2px" opacity={0.85} />
+          <Bar w={40} bg={colors.mutedText} opacity={0.6} />
+        </Flex>
+        <Flex gap={2.5}>
           {[38, 28, 34].map((w, i) => (
-            <div
-              key={i}
-              style={{ display: "flex", flexDirection: "column", gap: "3px" }}
-            >
-              <div
-                style={{
-                  height: "3px",
-                  width: `${w}px`,
-                  backgroundColor: colors.mutedText,
-                  borderRadius: "2px",
-                  opacity: 0.5,
-                }}
-              />
-              <div
-                style={{
-                  height: "5px",
-                  width: `${w}px`,
-                  backgroundColor: i === 1 ? colors.accent : colors.text,
-                  borderRadius: "2px",
-                  opacity: 0.8,
-                }}
-              />
-            </div>
+            <Flex key={i} direction="column" gap="3px">
+              <Bar w={w} bg={colors.mutedText} opacity={0.5} />
+              <Box h="5px" w={`${w}px`} bg={i === 1 ? colors.accent : colors.text} borderRadius="2px" opacity={0.8} />
+            </Flex>
           ))}
-        </div>
-      </div>
+        </Flex>
+      </Flex>
 
       {/* Mini table */}
-      <div
-        style={{
-          backgroundColor: colors.panelBackground,
-          border: `1px solid ${colors.border}`,
-          borderRadius: "4px",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-            padding: "4px 8px",
-            borderBottom: `1px solid ${colors.border}`,
-          }}
-        >
+      <Box {...panelProps} overflow="hidden">
+        <Flex gap={3} px={2} py={1} borderBottomWidth="1px" borderBottomColor={colors.border}>
           {[72, 44, 36].map((w, i) => (
-            <div
-              key={i}
-              style={{
-                height: "3px",
-                width: `${w}px`,
-                backgroundColor: colors.mutedText,
-                borderRadius: "2px",
-                opacity: 0.5,
-                alignSelf: "center",
-              }}
-            />
+            <Bar key={i} w={w} bg={colors.mutedText} opacity={0.5} />
           ))}
-        </div>
+        </Flex>
         {[0, 1].map((row) => (
-          <div
+          <Flex
             key={row}
-            style={{
-              display: "flex",
-              gap: "12px",
-              padding: "4px 8px",
-              borderBottom: row < 1 ? `1px solid ${colors.border}` : undefined,
-            }}
+            gap={3}
+            px={2}
+            py={1}
+            borderBottomWidth={row < 1 ? "1px" : 0}
+            borderBottomColor={colors.border}
           >
             {[72, 44, 36].map((w, i) => (
-              <div
-                key={i}
-                style={{
-                  height: "3px",
-                  width: `${w}px`,
-                  backgroundColor:
-                    i === 1 ? colors.accent : colors.text,
-                  borderRadius: "2px",
-                  opacity: i === 1 ? 0.85 : 0.7,
-                  alignSelf: "center",
-                }}
-              />
+              <Bar key={i} w={w} bg={i === 1 ? colors.accent : colors.text} opacity={i === 1 ? 0.85 : 0.7} />
             ))}
-          </div>
+          </Flex>
         ))}
-      </div>
+      </Box>
 
       {/* Mini chart */}
-      <div
-        style={{
-          backgroundColor: colors.panelBackground,
-          border: `1px solid ${colors.border}`,
-          borderRadius: "4px",
-          padding: "4px 6px",
-          overflow: "hidden",
-        }}
-      >
-        <svg
-          width="100%"
-          height="32"
-          viewBox="0 0 200 32"
-          preserveAspectRatio="none"
-        >
+      <Box {...panelProps} px={1.5} py={1} overflow="hidden">
+        <svg width="100%" height="32" viewBox="0 0 200 32" preserveAspectRatio="none">
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={colors.accent} stopOpacity="0.35" />
@@ -167,7 +76,7 @@ export function PalettePreview({ paletteName, colors }: PalettePreviewProps) {
             fill={`url(#${gradientId})`}
           />
         </svg>
-      </div>
-    </div>
+      </Box>
+    </Flex>
   )
 }
