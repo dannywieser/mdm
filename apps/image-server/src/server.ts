@@ -1,12 +1,14 @@
 import express from "express"
-import { toLoggableError } from "mdm-util"
-import { createRedisClient } from "mdm-util/redis"
+import { createRedisClient, toLoggableError } from "mdm-util"
 import morgan from "morgan"
 
 import type { ImageRedisClient } from "./handlers/images/images.types"
 
 import { healthHandler } from "./handlers/health/health"
-import { createImageHandler, resolveImageProxyConfig } from "./handlers/images/images"
+import {
+  createImageHandler,
+  resolveImageProxyConfig,
+} from "./handlers/images/images"
 
 const noopRedisClient: ImageRedisClient = {
   get: () => Promise.resolve(null),
@@ -39,7 +41,10 @@ if (require.main === module) {
       await redisClient.connect()
       cacheClient = redisClient
     } catch (error) {
-      console.error("Redis unavailable, image caching disabled", toLoggableError(error))
+      console.error(
+        "Redis unavailable, image caching disabled",
+        toLoggableError(error),
+      )
     }
 
     const app = createApp(cacheClient)

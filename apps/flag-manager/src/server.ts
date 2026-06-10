@@ -1,9 +1,11 @@
 import express from "express"
-import { toLoggableError } from "mdm-util"
-import { createRedisClient } from "mdm-util/redis"
+import { createRedisClient, toLoggableError } from "mdm-util"
 import morgan from "morgan"
 
-import type { FlagDefinition, FlagRedisClient } from "./handlers/flags/flags.types"
+import type {
+  FlagDefinition,
+  FlagRedisClient,
+} from "./handlers/flags/flags.types"
 
 import { resolveFlagDefinitions } from "./config"
 import { createFlagsHandler } from "./handlers/flags/flags"
@@ -43,7 +45,10 @@ const startServer = async (): Promise<void> => {
 
   app.listen(port, () => {
     console.log(`flag-manager listening on ${port}`)
-    console.log("Resolved flag definitions", JSON.stringify(flagDefinitions, null, 2))
+    console.log(
+      "Resolved flag definitions",
+      JSON.stringify(flagDefinitions, null, 2),
+    )
   })
 }
 
