@@ -32,6 +32,8 @@ export type TranslationKey =
   | "errors.unableToLoadHabit"
   | "errors.unableToLoadHabits"
   | "errors.unableToLoadNotes"
+  | "gallery.allMonths"
+  | "gallery.allYears"
   | "errors.unableToLoadReadState"
   | "errors.unableToLoadStats"
   | "errors.unableToToggleReadState"

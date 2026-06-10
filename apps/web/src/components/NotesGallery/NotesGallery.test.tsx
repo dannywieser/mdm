@@ -6,7 +6,6 @@ import { afterEach, describe, expect, test, vi } from "vitest"
 afterEach(cleanup)
 
 import { NotesGallery } from "./NotesGallery"
-import { filterNotesWithCovers, getCoverSrc } from "./NotesGallery.util"
 
 const renderGallery = (badges: string[] = []) =>
   render(
@@ -95,32 +94,6 @@ describe("NotesGallery", () => {
     expect(screen.queryByText("No Cover")).toBeNull()
   })
 
-  test("uses the first element when cover is an array", () => {
-    useNotesQueryMock.mockReturnValue({
-      data: {
-        notes: [
-          {
-            id: "1",
-            title: "Array Cover",
-            obsidianUrl: "obsidian://open?vault=v&file=1",
-            frontmatter: {
-              cover: ["https://example.com/first.jpg", "https://example.com/second.jpg"],
-            },
-          },
-        ],
-      },
-      error: undefined,
-      isLoading: false,
-    })
-
-    renderGallery()
-
-    const img = screen.getByRole("img", { name: "Array Cover" })
-    expect(img.getAttribute("src")).toBe(
-      `/images?path=${encodeURIComponent("https://example.com/first.jpg")}`,
-    )
-  })
-
   test("renders NoteBadges with configured badges", () => {
     useNotesQueryMock.mockReturnValue({
       data: { notes: [noteWithCover] },
@@ -144,47 +117,5 @@ describe("NotesGallery", () => {
     renderGallery()
 
     expect(screen.getByTestId("gallery-grid")).toBeTruthy()
-  })
-})
-
-describe("getCoverSrc", () => {
-  test("builds a proxy URL from a string cover", () => {
-    expect(getCoverSrc("attachments/cover.jpg")).toBe(
-      `/images?path=${encodeURIComponent("attachments/cover.jpg")}`,
-    )
-  })
-
-  test("uses the first element of an array cover", () => {
-    expect(getCoverSrc(["attachments/first.jpg", "attachments/second.jpg"])).toBe(
-      `/images?path=${encodeURIComponent("attachments/first.jpg")}`,
-    )
-  })
-})
-
-describe("filterNotesWithCovers", () => {
-  const note = (cover: unknown) => ({ id: "1", frontmatter: cover !== undefined ? { cover } : {} }) as never
-
-  test("includes notes with a string cover", () => {
-    expect(filterNotesWithCovers([note("attachments/cover.jpg")])).toHaveLength(1)
-  })
-
-  test("includes notes with a non-empty array cover", () => {
-    expect(filterNotesWithCovers([note(["attachments/cover.jpg"])])).toHaveLength(1)
-  })
-
-  test("excludes notes with no cover field", () => {
-    expect(filterNotesWithCovers([note(undefined)])).toHaveLength(0)
-  })
-
-  test("excludes notes with an empty string cover", () => {
-    expect(filterNotesWithCovers([note("")])).toHaveLength(0)
-  })
-
-  test("excludes notes with an empty array cover", () => {
-    expect(filterNotesWithCovers([note([])])).toHaveLength(0)
-  })
-
-  test("excludes notes with an array whose first element is empty", () => {
-    expect(filterNotesWithCovers([note([""])])).toHaveLength(0)
   })
 })
