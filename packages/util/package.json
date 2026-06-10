@@ -8,6 +8,10 @@
     ".": {
       "types": "./index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./redis": {
+      "types": "./dist/redis/createRedisClient.d.ts",
+      "default": "./dist/redis/createRedisClient.js"
     }
   },
   "scripts": {
@@ -16,6 +20,7 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
+    "redis": "5.10.0",
     "uuid": "11.1.0"
   }
 }

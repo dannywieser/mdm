@@ -1,17 +1,12 @@
 import express from "express"
 import { toLoggableError } from "mdm-util"
+import { createRedisClient } from "mdm-util/redis"
 import morgan from "morgan"
-import { createClient } from "redis"
 
 import type { ImageRedisClient } from "./handlers/images/images.types"
 
 import { healthHandler } from "./handlers/health/health"
 import { createImageHandler, resolveImageProxyConfig } from "./handlers/images/images"
-
-type RuntimeRedisClient = ImageRedisClient & {
-  connect: () => Promise<void>
-  on: (event: "error", listener: (error: unknown) => void) => void
-}
 
 const noopRedisClient: ImageRedisClient = {
   get: () => Promise.resolve(null),
@@ -27,21 +22,6 @@ export const createApp = (redisClient: ImageRedisClient = noopRedisClient) => {
   app.get("/images", createImageHandler(resolveImageProxyConfig(), redisClient))
 
   return app
-}
-
-export const createRedisClient = (redisUrl: string): RuntimeRedisClient => {
-  const client = createClient({ url: redisUrl })
-
-  return {
-    connect: async () => {
-      await client.connect()
-    },
-    get: async (key) => client.get(key),
-    on: (event, listener) => {
-      client.on(event, listener)
-    },
-    set: async (key, value, options) => client.set(key, value, options),
-  }
 }
 
 if (require.main === module) {

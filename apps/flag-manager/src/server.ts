@@ -1,18 +1,13 @@
 import express from "express"
 import { toLoggableError } from "mdm-util"
+import { createRedisClient } from "mdm-util/redis"
 import morgan from "morgan"
-import { createClient } from "redis"
 
 import type { FlagDefinition, FlagRedisClient } from "./handlers/flags/flags.types"
 
 import { resolveFlagDefinitions } from "./config"
 import { createFlagsHandler } from "./handlers/flags/flags"
 import { healthHandler } from "./handlers/health/health"
-
-type RuntimeRedisClient = FlagRedisClient & {
-  connect: () => Promise<void>
-  on: (event: "error", listener: (error: unknown) => void) => void
-}
 
 export const createApp = (
   redisClient: FlagRedisClient,
@@ -30,25 +25,6 @@ export const createApp = (
   app.patch("/flags/:id/:flag", flagsHandler)
 
   return app
-}
-
-export const createRedisClient = (
-  redisUrl: string,
-): RuntimeRedisClient => {
-  const client = createClient({
-    url: redisUrl,
-  })
-
-  return {
-    connect: async () => {
-      await client.connect()
-    },
-    get: async (key) => client.get(key),
-    on: (event, listener) => {
-      client.on(event, listener)
-    },
-    set: async (key, value, options) => client.set(key, value, options),
-  }
 }
 
 const startServer = async (): Promise<void> => {
