@@ -4,7 +4,6 @@ import {
   isStringRecord,
   isValidTimezone,
 } from "mdm-util"
-import { promises as fs } from "node:fs"
 import path from "node:path"
 
 import type {
@@ -15,6 +14,9 @@ import type {
   HomeStatsShowConfig,
   ResolvedNotesConfig,
 } from "./types"
+
+import { AppConfigError } from "./AppConfigError"
+import { readAppConfigFile } from "./readAppConfigFile"
 
 export type {
   AppConfig,
@@ -29,9 +31,8 @@ export type {
   ViewFilter,
 } from "./types"
 
-const APP_CONFIG_FILENAME = "app.config.json"
-
-export class AppConfigError extends Error {}
+export { AppConfigError } from "./AppConfigError"
+export { readAppConfigFile } from "./readAppConfigFile"
 
 let cachedNotesConfig: ResolvedNotesConfig | undefined
 
@@ -232,22 +233,7 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
     return cachedNotesConfig
   }
 
-  const appConfigPath = await findAppConfigPath()
-  let appConfigSource: string
-
-  try {
-    appConfigSource = await fs.readFile(appConfigPath, "utf8")
-  } catch {
-    throw new AppConfigError("app.config.json must be readable")
-  }
-
-  let parsedAppConfig: unknown
-
-  try {
-    parsedAppConfig = JSON.parse(appConfigSource)
-  } catch {
-    throw new AppConfigError("app.config.json must contain valid JSON")
-  }
+  const parsedAppConfig = await readAppConfigFile()
 
   const appConfig = validateAppConfig(parsedAppConfig)
 
@@ -279,34 +265,6 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
 
 export const resolveNotesDirectory = async (): Promise<string> =>
   (await resolveNotesConfig()).notesDirectory
-
-const findAppConfigPath = async (): Promise<string> => {
-  let currentDirectory = process.cwd()
-
-  while (currentDirectory) {
-    const appConfigPath = path.join(currentDirectory, APP_CONFIG_FILENAME)
-    const hasAppConfig = await fs
-      .access(appConfigPath)
-      .then(() => true)
-      .catch(() => false)
-
-    if (hasAppConfig) {
-      return appConfigPath
-    }
-
-    const parentDirectory = path.dirname(currentDirectory)
-
-    if (parentDirectory === currentDirectory) {
-      break
-    }
-
-    currentDirectory = parentDirectory
-  }
-
-  throw new AppConfigError(
-    "app.config.json is required. Copy app.config.example.json to app.config.json.",
-  )
-}
 
 export const clearConfigCache = (): void => {
   cachedNotesConfig = undefined

@@ -88,7 +88,7 @@ This repository is a Turborepo monorepo with this structure:
     - Purpose: toggle the current value of the named flag for the given ID
     - Flags must be pre-configured in `app.config.json` (`flags` object)
     - Redis storage key format: `<flag>:<id>` (for example `read:note-1`)
-    - Optional per-flag expiry: set `expiresInSeconds` to apply Redis TTL on each toggle
+    - Optional per-flag expiry: set `expiresInDays` to apply Redis TTL on each toggle
     - Success response: `200`
       ```json
       { "id": "note-1", "flag": "read", "value": true }
@@ -263,7 +263,7 @@ This repository is a Turborepo monorepo with this structure:
       - Use `{"$exclude": { ... }}` to define exclusion groups; exclusion groups are ANDed against all other filters.
       - Use `$missing` as a filter value to match notes where a property path is absent (for example `{"frontmatter.type": "$missing"}`).
     - `badges` (optional): array of note property paths to render as badges in the UI, such as `folder` or `frontmatter.type`
-  - `flags`: object keyed by allowed flag names. Each flag definition supports optional `expiresInSeconds` (positive integer) to set Redis TTL, or omit it for non-expiring flags.
+  - `flags`: object keyed by allowed flag names. Each flag definition supports optional `expiresInDays` (positive integer) to set Redis TTL, or omit it for non-expiring flags.
   - `habits` (optional): array of habit configs consumed by `apps/habit-tracker`'s `GET /habits` and `GET /habit/:id`. Each habit has:
     - `id`: route key used by `GET /habit/:id`
     - `name`: human-readable label returned in the response

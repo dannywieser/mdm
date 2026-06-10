@@ -1,6 +1,7 @@
 export { addDays } from "./date/addDays"
 export { buildDateRange } from "./date/buildDateRange"
 export { daysBetween } from "./date/daysBetween"
+export { daysToSeconds } from "./date/daysToSeconds"
 export { formatDate } from "./date/formatDate"
 export { getDateComponents } from "./date/getDateComponents"
 export { getDateWindowStart } from "./date/getDateWindowStart"

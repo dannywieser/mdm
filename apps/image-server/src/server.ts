@@ -1,17 +1,15 @@
 import express from "express"
 import { toLoggableError } from "mdm-util"
+import { createRedisClient } from "mdm-util/redis"
 import morgan from "morgan"
-import { createClient } from "redis"
 
 import type { ImageRedisClient } from "./handlers/images/images.types"
 
 import { healthHandler } from "./handlers/health/health"
-import { createImageHandler, resolveImageProxyConfig } from "./handlers/images/images"
-
-type RuntimeRedisClient = ImageRedisClient & {
-  connect: () => Promise<void>
-  on: (event: "error", listener: (error: unknown) => void) => void
-}
+import {
+  createImageHandler,
+  resolveImageProxyConfig,
+} from "./handlers/images/images"
 
 const noopRedisClient: ImageRedisClient = {
   get: () => Promise.resolve(null),
@@ -29,21 +27,6 @@ export const createApp = (redisClient: ImageRedisClient = noopRedisClient) => {
   return app
 }
 
-export const createRedisClient = (redisUrl: string): RuntimeRedisClient => {
-  const client = createClient({ url: redisUrl })
-
-  return {
-    connect: async () => {
-      await client.connect()
-    },
-    get: async (key) => client.get(key),
-    on: (event, listener) => {
-      client.on(event, listener)
-    },
-    set: async (key, value, options) => client.set(key, value, options),
-  }
-}
-
 if (require.main === module) {
   const start = async (): Promise<void> => {
     const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379"
@@ -59,7 +42,10 @@ if (require.main === module) {
       await redisClient.connect()
       cacheClient = redisClient
     } catch (error) {
-      console.error("Redis unavailable, image caching disabled", toLoggableError(error))
+      console.error(
+        "Redis unavailable, image caching disabled",
+        toLoggableError(error),
+      )
     }
 
     const app = createApp(cacheClient)

@@ -1,3 +1,5 @@
+import { daysToSeconds } from "mdm-util"
+
 import type {
   FlagDefinition,
   FlagRedisClient,
@@ -40,8 +42,10 @@ export const toggleFlag = async (
   const nextValue = !parseFlagValue(currentValue)
   const redisValue = toRedisFlagValue(nextValue)
 
-  if (typeof options?.expiresInSeconds === "number") {
-    await redisClient.set(key, redisValue, { EX: options.expiresInSeconds })
+  if (typeof options?.expiresInDays === "number") {
+    await redisClient.set(key, redisValue, {
+      EX: daysToSeconds(options.expiresInDays),
+    })
   } else {
     await redisClient.set(key, redisValue)
   }

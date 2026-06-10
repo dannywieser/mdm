@@ -67,7 +67,7 @@ describe("flags util", () => {
     expect(result).toEqual({ id: "a", flag: "read", value: false })
   })
 
-  test("sets redis expiry when flag definition includes expiresInSeconds", async () => {
+  test("sets redis expiry when flag definition includes expiresInDays", async () => {
     const redisClient: FlagRedisClient = {
       get: vi.fn().mockResolvedValue(null),
       set: vi.fn().mockResolvedValue("OK"),
@@ -76,10 +76,12 @@ describe("flags util", () => {
     const result = await toggleFlag(
       redisClient,
       { id: "a", flag: "read" },
-      { expiresInSeconds: 120 },
+      { expiresInDays: 1 },
     )
 
-    expect(redisClient.set).toHaveBeenCalledWith("read:a", "true", { EX: 120 })
+    expect(redisClient.set).toHaveBeenCalledWith("read:a", "true", {
+      EX: 86400,
+    })
     expect(result).toEqual({ id: "a", flag: "read", value: true })
   })
 })

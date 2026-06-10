@@ -30,6 +30,10 @@ export const groupViewsByGroup = (
   for (const view of views) {
     const group = view.group?.trim()
 
+    if (view.count === 0) {
+      continue
+    }
+
     if (!group) {
       ungroupedViews.push(view)
       continue

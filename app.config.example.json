@@ -46,7 +46,7 @@
   ],
   "flags": {
     "read": {
-      "expiresInSeconds": 3600
+      "expiresInDays": 30
     },
     "archived": {}
   }

@@ -19,5 +19,5 @@ export type ToggleFlagResult = ToggleFlagInput & {
 }
 
 export type FlagDefinition = {
-  expiresInSeconds?: number
+  expiresInDays?: number
 }

@@ -1,14 +1,4 @@
-import {
-  Box,
-  Heading,
-  Separator,
-  SimpleGrid,
-  StatLabel,
-  StatRoot,
-  StatValueText,
-  VStack,
-} from "@chakra-ui/react"
-import { Link } from "react-router-dom"
+import { Box, Heading, Separator, SimpleGrid, VStack } from "@chakra-ui/react"
 
 import { useHabitsQuery } from "../../hooks/useHabitsQuery/useHabitsQuery"
 import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
@@ -18,6 +8,7 @@ import { HabitCard } from "../HabitCard/HabitCard"
 import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
 import { HomeViewGroupSection } from "./HomeViewGroupSection"
 import { getViewGridColumns, groupViewsByGroup } from "./Home.util"
+import { HomeViewCard } from "./HomeViewCard"
 
 export function Home() {
   const { t } = useI18n()
@@ -36,47 +27,26 @@ export function Home() {
             <SimpleGrid
               color="app.textMuted"
               columns={{
-                base: Math.min(2, getViewGridColumns(groupedViews.ungroupedViews.length)),
+                base: Math.min(
+                  2,
+                  getViewGridColumns(groupedViews.ungroupedViews.length),
+                ),
                 md: getViewGridColumns(groupedViews.ungroupedViews.length),
               }}
               gap={2}
               textAlign="center"
             >
               {groupedViews.ungroupedViews.map((view) => (
-                <Box
-                  key={view.id}
-                  borderRadius="md"
-                  _focusWithin={{
-                    outlineWidth: "2px",
-                    outlineStyle: "solid",
-                    outlineColor: "app.accent",
-                    outlineOffset: "2px",
-                  }}
-                >
-                  <Link
-                    style={{ textDecoration: "none", outline: "none" }}
-                    to={`/notes/${view.id}`}
-                  >
-                    <StatRoot
-                      borderColor="app.border"
-                      borderRadius="md"
-                      borderWidth="1px"
-                      backgroundColor="app.panelBackground"
-                      px={3}
-                      py={2}
-                      size="sm"
-                      _hover={{ borderColor: "app.borderHover" }}
-                    >
-                      <StatLabel>{view.name}</StatLabel>
-                      <StatValueText>{view.count}</StatValueText>
-                    </StatRoot>
-                  </Link>
-                </Box>
+                <HomeViewCard key={view.id} view={view} />
               ))}
             </SimpleGrid>
           )}
           {groupedViews.groups.map((groupedSection) => (
-            <HomeViewGroupSection key={groupedSection.group} group={groupedSection.group} views={groupedSection.views} />
+            <HomeViewGroupSection
+              key={groupedSection.group}
+              group={groupedSection.group}
+              views={groupedSection.views}
+            />
           ))}
         </VStack>
       )}
@@ -88,7 +58,10 @@ export function Home() {
           <Separator borderColor="app.border" />
           <SimpleGrid
             color="app.textMuted"
-            columns={{ base: Math.min(2, getViewGridColumns(habits.length)), md: getViewGridColumns(habits.length) }}
+            columns={{
+              base: Math.min(2, getViewGridColumns(habits.length)),
+              md: getViewGridColumns(habits.length),
+            }}
             gap={2}
             textAlign="center"
           >
