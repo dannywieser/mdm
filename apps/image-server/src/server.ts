@@ -1,5 +1,6 @@
 import express from "express"
-import { createRedisClient, toLoggableError } from "mdm-util"
+import { toLoggableError } from "mdm-util"
+import { createRedisClient } from "mdm-util/redis"
 import morgan from "morgan"
 
 import type { ImageRedisClient } from "./handlers/images/images.types"

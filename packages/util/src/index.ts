@@ -19,6 +19,3 @@ export { isStringRecord } from "./strings/isStringRecord"
 export type { DateComponents } from "./date/getDateComponents.types"
 export type { ParsedDate } from "./date/parseDateFromFormats.types"
 export type { CapturingPattern } from "./regex/buildCapturingPattern.types"
-
-export type { RedisClient } from "./redis/createRedisClient.types"
-export { createRedisClient } from "./redis/createRedisClient"
