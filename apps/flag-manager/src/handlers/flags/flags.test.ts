@@ -25,7 +25,7 @@ describe("flagsHandler interface", () => {
   }
   const flagDefinitions = {
     archived: {},
-    read: { expiresInSeconds: 3600 },
+    read: { expiresInDays: 1 },
   }
 
   test("returns 400 when id is missing", async () => {
@@ -89,7 +89,7 @@ describe("flagsHandler interface", () => {
         id: "note-1",
         flag: "read",
       },
-      { expiresInSeconds: 3600 },
+      { expiresInDays: 1 },
     )
     expect(response.status).toHaveBeenCalledWith(200)
     expect(response.json).toHaveBeenCalledWith({

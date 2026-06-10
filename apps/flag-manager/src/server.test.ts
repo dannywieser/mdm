@@ -18,7 +18,7 @@ const healthHandlerMock = vi.mocked(healthHandler)
 const createFlagsHandlerMock = vi.mocked(createFlagsHandler)
 
 describe("flag-manager server interface", () => {
-  const flagDefinitions = { read: {}, archived: { expiresInSeconds: 3600 } }
+  const flagDefinitions = { read: {}, archived: { expiresInDays: 1 } }
 
   test("wires GET /health to the health handler", async () => {
     healthHandlerMock.mockImplementation((_request, response) => {

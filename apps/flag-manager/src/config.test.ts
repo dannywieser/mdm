@@ -28,7 +28,7 @@ describe("flag-manager config", () => {
       flags: {
         archived: {},
         read: {
-          expiresInSeconds: 300,
+          expiresInDays: 5,
         },
       },
     })
@@ -36,7 +36,7 @@ describe("flag-manager config", () => {
     await expect(resolveFlagDefinitions()).resolves.toEqual({
       archived: {},
       read: {
-        expiresInSeconds: 300,
+        expiresInDays: 5,
       },
     })
   })
@@ -55,14 +55,14 @@ describe("flag-manager config", () => {
     readAppConfigFileMock.mockResolvedValue({
       flags: {
         read: {
-          expiresInSeconds: 0,
+          expiresInDays: 0,
         },
       },
     })
 
     await expect(resolveFlagDefinitions()).rejects.toEqual(
       new FlagConfigError(
-        "app.config.json flags must map non-empty flag names to definitions with optional positive integer expiresInSeconds",
+        "app.config.json flags must map non-empty flag names to definitions with optional positive integer expiresInDays",
       ),
     )
   })

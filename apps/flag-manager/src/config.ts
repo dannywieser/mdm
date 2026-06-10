@@ -10,11 +10,11 @@ const isValidFlagDefinition = (value: unknown): value is FlagDefinition => {
     return false
   }
 
-  const expiresInSeconds = (value as Record<string, unknown>)["expiresInSeconds"]
+  const expiresInDays = (value as Record<string, unknown>)["expiresInDays"]
 
   return (
-    expiresInSeconds === undefined ||
-    (Number.isInteger(expiresInSeconds) && Number(expiresInSeconds) > 0)
+    expiresInDays === undefined ||
+    (Number.isInteger(expiresInDays) && Number(expiresInDays) > 0)
   )
 }
 
@@ -37,7 +37,7 @@ const validateFlagDefinitions = (
 
   if (hasInvalidEntry) {
     throw new FlagConfigError(
-      "app.config.json flags must map non-empty flag names to definitions with optional positive integer expiresInSeconds",
+      "app.config.json flags must map non-empty flag names to definitions with optional positive integer expiresInDays",
     )
   }
 
