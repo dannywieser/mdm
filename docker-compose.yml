@@ -4,10 +4,14 @@ services:
       context: .
       dockerfile: infra/docker/web.Dockerfile
     depends_on:
-      - notes-api
-      - flag-manager
-      - image-server
-      - habit-tracker
+      notes-api:
+        condition: service_healthy
+      flag-manager:
+        condition: service_healthy
+      image-server:
+        condition: service_healthy
+      habit-tracker:
+        condition: service_healthy
     ports:
       - "80:80"
 
@@ -23,6 +27,12 @@ services:
     volumes:
       - ./app.config.json:/app/app.config.json:ro
       - ${NOTES_ROOT:-./notes}:/data/notes:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   flag-manager:
     build:
@@ -37,6 +47,12 @@ services:
       - "3001"
     volumes:
       - ./app.config.json:/app/app.config.json:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   habit-tracker:
     build:
@@ -50,6 +66,12 @@ services:
     volumes:
       - ./app.config.json:/app/app.config.json:ro
       - ${NOTES_ROOT:-./notes}:/data/notes:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   image-server:
     build:
@@ -68,6 +90,12 @@ services:
     volumes:
       - ./app.config.json:/app/app.config.json:ro
       - ${IMAGES_ROOT:-./notes}:/data/images:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   imgproxy:
     image: darthsim/imgproxy:v3.31.0

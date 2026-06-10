@@ -299,6 +299,7 @@ This repository is a Turborepo monorepo with this structure:
   - override: `IMAGES_ROOT=/absolute/path/on/host docker compose up --build`
 - Notes markdown image paths now resolve through `/images?path=<encoded-relative-path>` for imgproxy optimization.
 - If local and container config values differ, create a separate Docker-specific config file and mount it to `/app/app.config.json`.
+- `notes-api`, `flag-manager`, `habit-tracker`, and `image-server` each define a Docker healthcheck that polls their `/health` endpoint; `web` waits for all of them to report healthy before starting.
 
 Start services:
 
