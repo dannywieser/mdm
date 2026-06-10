@@ -3,9 +3,7 @@ import type { Note } from "markdown"
 import type { NoteYearMonth } from "./NotesGalleryByMonth.types"
 
 export function getNoteYearMonth(note: Note): NoteYearMonth | null {
-  if (!note.createdDate) return null
-
-  const date = new Date(note.createdDate)
+  const date = new Date(note.createdDate ?? note.modifiedDate)
   if (Number.isNaN(date.getTime())) return null
 
   return { month: date.getUTCMonth() + 1, year: date.getUTCFullYear() }

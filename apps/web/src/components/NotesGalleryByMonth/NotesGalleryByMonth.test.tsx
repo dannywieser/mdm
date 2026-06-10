@@ -29,12 +29,13 @@ vi.mock("../NoteBadges/NoteBadges", () => ({
 
 import { NotesGalleryByMonth } from "./NotesGalleryByMonth"
 
-const note = (id: string, title: string, createdDate: string) => ({
+const note = (id: string, title: string, createdDate: string | null, modifiedDate = createdDate ?? "2020-01-01T00:00:00.000Z") => ({
   id,
   title,
   obsidianUrl: `obsidian://open?vault=v&file=${id}`,
   frontmatter: { cover: "https://example.com/cover.jpg" },
   createdDate,
+  modifiedDate,
 })
 
 const renderComponent = (props: Parameters<typeof NotesGalleryByMonth>[0] = {}) =>
@@ -85,6 +86,21 @@ describe("NotesGalleryByMonth", () => {
     expect(screen.queryByText("Other Year Note")).toBeNull()
     expect(screen.getByText("January 2024")).toBeTruthy()
     expect(screen.getByText("March 2024")).toBeTruthy()
+  })
+
+  test("falls back to modifiedDate when createdDate is missing", () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [note("1", "Undated Note", null, "2024-02-15T00:00:00.000Z")],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+
+    renderComponent({ year: 2024 })
+
+    expect(screen.getByText("February 2024")).toBeTruthy()
+    expect(screen.getByText("Undated Note")).toBeTruthy()
   })
 
   test("filters to the selected month", () => {

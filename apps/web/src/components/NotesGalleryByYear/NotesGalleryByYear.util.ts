@@ -1,9 +1,7 @@
 import type { Note } from "markdown"
 
 export function getNoteYear(note: Note): number | null {
-  if (!note.createdDate) return null
-
-  const date = new Date(note.createdDate)
+  const date = new Date(note.createdDate ?? note.modifiedDate)
   if (Number.isNaN(date.getTime())) return null
 
   return date.getUTCFullYear()
