@@ -2,7 +2,8 @@ import type { FrontmatterValue, Note } from "markdown"
 
 export function getCoverSrc(cover: FrontmatterValue): string {
   const path = Array.isArray(cover) ? cover[0] : cover
-  return `/images?path=${encodeURIComponent(path)}`
+  const unquotedPath = path.replace(/^["']+|["']+$/g, "")
+  return `/images?path=${encodeURIComponent(unquotedPath)}`
 }
 
 export function filterNotesWithCovers(notes: Note[]): Note[] {

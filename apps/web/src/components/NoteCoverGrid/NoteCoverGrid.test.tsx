@@ -80,6 +80,12 @@ describe("getCoverSrc", () => {
       `/images?path=${encodeURIComponent("attachments/first.jpg")}`,
     )
   })
+
+  test("strips surrounding quotes from the cover path", () => {
+    expect(getCoverSrc('"attachments/cover.jpg"')).toBe(
+      `/images?path=${encodeURIComponent("attachments/cover.jpg")}`,
+    )
+  })
 })
 
 describe("filterNotesWithCovers", () => {
