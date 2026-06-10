@@ -34,6 +34,7 @@ vi.mock("./filters/notes.filters", () => ({
 }))
 
 vi.mock("./notes.parse", () => ({
+  EMPTY_MARKDOWN_NODE: { children: [], type: "root" },
   parseMarkdownFile: vi.fn(),
 }))
 
@@ -248,6 +249,45 @@ describe("notes handler interface", () => {
       "books",
       { dateFormats: [], timezone: "UTC" },
     )
+  })
+
+  test("skips markdown body parsing when includeContent=false", async () => {
+    const scannedNote = createScannedNote({
+      basename: "a.md",
+      fullPath: "/notes/a.md",
+      id: "a",
+      obsidianUrl: "obsidian://open?vault=vault&file=a",
+      title: "a",
+    })
+
+    resolveNotesConfigMock.mockResolvedValue({
+      attachmentsDirectory: "attachments",
+      createdDateProperty: "created",
+      dateFormats: [],
+      deriveTitleDate: false,
+      notesDirectory: "/notes",
+      obsidianVault: "vault",
+      timezone: "UTC",
+      views: [],
+    })
+    collectMarkdownFilesMock.mockResolvedValue(["/notes/a.md"])
+    scanMarkdownFileMock.mockResolvedValue(scannedNote)
+    applyViewFilterMock.mockReturnValue([scannedNote])
+
+    const app = express()
+    app.get("/notes", notesHandler)
+
+    const response = await request(app).get("/notes?includeContent=false")
+    const body = response.body as { notes: unknown[] }
+
+    expect(response.status).toBe(200)
+    expect(body.notes).toEqual([
+      expect.objectContaining({
+        basename: "a.md",
+        content: { children: [], type: "root" },
+      }),
+    ])
+    expect(parseMarkdownFileMock).not.toHaveBeenCalled()
   })
 
   test("returns an error when util loading fails", async () => {

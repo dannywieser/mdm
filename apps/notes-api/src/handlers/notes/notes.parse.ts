@@ -17,6 +17,8 @@ import {
 const IMAGE_SERVER_PATH = "/images"
 const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
 
+export const EMPTY_MARKDOWN_NODE: MarkdownNode = { type: "root", children: [] }
+
 export const parseMarkdownFile = async (
   note: ScannedNote,
   notesDirectory: string,

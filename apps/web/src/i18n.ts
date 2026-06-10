@@ -39,6 +39,8 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     "errors.unableToLoadHabit": "unable to load habit",
     "errors.unableToLoadHabits": "unable to load habits",
     "errors.unableToLoadNotes": "well, that didn't go as planned",
+    "gallery.allMonths": "all months",
+    "gallery.allYears": "all years",
     "errors.unableToLoadReadState": "unable to load read state",
     "errors.unableToLoadStats": "unable to load stats",
     "errors.unableToToggleReadState": "unable to toggle read state",

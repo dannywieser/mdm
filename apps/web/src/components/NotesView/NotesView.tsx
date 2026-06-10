@@ -4,6 +4,8 @@ import { useParams } from "react-router-dom"
 import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
 
 import { NotesGallery } from "../NotesGallery/NotesGallery"
+import { NotesGalleryByMonth } from "../NotesGalleryByMonth/NotesGalleryByMonth"
+import { NotesGalleryByYear } from "../NotesGalleryByYear/NotesGalleryByYear"
 import { NotesList } from "../NotesList/NotesList"
 import { NotesReview } from "../NotesReview/NotesReview"
 import { NotesSummaryTable } from "../NotesSummaryTable/NotesSummaryTable"
@@ -22,6 +24,8 @@ interface ViewComponentProps {
 const VIEW_COMPONENTS: Record<ViewComponentName, ComponentType<ViewComponentProps>> = {
   NotesList,
   NotesGallery,
+  NotesGalleryByMonth,
+  NotesGalleryByYear,
   NotesReview,
   NotesSummaryTable,
 }
