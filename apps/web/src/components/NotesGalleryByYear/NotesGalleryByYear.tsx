@@ -16,7 +16,7 @@ import { groupNotesByYear } from "./NotesGalleryByYear.util"
 export const NotesGalleryByYear = ({ aspectRatio, badges = [] }: NotesGalleryByYearProps) => {
   const { t } = useI18n()
   const { view } = useParams<NotesGalleryByYearRouteParamKey>()
-  const { data, error, isLoading } = useNotesQuery({ view })
+  const { data, error, isLoading } = useNotesQuery({ includeContent: false, view })
   const [selectedYear, setSelectedYear] = useState<"all" | number>("all")
 
   if (isLoading) return <LoadingScreen />

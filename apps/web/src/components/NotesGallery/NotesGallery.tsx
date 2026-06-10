@@ -11,7 +11,7 @@ import type { NotesGalleryProps, NotesGalleryRouteParamKey } from "./NotesGaller
 
 export const NotesGallery = ({ aspectRatio, badges = [] }: NotesGalleryProps) => {
   const { view } = useParams<NotesGalleryRouteParamKey>()
-  const { data, error, isLoading } = useNotesQuery({ view })
+  const { data, error, isLoading } = useNotesQuery({ includeContent: false, view })
 
   if (isLoading) return <LoadingScreen />
   if (error) return <AppError message={error.message} />

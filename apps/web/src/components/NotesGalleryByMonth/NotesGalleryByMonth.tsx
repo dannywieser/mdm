@@ -16,7 +16,7 @@ import { getMonthName, getMostRecentYear, groupNotesByMonth } from "./NotesGalle
 export const NotesGalleryByMonth = ({ aspectRatio, badges = [], year }: NotesGalleryByMonthProps) => {
   const { t } = useI18n()
   const { view } = useParams<NotesGalleryByMonthRouteParamKey>()
-  const { data, error, isLoading } = useNotesQuery({ view })
+  const { data, error, isLoading } = useNotesQuery({ includeContent: false, view })
   const [selectedMonth, setSelectedMonth] = useState<"all" | number>("all")
 
   if (isLoading) return <LoadingScreen />

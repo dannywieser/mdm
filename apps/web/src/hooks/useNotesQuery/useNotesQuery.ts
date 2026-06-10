@@ -7,10 +7,13 @@ import type { UseNotesQueryParams } from "./useNotesQuery.types"
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api"
 
-const fetchNotes = async (view?: string): Promise<NotesResponse> => {
-  const url = view
-    ? `${API_BASE_URL}/notes?view=${encodeURIComponent(view)}`
-    : `${API_BASE_URL}/notes`
+const fetchNotes = async (view?: string, includeContent: boolean = true): Promise<NotesResponse> => {
+  const params = new URLSearchParams()
+  if (view) params.set("view", view)
+  if (!includeContent) params.set("includeContent", "false")
+
+  const queryString = params.toString()
+  const url = queryString ? `${API_BASE_URL}/notes?${queryString}` : `${API_BASE_URL}/notes`
   const response = await fetch(url)
 
   if (!response.ok) {
@@ -20,8 +23,8 @@ const fetchNotes = async (view?: string): Promise<NotesResponse> => {
   return (await response.json()) as NotesResponse
 }
 
-export const useNotesQuery = ({ view }: UseNotesQueryParams = {}) =>
+export const useNotesQuery = ({ includeContent = true, view }: UseNotesQueryParams = {}) =>
   useSuspenseQuery({
-    queryKey: ["notes", view],
-    queryFn: () => fetchNotes(view),
+    queryKey: ["notes", view, includeContent],
+    queryFn: () => fetchNotes(view, includeContent),
   })

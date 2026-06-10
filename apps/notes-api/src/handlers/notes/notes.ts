@@ -6,7 +6,7 @@ import { toLoggableError } from "mdm-util"
 
 import { applyViewFilter } from "./filters/notes.filters"
 import { collectMarkdownFiles } from "./notes.files"
-import { parseMarkdownFile } from "./notes.parse"
+import { EMPTY_MARKDOWN_NODE, parseMarkdownFile } from "./notes.parse"
 import { scanMarkdownFile } from "./notes.scan"
 
 export const notesHandler: RequestHandler = async (request, response) => {
@@ -39,9 +39,13 @@ export const notesHandler: RequestHandler = async (request, response) => {
     })
     console.log(`[notes] ${filteredNotes.length}/${scannedNotes.length} note(s) passed view filter`)
 
-    const parsedNotes = await Promise.all(
-      filteredNotes.map((note) => parseMarkdownFile(note, notesDirectory, attachmentsDirectory, scannedNotes)),
-    )
+    const includeContent = request.query["includeContent"] !== "false"
+
+    const parsedNotes = includeContent
+      ? await Promise.all(
+          filteredNotes.map((note) => parseMarkdownFile(note, notesDirectory, attachmentsDirectory, scannedNotes)),
+        )
+      : filteredNotes.map((note) => ({ ...note, content: EMPTY_MARKDOWN_NODE }))
 
     response
       .status(200)

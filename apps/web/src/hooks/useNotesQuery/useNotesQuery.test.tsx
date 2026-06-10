@@ -88,6 +88,28 @@ describe("useNotesQuery", () => {
     expect(global.fetch).toHaveBeenCalledWith("/api/notes?view=on-this-day")
   })
 
+  test("fetches notes with includeContent=false when content is not requested", async () => {
+    const responseBody = {
+      notes: [],
+      notesDirectory: "/notes",
+      obsidianVault: "vault",
+    }
+
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue(responseBody),
+    }))
+
+    const { result } = renderHook(
+      () => useNotesQuery({ includeContent: false, view: "on-this-day" }),
+      { wrapper: createWrapper() },
+    )
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    expect(global.fetch).toHaveBeenCalledWith("/api/notes?view=on-this-day&includeContent=false")
+  })
+
   test("throws to error boundary when the response is not ok", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }))
     vi.spyOn(console, "error").mockImplementation(() => {})
