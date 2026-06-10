@@ -1,5 +1,6 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
 import { cleanup, fireEvent, render, screen } from "@testing-library/react"
+import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
 afterEach(cleanup)
@@ -39,7 +40,11 @@ const note = (id: string, title: string, createdDate: string) => ({
 const renderComponent = (props: Parameters<typeof NotesGalleryByYear>[0] = {}) =>
   render(
     <ChakraProvider value={defaultSystem}>
-      <NotesGalleryByYear {...props} />
+      <MemoryRouter initialEntries={["/notes/books"]}>
+        <Routes>
+          <Route path="/notes/:view" element={<NotesGalleryByYear {...props} />} />
+        </Routes>
+      </MemoryRouter>
     </ChakraProvider>,
   )
 

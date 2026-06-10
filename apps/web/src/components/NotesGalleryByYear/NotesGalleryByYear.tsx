@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Box, Heading, NativeSelect } from "@chakra-ui/react"
+import { useParams } from "react-router-dom"
 
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 import { useI18n } from "../../i18n"
@@ -9,12 +10,13 @@ import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
 import { NoteCoverGrid } from "../NoteCoverGrid/NoteCoverGrid"
 import { filterNotesWithCovers } from "../NoteCoverGrid/NoteCoverGrid.util"
 
-import type { NotesGalleryByYearProps } from "./NotesGalleryByYear.types"
+import type { NotesGalleryByYearProps, NotesGalleryByYearRouteParamKey } from "./NotesGalleryByYear.types"
 import { groupNotesByYear } from "./NotesGalleryByYear.util"
 
 export const NotesGalleryByYear = ({ aspectRatio, badges = [] }: NotesGalleryByYearProps) => {
   const { t } = useI18n()
-  const { data, error, isLoading } = useNotesQuery({})
+  const { view } = useParams<NotesGalleryByYearRouteParamKey>()
+  const { data, error, isLoading } = useNotesQuery({ view })
   const [selectedYear, setSelectedYear] = useState<"all" | number>("all")
 
   if (isLoading) return <LoadingScreen />

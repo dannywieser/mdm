@@ -1,3 +1,5 @@
+export type NotesGalleryByMonthRouteParamKey = "view"
+
 export interface NotesGalleryByMonthProps {
   aspectRatio?: string
   badges?: string[]
