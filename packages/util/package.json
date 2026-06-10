@@ -8,10 +8,6 @@
     ".": {
       "types": "./index.d.ts",
       "default": "./dist/index.js"
-    },
-    "./redis": {
-      "types": "./dist/redis/createRedisClient.d.ts",
-      "default": "./dist/redis/createRedisClient.js"
     }
   },
   "scripts": {
