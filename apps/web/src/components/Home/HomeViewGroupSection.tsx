@@ -1,10 +1,13 @@
-import { Box, Heading, Separator, SimpleGrid, StatLabel, StatRoot, StatValueText, VStack } from "@chakra-ui/react"
-import { Link } from "react-router-dom"
+import { Heading, Separator, SimpleGrid, VStack } from "@chakra-ui/react"
 
 import { getViewGridColumns } from "./Home.util"
 import type { HomeViewGroupSectionProps } from "./HomeViewGroupSection.types"
+import { HomeViewCard } from "./HomeViewCard"
 
-export function HomeViewGroupSection({ group, views }: HomeViewGroupSectionProps) {
+export function HomeViewGroupSection({
+  group,
+  views,
+}: HomeViewGroupSectionProps) {
   return (
     <VStack align="stretch" gap={2} width="full">
       <Heading as="h2" size="sm" color="app.textMuted" fontWeight="medium">
@@ -21,35 +24,7 @@ export function HomeViewGroupSection({ group, views }: HomeViewGroupSectionProps
         textAlign="center"
       >
         {views.map((view) => (
-          <Box
-            key={view.id}
-            borderRadius="md"
-            _focusWithin={{
-              outlineWidth: "2px",
-              outlineStyle: "solid",
-              outlineColor: "app.accent",
-              outlineOffset: "2px",
-            }}
-          >
-            <Link
-              style={{ textDecoration: "none", outline: "none" }}
-              to={`/notes/${view.id}`}
-            >
-              <StatRoot
-                borderColor="app.border"
-                borderRadius="md"
-                borderWidth="1px"
-                backgroundColor="app.panelBackground"
-                px={3}
-                py={2}
-                size="sm"
-                _hover={{ borderColor: "app.borderHover" }}
-              >
-                <StatLabel>{view.name}</StatLabel>
-                <StatValueText>{view.count}</StatValueText>
-              </StatRoot>
-            </Link>
-          </Box>
+          <HomeViewCard key={view.id} view={view} />
         ))}
       </SimpleGrid>
     </VStack>
