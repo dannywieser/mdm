@@ -4,12 +4,12 @@ import type { RequestHandler } from "express"
 import { AppConfigError, resolveNotesConfig } from "app-config"
 import { toLoggableError } from "mdm-util"
 
-import type { HabitResult } from "./habit.types"
+import type { HabitResult } from "./habit-detail.types"
 
-import { collectMarkdownFiles, scanHabitEntries } from "./habit.files"
-import { buildHistory, buildScoreEntries, buildStreaks, calculateHabitScore, getWindowEntries } from "./habit.util"
+import { collectMarkdownFiles, scanHabitEntries } from "./habit-detail.files"
+import { buildHistory, buildScoreEntries, buildStreaks, calculateHabitScore, getWindowEntries } from "./habit-detail.util"
 
-export const habitHandler: RequestHandler = async (request, response) => {
+export const habitDetailHandler: RequestHandler = async (request, response) => {
   let notesConfig: ResolvedNotesConfig | undefined
 
   try {

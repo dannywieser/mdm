@@ -2,7 +2,7 @@ import { parseDateString, parseFrontMatter, parseMarkdownBodyDates } from "markd
 import { promises as fs } from "node:fs"
 import path from "node:path"
 
-import type { HabitEntry } from "./habit.types"
+import type { HabitEntry } from "./habit-detail.types"
 
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
 

@@ -3,7 +3,7 @@ import type { Mock } from "vitest"
 import { parseDateString, parseFrontMatter, parseMarkdownBodyDates } from "markdown"
 import { promises as fs, type Dirent } from "node:fs"
 
-import { collectMarkdownFiles, scanHabitEntries } from "./habit.files"
+import { collectMarkdownFiles, scanHabitEntries } from "./habit-detail.files"
 
 vi.mock("node:fs", () => ({
   promises: {

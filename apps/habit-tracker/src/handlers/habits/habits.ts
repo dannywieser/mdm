@@ -6,8 +6,8 @@ import { toLoggableError } from "mdm-util"
 
 import type { HabitSummary } from "./habits.types"
 
-import { collectMarkdownFiles, scanHabitEntries } from "../habit/habit.files"
-import { calculateHabitScore } from "../habit/habit.util"
+import { collectMarkdownFiles, scanHabitEntries } from "../habit-detail/habit-detail.files"
+import { calculateHabitScore } from "../habit-detail/habit-detail.util"
 
 export const habitsHandler: RequestHandler = async (_request, response) => {
   let notesConfig: ResolvedNotesConfig | undefined

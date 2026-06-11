@@ -64,7 +64,7 @@ describe("useHabitQuery", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(global.fetch).toHaveBeenCalledWith("/habit/exercise")
+    expect(global.fetch).toHaveBeenCalledWith("/habits/exercise")
     expect(result.current.data).toEqual(responseBody)
   })
 
