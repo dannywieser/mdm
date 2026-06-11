@@ -5,13 +5,13 @@ import { describe, expect, test, vi } from "vitest"
 
 import { Home } from "./Home"
 
-const useStatsQueryMock = vi.fn()
+const useViewsQueryMock = vi.fn()
 const useHabitsQueryMock = vi.fn()
 const groupViewsByGroupMock = vi.fn()
 const getViewGridColumnsMock = vi.fn()
 
-vi.mock("../../hooks/useStatsQuery/useStatsQuery", () => ({
-  useStatsQuery: () => useStatsQueryMock(),
+vi.mock("../../hooks/useViewsQuery/useViewsQuery", () => ({
+  useViewsQuery: () => useViewsQueryMock(),
 }))
 
 vi.mock("../../hooks/useHabitsQuery/useHabitsQuery", () => ({
@@ -29,7 +29,7 @@ vi.mock("./Home.util", () => ({
 
 describe("Home", () => {
   test("renders view links with name and count", () => {
-    useStatsQueryMock.mockReturnValue({
+    useViewsQueryMock.mockReturnValue({
       isLoading: false,
       data: {
         views: [
@@ -62,7 +62,7 @@ describe("Home", () => {
   })
 
   test("renders habit cards linking to the habit detail route", () => {
-    useStatsQueryMock.mockReturnValue({
+    useViewsQueryMock.mockReturnValue({
       isLoading: false,
       data: { views: [] },
     })
@@ -99,7 +99,7 @@ describe("Home", () => {
   })
 
   test("renders grouped views with section heading", () => {
-    useStatsQueryMock.mockReturnValue({
+    useViewsQueryMock.mockReturnValue({
       isLoading: false,
       data: {
         views: [
@@ -166,7 +166,7 @@ describe("Home", () => {
   })
 
   test("does not render section heading when views are ungrouped", () => {
-    useStatsQueryMock.mockReturnValue({
+    useViewsQueryMock.mockReturnValue({
       isLoading: false,
       data: {
         views: [

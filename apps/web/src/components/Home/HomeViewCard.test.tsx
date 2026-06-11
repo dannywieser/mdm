@@ -11,7 +11,7 @@ describe("HomeViewCard", () => {
       <ChakraProvider value={defaultSystem}>
         <MemoryRouter>
           <HomeViewCard
-            view={{ component: "NotesList", count: 4, id: "books", name: "Books" }}
+            view={{ component: "NotesList", count: 4, id: "books", name: "Books", noteIds: ["a"] }}
           />
         </MemoryRouter>
       </ChakraProvider>,
@@ -29,7 +29,7 @@ describe("HomeViewCard", () => {
       <ChakraProvider value={defaultSystem}>
         <MemoryRouter>
           <HomeViewCard
-            view={{ component: "NotesList", count: 0, id: "books", name: "Books" }}
+            view={{ component: "NotesList", count: 0, id: "books", name: "Books", noteIds: [] }}
           />
         </MemoryRouter>
       </ChakraProvider>,

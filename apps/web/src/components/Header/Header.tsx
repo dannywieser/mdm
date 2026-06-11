@@ -24,7 +24,7 @@ import {
 const RouterLink = chakra(Link)
 import { BarChart2, X } from "lucide-react"
 
-import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
+import { useViewsQuery } from "../../hooks/useViewsQuery/useViewsQuery"
 import { useI18n } from "../../i18n"
 
 import { PaletteSelector } from "../PaletteSelector/PaletteSelector"
@@ -74,7 +74,7 @@ export function Header() {
   const isStatsPage = useMatch("/stats")
   const isColorsPage = useMatch("/colors")
   const habitMatch = useMatch("/tracking/:habitId")
-  const { data } = useStatsQuery({})
+  const { data } = useViewsQuery({})
   const currentView = view
     ? data.views.find(({ id }) => id === view)
     : undefined

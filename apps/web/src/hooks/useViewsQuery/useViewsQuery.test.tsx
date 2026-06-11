@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { renderHook, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
-import { useStatsQuery } from "./useStatsQuery"
+import { useViewsQuery } from "./useViewsQuery"
 
 class ErrorBoundary extends Component<
   { children: ReactNode },
@@ -43,11 +43,12 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe("useStatsQuery", () => {
-  test("fetches stats successfully", async () => {
+describe("useViewsQuery", () => {
+  test("fetches views successfully", async () => {
     const responseBody = {
-      totalNotes: 2,
-      modifiedToday: 1,
+      views: [
+        { component: "NotesList", count: 1, id: "books", name: "Books", noteIds: ["a"] },
+      ],
     }
 
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
@@ -55,21 +56,21 @@ describe("useStatsQuery", () => {
       json: vi.fn().mockResolvedValue(responseBody),
     }))
 
-    const { result } = renderHook(() => useStatsQuery(), {
+    const { result } = renderHook(() => useViewsQuery(), {
       wrapper: createWrapper(),
     })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(global.fetch).toHaveBeenCalledWith("/api/stats")
+    expect(global.fetch).toHaveBeenCalledWith("/api/views")
     expect(result.current.data).toEqual(responseBody)
   })
 
-  test("throws to error boundary when the stats response is not ok", async () => {
+  test("throws to error boundary when the views response is not ok", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }))
     vi.spyOn(console, "error").mockImplementation(() => {})
 
-    renderHook(() => useStatsQuery(), { wrapper: createWrapper() })
+    renderHook(() => useViewsQuery(), { wrapper: createWrapper() })
 
     expect(await screen.findByTestId("error")).toBeTruthy()
   })

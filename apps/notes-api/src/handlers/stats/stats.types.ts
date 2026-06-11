@@ -2,17 +2,6 @@ import type { HomeStatsConfig } from "app-config"
 
 export type { HomeStatsConfig }
 
-export interface StatsViewCount {
-  aspectRatio?: string
-  badges?: string[]
-  component: string
-  count: number
-  group?: string
-  id: string
-  layout?: string
-  name: string
-}
-
 export interface FolderCount {
   count: number
   folder: string
@@ -46,5 +35,4 @@ export interface StatsResponse {
   totalFolders: number
   totalNotes: number
   trends: StatsTrends
-  views: StatsViewCount[]
 }

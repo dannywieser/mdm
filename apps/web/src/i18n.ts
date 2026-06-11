@@ -42,6 +42,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "gallery.allYears": "all years",
     "errors.unableToLoadReadState": "unable to load read state",
     "errors.unableToLoadStats": "unable to load stats",
+    "errors.unableToLoadViews": "unable to load views",
     "errors.unableToToggleReadState": "unable to toggle read state",
     "notes.errorTitle": "unable to load notes",
     "notes.header": "notes",

@@ -19,8 +19,8 @@ vi.mock("../../i18n", () => ({
   useI18n: () => ({ t: (key: string) => key }),
 }))
 
-vi.mock("../../hooks/useStatsQuery/useStatsQuery", () => ({
-  useStatsQuery: () => ({
+vi.mock("../../hooks/useViewsQuery/useViewsQuery", () => ({
+  useViewsQuery: () => ({
     data: {
       views: [
         { id: "daily", name: "daily review" },

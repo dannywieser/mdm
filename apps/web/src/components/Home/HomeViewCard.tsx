@@ -1,8 +1,9 @@
 import { Box, StatLabel, StatRoot, StatValueText } from "@chakra-ui/react"
 
 import { Link } from "react-router-dom"
-import type { StatsViewCount } from "../../types/stats"
-export function HomeViewCard({ view }: { view: StatsViewCount }) {
+import type { ViewSummary } from "../../types/views"
+
+export function HomeViewCard({ view }: { view: ViewSummary }) {
   if (view.count === 0) {
     return null
   }

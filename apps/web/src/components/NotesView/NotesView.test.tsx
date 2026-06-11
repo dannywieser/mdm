@@ -5,10 +5,10 @@ import { describe, expect, test, vi } from "vitest"
 
 import { NotesView } from "./NotesView"
 
-const useStatsQueryMock = vi.fn()
+const useViewsQueryMock = vi.fn()
 
-vi.mock("../../hooks/useStatsQuery/useStatsQuery", () => ({
-  useStatsQuery: () => useStatsQueryMock(),
+vi.mock("../../hooks/useViewsQuery/useViewsQuery", () => ({
+  useViewsQuery: () => useViewsQueryMock(),
 }))
 
 vi.mock("../NotesList/NotesList", () => ({
@@ -42,10 +42,8 @@ const renderNotesView = (path: string) =>
 
 describe("NotesView", () => {
   test("renders NotesReview when configured component is NotesReview", () => {
-    useStatsQueryMock.mockReturnValue({
+    useViewsQueryMock.mockReturnValue({
       data: {
-        modifiedToday: 0,
-        totalNotes: 1,
         views: [
           {
             component: "NotesReview",
@@ -64,10 +62,8 @@ describe("NotesView", () => {
   })
 
   test("falls back to NotesList when component is missing", () => {
-    useStatsQueryMock.mockReturnValue({
+    useViewsQueryMock.mockReturnValue({
       data: {
-        modifiedToday: 0,
-        totalNotes: 1,
         views: [
           { component: "NotesList", count: 1, id: "books", name: "Books" },
         ],
@@ -80,10 +76,8 @@ describe("NotesView", () => {
   })
 
   test("renders NotesSummaryTable when configured component is NotesSummaryTable", () => {
-    useStatsQueryMock.mockReturnValue({
+    useViewsQueryMock.mockReturnValue({
       data: {
-        modifiedToday: 0,
-        totalNotes: 1,
         views: [
           {
             component: "NotesSummaryTable",

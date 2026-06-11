@@ -1,4 +1,4 @@
-import type { StatsViewCount } from "../../types/stats"
+import type { ViewSummary } from "../../types/views"
 import type { ViewGroupSection } from "./Home.types"
 
 /**
@@ -18,10 +18,10 @@ export function getViewGridColumns(count: number): number {
  * Missing or whitespace-only group values are treated as ungrouped views.
  */
 export const groupViewsByGroup = (
-  views: StatsViewCount[],
-): { groups: ViewGroupSection[]; ungroupedViews: StatsViewCount[] } => {
-  const ungroupedViews: StatsViewCount[] = []
-  const groupedViews = new Map<string, StatsViewCount[]>()
+  views: ViewSummary[],
+): { groups: ViewGroupSection[]; ungroupedViews: ViewSummary[] } => {
+  const ungroupedViews: ViewSummary[] = []
+  const groupedViews = new Map<string, ViewSummary[]>()
 
   for (const view of views) {
     const group = view.group?.trim()
