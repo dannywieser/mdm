@@ -1,4 +1,12 @@
-import { Box, Flex, SimpleGrid, StatLabel, StatRoot, StatValueText, Text } from "@chakra-ui/react"
+import {
+  Box,
+  Flex,
+  SimpleGrid,
+  StatLabel,
+  StatRoot,
+  StatValueText,
+  Text,
+} from "@chakra-ui/react"
 import { Link } from "react-router-dom"
 
 import { useI18n } from "../../i18n"
@@ -10,7 +18,11 @@ import type { HabitCardProps } from "./HabitCard.types"
 
 export function HabitCard({ habit }: HabitCardProps) {
   const { t } = useI18n()
-  const heatDotCount = calculateHeatDotCount(habit.mode, habit.habitScore, habit.targetScore)
+  const heatDotCount = calculateHeatDotCount(
+    habit.mode,
+    habit.habitScore,
+    habit.targetScore,
+  )
 
   return (
     <Box
@@ -23,7 +35,12 @@ export function HabitCard({ habit }: HabitCardProps) {
       }}
     >
       <Link
-        style={{ textDecoration: "none", outline: "none", display: "block", width: "100%" }}
+        style={{
+          textDecoration: "none",
+          outline: "none",
+          display: "block",
+          width: "100%",
+        }}
         to={`/tracking/${habit.habitId}`}
       >
         <Box
@@ -37,22 +54,30 @@ export function HabitCard({ habit }: HabitCardProps) {
           _hover={{ borderColor: "app.borderHover" }}
         >
           <Text fontSize="sm" fontWeight="semibold" color="app.text" mb={2}>
-            {t(habit.mode === "do-more" ? "habit.modeDoMore" : "habit.modeDoLess")}: {habit.habitName}
+            {t(`habit.${habit.mode}`, { name: habit.habitName })}
           </Text>
           <SimpleGrid columns={3} gap={3}>
             <StatRoot size="sm">
               <StatLabel color="app.textMuted">{t("habit.score")}</StatLabel>
               <Flex align="center" gap={1.5}>
-                <HabitScoreValue mode={habit.mode} score={habit.habitScore} targetScore={habit.targetScore} />
+                <HabitScoreValue
+                  mode={habit.mode}
+                  score={habit.habitScore}
+                  targetScore={habit.targetScore}
+                />
                 <HeatDots count={heatDotCount} />
               </Flex>
             </StatRoot>
             <StatRoot size="sm">
-              <StatLabel color="app.textMuted">{t("habit.currentStreak")}</StatLabel>
+              <StatLabel color="app.textMuted">
+                {t(`habit.${habit.mode}-streak`)}
+              </StatLabel>
               <StatValueText>{habit.streak}</StatValueText>
             </StatRoot>
             <StatRoot size="sm">
-              <StatLabel color="app.textMuted">{t("habit.totalDays")}</StatLabel>
+              <StatLabel color="app.textMuted">
+                {t("habit.totalDays")}
+              </StatLabel>
               <StatValueText>{habit.windowEntries}</StatValueText>
             </StatRoot>
           </SimpleGrid>

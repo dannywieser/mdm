@@ -52,15 +52,15 @@ const AXIS_TICK_STYLE = { fill: "var(--chakra-colors-gray-500)", fontSize: 10 }
 export function HabitDetail() {
   const { habitId } = useParams<HabitDetailRouteParamKey>()
   const { t } = useI18n()
-  const { data } = useHabitQuery({ habitId: habitId ?? "" })
+  const { data: habit } = useHabitQuery({ habitId: habitId ?? "" })
   const heatDotCount = calculateHeatDotCount(
-    data.mode,
-    data.habitScore,
-    data.targetScore,
+    habit.mode,
+    habit.habitScore,
+    habit.targetScore,
   )
   const windowFillPercentage = calculateWindowFillPercentage(
-    data.windowEntries,
-    data.trackingWindowDays,
+    habit.windowEntries,
+    habit.trackingWindowDays,
   )
 
   return (
@@ -76,10 +76,7 @@ export function HabitDetail() {
       >
         <VStack align="stretch" gap={4}>
           <Text fontSize="lg" fontWeight="semibold" color="app.text">
-            {t(
-              data.mode === "do-more" ? "habit.modeDoMore" : "habit.modeDoLess",
-            )}
-            : {data.habitName}
+            {t(`habit.${habit.mode}`, { name: habit.habitName })}
           </Text>
 
           <Box
@@ -91,7 +88,7 @@ export function HabitDetail() {
             <VStack align="stretch" gap={3}>
               <Text fontSize="xs" color="app.textMuted" letterSpacing="wide">
                 {t("habit.currentTrackingWindow", {
-                  date: data.windowStart.replaceAll("-", "."),
+                  date: habit.windowStart.replaceAll("-", "."),
                 })}
               </Text>
               <StatRoot size="lg" textAlign="center">
@@ -123,16 +120,16 @@ export function HabitDetail() {
                         maxW="xs"
                       >
                         <VStack align="start" gap={1}>
-                          {data.targetScore !== undefined && (
+                          {habit.targetScore !== undefined && (
                             <Text fontSize="xs" color="app.textMuted">
                               {t("habit.scoreInfoTarget", {
-                                target: data.targetScore,
+                                target: habit.targetScore,
                               })}
                             </Text>
                           )}
                           <Text fontSize="xs" color="app.textMuted">
                             {t(
-                              data.mode === "do-less"
+                              habit.mode === "do-less"
                                 ? "habit.scoreInfoDoLess"
                                 : "habit.scoreInfoDoMore",
                             )}
@@ -144,16 +141,16 @@ export function HabitDetail() {
                 </Flex>
                 <Flex align="center" justify="center" gap={2}>
                   <HabitScoreValue
-                    mode={data.mode}
-                    score={data.habitScore}
-                    targetScore={data.targetScore}
+                    mode={habit.mode}
+                    score={habit.habitScore}
+                    targetScore={habit.targetScore}
                   />
                   <HeatDots count={heatDotCount} />
                 </Flex>
                 <Box mt={2} px={6}>
                   <HabitScoreProgress
-                    score={data.habitScore}
-                    targetScore={data.targetScore}
+                    score={habit.habitScore}
+                    targetScore={habit.targetScore}
                   />
                 </Box>
               </StatRoot>
@@ -164,7 +161,7 @@ export function HabitDetail() {
                     {t("habit.daysLogged")}
                   </StatLabel>
                   <Flex align="center" gap={2}>
-                    <StatValueText>{data.windowEntries}</StatValueText>
+                    <StatValueText>{habit.windowEntries}</StatValueText>
                     <Badge
                       variant="subtle"
                       bg="app.panelBackgroundHover"
@@ -178,9 +175,9 @@ export function HabitDetail() {
                 </StatRoot>
                 <StatRoot size="sm">
                   <StatLabel color="app.textMuted">
-                    {t("habit.currentStreak")}
+                    {t(`habit.${habit.mode}-streak`)}
                   </StatLabel>
-                  <StatValueText>{data.streak}</StatValueText>
+                  <StatValueText>{habit.streak}</StatValueText>
                 </StatRoot>
               </SimpleGrid>
             </VStack>
@@ -201,25 +198,27 @@ export function HabitDetail() {
                   <StatLabel color="app.textMuted">
                     {t("habit.highestScore")}
                   </StatLabel>
-                  <StatValueText>{data.allTimeHighScore}</StatValueText>
+                  <StatValueText>{habit.allTimeHighScore}</StatValueText>
                 </StatRoot>
                 <StatRoot size="sm">
                   <StatLabel color="app.textMuted">
                     {t("habit.bestStreak")}
                   </StatLabel>
-                  <StatValueText>{data.allTimeHighStreak}</StatValueText>
+                  <StatValueText>{habit.allTimeHighStreak}</StatValueText>
                 </StatRoot>
                 <StatRoot size="sm">
                   <StatLabel color="app.textMuted">
                     {t("habit.mostDaysLogged")}
                   </StatLabel>
-                  <StatValueText>{data.allTimeHighWindowEntries}</StatValueText>
+                  <StatValueText>
+                    {habit.allTimeHighWindowEntries}
+                  </StatValueText>
                 </StatRoot>
               </SimpleGrid>
             </VStack>
           </Box>
 
-          {data.history.length > 0 && (
+          {habit.history.length > 0 && (
             <Box>
               <Text
                 fontSize="xs"
@@ -231,7 +230,7 @@ export function HabitDetail() {
               </Text>
               <ResponsiveContainer width="100%" height={260}>
                 <ComposedChart
-                  data={data.history}
+                  data={habit.history}
                   margin={{ bottom: 4, left: 0, right: 0, top: 4 }}
                 >
                   <CartesianGrid
@@ -292,7 +291,7 @@ export function HabitDetail() {
             </Box>
           )}
 
-          {data.scoreEntries.length > 0 && (
+          {habit.scoreEntries.length > 0 && (
             <Collapsible.Root>
               <Collapsible.Trigger asChild>
                 <Flex
@@ -311,7 +310,10 @@ export function HabitDetail() {
                     },
                   }}
                 >
-                  <ChevronRight size={14} className="habit-score-entries-chevron" />
+                  <ChevronRight
+                    size={14}
+                    className="habit-score-entries-chevron"
+                  />
                   <Text fontSize="xs" letterSpacing="wide">
                     {t("habit.scoreEntries")}
                   </Text>
@@ -343,7 +345,7 @@ export function HabitDetail() {
                     </Table.Row>
                   </Table.Header>
                   <Table.Body>
-                    {data.scoreEntries.map((entry) => (
+                    {habit.scoreEntries.map((entry) => (
                       <Table.Row
                         key={entry.date}
                         bg="app.panelBackground"

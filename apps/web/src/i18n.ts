@@ -1,23 +1,22 @@
 import { createContext, createElement, type ReactNode, useContext } from "react"
 
-import type { Locale, TranslationKey } from "./i18n.types"
+export type Locale = "en"
 
-export type { TranslationKey } from "./i18n.types"
-
-const translations: Record<Locale, Record<TranslationKey, string>> = {
+const translations: Record<Locale, Record<string, string>> = {
   en: {
     "app.name": "mdm",
     "habit.backToHome": "back to home",
     "habit.bestStreak": "best streak",
-    "habit.currentStreak": "current streak",
     "habit.currentTrackingWindow": "current tracking window (since {date})",
     "habit.daysLogged": "days logged",
     "habit.entryDate": "date",
     "habit.entryValue": "value",
     "habit.heatLevel": "{count} heat",
     "habit.highestScore": "highest score",
-    "habit.modeDoLess": "do less",
-    "habit.modeDoMore": "do more",
+    "habit.do-less": "do less: {name}",
+    "habit.do-more": "do more: {name}",
+    "habit.do-more-streak": "streak of more",
+    "habit.do-less-streak": "streak of less",
     "habit.mostDaysLogged": "most days logged",
     "habit.newHigh": "new high!",
     "habit.personalRecords": "personal records",
