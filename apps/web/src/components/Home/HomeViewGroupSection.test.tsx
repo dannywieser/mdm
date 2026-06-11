@@ -23,6 +23,7 @@ describe("HomeViewGroupSection", () => {
                 group: "Library",
                 id: "books",
                 name: "Books",
+                noteIds: ["a", "b", "c", "d"],
               },
               {
                 component: "NotesList",
@@ -30,6 +31,7 @@ describe("HomeViewGroupSection", () => {
                 group: "Library",
                 id: "movies",
                 name: "Movies",
+                noteIds: ["e", "f", "g"],
               },
             ]}
           />

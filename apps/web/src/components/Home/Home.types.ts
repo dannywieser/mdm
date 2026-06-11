@@ -1,13 +1,13 @@
-import type { StatsViewCount } from "../../types/stats"
+import type { ViewSummary } from "../../types/views"
 
 export type HomeProps = Record<string, never>
 
 export interface ViewGroupSection {
   group: string
-  views: StatsViewCount[]
+  views: ViewSummary[]
 }
 
 export interface HomeViewGroupSectionProps {
   group: string | null
-  views: StatsViewCount[]
+  views: ViewSummary[]
 }

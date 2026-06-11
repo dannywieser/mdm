@@ -39,10 +39,10 @@ describe("getViewGridColumns", () => {
 describe("groupViewsByGroup", () => {
   test("returns ungrouped views and grouped sections preserving order", () => {
     const grouped = groupViewsByGroup([
-      { component: "NotesList", count: 1, id: "all", name: "All Notes" },
-      { component: "NotesList", count: 2, group: "Library", id: "books", name: "Books" },
-      { component: "NotesList", count: 3, group: "Writing", id: "drafts", name: "Drafts" },
-      { component: "NotesList", count: 4, group: "Library", id: "movies", name: "Movies" },
+      { component: "NotesList", count: 1, id: "all", name: "All Notes", noteIds: ["a"] },
+      { component: "NotesList", count: 2, group: "Library", id: "books", name: "Books", noteIds: ["b", "c"] },
+      { component: "NotesList", count: 3, group: "Writing", id: "drafts", name: "Drafts", noteIds: ["d", "e", "f"] },
+      { component: "NotesList", count: 4, group: "Library", id: "movies", name: "Movies", noteIds: ["g", "h", "i", "j"] },
     ])
 
     expect(grouped.ungroupedViews.map((view) => view.id)).toEqual(["all"])
@@ -50,14 +50,14 @@ describe("groupViewsByGroup", () => {
       {
         group: "Library",
         views: [
-          { component: "NotesList", count: 2, group: "Library", id: "books", name: "Books" },
-          { component: "NotesList", count: 4, group: "Library", id: "movies", name: "Movies" },
+          { component: "NotesList", count: 2, group: "Library", id: "books", name: "Books", noteIds: ["b", "c"] },
+          { component: "NotesList", count: 4, group: "Library", id: "movies", name: "Movies", noteIds: ["g", "h", "i", "j"] },
         ],
       },
       {
         group: "Writing",
         views: [
-          { component: "NotesList", count: 3, group: "Writing", id: "drafts", name: "Drafts" },
+          { component: "NotesList", count: 3, group: "Writing", id: "drafts", name: "Drafts", noteIds: ["d", "e", "f"] },
         ],
       },
     ])
@@ -65,9 +65,9 @@ describe("groupViewsByGroup", () => {
 
   test("skips views with a count of zero", () => {
     const grouped = groupViewsByGroup([
-      { component: "NotesList", count: 0, id: "empty", name: "Empty" },
-      { component: "NotesList", count: 0, group: "Library", id: "archived", name: "Archived" },
-      { component: "NotesList", count: 1, id: "all", name: "All Notes" },
+      { component: "NotesList", count: 0, id: "empty", name: "Empty", noteIds: [] },
+      { component: "NotesList", count: 0, group: "Library", id: "archived", name: "Archived", noteIds: [] },
+      { component: "NotesList", count: 1, id: "all", name: "All Notes", noteIds: ["a"] },
     ])
 
     expect(grouped.ungroupedViews.map((view) => view.id)).toEqual(["all"])
@@ -76,7 +76,7 @@ describe("groupViewsByGroup", () => {
 
   test("treats whitespace-only group values as ungrouped", () => {
     const grouped = groupViewsByGroup([
-      { component: "NotesList", count: 1, group: "   ", id: "all", name: "All Notes" },
+      { component: "NotesList", count: 1, group: "   ", id: "all", name: "All Notes", noteIds: ["a"] },
     ])
 
     expect(grouped.ungroupedViews.map((view) => view.id)).toEqual(["all"])

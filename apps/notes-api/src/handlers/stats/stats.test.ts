@@ -12,7 +12,6 @@ import {
   buildNotesCreated,
   buildNotesPerDay,
   buildTrends,
-  buildViewCounts,
   countFolders,
   countModifiedToday,
   countNotesWithoutCreatedDate,
@@ -51,7 +50,6 @@ vi.mock("./stats.util", () => ({
   buildNotesCreated: vi.fn(),
   buildNotesPerDay: vi.fn(),
   buildTrends: vi.fn(),
-  buildViewCounts: vi.fn(),
   countFolders: vi.fn(),
   countModifiedToday: vi.fn(),
   countNotesWithoutCreatedDate: vi.fn(),
@@ -66,7 +64,6 @@ const buildFolderBreakdownMock = vi.mocked(buildFolderBreakdown)
 const buildNotesCreatedMock = vi.mocked(buildNotesCreated)
 const buildNotesPerDayMock = vi.mocked(buildNotesPerDay)
 const buildTrendsMock = vi.mocked(buildTrends)
-const buildViewCountsMock = vi.mocked(buildViewCounts)
 const countFoldersMock = vi.mocked(countFolders)
 const countModifiedTodayMock = vi.mocked(countModifiedToday)
 const countNotesWithoutCreatedDateMock = vi.mocked(countNotesWithoutCreatedDate)
@@ -94,15 +91,7 @@ const mockConfig = {
   notesDirectory: "/notes",
   obsidianVault: "vault",
   timezone: "UTC",
-  views: [
-    {
-      badges: ["folder", "frontmatter.type"],
-      component: "NotesList",
-      filters: [{ "frontmatter.type": "book" }],
-      id: "books",
-      name: "Books",
-    },
-  ],
+  views: [],
 }
 
 const mockNote = {
@@ -126,15 +115,6 @@ describe("stats handler interface", () => {
     countFilesRecursiveMock.mockResolvedValue(12)
     countModifiedTodayMock.mockReturnValue(1)
     countFoldersMock.mockReturnValue(3)
-    buildViewCountsMock.mockReturnValue([
-      {
-        badges: ["folder", "frontmatter.type"],
-        component: "NotesList",
-        count: 5,
-        id: "books",
-        name: "Books",
-      },
-    ])
     buildFolderBreakdownMock.mockReturnValue([
       { count: 5, folder: "notes" },
     ])
@@ -170,15 +150,6 @@ describe("stats handler interface", () => {
       totalFolders: 3,
       totalNotes: 2,
       trends: { changePercent: 50, notesLast30Days: 3, notesPrevious30Days: 2 },
-      views: [
-        {
-          badges: ["folder", "frontmatter.type"],
-          component: "NotesList",
-          count: 5,
-          id: "books",
-          name: "Books",
-        },
-      ],
     })
   })
 
@@ -188,11 +159,6 @@ describe("stats handler interface", () => {
 
     await request(app).get("/stats")
 
-    expect(buildViewCountsMock).toHaveBeenCalledWith(
-      expect.any(Array),
-      mockConfig.views,
-      { dateFormats: mockConfig.dateFormats, timezone: mockConfig.timezone },
-    )
     expect(countModifiedTodayMock).toHaveBeenCalledWith(
       expect.any(Array),
       mockConfig.timezone,

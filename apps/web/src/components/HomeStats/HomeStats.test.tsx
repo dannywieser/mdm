@@ -49,7 +49,6 @@ const defaultData = {
   totalFolders: 8,
   totalNotes: 200,
   trends: { changePercent: 22, notesLast30Days: 11, notesPrevious30Days: 9 },
-  views: [],
 }
 
 const renderComponent = (data = defaultData) => {

@@ -1,18 +1,12 @@
-import type { NotesView } from "app-config"
-
 import { getDateComponents } from "mdm-util"
 
-import type { ViewFilterContext } from "../notes/filters/notes.filters.types"
 import type { ScannedNote } from "../notes/notes.types"
 import type {
   FolderCount,
   NotePerDay,
   NotesCreatedStats,
   StatsTrends,
-  StatsViewCount,
 } from "./stats.types"
-
-import { applyViewFilter } from "../notes/filters/notes.filters"
 
 export const countModifiedToday = (
   notes: readonly ScannedNote[],
@@ -28,22 +22,6 @@ export const countModifiedToday = (
     )
   }).length
 }
-
-export const buildViewCounts = (
-  notes: readonly ScannedNote[],
-  views: readonly NotesView[],
-  context: ViewFilterContext,
-): StatsViewCount[] =>
-  views.map((view) => ({
-    aspectRatio: view.aspectRatio,
-    badges: view.badges,
-    component: view.component,
-    count: applyViewFilter(notes, views, view.id, context).length,
-    group: view.group,
-    id: view.id,
-    layout: view.layout,
-    name: view.name,
-  }))
 
 export const countFolders = (notes: readonly ScannedNote[]): number =>
   new Set(notes.map((note) => note.folder)).size

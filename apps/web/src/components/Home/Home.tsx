@@ -1,7 +1,7 @@
 import { Box, Heading, Separator, SimpleGrid, VStack } from "@chakra-ui/react"
 
 import { useHabitsQuery } from "../../hooks/useHabitsQuery/useHabitsQuery"
-import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
+import { useViewsQuery } from "../../hooks/useViewsQuery/useViewsQuery"
 import { useI18n } from "../../i18n"
 
 import { HabitCard } from "../HabitCard/HabitCard"
@@ -11,7 +11,7 @@ import { getViewGridColumns, groupViewsByGroup } from "./Home.util"
 
 export function Home() {
   const { t } = useI18n()
-  const { data, isLoading } = useStatsQuery({})
+  const { data, isLoading } = useViewsQuery({})
   const { data: habits } = useHabitsQuery()
   const groupedViews = data ? groupViewsByGroup(data.views) : undefined
 

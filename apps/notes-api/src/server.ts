@@ -6,6 +6,7 @@ import morgan from "morgan"
 import { healthHandler } from "./handlers/health/health"
 import { notesHandler } from "./handlers/notes/notes"
 import { statsHandler } from "./handlers/stats/stats"
+import { viewsHandler } from "./handlers/views/views"
 
 export const createApp = () => {
   const app = express()
@@ -15,6 +16,7 @@ export const createApp = () => {
   app.get("/health", healthHandler)
   app.get("/notes", notesHandler)
   app.get("/stats", statsHandler)
+  app.get("/views", viewsHandler)
 
   return app
 }

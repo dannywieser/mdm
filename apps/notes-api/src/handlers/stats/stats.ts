@@ -13,7 +13,6 @@ import {
   buildNotesCreated,
   buildNotesPerDay,
   buildTrends,
-  buildViewCounts,
   countFolders,
   countModifiedToday,
   countNotesWithoutCreatedDate,
@@ -33,7 +32,6 @@ export const statsHandler: RequestHandler = async (_request, response) => {
       notesDirectory,
       obsidianVault,
       timezone,
-      views,
     } = notesConfig
 
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).sort()
@@ -44,7 +42,6 @@ export const statsHandler: RequestHandler = async (_request, response) => {
     )
 
     const now = new Date()
-    const context = { dateFormats, timezone }
     const attachmentsPath = path.join(notesDirectory, attachmentsDirectory)
     const totalAttachments = await countFilesRecursive(attachmentsPath)
 
@@ -59,7 +56,6 @@ export const statsHandler: RequestHandler = async (_request, response) => {
       totalFolders: countFolders(scannedNotes),
       totalNotes: scannedNotes.length,
       trends: buildTrends(scannedNotes, now),
-      views: buildViewCounts(scannedNotes, views, context),
     })
   } catch (error) {
     if (error instanceof AppConfigError) {

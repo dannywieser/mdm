@@ -1,7 +1,7 @@
 import type { ComponentType } from "react"
 import { useParams } from "react-router-dom"
 
-import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
+import { useViewsQuery } from "../../hooks/useViewsQuery/useViewsQuery"
 
 import { NotesGallery } from "../NotesGallery/NotesGallery"
 import { NotesGalleryByMonth } from "../NotesGalleryByMonth/NotesGalleryByMonth"
@@ -32,7 +32,7 @@ const VIEW_COMPONENTS: Record<ViewComponentName, ComponentType<ViewComponentProp
 
 export const NotesView = () => {
   const { view } = useParams<NotesViewRouteParamKey>()
-  const { data } = useStatsQuery({})
+  const { data } = useViewsQuery({})
 
   const configuredView = data.views.find(({ id }) => id === view)
   const componentName = configuredView?.component as ViewComponentName | undefined

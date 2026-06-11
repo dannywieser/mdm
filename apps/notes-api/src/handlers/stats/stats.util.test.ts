@@ -2,25 +2,19 @@ import { getDateComponents } from "mdm-util"
 
 import type { ScannedNote } from "../notes/notes.types"
 
-import { applyViewFilter } from "../notes/filters/notes.filters"
 import {
   buildFolderBreakdown,
   buildNotesCreated,
   buildNotesPerDay,
   buildTrends,
-  buildViewCounts,
   countFolders,
   countModifiedToday,
   countNotesWithoutCreatedDate,
 } from "./stats.util"
 
 vi.mock("mdm-util", () => ({ getDateComponents: vi.fn() }))
-vi.mock("../notes/filters/notes.filters", () => ({
-  applyViewFilter: vi.fn(),
-}))
 
 const getDateComponentsMock = vi.mocked(getDateComponents)
-const applyViewFilterMock = vi.mocked(applyViewFilter)
 
 const createNote = (
   overrides: Partial<ScannedNote> & { modifiedDate: string },
@@ -63,71 +57,6 @@ describe("stats util", () => {
       const notes = [createNote({ modifiedDate: "2026-05-31T10:00:00.000Z" })]
 
       expect(countModifiedToday(notes, "UTC")).toBe(0)
-    })
-  })
-
-  describe("buildViewCounts", () => {
-    test("returns a count per configured view", () => {
-      const notes = [createNote({ modifiedDate: "2026-06-01T10:00:00.000Z" })]
-      const views = [
-        {
-          badges: ["folder", "frontmatter.type"],
-          component: "NotesList",
-          filters: [{ "frontmatter.type": "book" }],
-          id: "books",
-          name: "Books",
-        },
-        {
-          component: "NotesReview",
-          filters: [{ "frontmatter.type": "game" }],
-          id: "games",
-          name: "Games",
-        },
-      ]
-      const context = { dateFormats: [], timezone: "UTC" }
-
-      applyViewFilterMock
-        .mockReturnValueOnce([notes[0]])
-        .mockReturnValueOnce([])
-
-      const result = buildViewCounts(notes, views, context)
-
-      expect(result).toEqual([
-        {
-          badges: ["folder", "frontmatter.type"],
-          component: "NotesList",
-          count: 1,
-          id: "books",
-          name: "Books",
-        },
-        {
-          component: "NotesReview",
-          count: 0,
-          id: "games",
-          name: "Games",
-        },
-      ])
-      expect(applyViewFilterMock).toHaveBeenCalledWith(
-        notes,
-        views,
-        "books",
-        context,
-      )
-      expect(applyViewFilterMock).toHaveBeenCalledWith(
-        notes,
-        views,
-        "games",
-        context,
-      )
-    })
-
-    test("returns an empty array when there are no views", () => {
-      const notes = [createNote({ modifiedDate: "2026-06-01T10:00:00.000Z" })]
-
-      expect(
-        buildViewCounts(notes, [], { dateFormats: [], timezone: "UTC" }),
-      ).toEqual([])
-      expect(applyViewFilterMock).not.toHaveBeenCalled()
     })
   })
 
