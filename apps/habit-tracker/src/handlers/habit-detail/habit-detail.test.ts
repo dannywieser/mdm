@@ -1,10 +1,11 @@
 import { AppConfigError, resolveNotesConfig } from "app-config"
+import { collectMarkdownFiles } from "markdown"
 import { addDays } from "mdm-util"
 
 import type { HabitEntry, HabitResult } from "./habit-detail.types"
 
 import { habitDetailHandler } from "./habit-detail"
-import { collectMarkdownFiles, scanHabitEntries } from "./habit-detail.files"
+import { scanHabitEntries } from "./habit-detail.files"
 import {
   buildHistory,
   buildScoreEntries,
@@ -24,8 +25,15 @@ vi.mock("app-config", () => ({
   resolveNotesConfig: vi.fn(),
 }))
 
+vi.mock("markdown", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("markdown")>()
+  return {
+    ...actual,
+    collectMarkdownFiles: vi.fn(),
+  }
+})
+
 vi.mock("./habit-detail.files", () => ({
-  collectMarkdownFiles: vi.fn(),
   scanHabitEntries: vi.fn(),
 }))
 

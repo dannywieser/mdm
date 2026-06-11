@@ -2,10 +2,10 @@ import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler } from "express"
 
 import { AppConfigError, resolveNotesConfig } from "app-config"
+import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 import path from "node:path"
 
-import { collectMarkdownFiles } from "../notes/notes.files"
 import { scanMarkdownFile } from "../notes/notes.scan"
 import { countFilesRecursive } from "./stats.files"
 import {

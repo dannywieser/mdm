@@ -1,5 +1,6 @@
 import { AppConfigError, resolveNotesConfig } from "app-config"
 import express from "express"
+import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
@@ -7,7 +8,6 @@ import type { ScannedNote } from "./notes.types"
 
 import { applyViewFilter } from "./filters/notes.filters"
 import { notesHandler } from "./notes"
-import { collectMarkdownFiles } from "./notes.files"
 import { parseMarkdownFile } from "./notes.parse"
 import { scanMarkdownFile } from "./notes.scan"
 
@@ -21,12 +21,16 @@ vi.mock("app-config", async () => {
   }
 })
 
+vi.mock("markdown", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("markdown")>()
+  return {
+    ...actual,
+    collectMarkdownFiles: vi.fn(),
+  }
+})
+
 vi.mock("mdm-util", () => ({
   toLoggableError: vi.fn(),
-}))
-
-vi.mock("./notes.files", () => ({
-  collectMarkdownFiles: vi.fn(),
 }))
 
 vi.mock("./filters/notes.filters", () => ({

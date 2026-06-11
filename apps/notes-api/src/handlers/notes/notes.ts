@@ -2,10 +2,10 @@ import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler } from "express"
 
 import { AppConfigError, resolveNotesConfig } from "app-config"
+import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 
 import { applyViewFilter } from "./filters/notes.filters"
-import { collectMarkdownFiles } from "./notes.files"
 import { EMPTY_MARKDOWN_NODE, parseMarkdownFile } from "./notes.parse"
 import { scanMarkdownFile } from "./notes.scan"
 

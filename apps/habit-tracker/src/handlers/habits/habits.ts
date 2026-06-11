@@ -2,11 +2,12 @@ import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler } from "express"
 
 import { AppConfigError, resolveNotesConfig } from "app-config"
+import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 
 import type { HabitSummary } from "./habits.types"
 
-import { collectMarkdownFiles, scanHabitEntries } from "../habit-detail/habit-detail.files"
+import { scanHabitEntries } from "../habit-detail/habit-detail.files"
 import { calculateHabitScore } from "../habit-detail/habit-detail.util"
 
 export const habitsHandler: RequestHandler = async (_request, response) => {
