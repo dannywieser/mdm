@@ -13,7 +13,13 @@ import {
 } from "@chakra-ui/react"
 import { formatDate } from "mdm-util"
 import { type ReactNode } from "react"
-import { Link, useLocation, useMatch, useNavigate, useParams } from "react-router-dom"
+import {
+  Link,
+  useLocation,
+  useMatch,
+  useNavigate,
+  useParams,
+} from "react-router-dom"
 
 const RouterLink = chakra(Link)
 import { BarChart2, X } from "lucide-react"
@@ -32,9 +38,9 @@ function HeaderShell({ left, right }: { left: ReactNode; right: ReactNode }) {
       borderBottomColor="app.border"
       borderBottomWidth="1px"
       position="sticky"
-      px={4}
+      px={2}
       py={1}
-      minH="32px"
+      minH="42px"
       top={0}
       zIndex="sticky"
       backgroundColor="app.background"
@@ -55,11 +61,7 @@ export function HeaderSkeleton() {
           {t("app.name")}
         </Text>
       }
-      right={
-        <Text fontSize="sm" color="app.text" fontWeight="bold">
-          {formatDate(new Date())}
-        </Text>
-      }
+      right={null}
     />
   )
 }
@@ -90,7 +92,11 @@ export function Header() {
             {isStatsPage ? (
               <>
                 <BreadcrumbItem>
-                  <BreadcrumbLink asChild fontWeight="semibold" color="app.text">
+                  <BreadcrumbLink
+                    asChild
+                    fontWeight="semibold"
+                    color="app.text"
+                  >
                     <Link to="/">{t("app.name")}</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -104,7 +110,11 @@ export function Header() {
             ) : isColorsPage ? (
               <>
                 <BreadcrumbItem>
-                  <BreadcrumbLink asChild fontWeight="semibold" color="app.text">
+                  <BreadcrumbLink
+                    asChild
+                    fontWeight="semibold"
+                    color="app.text"
+                  >
                     <Link to="/">{t("app.name")}</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -118,7 +128,11 @@ export function Header() {
             ) : currentView ? (
               <>
                 <BreadcrumbItem>
-                  <BreadcrumbLink asChild fontWeight="semibold" color="app.text">
+                  <BreadcrumbLink
+                    asChild
+                    fontWeight="semibold"
+                    color="app.text"
+                  >
                     <Link to="/">{t("app.name")}</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -132,7 +146,11 @@ export function Header() {
             ) : habitMatch ? (
               <>
                 <BreadcrumbItem>
-                  <BreadcrumbLink asChild fontWeight="semibold" color="app.text">
+                  <BreadcrumbLink
+                    asChild
+                    fontWeight="semibold"
+                    color="app.text"
+                  >
                     <Link to="/">{t("app.name")}</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>

@@ -18,23 +18,27 @@
     <meta name="apple-mobile-web-app-title" content="mdm" />
     <link rel="manifest" href="/site.webmanifest?v=20260609" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#fbf1c7" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#282a36" media="(prefers-color-scheme: dark)" />
+    <meta
+      name="theme-color"
+      content="#fbf1c7"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#282a36"
+      media="(prefers-color-scheme: dark)"
+    />
     <title>mdm</title>
     <style>
-      :root {
-        --splash-bg: #fbf1c7;
-        --splash-border: #d5c4a1;
-        --splash-text: #3c3836;
-        --splash-icon: #427b58;
+      body {
+        margin: 0;
+        padding: 0;
       }
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --splash-bg: #282a36;
-          --splash-border: #44475a;
-          --splash-text: #f8f8f2;
-          --splash-icon: #8be9fd;
-        }
+      :root {
+        --splash-bg: #fff;
+        --splash-border: #000;
+        --splash-text: #000;
+        --splash-icon: #000;
       }
       html.splash-loading,
       html.splash-loading body {
@@ -50,11 +54,11 @@
       .splash-header {
         display: flex;
         align-items: center;
-        height: 40px;
-        padding: 0 16px;
+        height: 42px;
+        padding: 0 8px;
         border-bottom: 1px solid var(--splash-border);
         color: var(--splash-text);
-        font-family: 'Anonymous Pro', monospace;
+        font-family: "Anonymous Pro", monospace;
         font-size: 14px;
         font-weight: 600;
       }
@@ -66,156 +70,23 @@
         color: var(--splash-icon);
         box-sizing: border-box;
       }
-      @keyframes splash-rect {
-        0% {
-          stroke-dashoffset: 72;
-          animation-timing-function: ease-out;
-        }
-        38% {
-          stroke-dashoffset: 0;
-          animation-timing-function: linear;
-        }
-        88% {
-          stroke-dashoffset: 0;
-          animation-timing-function: ease-in;
-        }
+      @keyframes splash-pulse {
+        0%,
         100% {
-          stroke-dashoffset: 72;
+          transform: scale(0.8);
+          opacity: 0.6;
+        }
+        50% {
+          transform: scale(1);
+          opacity: 1;
         }
       }
-      @keyframes splash-vline {
-        0% {
-          stroke-dashoffset: 22;
-        }
-        38% {
-          stroke-dashoffset: 22;
-          animation-timing-function: ease-out;
-        }
-        48% {
-          stroke-dashoffset: 0;
-          animation-timing-function: linear;
-        }
-        88% {
-          stroke-dashoffset: 0;
-          animation-timing-function: ease-in;
-        }
-        100% {
-          stroke-dashoffset: 22;
-        }
-      }
-      @keyframes splash-hline1 {
-        0% {
-          stroke-dashoffset: 6;
-        }
-        48% {
-          stroke-dashoffset: 6;
-          animation-timing-function: ease-out;
-        }
-        54% {
-          stroke-dashoffset: 0;
-          animation-timing-function: linear;
-        }
-        88% {
-          stroke-dashoffset: 0;
-          animation-timing-function: ease-in;
-        }
-        100% {
-          stroke-dashoffset: 6;
-        }
-      }
-      @keyframes splash-hline2 {
-        0% {
-          stroke-dashoffset: 6;
-        }
-        54% {
-          stroke-dashoffset: 6;
-          animation-timing-function: ease-out;
-        }
-        60% {
-          stroke-dashoffset: 0;
-          animation-timing-function: linear;
-        }
-        88% {
-          stroke-dashoffset: 0;
-          animation-timing-function: ease-in;
-        }
-        100% {
-          stroke-dashoffset: 6;
-        }
-      }
-      @keyframes splash-hline3 {
-        0% {
-          stroke-dashoffset: 6;
-        }
-        60% {
-          stroke-dashoffset: 6;
-          animation-timing-function: ease-out;
-        }
-        66% {
-          stroke-dashoffset: 0;
-          animation-timing-function: linear;
-        }
-        88% {
-          stroke-dashoffset: 0;
-          animation-timing-function: ease-in;
-        }
-        100% {
-          stroke-dashoffset: 6;
-        }
-      }
-      @keyframes splash-hline4 {
-        0% {
-          stroke-dashoffset: 6;
-        }
-        66% {
-          stroke-dashoffset: 6;
-          animation-timing-function: ease-out;
-        }
-        72% {
-          stroke-dashoffset: 0;
-          animation-timing-function: linear;
-        }
-        88% {
-          stroke-dashoffset: 0;
-          animation-timing-function: ease-in;
-        }
-        100% {
-          stroke-dashoffset: 6;
-        }
-      }
-      .splash-icon rect,
-      .splash-icon path {
-        animation: 2.4s infinite;
-      }
-      .splash-icon rect {
-        stroke-dasharray: 72;
-        stroke-dashoffset: 72;
-        animation-name: splash-rect;
-      }
-      .splash-icon path:nth-of-type(1) {
-        stroke-dasharray: 22;
-        stroke-dashoffset: 22;
-        animation-name: splash-vline;
-      }
-      .splash-icon path:nth-of-type(2) {
-        stroke-dasharray: 6;
-        stroke-dashoffset: 6;
-        animation-name: splash-hline1;
-      }
-      .splash-icon path:nth-of-type(3) {
-        stroke-dasharray: 6;
-        stroke-dashoffset: 6;
-        animation-name: splash-hline2;
-      }
-      .splash-icon path:nth-of-type(4) {
-        stroke-dasharray: 6;
-        stroke-dashoffset: 6;
-        animation-name: splash-hline3;
-      }
-      .splash-icon path:nth-of-type(5) {
-        stroke-dasharray: 6;
-        stroke-dashoffset: 6;
-        animation-name: splash-hline4;
+      .splash-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--splash-icon);
+        animation: splash-pulse 1.2s ease-in-out infinite;
       }
     </style>
   </head>
@@ -224,24 +95,7 @@
       <div class="splash-shell" aria-hidden="true">
         <header class="splash-header">mdm</header>
         <div class="splash-icon">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="80px"
-            height="80px"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <rect width="16" height="20" x="4" y="2" rx="2" />
-            <path d="M16 2v20" />
-            <path d="M2 6h4" />
-            <path d="M2 10h4" />
-            <path d="M2 14h4" />
-            <path d="M2 18h4" />
-          </svg>
+          <div class="splash-dot"></div>
         </div>
       </div>
     </div>
