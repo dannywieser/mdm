@@ -1,5 +1,15 @@
 # markdown
 
+## 1.7.0
+
+### Minor Changes
+
+- 88032d0: Moved shared markdown file-loading helpers (`collectMarkdownFiles`, `buildObsidianUrl`, `resolveDateFromFrontmatterOrTitle`) into the `markdown` package and updated `notes-api` and `habit-tracker` to use them, removing duplicated implementations.
+
+### Patch Changes
+
+- mdm-util@1.7.0
+
 ## 1.6.1
 
 ### Patch Changes
