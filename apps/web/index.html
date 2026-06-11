@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="splash-loading">
   <head>
     <meta charset="UTF-8" />
     <link
@@ -36,14 +36,21 @@
           --splash-icon: #8be9fd;
         }
       }
-      html,
-      body {
+      html.splash-loading,
+      html.splash-loading body {
         background: var(--splash-bg);
+      }
+      .splash-shell {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        min-height: 100dvh;
+        box-sizing: border-box;
       }
       .splash-header {
         display: flex;
         align-items: center;
-        height: 33px;
+        height: 40px;
         padding: 0 16px;
         border-bottom: 1px solid var(--splash-border);
         color: var(--splash-text);
@@ -53,9 +60,11 @@
       }
       .splash-icon {
         display: flex;
+        width: 100%;
         justify-content: center;
         padding-top: 64px;
         color: var(--splash-icon);
+        box-sizing: border-box;
       }
       @keyframes splash-rect {
         0% {
@@ -212,7 +221,7 @@
   </head>
   <body>
     <div id="root">
-      <div aria-hidden="true">
+      <div class="splash-shell" aria-hidden="true">
         <header class="splash-header">mdm</header>
         <div class="splash-icon">
           <svg

@@ -24,3 +24,5 @@ createRoot(document.getElementById('root')!).render(
     </ColorPaletteProvider>
   </StrictMode>
 )
+
+document.documentElement.classList.remove('splash-loading')
