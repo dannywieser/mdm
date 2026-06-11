@@ -8,7 +8,7 @@ import type { UseHabitQueryParams } from "./useHabitQuery.types"
 const HABIT_API_BASE_URL = import.meta.env.VITE_HABIT_API_BASE_URL ?? ""
 
 const fetchHabit = async (habitId: string): Promise<HabitResult> => {
-  const response = await fetch(`${HABIT_API_BASE_URL}/habit/${encodeURIComponent(habitId)}`)
+  const response = await fetch(`${HABIT_API_BASE_URL}/habits/${encodeURIComponent(habitId)}`)
 
   if (!response.ok) {
     throw new Error(translate("errors.unableToLoadHabit"))

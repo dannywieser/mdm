@@ -1,6 +1,6 @@
 import type { NoteFrontmatter } from "markdown"
 
-import { parseDateString, parseFrontMatter, parseMarkdownBodyDates } from "markdown"
+import { buildObsidianUrl, parseFrontMatter, parseMarkdownBodyDates, resolveDateFromFrontmatterOrTitle } from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
 import path from "node:path"
@@ -16,23 +16,8 @@ export const resolveCreatedDate = (
   deriveTitleDate: boolean,
   dateFormats: readonly string[],
 ): string | null => {
-  const fmValue = frontmatter?.[createdDateProperty]
-  if (typeof fmValue === "string") {
-    const fmFormatParsed = parseDateString(fmValue, dateFormats)
-    if (fmFormatParsed) return fmFormatParsed.toISOString()
-    const isoDate = new Date(fmValue)
-    if (!isNaN(isoDate.getTime())) return isoDate.toISOString()
-  }
-
-  if (deriveTitleDate) {
-    const titleDates = parseMarkdownBodyDates(title, dateFormats)
-    if (titleDates.length > 0) {
-      const parsed = parseDateString(titleDates[0] ?? "", dateFormats)
-      if (parsed) return parsed.toISOString()
-    }
-  }
-
-  return null
+  const date = resolveDateFromFrontmatterOrTitle(frontmatter, title, createdDateProperty, deriveTitleDate, dateFormats)
+  return date ? date.toISOString() : null
 }
 
 const extractFrontmatterDates = (
@@ -66,14 +51,7 @@ export const scanMarkdownFile = async (
     ]),
   )
 
-  const relativePath = path.relative(notesDirectory, filePath)
-  const normalizedRelativePath = relativePath.split(path.sep).join("/")
-  const relativePathWithoutExtension = normalizedRelativePath.replace(/\.[^.]+$/, "")
-  const escapedFilePath = relativePathWithoutExtension
-    .split("/")
-    .map((segment) => encodeURI(segment))
-    .join("%2F")
-  const obsidianUrl = `obsidian://open?vault=${encodeURIComponent(obsidianVault)}&file=${escapedFilePath}`
+  const obsidianUrl = buildObsidianUrl(obsidianVault, notesDirectory, filePath)
 
   return {
     basename,

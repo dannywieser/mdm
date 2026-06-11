@@ -1,34 +1,8 @@
-import { parseDateString, parseFrontMatter, parseMarkdownBodyDates } from "markdown"
+import { buildObsidianUrl, parseFrontMatter, resolveDateFromFrontmatterOrTitle } from "markdown"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 
-import type { HabitEntry } from "./habit.types"
-
-const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
-
-export const collectMarkdownFiles = async (directory: string): Promise<string[]> => {
-  const entries = await fs.readdir(directory, { withFileTypes: true })
-  const nestedPaths = await Promise.all(
-    entries.map(async (entry) => {
-      const fullPath = path.join(directory, entry.name)
-      if (entry.isDirectory()) return collectMarkdownFiles(fullPath)
-      if (entry.isFile() && MARKDOWN_FILE_PATTERN.test(entry.name)) return [fullPath]
-      return []
-    }),
-  )
-  return nestedPaths.flat()
-}
-
-const buildObsidianUrl = (obsidianVault: string, notesDirectory: string, filePath: string): string => {
-  const relativePath = path.relative(notesDirectory, filePath)
-  const normalizedRelativePath = relativePath.split(path.sep).join("/")
-  const relativePathWithoutExtension = normalizedRelativePath.replace(/\.[^.]+$/, "")
-  const escapedFilePath = relativePathWithoutExtension
-    .split("/")
-    .map((segment) => encodeURI(segment))
-    .join("%2F")
-  return `obsidian://open?vault=${encodeURIComponent(obsidianVault)}&file=${escapedFilePath}`
-}
+import type { HabitEntry } from "./habit-detail.types"
 
 const resolveNoteDate = (
   frontmatter: Record<string, string | string[]> | null,
@@ -37,22 +11,9 @@ const resolveNoteDate = (
   deriveTitleDate: boolean,
   dateFormats: readonly string[],
 ): string | null => {
-  const fmValue = frontmatter?.[createdDateProperty]
-  if (typeof fmValue === "string") {
-    const fmParsed = parseDateString(fmValue, dateFormats)
-    if (fmParsed) return fmParsed.toISOString().slice(0, 10)
-    const isoDate = new Date(fmValue)
-    if (!isNaN(isoDate.getTime())) return isoDate.toISOString().slice(0, 10)
-  }
-  if (deriveTitleDate) {
-    const title = basename.replace(/\.[^.]+$/, "")
-    const titleDates = parseMarkdownBodyDates(title, dateFormats)
-    if (titleDates.length > 0) {
-      const parsed = parseDateString(titleDates[0] ?? "", dateFormats)
-      if (parsed) return parsed.toISOString().slice(0, 10)
-    }
-  }
-  return null
+  const title = basename.replace(/\.[^.]+$/, "")
+  const date = resolveDateFromFrontmatterOrTitle(frontmatter, title, createdDateProperty, deriveTitleDate, dateFormats)
+  return date ? date.toISOString().slice(0, 10) : null
 }
 
 export const scanHabitEntries = async (

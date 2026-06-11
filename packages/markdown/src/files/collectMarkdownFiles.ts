@@ -3,9 +3,14 @@ import path from "node:path"
 
 const MARKDOWN_FILE_PATTERN = /\.(md|markdown)$/i
 
-export const collectMarkdownFiles = async (
-  directory: string,
-): Promise<string[]> => {
+/**
+ * Recursively collects the absolute paths of all markdown (`.md`/`.markdown`)
+ * files within `directory`, including nested subdirectories.
+ *
+ * @param directory - Absolute path to the directory to search.
+ * @returns Absolute paths of every markdown file found.
+ */
+export const collectMarkdownFiles = async (directory: string): Promise<string[]> => {
   const entries = await fs.readdir(directory, { withFileTypes: true })
   const nestedPaths = await Promise.all(
     entries.map(async (entry) => {

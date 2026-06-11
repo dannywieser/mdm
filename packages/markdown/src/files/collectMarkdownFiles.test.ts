@@ -2,7 +2,7 @@ import type { Mock } from "vitest"
 
 import { promises as fs, type Dirent } from "node:fs"
 
-import { collectMarkdownFiles } from "./notes.files"
+import { collectMarkdownFiles } from "./collectMarkdownFiles"
 
 vi.mock("node:fs", () => ({
   promises: {
@@ -19,8 +19,8 @@ const createDirent = (name: string, type: "file" | "directory"): Dirent =>
     isFile: () => type === "file",
   }) as Dirent
 
-describe("notes file helpers", () => {
-  test("collectMarkdownFiles finds markdown files recursively", async () => {
+describe("collectMarkdownFiles", () => {
+  test("recursively finds markdown files and ignores non-markdown files", async () => {
     readdirMock
       .mockResolvedValueOnce([
         createDirent("root.md", "file"),
@@ -42,14 +42,8 @@ describe("notes file helpers", () => {
         "/notes/nested/deep/upper.MD",
       ].sort(),
     )
-    expect(readdirMock).toHaveBeenNthCalledWith(1, "/notes", {
-      withFileTypes: true,
-    })
-    expect(readdirMock).toHaveBeenNthCalledWith(2, "/notes/nested", {
-      withFileTypes: true,
-    })
-    expect(readdirMock).toHaveBeenNthCalledWith(3, "/notes/nested/deep", {
-      withFileTypes: true,
-    })
+    expect(readdirMock).toHaveBeenNthCalledWith(1, "/notes", { withFileTypes: true })
+    expect(readdirMock).toHaveBeenNthCalledWith(2, "/notes/nested", { withFileTypes: true })
+    expect(readdirMock).toHaveBeenNthCalledWith(3, "/notes/nested/deep", { withFileTypes: true })
   })
 })

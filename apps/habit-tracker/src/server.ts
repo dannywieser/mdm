@@ -1,7 +1,7 @@
 import express from "express"
 import morgan from "morgan"
 
-import { habitHandler } from "./handlers/habit/habit"
+import { habitDetailHandler } from "./handlers/habit-detail/habit-detail"
 import { habitsHandler } from "./handlers/habits/habits"
 import { healthHandler } from "./handlers/health/health"
 
@@ -12,7 +12,7 @@ export const createApp = () => {
 
   app.get("/health", healthHandler)
   app.get("/habits", habitsHandler)
-  app.get("/habit/:id", habitHandler)
+  app.get("/habits/:id", habitDetailHandler)
 
   return app
 }

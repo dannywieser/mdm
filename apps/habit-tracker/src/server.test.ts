@@ -2,7 +2,7 @@ import type { RequestHandler } from "express"
 
 import request from "supertest"
 
-import { habitHandler } from "./handlers/habit/habit"
+import { habitDetailHandler } from "./handlers/habit-detail/habit-detail"
 import { habitsHandler } from "./handlers/habits/habits"
 import { healthHandler } from "./handlers/health/health"
 import { createApp } from "./server"
@@ -11,8 +11,8 @@ vi.mock("./handlers/health/health", () => ({
   healthHandler: vi.fn(),
 }))
 
-vi.mock("./handlers/habit/habit", () => ({
-  habitHandler: vi.fn(),
+vi.mock("./handlers/habit-detail/habit-detail", () => ({
+  habitDetailHandler: vi.fn(),
 }))
 
 vi.mock("./handlers/habits/habits", () => ({
@@ -20,7 +20,7 @@ vi.mock("./handlers/habits/habits", () => ({
 }))
 
 const healthHandlerMock = vi.mocked(healthHandler)
-const habitHandlerMock = vi.mocked(habitHandler)
+const habitDetailHandlerMock = vi.mocked(habitDetailHandler)
 const habitsHandlerMock = vi.mocked(habitsHandler)
 
 describe("habit-tracker server interface", () => {
@@ -38,19 +38,19 @@ describe("habit-tracker server interface", () => {
     expect(healthHandlerMock).toHaveBeenCalledTimes(1)
   })
 
-  test("wires GET /habit/:id to the habit handler", async () => {
+  test("wires GET /habits/:id to the habit detail handler", async () => {
     const handler: RequestHandler = (_request, response) => {
       response.status(200).json({})
     }
-    habitHandlerMock.mockImplementation(handler)
+    habitDetailHandlerMock.mockImplementation(handler)
 
     const app = createApp()
 
-    const response = await request(app).get("/habit/morning-routine")
+    const response = await request(app).get("/habits/morning-routine")
 
     expect(response.status).toBe(200)
     expect(response.body).toEqual({})
-    expect(habitHandlerMock).toHaveBeenCalledTimes(1)
+    expect(habitDetailHandlerMock).toHaveBeenCalledTimes(1)
   })
 
   test("wires GET /habits to the habits handler", async () => {

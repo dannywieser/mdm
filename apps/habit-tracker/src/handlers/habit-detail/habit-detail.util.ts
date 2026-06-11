@@ -2,7 +2,7 @@ import type { HabitMode } from "app-config"
 
 import { addDays, buildDateRange, daysBetween, getDateWindowStart } from "mdm-util"
 
-import type { HabitEntry, HabitHistoryEntry, HabitScoreEntry, HabitScoreResult, HabitStreak } from "./habit.types"
+import type { HabitEntry, HabitHistoryEntry, HabitScoreEntry, HabitScoreResult, HabitStreak } from "./habit-detail.types"
 
 const RECENT_WINDOW_DAYS = 14
 const RECENT_MULTIPLIER = 10

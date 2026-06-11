@@ -1,9 +1,9 @@
 import { AppConfigError, resolveNotesConfig } from "app-config"
 import express from "express"
+import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
-import { collectMarkdownFiles } from "../notes/notes.files"
 import { scanMarkdownFile } from "../notes/notes.scan"
 import { statsHandler } from "./stats"
 import { countFilesRecursive } from "./stats.files"
@@ -30,9 +30,13 @@ vi.mock("app-config", async () => {
 
 vi.mock("mdm-util", () => ({ toLoggableError: vi.fn() }))
 
-vi.mock("../notes/notes.files", () => ({
-  collectMarkdownFiles: vi.fn(),
-}))
+vi.mock("markdown", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("markdown")>()
+  return {
+    ...actual,
+    collectMarkdownFiles: vi.fn(),
+  }
+})
 
 vi.mock("../notes/notes.scan", () => ({
   scanMarkdownFile: vi.fn(),

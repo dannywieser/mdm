@@ -1,10 +1,11 @@
 import { AppConfigError, resolveNotesConfig } from "app-config"
+import { collectMarkdownFiles } from "markdown"
 import { addDays } from "mdm-util"
 
-import type { HabitEntry, HabitResult } from "./habit.types"
+import type { HabitEntry, HabitResult } from "./habit-detail.types"
 
-import { habitHandler } from "./habit"
-import { collectMarkdownFiles, scanHabitEntries } from "./habit.files"
+import { habitDetailHandler } from "./habit-detail"
+import { scanHabitEntries } from "./habit-detail.files"
 import {
   buildHistory,
   buildScoreEntries,
@@ -17,15 +18,22 @@ import {
   calculateRecentEntryAdditions,
   calculateStreak,
   getWindowEntries,
-} from "./habit.util"
+} from "./habit-detail.util"
 
 vi.mock("app-config", () => ({
   AppConfigError: class AppConfigError extends Error {},
   resolveNotesConfig: vi.fn(),
 }))
 
-vi.mock("./habit.files", () => ({
-  collectMarkdownFiles: vi.fn(),
+vi.mock("markdown", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("markdown")>()
+  return {
+    ...actual,
+    collectMarkdownFiles: vi.fn(),
+  }
+})
+
+vi.mock("./habit-detail.files", () => ({
   scanHabitEntries: vi.fn(),
 }))
 
@@ -1005,10 +1013,10 @@ describe("year-long dataset (2025)", () => {
 })
 
 // ---------------------------------------------------------------------------
-// habitHandler
+// habitDetailHandler
 // ---------------------------------------------------------------------------
 
-describe("habitHandler", () => {
+describe("habitDetailHandler", () => {
   const mockConfig = {
     ...BASE_CONFIG,
     habits: [HABIT_DO_MORE, HABIT_DO_LESS],
@@ -1034,7 +1042,7 @@ describe("habitHandler", () => {
 
   test("returns 200 with habit result for known habit id", async () => {
     const { response, status, json } = makeResponse()
-    await habitHandler(makeRequest("exercise"), response, vi.fn())
+    await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
     expect(status).toHaveBeenCalledWith(200)
     const result = getJsonResult(json)
     expect(result.habitId).toBe("exercise")
@@ -1048,20 +1056,20 @@ describe("habitHandler", () => {
 
   test("returns mode, targetScore, and trackingWindowDays from habit config", async () => {
     const { response, json } = makeResponse()
-    await habitHandler(makeRequest("exercise"), response, vi.fn())
+    await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
     expect(getJsonResult(json).mode).toBe("do-more")
     expect(getJsonResult(json).targetScore).toBeUndefined()
     expect(getJsonResult(json).trackingWindowDays).toBe(30)
 
     const stressResponse = makeResponse()
-    await habitHandler(makeRequest("stress"), stressResponse.response, vi.fn())
+    await habitDetailHandler(makeRequest("stress"), stressResponse.response, vi.fn())
     expect(getJsonResult(stressResponse.json).mode).toBe("do-less")
     expect(getJsonResult(stressResponse.json).targetScore).toBe(100)
   })
 
   test("returns 404 for unknown habit id", async () => {
     const { response, status, json } = makeResponse()
-    await habitHandler(makeRequest("unknown-habit"), response, vi.fn())
+    await habitDetailHandler(makeRequest("unknown-habit"), response, vi.fn())
     expect(status).toHaveBeenCalledWith(404)
     expect(json).toHaveBeenCalledWith({
       error: "Habit not found: unknown-habit",
@@ -1070,7 +1078,7 @@ describe("habitHandler", () => {
 
   test("current score reflects entries up to today", async () => {
     const { response, status, json } = makeResponse()
-    await habitHandler(makeRequest("exercise"), response, vi.fn())
+    await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
     expect(status).toHaveBeenCalledWith(200)
     const result = getJsonResult(json)
     // today = 2025-01-03, entries on 2025-01-01, 2025-01-02, 2025-01-03 are all recent
@@ -1084,7 +1092,7 @@ describe("habitHandler", () => {
 
   test("returns score entries with raw values and recency multipliers, most recent first", async () => {
     const { response, json } = makeResponse()
-    await habitHandler(makeRequest("exercise"), response, vi.fn())
+    await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
     const result = getJsonResult(json)
     // today = 2025-01-03; entries on 2025-01-01, 2025-01-02, 2025-01-03 are all within
     // the 14-day recent window, so each gets the 10x recency multiplier
@@ -1112,7 +1120,7 @@ describe("habitHandler", () => {
 
   test("returns all-time high stats derived from history", async () => {
     const { response, json } = makeResponse()
-    await habitHandler(makeRequest("exercise"), response, vi.fn())
+    await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
     const result = getJsonResult(json)
     expect(result.allTimeHighScore).toBeGreaterThan(0)
     expect(result.allTimeHighStreak).toBeGreaterThanOrEqual(1)
@@ -1124,7 +1132,7 @@ describe("habitHandler", () => {
       new AppConfigError("app.config.json is required"),
     )
     const { response, status, json } = makeResponse()
-    await habitHandler(makeRequest("exercise"), response, vi.fn())
+    await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
     expect(status).toHaveBeenCalledWith(500)
     expect(json).toHaveBeenCalledWith({ error: "app.config.json is required" })
   })
@@ -1132,14 +1140,14 @@ describe("habitHandler", () => {
   test("returns generic 500 on unexpected error", async () => {
     vi.mocked(resolveNotesConfig).mockRejectedValue(new Error("disk failure"))
     const { response, status, json } = makeResponse()
-    await habitHandler(makeRequest("exercise"), response, vi.fn())
+    await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
     expect(status).toHaveBeenCalledWith(500)
     expect(json).toHaveBeenCalledWith({ error: "Unable to load habit" })
   })
 
   test("windowStart begins the trackingWindowDays-day window ending today", async () => {
     const { response, json } = makeResponse()
-    await habitHandler(makeRequest("exercise"), response, vi.fn())
+    await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
     const result = getJsonResult(json)
     // today = 2025-01-03, trackingWindowDays = 30 → window spans 2024-12-05..2025-01-03
     expect(result.windowStart).toBe("2024-12-05")
