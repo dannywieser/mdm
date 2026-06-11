@@ -1,6 +1,6 @@
 {
   "name": "notes-api",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "private": true,
   "main": "dist/server.js",
   "scripts": {
@@ -13,10 +13,10 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "app-config": "1.6.1",
+    "app-config": "1.7.0",
     "express": "5.2.1",
-    "markdown": "1.6.1",
-    "mdm-util": "1.6.1",
+    "markdown": "1.7.0",
+    "mdm-util": "1.7.0",
     "morgan": "1.10.1",
     "remark": "13.0.0",
     "remark-gfm": "1.0.0",

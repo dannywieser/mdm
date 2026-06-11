@@ -1,6 +1,6 @@
 {
   "name": "flag-manager",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "private": true,
   "main": "dist/server.js",
   "scripts": {
@@ -13,9 +13,9 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "app-config": "1.6.1",
+    "app-config": "1.7.0",
     "express": "5.2.1",
-    "mdm-util": "1.6.1",
+    "mdm-util": "1.7.0",
     "morgan": "1.10.1",
     "redis": "5.10.0"
   }

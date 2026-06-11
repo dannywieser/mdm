@@ -1,5 +1,27 @@
 # web
 
+## 1.7.0
+
+### Minor Changes
+
+- 7399c56: Add `NotesGalleryByMonth` and `NotesGalleryByYear` views, which group cover-card galleries by month/year with a dropdown to filter to a single month or year.
+- 9ef23d7: Add ocean color palette with deep navy background and cyan accent (all WCAG AA contrast ratios verified).
+- 9ef23d7: Replace palette popover with a full /colors page showing a themed preview for each palette option.
+
+### Patch Changes
+
+- 5e8cc5c: Add Docker Compose healthchecks for `notes-api`, `flag-manager`, `habit-tracker`, and `image-server` based on their `/health` endpoints, and have `web` wait for all of them to be healthy before starting.
+- 7399c56: Fix `NotesGalleryByMonth` and `NotesGalleryByYear` dropping notes that lack a `createdDate`, by falling back to `modifiedDate` for grouping.
+- 7313efa: Fix note cover gallery image placeholders collapsing to a sliver while loading by giving them a default aspect ratio when no view aspect ratio is configured.
+- db1bddf: Fix the header skeleton (and the static PWA splash header) being slightly shorter than the real header, which caused a layout shift on load.
+- 7399c56: Add an `includeContent=false` query param to `GET /notes` that skips remark parsing of note bodies, and use it for the gallery views which only need frontmatter.
+- db1bddf: Fix the PWA startup splash so the page background reverts to the user's selected color palette after the app mounts (it was previously stuck on the static splash background due to CSS `@layer` priority), and fix the loading icon briefly appearing oversized and right-aligned before centering.
+- d949e4b: Show a static notebook loading icon and matching theme background on initial page load to avoid a blank white flash before the app's JS bundle mounts (especially noticeable when launching as an installed PWA).
+- 88032d0: Renamed the `GET /habit/:id` endpoint to `GET /habits/:id` for REST consistency with `GET /habits`, and consolidated the `habit` and `habits` handler folders into `habits` and `habit-detail`.
+- 18dca6d: Extract hardcoded stats page strings to i18n (lowercased to match the rest of the app), remove the all-uppercase heading styling, and add a close button matching the colors page that returns to the previous route.
+- 7399c56: Strip surrounding quote characters from frontmatter `cover` paths so notes whose cover value is wrapped in quotes load images correctly.
+  - mdm-util@1.7.0
+
 ## 1.6.1
 
 ### Patch Changes
