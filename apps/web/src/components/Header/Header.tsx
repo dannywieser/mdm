@@ -34,6 +34,7 @@ function HeaderShell({ left, right }: { left: ReactNode; right: ReactNode }) {
       position="sticky"
       px={4}
       py={1}
+      minH="32px"
       top={0}
       zIndex="sticky"
       backgroundColor="app.background"
