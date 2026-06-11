@@ -19,7 +19,7 @@ export const FadeImage = ({
 
   return (
     <Box
-      aspectRatio={aspectRatio}
+      aspectRatio={loaded ? undefined : aspectRatio}
       borderRadius={borderRadius}
       maxW={maxW}
       minH={loaded ? undefined : minH}

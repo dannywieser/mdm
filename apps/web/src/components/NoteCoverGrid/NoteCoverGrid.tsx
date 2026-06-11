@@ -18,6 +18,7 @@ const CARD_FOCUS_STYLE = {
 const MASONRY_GAP_PX = 16
 const MASONRY_ROW_HEIGHT_PX = 8
 const MASONRY_COLUMNS = { base: 1, md: 3, lg: 4 }
+const DEFAULT_ASPECT_RATIO = "3/4"
 
 const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => (
   <a href={note.obsidianUrl} style={{ textDecoration: "none", outline: "none" }}>
@@ -30,7 +31,7 @@ const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => (
     >
       <FadeImage
         alt={note.title}
-        aspectRatio={aspectRatio}
+        aspectRatio={aspectRatio ?? DEFAULT_ASPECT_RATIO}
         objectFit="cover"
         src={getCoverSrc(note.frontmatter!.cover)}
       />
