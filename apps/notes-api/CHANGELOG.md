@@ -1,5 +1,16 @@
 # notes-api
 
+## 1.7.0
+
+### Patch Changes
+
+- 7399c56: Add an `includeContent=false` query param to `GET /notes` that skips remark parsing of note bodies, and use it for the gallery views which only need frontmatter.
+- 88032d0: Moved shared markdown file-loading helpers (`collectMarkdownFiles`, `buildObsidianUrl`, `resolveDateFromFrontmatterOrTitle`) into the `markdown` package and updated `notes-api` and `habit-tracker` to use them, removing duplicated implementations.
+- Updated dependencies [88032d0]
+  - markdown@1.7.0
+  - app-config@1.7.0
+  - mdm-util@1.7.0
+
 ## 1.6.1
 
 ### Patch Changes

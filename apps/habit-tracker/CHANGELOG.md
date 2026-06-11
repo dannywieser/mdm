@@ -1,5 +1,19 @@
 # habit-tracker
 
+## 1.2.0
+
+### Minor Changes
+
+- 88032d0: Renamed the `GET /habit/:id` endpoint to `GET /habits/:id` for REST consistency with `GET /habits`, and consolidated the `habit` and `habits` handler folders into `habits` and `habit-detail`.
+
+### Patch Changes
+
+- 88032d0: Moved shared markdown file-loading helpers (`collectMarkdownFiles`, `buildObsidianUrl`, `resolveDateFromFrontmatterOrTitle`) into the `markdown` package and updated `notes-api` and `habit-tracker` to use them, removing duplicated implementations.
+- Updated dependencies [88032d0]
+  - markdown@1.7.0
+  - app-config@1.7.0
+  - mdm-util@1.7.0
+
 ## 1.1.1
 
 ### Patch Changes
