@@ -1,5 +1,3 @@
-import type { TranslationKey } from "../i18n.types"
-
 export type ColorPaletteName =
   | "dracula"
   | "gruvbox"
@@ -26,7 +24,7 @@ export interface ColorPaletteVariant {
 }
 
 export interface ColorPaletteDefinition {
-  i18nKey: TranslationKey
+  i18nKey: string
   dark: ColorPaletteVariant
   light: ColorPaletteVariant
 }

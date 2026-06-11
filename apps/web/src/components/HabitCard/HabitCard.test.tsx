@@ -35,13 +35,13 @@ describe("HabitCard", () => {
   test("renders the title prefixed with its mode", () => {
     renderCard(HABIT)
 
-    expect(screen.getByText("habit.modeDoMore: Daily Exercise")).toBeTruthy()
+    expect(screen.getByText("habit.do-more")).toBeTruthy()
   })
 
   test("renders the do-less mode label for do-less habits", () => {
     renderCard({ ...HABIT, mode: "do-less" })
 
-    expect(screen.getByText("habit.modeDoLess: Daily Exercise")).toBeTruthy()
+    expect(screen.getByText("habit.do-less")).toBeTruthy()
   })
 
   test("renders the habit score, streak, and total days stats", () => {
@@ -49,7 +49,7 @@ describe("HabitCard", () => {
 
     expect(screen.getByText("habit.score")).toBeTruthy()
     expect(screen.getByText("525")).toBeTruthy()
-    expect(screen.getByText("habit.currentStreak")).toBeTruthy()
+    expect(screen.getByText("habit.do-more-streak")).toBeTruthy()
     expect(screen.getByText("habit.totalDays")).toBeTruthy()
     expect(screen.getAllByText("5")).toHaveLength(1)
     expect(screen.getByText("12")).toBeTruthy()
@@ -58,7 +58,7 @@ describe("HabitCard", () => {
   test("links to the habit detail route", () => {
     renderCard(HABIT)
 
-    const link = screen.getByRole("link", { name: /daily exercise/i })
+    const link = screen.getByRole("link", { name: /habit.do-more/i })
 
     expect(link.getAttribute("href")).toBe("/tracking/exercise")
     expect(link.getAttribute("style")).toContain("display: block")

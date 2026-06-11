@@ -1,5 +1,11 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react"
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
@@ -32,8 +38,17 @@ const HABIT: HabitResult = {
   ],
   mode: "do-more",
   scoreEntries: [
-    { date: "2026-01-02", value: 9, recentMultiplier: 10, obsidianUrl: "obsidian://open?vault=v&file=2026.01.02" },
-    { date: "2026-01-01", value: 4, obsidianUrl: "obsidian://open?vault=v&file=2026.01.01" },
+    {
+      date: "2026-01-02",
+      value: 9,
+      recentMultiplier: 10,
+      obsidianUrl: "obsidian://open?vault=v&file=2026.01.02",
+    },
+    {
+      date: "2026-01-01",
+      value: 4,
+      obsidianUrl: "obsidian://open?vault=v&file=2026.01.01",
+    },
   ],
   streak: 5,
   streaks: [{ start: "2026-01-01", end: "2026-01-05", length: 5 }],
@@ -59,23 +74,23 @@ describe("HabitDetail", () => {
   test("renders the habit name prefixed with its mode", () => {
     renderDetail()
 
-    expect(screen.getByText("habit.modeDoMore: Daily Exercise")).toBeTruthy()
+    expect(screen.getByText("habit.do-more")).toBeTruthy()
   })
 
   test("renders the do-less mode label for do-less habits", () => {
     renderDetail({ ...HABIT, mode: "do-less" })
 
-    expect(screen.getByText("habit.modeDoLess: Daily Exercise")).toBeTruthy()
+    expect(screen.getByText("habit.do-less")).toBeTruthy()
   })
 
   test("renders the habit name, score, days logged, and streak", () => {
     renderDetail()
 
-    expect(screen.getByText("habit.modeDoMore: Daily Exercise")).toBeTruthy()
+    expect(screen.getByText("habit.do-more")).toBeTruthy()
     expect(screen.getByText("525")).toBeTruthy()
     expect(screen.getAllByText("5")).toHaveLength(2)
     expect(screen.getByText("habit.daysLogged")).toBeTruthy()
-    expect(screen.getByText("habit.currentStreak")).toBeTruthy()
+    expect(screen.getByText("habit.do-more-streak")).toBeTruthy()
   })
 
   test("renders the tracking window fill percentage as a badge next to days logged", () => {
@@ -160,7 +175,9 @@ describe("HabitDetail", () => {
   test("shows an info popover describing the target and how the score is interpreted", () => {
     renderDetail({ ...HABIT, mode: "do-less", targetScore: 100 })
 
-    fireEvent.click(screen.getByRole("button", { name: "habit.scoreInfoLabel" }))
+    fireEvent.click(
+      screen.getByRole("button", { name: "habit.scoreInfoLabel" }),
+    )
 
     expect(screen.getByText("habit.scoreInfoTarget")).toBeTruthy()
     expect(screen.getByText("habit.scoreInfoDoLess")).toBeTruthy()
@@ -169,26 +186,43 @@ describe("HabitDetail", () => {
   test("omits the target line from the info popover when no target is configured", () => {
     renderDetail({ ...HABIT, mode: "do-more", targetScore: undefined })
 
-    fireEvent.click(screen.getByRole("button", { name: "habit.scoreInfoLabel" }))
+    fireEvent.click(
+      screen.getByRole("button", { name: "habit.scoreInfoLabel" }),
+    )
 
     expect(screen.queryByText("habit.scoreInfoTarget")).toBeNull()
     expect(screen.getByText("habit.scoreInfoDoMore")).toBeTruthy()
   })
 
   test("renders heat dots for do-less habits scoring well above their target", () => {
-    renderDetail({ ...HABIT, mode: "do-less", habitScore: 125, targetScore: 100 })
+    renderDetail({
+      ...HABIT,
+      mode: "do-less",
+      habitScore: 125,
+      targetScore: 100,
+    })
 
     expect(screen.getByLabelText("habit.heatLevel")).toBeTruthy()
   })
 
   test("omits heat dots when the score is at or below the target", () => {
-    renderDetail({ ...HABIT, mode: "do-less", habitScore: 100, targetScore: 100 })
+    renderDetail({
+      ...HABIT,
+      mode: "do-less",
+      habitScore: 100,
+      targetScore: 100,
+    })
 
     expect(screen.queryByLabelText("habit.heatLevel")).toBeNull()
   })
 
   test("omits heat dots for do-more habits", () => {
-    renderDetail({ ...HABIT, mode: "do-more", habitScore: 200, targetScore: 100 })
+    renderDetail({
+      ...HABIT,
+      mode: "do-more",
+      habitScore: 200,
+      targetScore: 100,
+    })
 
     expect(screen.queryByLabelText("habit.heatLevel")).toBeNull()
   })

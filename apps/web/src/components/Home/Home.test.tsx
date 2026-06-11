@@ -71,8 +71,8 @@ describe("Home", () => {
     useHabitsQueryMock.mockReturnValue({
       data: [
         {
-          habitId: "drinking",
-          habitName: "drinking",
+          habitId: "foo",
+          habitName: "foo",
           habitScore: 38,
           mode: "do-less",
           streak: 2,
@@ -90,12 +90,12 @@ describe("Home", () => {
       </ChakraProvider>,
     )
 
-    expect(screen.getByText("habit.modeDoLess: drinking")).toBeTruthy()
+    expect(screen.getByText("habit.do-less")).toBeTruthy()
     expect(screen.getByText("38")).toBeTruthy()
     expect(screen.getByText("home.habits")).toBeTruthy()
     expect(
-      screen.getByRole("link", { name: /drinking/i }).getAttribute("href"),
-    ).toBe("/tracking/drinking")
+      screen.getByRole("link", { name: /habit.do-less/i }).getAttribute("href"),
+    ).toBe("/tracking/foo")
   })
 
   test("renders grouped views with section heading", () => {
@@ -103,8 +103,20 @@ describe("Home", () => {
       isLoading: false,
       data: {
         views: [
-          { component: "NotesList", count: 4, group: "Library", id: "books", name: "Books" },
-          { component: "NotesList", count: 3, group: "Library", id: "movies", name: "Movies" },
+          {
+            component: "NotesList",
+            count: 4,
+            group: "Library",
+            id: "books",
+            name: "Books",
+          },
+          {
+            component: "NotesList",
+            count: 3,
+            group: "Library",
+            id: "movies",
+            name: "Movies",
+          },
         ],
       },
     })
@@ -115,8 +127,20 @@ describe("Home", () => {
         {
           group: "Library",
           views: [
-            { component: "NotesList", count: 4, group: "Library", id: "books", name: "Books" },
-            { component: "NotesList", count: 3, group: "Library", id: "movies", name: "Movies" },
+            {
+              component: "NotesList",
+              count: 4,
+              group: "Library",
+              id: "books",
+              name: "Books",
+            },
+            {
+              component: "NotesList",
+              count: 3,
+              group: "Library",
+              id: "movies",
+              name: "Movies",
+            },
           ],
         },
       ],
@@ -136,7 +160,9 @@ describe("Home", () => {
 
     expect(libraryHeading).toBeTruthy()
     expect(within(librarySection).getByRole("separator")).toBeTruthy()
-    expect(within(groupedContainer).getByRole("link", { name: /books/i })).toBeTruthy()
+    expect(
+      within(groupedContainer).getByRole("link", { name: /books/i }),
+    ).toBeTruthy()
   })
 
   test("does not render section heading when views are ungrouped", () => {

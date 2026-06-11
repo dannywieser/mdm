@@ -90,14 +90,14 @@ const interpolate = (
   )
 
 export const translate = (
-  key: TranslationKey,
+  key: string,
   values?: Record<string, string | number>,
   locale: Locale = "en",
 ): string => interpolate(translations[locale][key], values)
 
 interface I18nContextValue {
   locale: Locale
-  t: (key: TranslationKey, values?: Record<string, string | number>) => string
+  t: (key: string, values?: Record<string, string | number>) => string
 }
 
 const i18nContext = createContext<I18nContextValue>({
@@ -114,7 +114,7 @@ export const I18nProvider = ({
   children,
   locale = "en",
 }: I18nProviderProps) => {
-  const t = (key: TranslationKey, values?: Record<string, string | number>) =>
+  const t = (key: string, values?: Record<string, string | number>) =>
     translate(key, values, locale)
 
   return createElement(i18nContext.Provider, { value: { locale, t } }, children)
