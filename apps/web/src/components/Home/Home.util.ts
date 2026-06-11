@@ -1,4 +1,5 @@
 import type { StatsViewCount } from "../../types/stats"
+import type { ViewGroupSection } from "./Home.types"
 
 /**
  * Returns a column count that keeps the grid compact and balanced:
@@ -9,11 +10,6 @@ export function getViewGridColumns(count: number): number {
   if (count <= 0) return 1
   if (count <= 3) return count
   return Math.ceil(Math.sqrt(count))
-}
-
-export interface ViewGroupSection {
-  group: string
-  views: StatsViewCount[]
 }
 
 /**

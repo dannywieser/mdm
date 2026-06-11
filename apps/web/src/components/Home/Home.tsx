@@ -8,7 +8,6 @@ import { HabitCard } from "../HabitCard/HabitCard"
 import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
 import { HomeViewGroupSection } from "./HomeViewGroupSection"
 import { getViewGridColumns, groupViewsByGroup } from "./Home.util"
-import { HomeViewCard } from "./HomeViewCard"
 
 export function Home() {
   const { t } = useI18n()
@@ -24,22 +23,11 @@ export function Home() {
       {groupedViews && (
         <VStack align="stretch" gap={4} width="full">
           {groupedViews.ungroupedViews.length > 0 && (
-            <SimpleGrid
-              color="app.textMuted"
-              columns={{
-                base: Math.min(
-                  2,
-                  getViewGridColumns(groupedViews.ungroupedViews.length),
-                ),
-                md: getViewGridColumns(groupedViews.ungroupedViews.length),
-              }}
-              gap={2}
-              textAlign="center"
-            >
-              {groupedViews.ungroupedViews.map((view) => (
-                <HomeViewCard key={view.id} view={view} />
-              ))}
-            </SimpleGrid>
+            <HomeViewGroupSection
+              key="ungrouped"
+              group={null}
+              views={groupedViews.ungroupedViews}
+            />
           )}
           {groupedViews.groups.map((groupedSection) => (
             <HomeViewGroupSection
@@ -59,7 +47,7 @@ export function Home() {
           <SimpleGrid
             color="app.textMuted"
             columns={{
-              base: Math.min(2, getViewGridColumns(habits.length)),
+              base: 1,
               md: getViewGridColumns(habits.length),
             }}
             gap={2}

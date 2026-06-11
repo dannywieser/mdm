@@ -1,7 +1,7 @@
 import { Heading, Separator, SimpleGrid, VStack } from "@chakra-ui/react"
 
 import { getViewGridColumns } from "./Home.util"
-import type { HomeViewGroupSectionProps } from "./HomeViewGroupSection.types"
+import type { HomeViewGroupSectionProps } from "./Home.types"
 import { HomeViewCard } from "./HomeViewCard"
 
 export function HomeViewGroupSection({
@@ -10,14 +10,18 @@ export function HomeViewGroupSection({
 }: HomeViewGroupSectionProps) {
   return (
     <VStack align="stretch" gap={2} width="full">
-      <Heading as="h2" size="sm" color="app.textMuted" fontWeight="medium">
-        {group}
-      </Heading>
-      <Separator borderColor="app.border" />
+      {group && (
+        <>
+          <Heading as="h2" size="sm" color="app.textMuted" fontWeight="medium">
+            {group}
+          </Heading>
+          <Separator borderColor="app.border" />
+        </>
+      )}
       <SimpleGrid
         color="app.textMuted"
         columns={{
-          base: Math.min(2, getViewGridColumns(views.length)),
+          base: 1,
           md: getViewGridColumns(views.length),
         }}
         gap={2}

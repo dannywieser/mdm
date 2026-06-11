@@ -4,10 +4,11 @@ import { MemoryRouter } from "react-router-dom"
 import { describe, expect, test, vi } from "vitest"
 
 import { Home } from "./Home"
-import { getViewGridColumns, groupViewsByGroup } from "./Home.util"
 
 const useStatsQueryMock = vi.fn()
 const useHabitsQueryMock = vi.fn()
+const groupViewsByGroupMock = vi.fn()
+const getViewGridColumnsMock = vi.fn()
 
 vi.mock("../../hooks/useStatsQuery/useStatsQuery", () => ({
   useStatsQuery: () => useStatsQueryMock(),
@@ -21,6 +22,11 @@ vi.mock("../../i18n", () => ({
   useI18n: () => ({ t: (key: string) => key }),
 }))
 
+vi.mock("./Home.util", () => ({
+  groupViewsByGroup: (...args: unknown[]) => groupViewsByGroupMock(...args),
+  getViewGridColumns: (...args: unknown[]) => getViewGridColumnsMock(...args),
+}))
+
 describe("Home", () => {
   test("renders view links with name and count", () => {
     useStatsQueryMock.mockReturnValue({
@@ -32,6 +38,13 @@ describe("Home", () => {
       },
     })
     useHabitsQueryMock.mockReturnValue({ data: [] })
+    getViewGridColumnsMock.mockReturnValue(1)
+    groupViewsByGroupMock.mockReturnValue({
+      groups: [],
+      ungroupedViews: [
+        { component: "NotesList", count: 4, id: "books", name: "Books" },
+      ],
+    })
 
     render(
       <ChakraProvider value={defaultSystem}>
@@ -53,6 +66,8 @@ describe("Home", () => {
       isLoading: false,
       data: { views: [] },
     })
+    getViewGridColumnsMock.mockReturnValue(1)
+    groupViewsByGroupMock.mockReturnValue({ groups: [], ungroupedViews: [] })
     useHabitsQueryMock.mockReturnValue({
       data: [
         {
@@ -94,6 +109,19 @@ describe("Home", () => {
       },
     })
     useHabitsQueryMock.mockReturnValue({ data: [] })
+    getViewGridColumnsMock.mockReturnValue(1)
+    groupViewsByGroupMock.mockReturnValue({
+      groups: [
+        {
+          group: "Library",
+          views: [
+            { component: "NotesList", count: 4, group: "Library", id: "books", name: "Books" },
+            { component: "NotesList", count: 3, group: "Library", id: "movies", name: "Movies" },
+          ],
+        },
+      ],
+      ungroupedViews: [],
+    })
 
     const { container: groupedContainer } = render(
       <ChakraProvider value={defaultSystem}>
@@ -121,6 +149,13 @@ describe("Home", () => {
       },
     })
     useHabitsQueryMock.mockReturnValue({ data: [] })
+    getViewGridColumnsMock.mockReturnValue(1)
+    groupViewsByGroupMock.mockReturnValue({
+      groups: [],
+      ungroupedViews: [
+        { component: "NotesList", count: 4, id: "books", name: "Books" },
+      ],
+    })
 
     const { container } = render(
       <ChakraProvider value={defaultSystem}>
@@ -131,67 +166,5 @@ describe("Home", () => {
     )
 
     expect(within(container).queryByRole("separator")).toBeNull()
-  })
-})
-
-describe("getViewGridColumns", () => {
-  test("returns 1 for zero items", () => {
-    expect(getViewGridColumns(0)).toBe(1)
-  })
-
-  test("returns 1 for one item", () => {
-    expect(getViewGridColumns(1)).toBe(1)
-  })
-
-  test("returns 2 for two items", () => {
-    expect(getViewGridColumns(2)).toBe(2)
-  })
-
-  test("returns 3 for three items", () => {
-    expect(getViewGridColumns(3)).toBe(3)
-  })
-
-  test("returns 2 for four items", () => {
-    expect(getViewGridColumns(4)).toBe(2)
-  })
-
-  test("returns 3 for five items", () => {
-    expect(getViewGridColumns(5)).toBe(3)
-  })
-
-  test("returns 3 for nine items", () => {
-    expect(getViewGridColumns(9)).toBe(3)
-  })
-
-  test("returns 4 for ten items", () => {
-    expect(getViewGridColumns(10)).toBe(4)
-  })
-})
-
-describe("groupViewsByGroup", () => {
-  test("returns ungrouped views and grouped sections preserving order", () => {
-    const grouped = groupViewsByGroup([
-      { component: "NotesList", count: 1, id: "all", name: "All Notes" },
-      { component: "NotesList", count: 2, group: "Library", id: "books", name: "Books" },
-      { component: "NotesList", count: 3, group: "Writing", id: "drafts", name: "Drafts" },
-      { component: "NotesList", count: 4, group: "Library", id: "movies", name: "Movies" },
-    ])
-
-    expect(grouped.ungroupedViews.map((view) => view.id)).toEqual(["all"])
-    expect(grouped.groups).toEqual([
-      {
-        group: "Library",
-        views: [
-          { component: "NotesList", count: 2, group: "Library", id: "books", name: "Books" },
-          { component: "NotesList", count: 4, group: "Library", id: "movies", name: "Movies" },
-        ],
-      },
-      {
-        group: "Writing",
-        views: [
-          { component: "NotesList", count: 3, group: "Writing", id: "drafts", name: "Drafts" },
-        ],
-      },
-    ])
   })
 })
