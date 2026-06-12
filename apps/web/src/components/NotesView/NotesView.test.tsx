@@ -7,9 +7,14 @@ import { NotesView } from "./NotesView"
 
 const useViewsQueryMock = vi.fn()
 
-vi.mock("../../hooks/useViewsQuery/useViewsQuery", () => ({
-  useViewsQuery: () => useViewsQueryMock(),
-}))
+vi.mock("services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("services")>()
+
+  return {
+    ...actual,
+    useViewsQuery: () => useViewsQueryMock(),
+  }
+})
 
 vi.mock("../NotesList", () => ({
   NotesList: ({ badges }: { badges?: string[] }) => (

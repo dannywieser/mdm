@@ -20,9 +20,14 @@ const renderGallery = (badges: string[] = []) =>
 
 const useNotesQueryMock = vi.fn()
 
-vi.mock("../../hooks/useNotesQuery/useNotesQuery", () => ({
-  useNotesQuery: () => useNotesQueryMock(),
-}))
+vi.mock("services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("services")>()
+
+  return {
+    ...actual,
+    useNotesQuery: () => useNotesQueryMock(),
+  }
+})
 
 vi.mock("../LoadingScreen", () => ({
   LoadingScreen: () => <div data-testid="loading-screen" />,

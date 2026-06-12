@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
 
-import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
+import { useNotesQuery } from "services"
 
 import { AppError } from "../AppError"
 import { LoadingScreen } from "../LoadingScreen"

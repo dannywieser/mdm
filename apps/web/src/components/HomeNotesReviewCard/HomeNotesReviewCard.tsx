@@ -9,13 +9,12 @@ import { useQueries } from "@tanstack/react-query"
 import { CircleCheck } from "lucide-react"
 import { Link } from "react-router-dom"
 
-import { fetchIsRead } from "../../hooks/useIsRead/useIsRead"
-import type { ViewSummary } from "../../types/views"
+import { fetchIsRead, type ViewSummary } from "services"
 
 export function HomeNotesReviewCard({ view }: { view: ViewSummary }) {
   const readStates = useQueries({
     queries: view.noteIds.map((noteId) => ({
-      queryKey: ["note-read", noteId],
+      queryKey: ["read", noteId],
       queryFn: () => fetchIsRead(noteId),
       enabled: noteId.trim().length > 0,
     })),

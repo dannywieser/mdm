@@ -1,4 +1,4 @@
-import type { HabitMode } from "../../types/habits"
+import type { HabitMode } from "services"
 
 export type HabitScoreStatus = "green" | "yellow" | "red" | "neutral"
 

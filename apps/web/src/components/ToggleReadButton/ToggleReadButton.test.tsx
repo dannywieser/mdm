@@ -4,18 +4,23 @@ import { beforeEach, describe, expect, test, vi } from "vitest"
 
 import { ToggleReadButton } from "./ToggleReadButton"
 
-const useToggleNoteReadMock = vi.fn()
+const useToggleReadMock = vi.fn()
 const mutateMock = vi.fn()
 
-vi.mock("../../hooks/useToggleNoteRead/useToggleNoteRead", () => ({
-  useToggleNoteRead: ({ noteId }: { noteId: string }) =>
-    useToggleNoteReadMock(noteId),
-}))
+vi.mock("services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("services")>()
+
+  return {
+    ...actual,
+    useToggleRead: ({ noteId }: { noteId: string }) =>
+      useToggleReadMock(noteId),
+  }
+})
 
 describe("ToggleReadButton", () => {
   beforeEach(() => {
     mutateMock.mockReset()
-    useToggleNoteReadMock.mockReturnValue({
+    useToggleReadMock.mockReturnValue({
       isPending: false,
       mutate: mutateMock,
     })

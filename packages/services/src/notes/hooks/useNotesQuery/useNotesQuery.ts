@@ -1,0 +1,29 @@
+import { useSuspenseQuery } from "@tanstack/react-query"
+
+import type { NotesResponse } from "../../notes.types"
+import type { UseNotesQueryParams } from "./useNotesQuery.types"
+
+import { getBaseUrl } from "../../../config"
+
+const fetchNotes = async (view?: string, includeContent: boolean = true): Promise<NotesResponse> => {
+  const params = new URLSearchParams()
+  if (view) params.set("view", view)
+  if (!includeContent) params.set("includeContent", "false")
+
+  const queryString = params.toString()
+  const baseUrl = getBaseUrl()
+  const url = queryString ? `${baseUrl}/notes?${queryString}` : `${baseUrl}/notes`
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error("errors.unableToLoadNotes")
+  }
+
+  return (await response.json()) as NotesResponse
+}
+
+export const useNotesQuery = ({ includeContent = true, view }: UseNotesQueryParams = {}) =>
+  useSuspenseQuery({
+    queryKey: ["notes", view, includeContent],
+    queryFn: () => fetchNotes(view, includeContent),
+  })

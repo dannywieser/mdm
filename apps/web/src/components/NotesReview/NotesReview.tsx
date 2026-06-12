@@ -5,9 +5,8 @@ import { keyframes } from "@emotion/react"
 import { BookCheck } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 
-import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
-import { useToggleNoteRead } from "../../hooks/useToggleNoteRead/useToggleNoteRead"
-import { fetchIsRead } from "../../hooks/useIsRead/useIsRead"
+import { fetchIsRead, useNotesQuery, useToggleRead } from "services"
+
 import { useI18n } from "../../i18n"
 
 import type { NotesReviewRouteParamKey } from "./NotesReview.types"
@@ -39,7 +38,7 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
 
   const notes = useMemo(() => data.notes, [data.notes])
   const currentNote = notes[currentIndex] as (typeof notes)[number] | undefined
-  const toggleRead = useToggleNoteRead({ noteId: currentNote?.id ?? "" })
+  const toggleRead = useToggleRead({ noteId: currentNote?.id ?? "" })
 
   useEffect(() => {
     if (currentIndex < 0) return
@@ -51,7 +50,7 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
 
   const readStates = useQueries({
     queries: notes.map((note) => ({
-      queryKey: ["note-read", note.id],
+      queryKey: ["read", note.id],
       queryFn: () => fetchIsRead(note.id),
       enabled: note.id.trim().length > 0,
     })),

@@ -1,3 +1,5 @@
+export type { ToggleFlagInput, ToggleFlagResult } from "services"
+
 export type FlagRedisClient = {
   get: (key: string) => Promise<string | null>
   set: (
@@ -7,15 +9,6 @@ export type FlagRedisClient = {
       EX: number
     },
   ) => Promise<unknown>
-}
-
-export type ToggleFlagInput = {
-  id: string
-  flag: string
-}
-
-export type ToggleFlagResult = ToggleFlagInput & {
-  value: boolean
 }
 
 export type FlagDefinition = {

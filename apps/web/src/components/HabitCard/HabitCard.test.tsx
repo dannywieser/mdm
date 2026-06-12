@@ -3,7 +3,7 @@ import { cleanup, render, screen } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
-import type { HabitSummary } from "../../types/habits"
+import type { HabitSummary } from "services"
 
 import { HabitCard } from "./HabitCard"
 

@@ -26,7 +26,7 @@ import {
 } from "recharts"
 import { useParams } from "react-router-dom"
 
-import { useHabitQuery } from "../../hooks/useHabitQuery/useHabitQuery"
+import { useHabitQuery } from "services"
 import { useI18n } from "../../i18n"
 
 import { HabitScoreProgress } from "../HabitScoreProgress"
@@ -263,7 +263,7 @@ export function HabitDetail() {
                   />
                   <Tooltip
                     contentStyle={TOOLTIP_STYLE}
-                    labelFormatter={formatChartDate}
+                    labelFormatter={(label) => formatChartDate(String(label))}
                   />
                   <Legend wrapperStyle={{ fontSize: "11px" }} />
                   <Line

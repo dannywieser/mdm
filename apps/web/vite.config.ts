@@ -7,6 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "mdm-util": path.resolve(__dirname, "../../packages/util/src/index.ts"),
+      services: path.resolve(__dirname, "../../packages/services/src/index.ts"),
     },
   },
   plugins: [react()],

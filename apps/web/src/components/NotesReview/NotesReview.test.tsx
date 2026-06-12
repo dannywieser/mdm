@@ -5,7 +5,7 @@ import { afterEach, describe, expect, test, vi } from "vitest"
 import { NotesReview } from "./NotesReview"
 
 const useNotesQueryMock = vi.fn()
-const useToggleNoteReadMock = vi.fn()
+const useToggleReadMock = vi.fn()
 const useQueriesMock = vi.fn()
 
 vi.mock("react-router-dom", async (importOriginal) => {
@@ -19,17 +19,16 @@ vi.mock("react-router-dom", async (importOriginal) => {
   }
 })
 
-vi.mock("../../hooks/useNotesQuery/useNotesQuery", () => ({
-  useNotesQuery: () => useNotesQueryMock(),
-}))
+vi.mock("services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("services")>()
 
-vi.mock("../../hooks/useToggleNoteRead/useToggleNoteRead", () => ({
-  useToggleNoteRead: () => useToggleNoteReadMock(),
-}))
-
-vi.mock("../../hooks/useIsRead/useIsRead", () => ({
-  fetchIsRead: vi.fn(),
-}))
+  return {
+    ...actual,
+    useNotesQuery: () => useNotesQueryMock(),
+    useToggleRead: () => useToggleReadMock(),
+    fetchIsRead: vi.fn(),
+  }
+})
 
 vi.mock("@tanstack/react-query", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-query")>()
@@ -89,7 +88,7 @@ describe("NotesReview", () => {
         notes: [{ id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" }],
       },
     })
-    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    useToggleReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
     useQueriesMock.mockReturnValue([{ status: "pending" }])
 
     renderComponent()
@@ -100,7 +99,7 @@ describe("NotesReview", () => {
 
   test("renders all caught up when there are no notes", () => {
     useNotesQueryMock.mockReturnValue({ data: { notes: [] } })
-    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    useToggleReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
     noReadStates()
 
     renderComponent()
@@ -110,7 +109,7 @@ describe("NotesReview", () => {
 
   test("uses component-local animation for completion state text", () => {
     useNotesQueryMock.mockReturnValue({ data: { notes: [] } })
-    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    useToggleReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
     noReadStates()
 
     renderComponent()
@@ -137,7 +136,7 @@ describe("NotesReview", () => {
         ],
       },
     })
-    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    useToggleReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
     readStatesFor(["1", "2", "3"], ["1", "2"])
 
     renderComponent()
@@ -149,7 +148,7 @@ describe("NotesReview", () => {
     useNotesQueryMock.mockReturnValue({
       data: { notes: [{ id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" }] },
     })
-    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    useToggleReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
     readStatesFor(["1"], [])
 
     renderComponent()
@@ -169,7 +168,7 @@ describe("NotesReview", () => {
     const mutateMock = vi.fn((_, options?: { onSuccess?: () => void }) => {
       options?.onSuccess?.()
     })
-    useToggleNoteReadMock.mockReturnValue({ mutate: mutateMock, isPending: false })
+    useToggleReadMock.mockReturnValue({ mutate: mutateMock, isPending: false })
     readStatesFor(["1", "2"], [])
 
     renderComponent()
@@ -187,7 +186,7 @@ describe("NotesReview", () => {
     const mutateMock = vi.fn((_, options?: { onSuccess?: () => void }) => {
       options?.onSuccess?.()
     })
-    useToggleNoteReadMock.mockReturnValue({ mutate: mutateMock, isPending: false })
+    useToggleReadMock.mockReturnValue({ mutate: mutateMock, isPending: false })
     readStatesFor(["1"], [])
 
     renderComponent()
@@ -206,7 +205,7 @@ describe("NotesReview", () => {
         ],
       },
     })
-    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    useToggleReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
     readStatesFor(["1", "2"], [])
 
     renderComponent()
@@ -228,7 +227,7 @@ describe("NotesReview", () => {
         ],
       },
     })
-    useToggleNoteReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
+    useToggleReadMock.mockReturnValue({ mutate: defaultMutate, isPending: false })
     readStatesFor(["1"], [])
 
     renderComponent(["folder", "frontmatter.type", "frontmatter.genre"])
