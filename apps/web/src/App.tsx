@@ -2,14 +2,14 @@ import { Component, Suspense, type ReactNode } from "react"
 import { Box } from "@chakra-ui/react"
 import { Outlet, Route, Routes } from "react-router-dom"
 
-import { AppError } from "./components/AppError/AppError"
-import { HabitDetail } from "./components/HabitDetail/HabitDetail"
-import { Header, HeaderSkeleton } from "./components/Header/Header"
-import { Home } from "./components/Home/Home"
-import { HomeStats } from "./components/HomeStats/HomeStats"
-import { LoadingScreen } from "./components/LoadingScreen/LoadingScreen"
-import { NotesView } from "./components/NotesView/NotesView"
-import { PaletteView } from "./components/PaletteView/PaletteView"
+import { AppError } from "./components/AppError"
+import { HabitDetail } from "./components/HabitDetail"
+import { Header, HeaderSkeleton } from "./components/Header"
+import { Home } from "./components/Home"
+import { HomeStats } from "./components/HomeStats"
+import { LoadingScreen } from "./components/LoadingScreen"
+import { NotesView } from "./components/NotesView"
+import { PaletteView } from "./components/PaletteView"
 
 function LoadingLayout() {
   return (

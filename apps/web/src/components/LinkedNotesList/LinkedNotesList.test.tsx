@@ -5,7 +5,7 @@ import { afterEach, describe, expect, test, vi } from "vitest"
 import type { LinkedNote } from "./LinkedNotesList.types"
 import { LinkedNotesList } from "./LinkedNotesList"
 
-vi.mock("../MarkdownTree/MarkdownTree", () => ({
+vi.mock("../MarkdownTree", () => ({
   MarkdownTree: () => null,
 }))
 

@@ -5,9 +5,9 @@ import { useParams } from "react-router-dom"
 import { useNotesQuery } from "services"
 import { useI18n } from "../../i18n"
 
-import { AppError } from "../AppError/AppError"
-import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
-import { NoteCoverGrid } from "../NoteCoverGrid/NoteCoverGrid"
+import { AppError } from "../AppError"
+import { LoadingScreen } from "../LoadingScreen"
+import { NoteCoverGrid } from "../NoteCoverGrid"
 import { filterNotesWithCovers } from "../NoteCoverGrid/NoteCoverGrid.util"
 
 import type { NotesGalleryByYearProps, NotesGalleryByYearRouteParamKey } from "./NotesGalleryByYear.types"

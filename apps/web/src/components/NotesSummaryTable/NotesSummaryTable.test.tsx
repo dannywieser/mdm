@@ -23,11 +23,11 @@ vi.mock("./NotesSummaryTable.util", () => ({
   getColumnLabel: (...args: unknown[]) => getColumnLabelMock(...args),
 }))
 
-vi.mock("../LoadingScreen/LoadingScreen", () => ({
+vi.mock("../LoadingScreen", () => ({
   LoadingScreen: () => <div data-testid="loading-screen" />,
 }))
 
-vi.mock("../AppError/AppError", () => ({
+vi.mock("../AppError", () => ({
   AppError: ({ message }: { message: string }) => <div data-testid="app-error">{message}</div>,
 }))
 

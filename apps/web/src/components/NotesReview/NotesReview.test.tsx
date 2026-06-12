@@ -35,12 +35,12 @@ vi.mock("@tanstack/react-query", async (importOriginal) => {
   return { ...actual, useQueries: () => useQueriesMock() }
 })
 
-vi.mock("../MarkdownTree/MarkdownTree", () => ({
+vi.mock("../MarkdownTree", () => ({
   MarkdownTree: () => null,
 }))
 
 
-vi.mock("../OpenInObsidianButton/OpenInObsidianButton", () => ({
+vi.mock("../OpenInObsidianButton", () => ({
   OpenInObsidianButton: ({ note }: { note: { obsidianUrl: string } }) => (
     <a href={note.obsidianUrl}>open</a>
   ),

@@ -6,8 +6,3 @@ export interface ViewGroupSection {
   group: string
   views: ViewSummary[]
 }
-
-export interface HomeViewGroupSectionProps {
-  group: string | null
-  views: ViewSummary[]
-}

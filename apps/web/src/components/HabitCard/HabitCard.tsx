@@ -11,8 +11,8 @@ import { Link } from "react-router-dom"
 
 import { useI18n } from "../../i18n"
 
-import { HabitScoreValue } from "../HabitScoreValue/HabitScoreValue"
-import { HeatDots } from "../HeatDots/HeatDots"
+import { HabitScoreValue } from "../HabitScoreValue"
+import { HeatDots } from "../HeatDots"
 import { calculateHeatDotCount } from "../HeatDots/HeatDots.util"
 import type { HabitCardProps } from "./HabitCard.types"
 

@@ -2,8 +2,8 @@ import { Box, Card, Text } from "@chakra-ui/react"
 
 import { useMasonryRowSpan } from "../../hooks/useMasonryRowSpan/useMasonryRowSpan"
 
-import { FadeImage } from "../FadeImage/FadeImage"
-import { NoteBadges } from "../NoteBadges/NoteBadges"
+import { FadeImage } from "../FadeImage"
+import { NoteBadges } from "../NoteBadges"
 
 import type { GalleryCardProps, NoteCoverGridProps } from "./NoteCoverGrid.types"
 import { getCoverSrc } from "./NoteCoverGrid.util"

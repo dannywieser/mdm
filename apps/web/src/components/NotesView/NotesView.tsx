@@ -3,12 +3,12 @@ import { useParams } from "react-router-dom"
 
 import { useViewsQuery } from "services"
 
-import { NotesGallery } from "../NotesGallery/NotesGallery"
-import { NotesGalleryByMonth } from "../NotesGalleryByMonth/NotesGalleryByMonth"
-import { NotesGalleryByYear } from "../NotesGalleryByYear/NotesGalleryByYear"
-import { NotesList } from "../NotesList/NotesList"
-import { NotesReview } from "../NotesReview/NotesReview"
-import { NotesSummaryTable } from "../NotesSummaryTable/NotesSummaryTable"
+import { NotesGallery } from "../NotesGallery"
+import { NotesGalleryByMonth } from "../NotesGalleryByMonth"
+import { NotesGalleryByYear } from "../NotesGalleryByYear"
+import { NotesList } from "../NotesList"
+import { NotesReview } from "../NotesReview"
+import { NotesSummaryTable } from "../NotesSummaryTable"
 
 import type {
   NotesViewRouteParamKey,

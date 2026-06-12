@@ -20,15 +20,15 @@ vi.mock("../../i18n", () => ({
   useI18n: () => ({ t: (key: string) => key }),
 }))
 
-vi.mock("../LoadingScreen/LoadingScreen", () => ({
+vi.mock("../LoadingScreen", () => ({
   LoadingScreen: () => <div data-testid="loading-screen" />,
 }))
 
-vi.mock("../AppError/AppError", () => ({
+vi.mock("../AppError", () => ({
   AppError: ({ message }: { message: string }) => <div data-testid="app-error">{message}</div>,
 }))
 
-vi.mock("../NoteBadges/NoteBadges", () => ({
+vi.mock("../NoteBadges", () => ({
   NoteBadges: () => <div data-testid="note-badges" />,
 }))
 

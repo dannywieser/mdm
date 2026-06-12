@@ -4,8 +4,8 @@ import { useParams } from "react-router-dom"
 import { useNotesQuery } from "services"
 import { useI18n } from "../../i18n"
 
-import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
-import { NotesCard } from "../NotesCard/NotesCard"
+import { LoadingScreen } from "../LoadingScreen"
+import { NotesCard } from "../NotesCard"
 
 import type { NotesListProps, NotesRouteParamKey } from "./NotesList.types"
 

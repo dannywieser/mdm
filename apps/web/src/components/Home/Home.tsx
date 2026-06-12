@@ -4,9 +4,9 @@ import { useHabitsQuery, useViewsQuery } from "services"
 
 import { useI18n } from "../../i18n"
 
-import { HabitCard } from "../HabitCard/HabitCard"
-import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
-import { HomeViewGroupSection } from "./HomeViewGroupSection"
+import { HabitCard } from "../HabitCard"
+import { NotebookIcon } from "../NotebookIcon"
+import { HomeViewGroupSection } from "../HomeViewGroupSection"
 import { getViewGridColumns, groupViewsByGroup } from "./Home.util"
 
 export function Home() {
