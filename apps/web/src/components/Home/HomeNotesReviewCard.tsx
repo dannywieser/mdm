@@ -1,4 +1,10 @@
-import { Box, HStack, StatLabel, StatRoot, StatValueText } from "@chakra-ui/react"
+import {
+  Box,
+  HStack,
+  StatLabel,
+  StatRoot,
+  StatValueText,
+} from "@chakra-ui/react"
 import { useQueries } from "@tanstack/react-query"
 import { CircleCheck } from "lucide-react"
 import { Link } from "react-router-dom"
@@ -45,10 +51,14 @@ export function HomeNotesReviewCard({ view }: { view: ViewSummary }) {
           _hover={{ borderColor: "app.borderHover" }}
         >
           <StatLabel>{view.name}</StatLabel>
-          <HStack justify="center" gap={1}>
+          <HStack gap={1}>
             <StatValueText>{`${readCount}/${total}`}</StatValueText>
             {isComplete && (
-              <Box color="app.successBackground" aria-label="review complete">
+              <Box
+                color="app.successBackground"
+                aria-label="review complete"
+                pl={2}
+              >
                 <CircleCheck size={18} />
               </Box>
             )}
