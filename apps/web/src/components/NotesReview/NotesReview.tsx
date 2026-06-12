@@ -69,10 +69,20 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
     isRead: readStates[i]?.data === true,
   }))
 
+  const advanceToNextUnread = () => {
+    const nextUnread = notes.findIndex(
+      (_, i) => i > currentIndex && readStates[i]?.data !== true,
+    )
+    setCurrentIndex(nextUnread === -1 ? notes.length : nextUnread)
+  }
+
   const handleMarkAsRead = () => {
-    toggleRead.mutate(undefined, {
-      onSuccess: () => setCurrentIndex((i) => i + 1),
-    })
+    if (readStates[currentIndex]?.data === true) {
+      advanceToNextUnread()
+      return
+    }
+
+    toggleRead.mutate(undefined, { onSuccess: advanceToNextUnread })
   }
 
   const isLoading = notes.length > 0 && currentIndex === -1
