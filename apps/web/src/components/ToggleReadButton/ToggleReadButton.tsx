@@ -1,7 +1,7 @@
 import { IconButton } from "@chakra-ui/react"
 import { Book, BookCheck } from "lucide-react"
 
-import { useToggleNoteRead } from "services"
+import { useToggleRead } from "services"
 import { useI18n } from "../../i18n"
 
 import type { ToggleReadButtonProps } from "./ToggleReadButton.types"
@@ -11,7 +11,7 @@ export const ToggleReadButton = ({
   noteId,
 }: ToggleReadButtonProps) => {
   const { t } = useI18n()
-  const toggleRead = useToggleNoteRead({ noteId })
+  const toggleRead = useToggleRead({ noteId })
   const toggleLabel = isRead ? t("notes.markAsUnread") : t("notes.markAsRead")
 
   return (

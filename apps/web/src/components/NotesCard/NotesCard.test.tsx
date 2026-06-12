@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import { NotesCard } from "./NotesCard"
 
 const useIsReadMock = vi.fn()
-const useToggleNoteReadMock = vi.fn()
+const useToggleReadMock = vi.fn()
 const mutateMock = vi.fn()
 
 vi.mock("services", async (importOriginal) => {
@@ -15,8 +15,8 @@ vi.mock("services", async (importOriginal) => {
   return {
     ...actual,
     useIsRead: ({ noteId }: { noteId: string }) => useIsReadMock(noteId),
-    useToggleNoteRead: ({ noteId }: { noteId: string }) =>
-      useToggleNoteReadMock(noteId),
+    useToggleRead: ({ noteId }: { noteId: string }) =>
+      useToggleReadMock(noteId),
   }
 })
 
@@ -80,7 +80,7 @@ afterEach(() => {
 beforeEach(() => {
   mutateMock.mockReset()
   useIsReadMock.mockReturnValue({ data: false })
-  useToggleNoteReadMock.mockReturnValue({
+  useToggleReadMock.mockReturnValue({
     isPending: false,
     mutate: mutateMock,
   })

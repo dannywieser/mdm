@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import type { ToggleFlagResult } from "../../flags.types"
-import type { UseToggleNoteReadParams } from "./useToggleNoteRead.types"
+import type { UseToggleReadParams } from "./useToggleRead.types"
 
 import { getFlagsBaseUrl } from "../../../config"
 import { READ_FLAG_NAME } from "../../flags.constants"
@@ -23,7 +23,7 @@ const toggleNoteRead = async (noteId: string): Promise<boolean> => {
   return result.value
 }
 
-export const useToggleNoteRead = ({ noteId }: UseToggleNoteReadParams) => {
+export const useToggleRead = ({ noteId }: UseToggleReadParams) => {
   const queryClient = useQueryClient()
   const queryKey = ["note-read", noteId] as const
 

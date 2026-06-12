@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest"
 
 import { ToggleReadButton } from "./ToggleReadButton"
 
-const useToggleNoteReadMock = vi.fn()
+const useToggleReadMock = vi.fn()
 const mutateMock = vi.fn()
 
 vi.mock("services", async (importOriginal) => {
@@ -12,15 +12,15 @@ vi.mock("services", async (importOriginal) => {
 
   return {
     ...actual,
-    useToggleNoteRead: ({ noteId }: { noteId: string }) =>
-      useToggleNoteReadMock(noteId),
+    useToggleRead: ({ noteId }: { noteId: string }) =>
+      useToggleReadMock(noteId),
   }
 })
 
 describe("ToggleReadButton", () => {
   beforeEach(() => {
     mutateMock.mockReset()
-    useToggleNoteReadMock.mockReturnValue({
+    useToggleReadMock.mockReturnValue({
       isPending: false,
       mutate: mutateMock,
     })

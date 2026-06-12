@@ -3,7 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react"
 import { type ReactNode } from "react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
-import { useToggleNoteRead } from "./useToggleNoteRead"
+import { useToggleRead } from "./useToggleRead"
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -30,7 +30,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe("useToggleNoteRead", () => {
+describe("useToggleRead", () => {
   test("posts the note read toggle and updates the cached value", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
@@ -41,7 +41,7 @@ describe("useToggleNoteRead", () => {
 
     const { QueryWrapper, queryClient } = createWrapper()
     const { result } = renderHook(
-      () => useToggleNoteRead({ noteId: "note-1" }),
+      () => useToggleRead({ noteId: "note-1" }),
       {
         wrapper: QueryWrapper,
       },
@@ -68,7 +68,7 @@ describe("useToggleNoteRead", () => {
 
     const { QueryWrapper } = createWrapper()
     const { result } = renderHook(
-      () => useToggleNoteRead({ noteId: "note-1" }),
+      () => useToggleRead({ noteId: "note-1" }),
       {
         wrapper: QueryWrapper,
       },
