@@ -2,10 +2,14 @@ import { Box, StatLabel, StatRoot, StatValueText } from "@chakra-ui/react"
 
 import { Link } from "react-router-dom"
 import type { ViewSummary } from "../../types/views"
+import { HomeNotesReviewCard } from "./HomeNotesReviewCard"
 
 export function HomeViewCard({ view }: { view: ViewSummary }) {
   if (view.count === 0) {
     return null
+  }
+  if (view.component === "NotesReview") {
+    return <HomeNotesReviewCard view={view} />
   }
   return (
     <Box
