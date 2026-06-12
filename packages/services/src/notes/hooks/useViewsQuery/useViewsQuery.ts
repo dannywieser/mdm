@@ -1,9 +1,9 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 
+import type { ViewsResponse } from "../../views.types"
 import type { UseViewsQueryParams } from "./useViewsQuery.types"
-import type { ViewsResponse } from "./views.types"
 
-import { getBaseUrl } from "../config"
+import { getBaseUrl } from "../../../config"
 
 const fetchViews = async (): Promise<ViewsResponse> => {
   const response = await fetch(`${getBaseUrl()}/views`)

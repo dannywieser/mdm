@@ -1,9 +1,9 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 
-import type { NotesResponse } from "./notes.types"
+import type { NotesResponse } from "../../notes.types"
 import type { UseNotesQueryParams } from "./useNotesQuery.types"
 
-import { getBaseUrl } from "../config"
+import { getBaseUrl } from "../../../config"
 
 const fetchNotes = async (view?: string, includeContent: boolean = true): Promise<NotesResponse> => {
   const params = new URLSearchParams()
