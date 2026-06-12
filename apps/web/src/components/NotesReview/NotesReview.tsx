@@ -34,7 +34,6 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
   // first-unread position is known, preventing a flash of note 0.
   const [currentIndex, setCurrentIndex] = useState(-1)
   const initialized = useRef(false)
-  const contentTopRef = useRef<HTMLDivElement>(null)
 
   const notes = useMemo(() => data.notes, [data.notes])
   const currentNote = notes[currentIndex] as (typeof notes)[number] | undefined
@@ -42,10 +41,7 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
 
   useEffect(() => {
     if (currentIndex < 0) return
-    contentTopRef.current?.scrollIntoView({
-      behavior: "instant",
-      block: "start",
-    })
+    window.scrollTo({ top: 0, behavior: "instant" })
   }, [currentIndex])
 
   const readStates = useQueries({
@@ -149,7 +145,6 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
       />
 
       <VStack
-        ref={contentTopRef}
         align="stretch"
         flex="1"
         gap="2"
