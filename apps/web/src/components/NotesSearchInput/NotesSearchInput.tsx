@@ -13,7 +13,7 @@ export function NotesSearchInput() {
   const searchParamValue = searchParams.get(SEARCH_PARAM_KEY) ?? ""
   const [value, setValue] = useState(searchParamValue)
   const [syncedSearchParamValue, setSyncedSearchParamValue] = useState(searchParamValue)
-  const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   if (searchParamValue !== syncedSearchParamValue) {
     setSyncedSearchParamValue(searchParamValue)
