@@ -1,4 +1,4 @@
-import type { ViewSummary } from "../../types/views"
+import type { ViewSummary } from "services"
 
 export interface HomeViewGroupSectionProps {
   group: string | null
