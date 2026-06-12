@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
-import type { ToggleFlagResult } from "../../../flags/flags.types"
+import type { ToggleFlagResult } from "../../flags.types"
 import type { UseToggleNoteReadParams } from "./useToggleNoteRead.types"
 
 import { getFlagsBaseUrl } from "../../../config"
-import { READ_FLAG_NAME } from "../../../flags/flags.constants"
+import { READ_FLAG_NAME } from "../../flags.constants"
 
 const toggleNoteRead = async (noteId: string): Promise<boolean> => {
   const response = await fetch(
