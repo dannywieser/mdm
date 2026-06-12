@@ -179,6 +179,31 @@ describe("NotesReview", () => {
     expect(screen.getByRole("link").getAttribute("href")).toBe("obsidian://note-2")
   })
 
+  test("fast-forwards to the next unread note, skipping already-read notes", () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          { id: "1", obsidianUrl: "obsidian://note-1", title: "Note 1" },
+          { id: "2", obsidianUrl: "obsidian://note-2", title: "Note 2" },
+          { id: "3", obsidianUrl: "obsidian://note-3", title: "Note 3" },
+        ],
+      },
+    })
+    const mutateMock = vi.fn((_, options?: { onSuccess?: () => void }) => {
+      options?.onSuccess?.()
+    })
+    useToggleReadMock.mockReturnValue({ mutate: mutateMock, isPending: false })
+    // Note 1 is the only unread note; notes 2 and 3 are already read.
+    readStatesFor(["1", "2", "3"], ["2", "3"])
+
+    renderComponent()
+
+    fireEvent.click(screen.getByRole("button", { name: "notes.markAsRead" }))
+
+    expect(mutateMock).toHaveBeenCalled()
+    expect(screen.getByText("review.complete")).toBeTruthy()
+  })
+
   test("shows all caught up after reviewing all notes", () => {
     useNotesQueryMock.mockReturnValue({
       data: { notes: [{ id: "1", title: "Note 1" }] },
