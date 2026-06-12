@@ -29,9 +29,9 @@ import { useParams } from "react-router-dom"
 import { useHabitQuery } from "../../hooks/useHabitQuery/useHabitQuery"
 import { useI18n } from "../../i18n"
 
-import { HabitScoreProgress } from "../HabitScoreProgress/HabitScoreProgress"
-import { HabitScoreValue } from "../HabitScoreValue/HabitScoreValue"
-import { HeatDots } from "../HeatDots/HeatDots"
+import { HabitScoreProgress } from "../HabitScoreProgress"
+import { HabitScoreValue } from "../HabitScoreValue"
+import { HeatDots } from "../HeatDots"
 import { calculateHeatDotCount } from "../HeatDots/HeatDots.util"
 import type { HabitDetailRouteParamKey } from "./HabitDetail.types"
 import {

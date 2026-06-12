@@ -2,7 +2,7 @@ import { Heading, Separator, SimpleGrid, VStack } from "@chakra-ui/react"
 
 import { getViewGridColumns } from "../Home/Home.util"
 import type { HomeViewGroupSectionProps } from "./HomeViewGroupSection.types"
-import { HomeViewCard } from "../HomeViewCard/HomeViewCard"
+import { HomeViewCard } from "../HomeViewCard"
 
 export function HomeViewGroupSection({
   group,

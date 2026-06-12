@@ -8,7 +8,7 @@ import {
   type ColorPaletteName,
 } from "../../theme/palettes"
 
-import { PalettePreview } from "../PalettePreview/PalettePreview"
+import { PalettePreview } from "../PalettePreview"
 
 export function PaletteView() {
   const { palette, setPalette } = useColorPalette()

@@ -11,19 +11,19 @@ vi.mock("../../hooks/useViewsQuery/useViewsQuery", () => ({
   useViewsQuery: () => useViewsQueryMock(),
 }))
 
-vi.mock("../NotesList/NotesList", () => ({
+vi.mock("../NotesList", () => ({
   NotesList: ({ badges }: { badges?: string[] }) => (
     <div>{`notes-list:${badges?.join(",") ?? ""}`}</div>
   ),
 }))
 
-vi.mock("../NotesReview/NotesReview", () => ({
+vi.mock("../NotesReview", () => ({
   NotesReview: ({ badges }: { badges?: string[] }) => (
     <div>{`notes-review:${badges?.join(",") ?? ""}`}</div>
   ),
 }))
 
-vi.mock("../NotesSummaryTable/NotesSummaryTable", () => ({
+vi.mock("../NotesSummaryTable", () => ({
   NotesSummaryTable: ({ badges }: { badges?: string[] }) => (
     <div>{`note-summary-list:${badges?.join(",") ?? ""}`}</div>
   ),

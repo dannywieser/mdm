@@ -1,7 +1,7 @@
 import { Card, Collapsible, Flex, Heading } from "@chakra-ui/react"
 
 import { useI18n } from "../../i18n"
-import { MarkdownTree } from "../MarkdownTree/MarkdownTree"
+import { MarkdownTree } from "../MarkdownTree"
 
 import type { LinkedNotesListProps } from "./LinkedNotesList.types"
 

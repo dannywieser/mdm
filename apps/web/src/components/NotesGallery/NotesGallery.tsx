@@ -2,9 +2,9 @@ import { useParams } from "react-router-dom"
 
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 
-import { AppError } from "../AppError/AppError"
-import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
-import { NoteCoverGrid } from "../NoteCoverGrid/NoteCoverGrid"
+import { AppError } from "../AppError"
+import { LoadingScreen } from "../LoadingScreen"
+import { NoteCoverGrid } from "../NoteCoverGrid"
 import { filterNotesWithCovers } from "../NoteCoverGrid/NoteCoverGrid.util"
 
 import type { NotesGalleryProps, NotesGalleryRouteParamKey } from "./NotesGallery.types"
