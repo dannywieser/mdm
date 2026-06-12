@@ -510,6 +510,7 @@ const defaultMockNote = (basename: string): Note => ({
   folder: "notes",
   frontmatter: null,
   fullPath: `/notes/${basename}`,
+  fullText: "",
   content: {
     children: [{ type: "text", value: "Note" }],
     type: "root",

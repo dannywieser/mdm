@@ -10,6 +10,7 @@ const createNote = (frontmatter: Note["frontmatter"]): Note => ({
   frontmatter,
   folder: "books",
   fullPath: "/notes/books/book.md",
+  fullText: "",
   content: { type: "root" },
   id: "1",
   modifiedDate: "2024-01-02",

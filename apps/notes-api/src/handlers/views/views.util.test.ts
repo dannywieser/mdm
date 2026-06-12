@@ -15,6 +15,7 @@ const createNote = (overrides: Partial<ScannedNote> & { id: string }): ScannedNo
   folder: "notes",
   frontmatter: null,
   fullPath: "/notes/note.md",
+  fullText: "",
   modifiedDate: "2026-06-01T00:00:00.000Z",
   obsidianUrl: "obsidian://open?vault=vault&file=note",
   title: "note",

@@ -16,6 +16,7 @@ const noteFixture: Note = {
   folder: 'daily',
   frontmatter: null,
   fullPath: '/daily/my-note.md',
+  fullText: '',
   id: 'my-note',
   linkedNotes: [],
   modifiedDate: '2026-01-01',

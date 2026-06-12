@@ -24,6 +24,7 @@ export interface Note {
   titleOrBodyDates: string[]
   createdDate: string | null
   frontmatter: NoteFrontmatter | null
+  fullText: string
   folder: string
   fullPath: string
   content: MarkdownNode
