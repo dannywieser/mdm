@@ -25,7 +25,7 @@ const toggleNoteRead = async (noteId: string): Promise<boolean> => {
 
 export const useToggleRead = ({ noteId }: UseToggleReadParams) => {
   const queryClient = useQueryClient()
-  const queryKey = ["note-read", noteId] as const
+  const queryKey = ["read", noteId] as const
 
   return useMutation({
     mutationFn: () => toggleNoteRead(noteId),

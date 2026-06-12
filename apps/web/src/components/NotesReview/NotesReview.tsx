@@ -50,7 +50,7 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
 
   const readStates = useQueries({
     queries: notes.map((note) => ({
-      queryKey: ["note-read", note.id],
+      queryKey: ["read", note.id],
       queryFn: () => fetchIsRead(note.id),
       enabled: note.id.trim().length > 0,
     })),

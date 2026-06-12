@@ -56,7 +56,7 @@ describe("useToggleRead", () => {
     expect(fetchMock).toHaveBeenCalledWith("/flags/note-1/read", {
       method: "POST",
     })
-    expect(queryClient.getQueryData(["note-read", "note-1"])).toBe(true)
+    expect(queryClient.getQueryData(["read", "note-1"])).toBe(true)
   })
 
   test("returns an error when the toggle request fails", async () => {

@@ -22,7 +22,7 @@ export const fetchIsRead = async (noteId: string): Promise<boolean> => {
 
 export const useIsRead = ({ noteId }: UseIsReadParams) =>
   useQuery({
-    queryKey: ["note-read", noteId],
+    queryKey: ["read", noteId],
     queryFn: () => fetchIsRead(noteId),
     enabled: noteId.trim().length > 0,
   })
