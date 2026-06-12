@@ -1,15 +1,14 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 
-import { translate } from "../../i18n"
-import type { HabitSummary } from "../../types/habits"
+import { getHabitsBaseUrl } from "../config"
 
-const HABIT_API_BASE_URL = import.meta.env.VITE_HABIT_API_BASE_URL ?? ""
+import type { HabitSummary } from "./habits.types"
 
 const fetchHabits = async (): Promise<HabitSummary[]> => {
-  const response = await fetch(`${HABIT_API_BASE_URL}/habits`)
+  const response = await fetch(`${getHabitsBaseUrl()}/habits`)
 
   if (!response.ok) {
-    throw new Error(translate("errors.unableToLoadHabits"))
+    throw new Error("errors.unableToLoadHabits")
   }
 
   return (await response.json()) as HabitSummary[]

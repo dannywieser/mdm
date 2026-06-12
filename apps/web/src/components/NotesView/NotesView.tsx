@@ -1,7 +1,7 @@
 import type { ComponentType } from "react"
 import { useParams } from "react-router-dom"
 
-import { useViewsQuery } from "../../hooks/useViewsQuery/useViewsQuery"
+import { useViewsQuery } from "services"
 
 import { NotesGallery } from "../NotesGallery/NotesGallery"
 import { NotesGalleryByMonth } from "../NotesGalleryByMonth/NotesGalleryByMonth"

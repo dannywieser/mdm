@@ -7,10 +7,15 @@ import { ToggleReadButton } from "./ToggleReadButton"
 const useToggleNoteReadMock = vi.fn()
 const mutateMock = vi.fn()
 
-vi.mock("../../hooks/useToggleNoteRead/useToggleNoteRead", () => ({
-  useToggleNoteRead: ({ noteId }: { noteId: string }) =>
-    useToggleNoteReadMock(noteId),
-}))
+vi.mock("services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("services")>()
+
+  return {
+    ...actual,
+    useToggleNoteRead: ({ noteId }: { noteId: string }) =>
+      useToggleNoteReadMock(noteId),
+  }
+})
 
 describe("ToggleReadButton", () => {
   beforeEach(() => {

@@ -7,9 +7,14 @@ import { HomeNotesReviewCard } from "./HomeNotesReviewCard"
 
 const useQueriesMock = vi.fn()
 
-vi.mock("../../hooks/useIsRead/useIsRead", () => ({
-  fetchIsRead: vi.fn(),
-}))
+vi.mock("services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("services")>()
+
+  return {
+    ...actual,
+    fetchIsRead: vi.fn(),
+  }
+})
 
 vi.mock("@tanstack/react-query", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-query")>()

@@ -10,13 +10,15 @@ const useHabitsQueryMock = vi.fn()
 const groupViewsByGroupMock = vi.fn()
 const getViewGridColumnsMock = vi.fn()
 
-vi.mock("../../hooks/useViewsQuery/useViewsQuery", () => ({
-  useViewsQuery: () => useViewsQueryMock(),
-}))
+vi.mock("services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("services")>()
 
-vi.mock("../../hooks/useHabitsQuery/useHabitsQuery", () => ({
-  useHabitsQuery: () => useHabitsQueryMock(),
-}))
+  return {
+    ...actual,
+    useViewsQuery: () => useViewsQueryMock(),
+    useHabitsQuery: () => useHabitsQueryMock(),
+  }
+})
 
 vi.mock("../../i18n", () => ({
   useI18n: () => ({ t: (key: string) => key }),

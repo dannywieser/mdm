@@ -1,3 +1,7 @@
+import type { HomeStatsConfig } from "app-config"
+
+export type { HomeStatsConfig }
+
 export interface FolderCount {
   count: number
   folder: string
@@ -18,22 +22,6 @@ export interface StatsTrends {
   changePercent: number
   notesLast30Days: number
   notesPrevious30Days: number
-}
-
-export interface HomeStatsShowConfig {
-  folderBreakdown: boolean
-  modifiedToday: boolean
-  notesCreated: boolean
-  notesPerDay: boolean
-  notesWithoutCreatedDate: boolean
-  totalAttachments: boolean
-  totalFolders: boolean
-  totalNotes: boolean
-  trends: boolean
-}
-
-export interface HomeStatsConfig {
-  show: HomeStatsShowConfig
 }
 
 export interface StatsResponse {

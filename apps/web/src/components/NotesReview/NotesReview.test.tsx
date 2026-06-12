@@ -19,17 +19,16 @@ vi.mock("react-router-dom", async (importOriginal) => {
   }
 })
 
-vi.mock("../../hooks/useNotesQuery/useNotesQuery", () => ({
-  useNotesQuery: () => useNotesQueryMock(),
-}))
+vi.mock("services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("services")>()
 
-vi.mock("../../hooks/useToggleNoteRead/useToggleNoteRead", () => ({
-  useToggleNoteRead: () => useToggleNoteReadMock(),
-}))
-
-vi.mock("../../hooks/useIsRead/useIsRead", () => ({
-  fetchIsRead: vi.fn(),
-}))
+  return {
+    ...actual,
+    useNotesQuery: () => useNotesQueryMock(),
+    useToggleNoteRead: () => useToggleNoteReadMock(),
+    fetchIsRead: vi.fn(),
+  }
+})
 
 vi.mock("@tanstack/react-query", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-query")>()

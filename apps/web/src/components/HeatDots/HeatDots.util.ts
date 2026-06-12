@@ -1,4 +1,4 @@
-import type { HabitMode } from "../../types/habits"
+import type { HabitMode } from "services"
 
 const HEAT_DOT_POINTS = 10
 

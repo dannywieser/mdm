@@ -1,4 +1,4 @@
-import type { HabitMode } from "../../types/habits"
+import type { HabitMode } from "services"
 
 export interface HabitScoreValueProps {
   mode: HabitMode

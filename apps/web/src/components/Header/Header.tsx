@@ -24,7 +24,7 @@ import {
 const RouterLink = chakra(Link)
 import { BarChart2, X } from "lucide-react"
 
-import { useViewsQuery } from "../../hooks/useViewsQuery/useViewsQuery"
+import { useViewsQuery } from "services"
 import { useI18n } from "../../i18n"
 
 import { PaletteSelector } from "../PaletteSelector/PaletteSelector"

@@ -1,7 +1,7 @@
 import { Box, Heading, Separator, SimpleGrid, VStack } from "@chakra-ui/react"
 
-import { useHabitsQuery } from "../../hooks/useHabitsQuery/useHabitsQuery"
-import { useViewsQuery } from "../../hooks/useViewsQuery/useViewsQuery"
+import { useHabitsQuery, useViewsQuery } from "services"
+
 import { useI18n } from "../../i18n"
 
 import { HabitCard } from "../HabitCard/HabitCard"

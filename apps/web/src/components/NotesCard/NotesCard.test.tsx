@@ -9,14 +9,16 @@ const useIsReadMock = vi.fn()
 const useToggleNoteReadMock = vi.fn()
 const mutateMock = vi.fn()
 
-vi.mock("../../hooks/useIsRead/useIsRead", () => ({
-  useIsRead: ({ noteId }: { noteId: string }) => useIsReadMock(noteId),
-}))
+vi.mock("services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("services")>()
 
-vi.mock("../../hooks/useToggleNoteRead/useToggleNoteRead", () => ({
-  useToggleNoteRead: ({ noteId }: { noteId: string }) =>
-    useToggleNoteReadMock(noteId),
-}))
+  return {
+    ...actual,
+    useIsRead: ({ noteId }: { noteId: string }) => useIsReadMock(noteId),
+    useToggleNoteRead: ({ noteId }: { noteId: string }) =>
+      useToggleNoteReadMock(noteId),
+  }
+})
 
 const noteFixture: Note = {
   basename: "My Note",

@@ -17,6 +17,7 @@
     "express": "5.2.1",
     "mdm-util": "1.7.0",
     "morgan": "1.10.1",
-    "redis": "5.10.0"
+    "redis": "5.10.0",
+    "services": "1.7.0"
   }
 }

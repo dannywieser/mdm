@@ -5,9 +5,8 @@ import { keyframes } from "@emotion/react"
 import { BookCheck } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 
-import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
-import { useToggleNoteRead } from "../../hooks/useToggleNoteRead/useToggleNoteRead"
-import { fetchIsRead } from "../../hooks/useIsRead/useIsRead"
+import { fetchIsRead, useNotesQuery, useToggleNoteRead } from "services"
+
 import { useI18n } from "../../i18n"
 
 import type { NotesReviewRouteParamKey } from "./NotesReview.types"

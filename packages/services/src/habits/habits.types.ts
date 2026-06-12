@@ -1,4 +1,6 @@
-export type HabitMode = "do-more" | "do-less"
+import type { HabitMode } from "app-config"
+
+export type { HabitMode }
 
 export interface HabitSummary {
   habitId: string
@@ -14,6 +16,13 @@ export interface HabitHistoryEntry {
   date: string
   habitScore: number
   streak: number
+  windowEntries: number
+  windowStart: string
+  rawScore: number
+  scoreBeforeMultipliers: number
+  streakMultiplier: number
+  dayMultiplier: number
+  recentEntryAdditions: number
   value: number
 }
 
@@ -46,4 +55,9 @@ export interface HabitResult {
   trackingWindowDays: number
   windowEntries: number
   windowStart: string
+  rawScore: number
+  scoreBeforeMultipliers: number
+  streakMultiplier: number
+  dayMultiplier: number
+  recentEntryAdditions: number
 }

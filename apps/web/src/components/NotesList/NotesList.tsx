@@ -1,7 +1,7 @@
 import { Alert, VStack } from "@chakra-ui/react"
 import { useParams } from "react-router-dom"
 
-import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
+import { useNotesQuery } from "services"
 import { useI18n } from "../../i18n"
 
 import { LoadingScreen } from "../LoadingScreen/LoadingScreen"

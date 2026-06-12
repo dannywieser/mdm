@@ -15,9 +15,14 @@ import {
 
 const useStatsQueryMock = vi.fn()
 
-vi.mock("../../hooks/useStatsQuery/useStatsQuery", () => ({
-  useStatsQuery: () => useStatsQueryMock(),
-}))
+vi.mock("services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("services")>()
+
+  return {
+    ...actual,
+    useStatsQuery: () => useStatsQueryMock(),
+  }
+})
 
 vi.mock("../../i18n", () => ({
   useI18n: () => ({ t: (key: string) => key }),

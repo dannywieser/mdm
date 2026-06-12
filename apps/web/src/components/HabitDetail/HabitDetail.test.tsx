@@ -9,7 +9,7 @@ import {
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
-import type { HabitResult } from "../../types/habits"
+import type { HabitResult } from "services"
 
 import { HabitDetail } from "./HabitDetail"
 
@@ -17,9 +17,14 @@ afterEach(cleanup)
 
 const useHabitQueryMock = vi.fn()
 
-vi.mock("../../hooks/useHabitQuery/useHabitQuery", () => ({
-  useHabitQuery: (params: { habitId: string }) => useHabitQueryMock(params),
-}))
+vi.mock("services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("services")>()
+
+  return {
+    ...actual,
+    useHabitQuery: (params: { habitId: string }) => useHabitQueryMock(params),
+  }
+})
 
 vi.mock("../../i18n", () => ({
   useI18n: () => ({ t: (key: string) => key }),
@@ -33,8 +38,32 @@ const HABIT: HabitResult = {
   habitName: "Daily Exercise",
   habitScore: 525,
   history: [
-    { date: "2026-01-01", habitScore: 100, streak: 1, value: 8 },
-    { date: "2026-01-02", habitScore: 200, streak: 2, value: 7 },
+    {
+      date: "2026-01-01",
+      habitScore: 100,
+      streak: 1,
+      value: 8,
+      windowEntries: 1,
+      windowStart: "2025-12-03",
+      rawScore: 8,
+      scoreBeforeMultipliers: 8,
+      streakMultiplier: 1,
+      dayMultiplier: 1,
+      recentEntryAdditions: 0,
+    },
+    {
+      date: "2026-01-02",
+      habitScore: 200,
+      streak: 2,
+      value: 7,
+      windowEntries: 2,
+      windowStart: "2025-12-04",
+      rawScore: 7,
+      scoreBeforeMultipliers: 7,
+      streakMultiplier: 1,
+      dayMultiplier: 1,
+      recentEntryAdditions: 0,
+    },
   ],
   mode: "do-more",
   scoreEntries: [
@@ -55,6 +84,11 @@ const HABIT: HabitResult = {
   trackingWindowDays: 30,
   windowEntries: 5,
   windowStart: "2025-12-29",
+  rawScore: 5,
+  scoreBeforeMultipliers: 5,
+  streakMultiplier: 1,
+  dayMultiplier: 1,
+  recentEntryAdditions: 0,
 }
 
 const renderDetail = (data: HabitResult = HABIT) => {

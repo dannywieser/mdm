@@ -16,7 +16,7 @@ import {
   YAxis,
 } from "recharts"
 
-import { useStatsQuery } from "../../hooks/useStatsQuery/useStatsQuery"
+import { useStatsQuery } from "services"
 import { useI18n } from "../../i18n"
 
 import type { HomeStatsProps } from "./HomeStats.types"
@@ -194,8 +194,8 @@ export function HomeStats({ staleTime }: HomeStatsProps) {
                       borderRadius: "6px",
                       fontSize: "12px",
                     }}
-                    labelFormatter={formatDate}
-                    formatter={(value: number) => [value, t("stats.notes")]}
+                    labelFormatter={(label) => formatDate(String(label))}
+                    formatter={(value) => [Number(value), t("stats.notes")]}
                   />
                   <Area
                     type="monotone"

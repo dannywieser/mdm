@@ -1,22 +1,21 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { translate } from "../../i18n"
-
-import { FLAGS_BASE_URL, READ_FLAG_NAME } from "../flags.constants"
-import type { FlagResponse } from "../flags.types"
+import { READ_FLAG_NAME } from "../flags/flags.constants"
+import type { ToggleFlagResult } from "../flags/flags.types"
+import { getFlagsBaseUrl } from "../config"
 
 import type { UseIsReadParams } from "./useIsRead.types"
 
 export const fetchIsRead = async (noteId: string): Promise<boolean> => {
   const response = await fetch(
-    `${FLAGS_BASE_URL}/${encodeURIComponent(noteId)}/${READ_FLAG_NAME}`,
+    `${getFlagsBaseUrl()}/${encodeURIComponent(noteId)}/${READ_FLAG_NAME}`,
   )
 
   if (!response.ok) {
-    throw new Error(translate("errors.unableToLoadReadState"))
+    throw new Error("errors.unableToLoadReadState")
   }
 
-  const result = (await response.json()) as FlagResponse
+  const result = (await response.json()) as ToggleFlagResult
 
   return result.value
 }

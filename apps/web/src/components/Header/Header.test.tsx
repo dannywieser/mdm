@@ -19,16 +19,21 @@ vi.mock("../../i18n", () => ({
   useI18n: () => ({ t: (key: string) => key }),
 }))
 
-vi.mock("../../hooks/useViewsQuery/useViewsQuery", () => ({
-  useViewsQuery: () => ({
-    data: {
-      views: [
-        { id: "daily", name: "daily review" },
-        { id: "downtime-active", name: "active downtime" },
-      ],
-    },
-  }),
-}))
+vi.mock("services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("services")>()
+
+  return {
+    ...actual,
+    useViewsQuery: () => ({
+      data: {
+        views: [
+          { id: "daily", name: "daily review" },
+          { id: "downtime-active", name: "active downtime" },
+        ],
+      },
+    }),
+  }
+})
 
 afterEach(() => {
   cleanup()

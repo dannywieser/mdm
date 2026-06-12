@@ -5,7 +5,7 @@ import {
   Heading,
 } from "@chakra-ui/react"
 
-import { useIsRead } from "../../hooks/useIsRead/useIsRead"
+import { useIsRead } from "services"
 
 import { LinkedNotesList } from "../LinkedNotesList/LinkedNotesList"
 import { OpenInObsidianButton } from "../OpenInObsidianButton/OpenInObsidianButton"

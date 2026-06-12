@@ -46,7 +46,7 @@ afterEach(() => {
 describe("useHabitsQuery", () => {
   test("fetches habits successfully", async () => {
     const responseBody = [
-      { habitId: "drinking", habitName: "drinking", habitScore: 38, mode: "do-less", streak: 2, targetScore: 100 },
+      { habitId: "drinking", habitName: "drinking", habitScore: 38, mode: "do-less", streak: 2, targetScore: 100, windowEntries: 3 },
     ]
 
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({

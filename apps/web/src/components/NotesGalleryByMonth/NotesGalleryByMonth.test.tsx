@@ -7,9 +7,14 @@ afterEach(cleanup)
 
 const useNotesQueryMock = vi.fn()
 
-vi.mock("../../hooks/useNotesQuery/useNotesQuery", () => ({
-  useNotesQuery: () => useNotesQueryMock(),
-}))
+vi.mock("services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("services")>()
+
+  return {
+    ...actual,
+    useNotesQuery: () => useNotesQueryMock(),
+  }
+})
 
 vi.mock("../../i18n", () => ({
   useI18n: () => ({ t: (key: string) => key }),

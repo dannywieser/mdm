@@ -1,7 +1,7 @@
 import { IconButton } from "@chakra-ui/react"
 import { Book, BookCheck } from "lucide-react"
 
-import { useToggleNoteRead } from "../../hooks/useToggleNoteRead/useToggleNoteRead"
+import { useToggleNoteRead } from "services"
 import { useI18n } from "../../i18n"
 
 import type { ToggleReadButtonProps } from "./ToggleReadButton.types"

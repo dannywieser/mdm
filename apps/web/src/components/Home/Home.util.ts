@@ -1,4 +1,4 @@
-import type { ViewSummary } from "../../types/views"
+import type { ViewSummary } from "services"
 import type { ViewGroupSection } from "./Home.types"
 
 /**
