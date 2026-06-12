@@ -27,7 +27,7 @@ import { BarChart2, X } from "lucide-react"
 import { useViewsQuery } from "../../hooks/useViewsQuery/useViewsQuery"
 import { useI18n } from "../../i18n"
 
-import { PaletteSelector } from "../PaletteSelector/PaletteSelector"
+import { PaletteSelector } from "../PaletteSelector"
 
 function HeaderShell({ left, right }: { left: ReactNode; right: ReactNode }) {
   return (

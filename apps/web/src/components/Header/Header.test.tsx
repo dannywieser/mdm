@@ -11,7 +11,7 @@ vi.mock("mdm-util", () => ({
   formatDate: () => "2026-06-01",
 }))
 
-vi.mock("../PaletteSelector/PaletteSelector", () => ({
+vi.mock("../PaletteSelector", () => ({
   PaletteSelector: () => <div data-testid="palette-selector" />,
 }))
 

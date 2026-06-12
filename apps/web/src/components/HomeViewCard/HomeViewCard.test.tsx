@@ -5,7 +5,7 @@ import { describe, expect, test, vi } from "vitest"
 
 import { HomeViewCard } from "./HomeViewCard"
 
-vi.mock("./HomeNotesReviewCard", () => ({
+vi.mock("../HomeNotesReviewCard", () => ({
   HomeNotesReviewCard: ({ view }: { view: { name: string } }) => (
     <div>notes review card: {view.name}</div>
   ),

@@ -7,11 +7,11 @@ import {
 
 import { useIsRead } from "../../hooks/useIsRead/useIsRead"
 
-import { LinkedNotesList } from "../LinkedNotesList/LinkedNotesList"
-import { OpenInObsidianButton } from "../OpenInObsidianButton/OpenInObsidianButton"
-import { MarkdownTree } from "../MarkdownTree/MarkdownTree"
-import { NoteBadges } from "../NoteBadges/NoteBadges"
-import { ToggleReadButton } from "../ToggleReadButton/ToggleReadButton"
+import { LinkedNotesList } from "../LinkedNotesList"
+import { OpenInObsidianButton } from "../OpenInObsidianButton"
+import { MarkdownTree } from "../MarkdownTree"
+import { NoteBadges } from "../NoteBadges"
+import { ToggleReadButton } from "../ToggleReadButton"
 
 import type { NotesCardProps } from "./NotesCard.types"
 

@@ -4,7 +4,7 @@ import { afterEach, describe, expect, test, vi } from "vitest"
 
 afterEach(cleanup)
 
-vi.mock("../NoteBadges/NoteBadges", () => ({
+vi.mock("../NoteBadges", () => ({
   NoteBadges: ({ badges }: { badges: string[] }) => (
     <div data-testid="note-badges">{badges.join(",")}</div>
   ),

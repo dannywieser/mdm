@@ -4,8 +4,8 @@ import { Link as RouterLink, useParams } from "react-router-dom"
 import { useNotesQuery } from "../../hooks/useNotesQuery/useNotesQuery"
 import { useI18n } from "../../i18n"
 
-import { AppError } from "../AppError/AppError"
-import { LoadingScreen } from "../LoadingScreen/LoadingScreen"
+import { AppError } from "../AppError"
+import { LoadingScreen } from "../LoadingScreen"
 
 import type {
   NotesSummaryTableProps,

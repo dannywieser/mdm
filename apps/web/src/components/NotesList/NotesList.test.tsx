@@ -10,7 +10,7 @@ vi.mock("../../hooks/useNotesQuery/useNotesQuery", () => ({
   useNotesQuery: () => useNotesQueryMock(),
 }))
 
-vi.mock("../NotesCard/NotesCard", () => ({
+vi.mock("../NotesCard", () => ({
   NotesCard: ({
     note,
     badges,
@@ -20,7 +20,7 @@ vi.mock("../NotesCard/NotesCard", () => ({
   }) => <div>{`${note.title}:${badges?.join(",") ?? ""}`}</div>,
 }))
 
-vi.mock("../LoadingScreen/LoadingScreen", () => ({
+vi.mock("../LoadingScreen", () => ({
   LoadingScreen: () => <div data-testid="loading-screen" />,
 }))
 

@@ -14,7 +14,7 @@ import type { MarkdownNode } from "markdown"
 import { CircleCheck, CircleDashed } from "lucide-react"
 import { Fragment, type ReactNode } from "react"
 
-import { FadeImage } from "../FadeImage/FadeImage"
+import { FadeImage } from "../FadeImage"
 import { MarkdownHeading } from "./MarkdownHeading"
 import type { MarkdownTreeProps } from "./MarkdownTree.types"
 
