@@ -6,7 +6,7 @@ import { useI18n } from "../../i18n"
 
 import { HabitCard } from "../HabitCard/HabitCard"
 import { NotebookIcon } from "../NotebookIcon/NotebookIcon"
-import { HomeViewGroupSection } from "./HomeViewGroupSection"
+import { HomeViewGroupSection } from "../HomeViewGroupSection/HomeViewGroupSection"
 import { getViewGridColumns, groupViewsByGroup } from "./Home.util"
 
 export function Home() {

@@ -5,7 +5,7 @@ import { describe, expect, test, vi } from "vitest"
 
 import { HomeViewGroupSection } from "./HomeViewGroupSection"
 
-vi.mock("./Home.util", () => ({
+vi.mock("../Home/Home.util", () => ({
   getViewGridColumns: vi.fn(() => 1),
 }))
 
