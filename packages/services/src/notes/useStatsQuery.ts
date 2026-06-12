@@ -1,9 +1,9 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 
-import { getBaseUrl } from "../config"
-
 import type { StatsResponse } from "./stats.types"
 import type { UseStatsQueryParams } from "./useStatsQuery.types"
+
+import { getBaseUrl } from "../config"
 
 const fetchStats = async (): Promise<StatsResponse> => {
   const response = await fetch(`${getBaseUrl()}/stats`)

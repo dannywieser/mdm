@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, test } from "vitest"
 
 import { setImagesBaseUrl } from "../config"
-
 import { buildImageUrl } from "./buildImageUrl"
 
 afterEach(() => {

@@ -1,8 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 
-import { getHabitsBaseUrl } from "../config"
-
 import type { HabitSummary } from "./habits.types"
+
+import { getHabitsBaseUrl } from "../config"
 
 const fetchHabits = async (): Promise<HabitSummary[]> => {
   const response = await fetch(`${getHabitsBaseUrl()}/habits`)

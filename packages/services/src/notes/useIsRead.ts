@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { READ_FLAG_NAME } from "../flags/flags.constants"
 import type { ToggleFlagResult } from "../flags/flags.types"
-import { getFlagsBaseUrl } from "../config"
-
 import type { UseIsReadParams } from "./useIsRead.types"
+
+import { getFlagsBaseUrl } from "../config"
+import { READ_FLAG_NAME } from "../flags/flags.constants"
 
 export const fetchIsRead = async (noteId: string): Promise<boolean> => {
   const response = await fetch(
