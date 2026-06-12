@@ -27,14 +27,16 @@ import { BarChart2, X } from "lucide-react"
 import { useViewsQuery } from "services"
 import { useI18n } from "../../i18n"
 
+import { NotesSearchInput } from "../NotesSearchInput"
 import { PaletteSelector } from "../PaletteSelector"
 
-function HeaderShell({ left, right }: { left: ReactNode; right: ReactNode }) {
+function HeaderShell({ left, center, right }: { left: ReactNode; center?: ReactNode; right: ReactNode }) {
   return (
     <Flex
       as="header"
       alignItems="center"
       justifyContent="space-between"
+      flexWrap={{ base: "wrap", md: "nowrap" }}
       borderBottomColor="app.border"
       borderBottomWidth="1px"
       position="sticky"
@@ -45,8 +47,17 @@ function HeaderShell({ left, right }: { left: ReactNode; right: ReactNode }) {
       zIndex="sticky"
       backgroundColor="app.background"
     >
-      {left}
-      {right}
+      <Flex order={1} alignItems="center">
+        {left}
+      </Flex>
+      {center && (
+        <Box order={{ base: 3, md: 2 }} flexBasis={{ base: "100%", md: "auto" }} flex={{ md: "1" }}>
+          {center}
+        </Box>
+      )}
+      <Flex order={{ base: 2, md: 3 }} alignItems="center">
+        {right}
+      </Flex>
     </Flex>
   )
 }
@@ -78,9 +89,11 @@ export function Header() {
   const currentView = view
     ? data.views.find(({ id }) => id === view)
     : undefined
+  const showNotesSearch = currentView?.component === "NotesGallery"
 
   return (
     <HeaderShell
+      center={showNotesSearch ? <NotesSearchInput /> : null}
       left={
         <BreadcrumbRoot size="md">
           <BreadcrumbList

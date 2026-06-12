@@ -451,6 +451,7 @@ const createScannedNote = (
   folder: "topic",
   frontmatter: null,
   fullPath: "/notes/topic/note.md",
+  fullText: "",
   id: "note",
   modifiedDate: "2026-05-26T01:00:00.000Z",
   obsidianUrl: "obsidian://open?vault=vault&file=topic%2Fnote",

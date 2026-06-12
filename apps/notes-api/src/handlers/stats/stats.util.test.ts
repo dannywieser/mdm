@@ -24,6 +24,7 @@ const createNote = (
   folder: "notes",
   frontmatter: null,
   fullPath: "/notes/note.md",
+  fullText: "",
   id: "note",
   obsidianUrl: "obsidian://open?vault=vault&file=note",
   title: "note",

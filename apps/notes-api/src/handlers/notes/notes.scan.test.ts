@@ -88,6 +88,7 @@ describe("notes scan helpers", () => {
       folder: "topic",
       frontmatter: null,
       fullPath: "/notes/topic/welcome.md",
+      fullText: "# Welcome\n\nThis is a note.",
       id: "17e3771f-2773-5c87-8f66-6a455a878763",
       modifiedDate: "2026-05-26T01:00:00.000Z",
       obsidianUrl: "obsidian://open?vault=dgw&file=topic%2Fwelcome",

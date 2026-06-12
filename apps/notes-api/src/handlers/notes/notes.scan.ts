@@ -60,6 +60,7 @@ export const scanMarkdownFile = async (
     folder: path.relative(notesDirectory, path.dirname(filePath)).split(path.sep).join("/"),
     frontmatter,
     fullPath: filePath,
+    fullText: body,
     id: createFileID(filePath, FILE_ID_NAMESPACE),
     modifiedDate: stats.mtime.toISOString(),
     obsidianUrl,

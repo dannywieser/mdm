@@ -29,6 +29,7 @@ vi.mock("services", async (importOriginal) => {
         views: [
           { id: "daily", name: "daily review" },
           { id: "downtime-active", name: "active downtime" },
+          { component: "NotesGallery", id: "books", name: "books" },
         ],
       },
     }),
@@ -126,5 +127,23 @@ describe("Header", () => {
     expect(screen.getByRole("button", { name: "Close" })).toBeTruthy()
     expect(screen.queryByText("2026-06-01")).toBeNull()
     expect(screen.queryByTestId("palette-selector")).toBeNull()
+  })
+
+  test("shows notes search input on a NotesGallery view route", () => {
+    renderAt("/notes/books")
+
+    expect(screen.getByRole("textbox", { name: "header.searchNotes" })).toBeTruthy()
+  })
+
+  test("hides notes search input on routes with a different view component", () => {
+    renderAt("/notes/daily")
+
+    expect(screen.queryByRole("textbox", { name: "header.searchNotes" })).toBeNull()
+  })
+
+  test("hides notes search input on the home route", () => {
+    renderAt("/")
+
+    expect(screen.queryByRole("textbox", { name: "header.searchNotes" })).toBeNull()
   })
 })
