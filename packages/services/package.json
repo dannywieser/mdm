@@ -1,6 +1,6 @@
 {
   "name": "services",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "private": true,
   "main": "dist/index.js",
   "types": "index.d.ts",
@@ -16,8 +16,8 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "app-config": "1.7.0",
-    "markdown": "1.7.0"
+    "app-config": "1.8.0",
+    "markdown": "1.8.0"
   },
   "peerDependencies": {
     "@tanstack/react-query": "5.100.14",

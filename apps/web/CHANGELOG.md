@@ -1,5 +1,23 @@
 # web
 
+## 1.8.0
+
+### Minor Changes
+
+- 9e2f995: Home view cards for "NotesReview" views now show read/unread progress (e.g. `0/10`) and a green check once all notes in the view have been read.
+- da76fb7: Add a search input to the header on the notes gallery view that filters note cards by matching keywords against the title, frontmatter, and full note body text. The `/notes` API response now includes a `fullText` field on each note containing its raw markdown body.
+- e476e6f: Add a dedicated `GET /views` endpoint that lists configured views along with the matching note IDs and counts, and remove the `views` property from the `/stats` response. The web app now fetches views from the new endpoint.
+
+### Patch Changes
+
+- 31b7059: Preserve single line breaks within markdown paragraphs by rendering them as `<br>` elements instead of collapsing them.
+- 11bec29: Fix NotesReview "Mark as Read" toggling already-read notes back to unread, and fast-forward to the next unread note (or end of the list) instead of just advancing by one.
+- 11bec29: Fix NotesReview scrolling under the sticky header when moving to a new note, leaving the title hidden for longer notes.
+- 957fdaa: Add a shared `services` package with per-domain (notes, habits, flags, images) response types and React Query hooks, removing duplicated and drifted type definitions from `apps/web` and the API apps. The web app now consumes shared `useNotesQuery`, `useViewsQuery`, `useStatsQuery`, `useHabitsQuery`, `useHabitQuery`, `useIsRead`, and `useToggleNoteRead` hooks, and `apps/notes-api`, `apps/habit-tracker`, and `apps/flag-manager` re-export their wire-shape types from `services` so handler outputs are checked against the shared contract. The habit history/score API responses now consistently include the full set of fields (`windowEntries`, `windowStart`, `rawScore`, `scoreBeforeMultipliers`, `streakMultiplier`, `dayMultiplier`, `recentEntryAdditions`) that were previously typed inconsistently between client and server.
+- Updated dependencies [957fdaa]
+  - services@1.8.0
+  - mdm-util@1.8.0
+
 ## 1.7.0
 
 ### Minor Changes
