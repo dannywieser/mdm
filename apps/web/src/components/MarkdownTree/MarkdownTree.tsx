@@ -61,7 +61,7 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
         )
       }
 
-      return <Fragment key={key}>{node.value ?? ""}</Fragment>
+      return <Fragment key={key}>{renderTextWithLineBreaks(node.value ?? "", key)}</Fragment>
     case "strong":
       return (
         <Text as="strong" key={key} fontWeight="semibold">
@@ -199,6 +199,13 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
       return <Fragment key={key}>{children}</Fragment>
   }
 }
+
+const renderTextWithLineBreaks = (value: string, key: string): ReactNode[] =>
+  value.split("\n").flatMap((line, index, lines) =>
+    index < lines.length - 1
+      ? [line, <br key={`${key}-break-${index}`} />]
+      : [line],
+  )
 
 const renderChildren = (node: MarkdownNode): ReactNode[] =>
   (node.children ?? []).map((childNode, index) =>
