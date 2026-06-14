@@ -1,5 +1,12 @@
 # markdown
 
+## 1.8.0
+
+### Patch Changes
+
+- da76fb7: Add a search input to the header on the notes gallery view that filters note cards by matching keywords against the title, frontmatter, and full note body text. The `/notes` API response now includes a `fullText` field on each note containing its raw markdown body.
+  - mdm-util@1.8.0
+
 ## 1.7.0
 
 ### Minor Changes
