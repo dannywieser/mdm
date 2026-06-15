@@ -17,7 +17,7 @@ const CARD_FOCUS_STYLE = {
 
 const MASONRY_GAP_PX = 16
 const MASONRY_ROW_HEIGHT_PX = 8
-const MASONRY_COLUMNS = { base: 1, md: 3, lg: 4, xl: 5, "2xl": 6 }
+const MASONRY_COLUMNS = { base: 1, md: 3, lg: 4, xl: 5, "2xl": 8 }
 const DEFAULT_ASPECT_RATIO = "3/4"
 
 const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => (
