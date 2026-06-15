@@ -17,7 +17,7 @@ const CARD_FOCUS_STYLE = {
 
 const MASONRY_GAP_PX = 16
 const MASONRY_ROW_HEIGHT_PX = 8
-const MASONRY_COLUMNS = { base: 1, md: 3, lg: 4 }
+const MASONRY_COLUMNS = { base: 1, md: 3, lg: 4, xl: 5, "2xl": 8 }
 const DEFAULT_ASPECT_RATIO = "3/4"
 
 const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => (
@@ -90,6 +90,8 @@ export const NoteCoverGrid = ({ aspectRatio, badges = [], notes }: NoteCoverGrid
       base: `repeat(${MASONRY_COLUMNS.base}, 1fr)`,
       md: `repeat(${MASONRY_COLUMNS.md}, 1fr)`,
       lg: `repeat(${MASONRY_COLUMNS.lg}, 1fr)`,
+      xl: `repeat(${MASONRY_COLUMNS.xl}, 1fr)`,
+      "2xl": `repeat(${MASONRY_COLUMNS["2xl"]}, 1fr)`,
     }}
     p={6}
   >
