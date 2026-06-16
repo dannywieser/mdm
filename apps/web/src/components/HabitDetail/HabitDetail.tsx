@@ -193,7 +193,13 @@ export function HabitDetail() {
               <Text fontSize="xs" color="app.textMuted" letterSpacing="wide">
                 {t("habit.personalRecords")}
               </Text>
-              <SimpleGrid columns={{ base: 1, sm: 3 }} gap={3}>
+              <SimpleGrid
+                columns={{
+                  base: 1,
+                  sm: habit.lowestDaysTrackedPerPeriod !== undefined ? 2 : 3,
+                }}
+                gap={3}
+              >
                 <StatRoot size="sm">
                   <StatLabel color="app.textMuted">
                     {t("habit.highestScore")}
@@ -214,6 +220,16 @@ export function HabitDetail() {
                     {habit.allTimeHighWindowEntries}
                   </StatValueText>
                 </StatRoot>
+                {habit.lowestDaysTrackedPerPeriod !== undefined && (
+                  <StatRoot size="sm">
+                    <StatLabel color="app.textMuted">
+                      {t("habit.fewestDaysPerPeriod")}
+                    </StatLabel>
+                    <StatValueText>
+                      {habit.lowestDaysTrackedPerPeriod}
+                    </StatValueText>
+                  </StatRoot>
+                )}
               </SimpleGrid>
             </VStack>
           </Box>

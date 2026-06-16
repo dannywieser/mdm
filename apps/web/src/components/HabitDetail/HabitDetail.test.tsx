@@ -164,6 +164,19 @@ describe("HabitDetail", () => {
     expect(screen.getByText("7")).toBeTruthy()
   })
 
+  test("shows fewest days per period stat for do-less habits", () => {
+    renderDetail({ ...HABIT, mode: "do-less", lowestDaysTrackedPerPeriod: 3 })
+
+    expect(screen.getByText("habit.fewestDaysPerPeriod")).toBeTruthy()
+    expect(screen.getByText("3")).toBeTruthy()
+  })
+
+  test("omits fewest days per period stat for do-more habits", () => {
+    renderDetail()
+
+    expect(screen.queryByText("habit.fewestDaysPerPeriod")).toBeNull()
+  })
+
   test("renders a table of score entries with their values and recency multipliers inline", () => {
     renderDetail()
 
