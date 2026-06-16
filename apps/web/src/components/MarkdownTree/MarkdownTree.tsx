@@ -148,6 +148,13 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
           textDecoration="underline"
           target={isExternalLink(href) ? "_blank" : undefined}
           rel={isExternalLink(href) ? "noreferrer" : undefined}
+          outline="none"
+          _focusVisible={{
+            outlineWidth: "2px",
+            outlineStyle: "solid",
+            outlineColor: "app.accent",
+            outlineOffset: "2px",
+          }}
         >
           {children}
         </Link>

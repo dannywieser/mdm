@@ -188,6 +188,13 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
             width={{ base: "full", sm: "auto" }}
             onClick={handleMarkAsRead}
             loading={toggleRead.isPending}
+            outline="none"
+            _focusVisible={{
+              outlineWidth: "2px",
+              outlineStyle: "solid",
+              outlineColor: "app.accent",
+              outlineOffset: "2px",
+            }}
           >
             <BookCheck size={16} />
             {t("notes.markAsRead")}

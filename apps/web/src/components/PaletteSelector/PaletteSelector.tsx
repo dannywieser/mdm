@@ -27,6 +27,13 @@ export const PaletteSelector = () => {
           color={colorPaletteDefinitions[palette].dark.accent}
           _hover={{ bg: "app.panelBackgroundHover" }}
           transition="background 0.15s"
+          outline="none"
+          _focusVisible={{
+            outlineWidth: "2px",
+            outlineStyle: "solid",
+            outlineColor: "app.accent",
+            outlineOffset: "2px",
+          }}
         >
           <Palette size={20} />
         </RouterLink>

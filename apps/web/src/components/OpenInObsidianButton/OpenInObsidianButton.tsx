@@ -13,6 +13,13 @@ export const OpenInObsidianButton = ({ note }: OpenInObsidianButtonProps) => (
     color="app.accent"
     bg="app.panelBackground"
     _hover={{ bg: "app.panelBackgroundHover" }}
+    outline="none"
+    _focusVisible={{
+      outlineWidth: "2px",
+      outlineStyle: "solid",
+      outlineColor: "app.accent",
+      outlineOffset: "2px",
+    }}
   >
     <a href={note.obsidianUrl}>
       <ExternalLink size={16} />
