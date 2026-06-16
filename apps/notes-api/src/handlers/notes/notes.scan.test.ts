@@ -205,4 +205,71 @@ This is a note.`)
     )
     expect(note.title).toBe("2026.05.27 (Wed) á")
   })
+
+  test("scanMarkdownFile resolves bare cover filename to attachment path", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "",
+      frontmatter: { cover: "attach-20260616070917164.png" },
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile(
+      "/notes/games/citizen-sleeper-2.md",
+      "/notes",
+      "vault",
+      [],
+      "created",
+      false,
+      "attachments",
+    )
+
+    expect(note.frontmatter?.["cover"]).toBe(
+      "attachments/games/citizen-sleeper-2/attach-20260616070917164.png",
+    )
+  })
+
+  test("scanMarkdownFile leaves cover path unchanged when it already starts with the attachments directory", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "",
+      frontmatter: {
+        cover: "attachments/downtime/The Rogue Prince of Persia/attach-20260503144843356.jpg",
+      },
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile(
+      "/notes/downtime/the-rogue-prince-of-persia.md",
+      "/notes",
+      "vault",
+      [],
+      "created",
+      false,
+      "attachments",
+    )
+
+    expect(note.frontmatter?.["cover"]).toBe(
+      "attachments/downtime/The Rogue Prince of Persia/attach-20260503144843356.jpg",
+    )
+  })
+
+  test("scanMarkdownFile leaves external url in cover frontmatter unchanged", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "",
+      frontmatter: { cover: "https://example.com/cover.png" },
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/note.md", "/notes", "vault")
+
+    expect(note.frontmatter?.["cover"]).toBe("https://example.com/cover.png")
+  })
 })

@@ -7,6 +7,8 @@ import path from "node:path"
 
 import type { ScannedNote } from "./notes.types"
 
+import { resolveFrontmatterImages } from "./notes.parse"
+
 export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 
 export const resolveCreatedDate = (
@@ -35,6 +37,7 @@ export const scanMarkdownFile = async (
   dateFormats: readonly string[] = [],
   createdDateProperty: string = "created",
   deriveTitleDate: boolean = false,
+  attachmentsDirectory: string = "attachments",
 ): Promise<ScannedNote> => {
   const [source, stats] = await Promise.all([
     fs.readFile(filePath, "utf8"),
@@ -52,13 +55,15 @@ export const scanMarkdownFile = async (
   )
 
   const obsidianUrl = buildObsidianUrl(obsidianVault, notesDirectory, filePath)
+  const relativePath = path.relative(notesDirectory, filePath).split(path.sep).join("/")
+  const resolvedFrontmatter = resolveFrontmatterImages(frontmatter, relativePath, attachmentsDirectory)
 
   return {
     basename,
     titleOrBodyDates,
     createdDate: resolveCreatedDate(frontmatter, title, createdDateProperty, deriveTitleDate, dateFormats),
     folder: path.relative(notesDirectory, path.dirname(filePath)).split(path.sep).join("/"),
-    frontmatter,
+    frontmatter: resolvedFrontmatter,
     fullPath: filePath,
     fullText: body,
     id: createFileID(filePath, FILE_ID_NAMESPACE),

@@ -24,7 +24,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
 
     const scannedNotes = await Promise.all(
       markdownFiles.map((filePath) =>
-        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, createdDateProperty, deriveTitleDate),
+        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, createdDateProperty, deriveTitleDate, attachmentsDirectory),
       ),
     )
     const requestedView =

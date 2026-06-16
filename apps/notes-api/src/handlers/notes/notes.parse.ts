@@ -1,4 +1,4 @@
-import type { MarkdownNode, Note } from "markdown"
+import type { MarkdownNode, Note, NoteFrontmatter } from "markdown"
 
 import { parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
@@ -50,6 +50,27 @@ export const parseMarkdownFile = async (
     content,
     linkedNotes,
   }
+}
+
+export const resolveFrontmatterImages = (
+  frontmatter: NoteFrontmatter | null,
+  noteRelativePath: string,
+  attachmentsDirectory: string,
+): NoteFrontmatter | null => {
+  if (!frontmatter) return null
+
+  const cover = frontmatter["cover"]
+  if (!cover) return frontmatter
+
+  const rawPath = Array.isArray(cover) ? cover[0] : cover
+  if (!rawPath) return frontmatter
+
+  if (rawPath.startsWith(`${attachmentsDirectory}/`)) return frontmatter
+
+  const resolvedPath = resolveLocalImagePath(rawPath, noteRelativePath, attachmentsDirectory)
+  if (!resolvedPath) return frontmatter
+
+  return { ...frontmatter, cover: resolvedPath }
 }
 
 const buildMarkdownTree = (

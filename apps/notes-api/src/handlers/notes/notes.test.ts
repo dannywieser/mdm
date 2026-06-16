@@ -40,6 +40,7 @@ vi.mock("./filters/notes.filters", () => ({
 vi.mock("./notes.parse", () => ({
   EMPTY_MARKDOWN_NODE: { children: [], type: "root" },
   parseMarkdownFile: vi.fn(),
+  resolveFrontmatterImages: vi.fn((fm: unknown) => fm),
 }))
 
 vi.mock("./notes.scan", () => ({
@@ -155,8 +156,8 @@ describe("notes handler interface", () => {
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(scanMarkdownFileMock.mock.calls).toEqual([
-      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"], "created", false],
-      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"], "created", false],
+      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"], "created", false, "attachments"],
+      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"], "created", false, "attachments"],
     ])
     expect(applyViewFilterMock).toHaveBeenCalledWith(
       scannedNotes,
