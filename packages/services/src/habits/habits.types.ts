@@ -47,6 +47,7 @@ export interface HabitResult {
   habitName: string
   habitScore: number
   history: HabitHistoryEntry[]
+  lowestDaysTrackedPerPeriod?: number
   mode: HabitMode
   scoreEntries: HabitScoreEntry[]
   streak: number

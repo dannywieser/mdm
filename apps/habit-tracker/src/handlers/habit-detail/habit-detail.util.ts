@@ -226,3 +226,30 @@ export const buildStreaks = (entries: HabitEntry[], mode: HabitMode): HabitStrea
   const sortedDates = [...new Set(entries.map((e) => e.date))].sort((a, b) => a.localeCompare(b))
   return mode === "do-more" ? buildConsecutiveEntryStreaks(sortedDates) : buildGapStreaks(sortedDates)
 }
+
+// For do-less habits: the minimum number of tracked days seen across any
+// `windowDays`-length period, working backwards from `referenceDate`. The
+// oldest period may be partial (if tracking started mid-window), and its
+// raw entry count is used as-is.
+export const calculateLowestDaysTrackedPerPeriod = (
+  entries: HabitEntry[],
+  referenceDate: string,
+  windowDays: number,
+): number => {
+  if (entries.length === 0) return 0
+
+  const uniqueDates = [...new Set(entries.map((e) => e.date))].sort()
+  const firstEntryDate = uniqueDates[0]
+
+  const counts: number[] = []
+  let periodEnd = referenceDate
+
+  while (periodEnd >= firstEntryDate) {
+    const periodStart = getDateWindowStart(periodEnd, windowDays - 1)
+    const count = uniqueDates.filter((d) => d >= periodStart && d <= periodEnd).length
+    counts.push(count)
+    periodEnd = addDays(periodStart, -1)
+  }
+
+  return Math.min(...counts)
+}

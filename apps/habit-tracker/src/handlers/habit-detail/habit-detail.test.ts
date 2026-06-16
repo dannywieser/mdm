@@ -14,6 +14,7 @@ import {
   calculateConsecutiveEntryStreak,
   calculateDaysSinceLastEntry,
   calculateHabitScore,
+  calculateLowestDaysTrackedPerPeriod,
   calculateRawScore,
   calculateRecentEntryAdditions,
   calculateStreak,
@@ -794,6 +795,84 @@ describe("buildStreaks", () => {
 })
 
 // ---------------------------------------------------------------------------
+// calculateLowestDaysTrackedPerPeriod
+// ---------------------------------------------------------------------------
+
+describe("calculateLowestDaysTrackedPerPeriod", () => {
+  test("returns 0 for no entries", () => {
+    expect(calculateLowestDaysTrackedPerPeriod([], "2025-06-01", 90)).toBe(0)
+  })
+
+  test("returns the count for a single incomplete period", () => {
+    // Only 10 days of tracking, window is 90 → one partial period with 3 entries
+    const entries = [
+      makeEntry("2025-05-23", 1),
+      makeEntry("2025-05-25", 1),
+      makeEntry("2025-06-01", 1),
+    ]
+    expect(calculateLowestDaysTrackedPerPeriod(entries, "2025-06-01", 90)).toBe(3)
+  })
+
+  test("returns the minimum across multiple exactly-aligned periods", () => {
+    // windowDays = 10, referenceDate = 2025-01-30
+    // Period 1: 2025-01-21..2025-01-30 → 2 unique dates
+    // Period 2: 2025-01-11..2025-01-20 → 3 unique dates
+    // Period 3: 2025-01-01..2025-01-10 → 4 unique dates
+    const entries = [
+      // Period 3 (oldest)
+      makeEntry("2025-01-01", 1),
+      makeEntry("2025-01-03", 1),
+      makeEntry("2025-01-05", 1),
+      makeEntry("2025-01-07", 1),
+      // Period 2
+      makeEntry("2025-01-11", 1),
+      makeEntry("2025-01-13", 1),
+      makeEntry("2025-01-15", 1),
+      // Period 1 (most recent)
+      makeEntry("2025-01-21", 1),
+      makeEntry("2025-01-25", 1),
+    ]
+    expect(calculateLowestDaysTrackedPerPeriod(entries, "2025-01-30", 10)).toBe(2)
+  })
+
+  test("a period with zero entries counts as 0 and becomes the minimum", () => {
+    // windowDays = 10, entries only in the oldest period
+    // Period 1 (2025-01-21..2025-01-30): 0 entries
+    // Period 2 (2025-01-11..2025-01-20): 0 entries
+    // Period 3 (2025-01-01..2025-01-10): 2 entries
+    const entries = [
+      makeEntry("2025-01-03", 1),
+      makeEntry("2025-01-07", 1),
+    ]
+    expect(calculateLowestDaysTrackedPerPeriod(entries, "2025-01-30", 10)).toBe(0)
+  })
+
+  test("duplicate dates on the same day count as one tracked day", () => {
+    const entries = [
+      makeEntry("2025-01-01", 3),
+      makeEntry("2025-01-01", 5), // same date, different value
+      makeEntry("2025-01-05", 1),
+    ]
+    // One period spanning the window; 2 unique dates
+    expect(calculateLowestDaysTrackedPerPeriod(entries, "2025-01-10", 10)).toBe(2)
+  })
+
+  test("oldest partial period (tracking started mid-window) is included as-is", () => {
+    // windowDays = 10, tracking started on 2025-01-06 (mid-period)
+    // Period 1 (2025-01-11..2025-01-20): 2 entries
+    // Partial period (2025-01-01..2025-01-10): only 2 entries (before 2025-01-06, zero)
+    const entries = [
+      makeEntry("2025-01-06", 1), // mid-window start
+      makeEntry("2025-01-09", 1),
+      makeEntry("2025-01-11", 1),
+      makeEntry("2025-01-19", 1),
+    ]
+    // Both periods have 2 entries
+    expect(calculateLowestDaysTrackedPerPeriod(entries, "2025-01-20", 10)).toBe(2)
+  })
+})
+
+// ---------------------------------------------------------------------------
 // Large dataset: 365 days of entries across 2025
 // ---------------------------------------------------------------------------
 
@@ -1125,6 +1204,20 @@ describe("habitDetailHandler", () => {
     expect(result.allTimeHighScore).toBeGreaterThan(0)
     expect(result.allTimeHighStreak).toBeGreaterThanOrEqual(1)
     expect(result.allTimeHighWindowEntries).toBeGreaterThanOrEqual(1)
+  })
+
+  test("lowestDaysTrackedPerPeriod is present for do-less habits", async () => {
+    const { response, json } = makeResponse()
+    await habitDetailHandler(makeRequest("stress"), response, vi.fn())
+    const result = getJsonResult(json)
+    expect(result.lowestDaysTrackedPerPeriod).toBeDefined()
+    expect(typeof result.lowestDaysTrackedPerPeriod).toBe("number")
+  })
+
+  test("lowestDaysTrackedPerPeriod is absent for do-more habits", async () => {
+    const { response, json } = makeResponse()
+    await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
+    expect(getJsonResult(json).lowestDaysTrackedPerPeriod).toBeUndefined()
   })
 
   test("returns 500 with config error message on AppConfigError", async () => {

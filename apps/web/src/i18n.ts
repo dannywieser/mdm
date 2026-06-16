@@ -17,6 +17,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "habit.do-more": "do more: {name}",
     "habit.do-more-streak": "streak of more",
     "habit.do-less-streak": "streak of less",
+    "habit.fewestDaysPerPeriod": "fewest days per period",
     "habit.mostDaysLogged": "most days logged",
     "habit.newHigh": "new high!",
     "habit.personalRecords": "personal records",
