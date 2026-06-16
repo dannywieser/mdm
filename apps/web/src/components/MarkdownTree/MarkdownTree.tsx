@@ -14,6 +14,7 @@ import type { MarkdownNode } from "markdown"
 import { CircleCheck, CircleDashed } from "lucide-react"
 import { Fragment, type ReactNode } from "react"
 
+import { focusRing } from "../../theme/focusRing"
 import { FadeImage } from "../FadeImage"
 import { MarkdownHeading } from "./MarkdownHeading"
 import type { MarkdownTreeProps } from "./MarkdownTree.types"
@@ -148,6 +149,7 @@ const renderNode = (node: MarkdownNode | undefined, key: string): ReactNode => {
           textDecoration="underline"
           target={isExternalLink(href) ? "_blank" : undefined}
           rel={isExternalLink(href) ? "noreferrer" : undefined}
+          {...focusRing}
         >
           {children}
         </Link>

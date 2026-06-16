@@ -27,6 +27,9 @@ const createPaletteSystem = (paletteName: ColorPaletteName) => {
       },
       semanticTokens: {
         colors: {
+          gray: {
+            focusRing: { value: { _light: light.accent, _dark: dark.accent } },
+          },
           app: {
             background: { value: { base: light.background, _dark: dark.background } },
             text: { value: { base: light.text, _dark: dark.text } },

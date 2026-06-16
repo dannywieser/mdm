@@ -27,6 +27,7 @@ import { BarChart2, X } from "lucide-react"
 import { useViewsQuery } from "services"
 import { useI18n } from "../../i18n"
 
+import { focusRing } from "../../theme/focusRing"
 import { NotesSearchInput } from "../NotesSearchInput"
 import { PaletteSelector } from "../PaletteSelector"
 
@@ -109,6 +110,7 @@ export function Header() {
                     asChild
                     fontWeight="semibold"
                     color="app.text"
+                    {...focusRing}
                   >
                     <Link to="/">{t("app.name")}</Link>
                   </BreadcrumbLink>
@@ -127,6 +129,7 @@ export function Header() {
                     asChild
                     fontWeight="semibold"
                     color="app.text"
+                    {...focusRing}
                   >
                     <Link to="/">{t("app.name")}</Link>
                   </BreadcrumbLink>
@@ -145,6 +148,7 @@ export function Header() {
                     asChild
                     fontWeight="semibold"
                     color="app.text"
+                    {...focusRing}
                   >
                     <Link to="/">{t("app.name")}</Link>
                   </BreadcrumbLink>
@@ -163,6 +167,7 @@ export function Header() {
                     asChild
                     fontWeight="semibold"
                     color="app.text"
+                    {...focusRing}
                   >
                     <Link to="/">{t("app.name")}</Link>
                   </BreadcrumbLink>
@@ -198,6 +203,7 @@ export function Header() {
             cursor="pointer"
             _hover={{ bg: "app.panelBackgroundHover", color: "app.text" }}
             transition="background 0.15s, color 0.15s"
+            {...focusRing}
             onClick={() =>
               location.key !== "default" ? navigate(-1) : navigate("/")
             }
@@ -222,6 +228,7 @@ export function Header() {
                   color="app.text"
                   _hover={{ bg: "app.panelBackgroundHover" }}
                   transition="background 0.15s"
+                  {...focusRing}
                 >
                   <BarChart2 size={20} />
                 </RouterLink>

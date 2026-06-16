@@ -1,8 +1,9 @@
-import { Drawer, IconButton, Text, VStack } from "@chakra-ui/react"
+import { Drawer, IconButton, Link, Text, VStack } from "@chakra-ui/react"
 import { BookCheck, X } from "lucide-react"
 
 import { useI18n } from "../../i18n"
 
+import { focusRing } from "../../theme/focusRing"
 import type { NotesReviewTableOfContentsProps } from "./NotesReviewTableOfContents.types"
 
 const TocList = ({ notes, currentIndex }: NotesReviewTableOfContentsProps) => {
@@ -20,8 +21,10 @@ const TocList = ({ notes, currentIndex }: NotesReviewTableOfContentsProps) => {
         {t("review.forReview", { count: notes.length })}
       </Text>
       {notes.map((note, i) => (
-        <Text
+        <Link
           key={note.id}
+          href={note.obsidianUrl}
+          display="block"
           color={
             i === currentIndex
               ? "app.accent"
@@ -34,11 +37,11 @@ const TocList = ({ notes, currentIndex }: NotesReviewTableOfContentsProps) => {
           overflow="hidden"
           textOverflow="ellipsis"
           whiteSpace="nowrap"
+          textDecoration="none"
+          {...focusRing}
         >
-          <a href={note.obsidianUrl} style={{ textDecoration: "none", color: "inherit" }}>
-            {note.title}
-          </a>
-        </Text>
+          {note.title}
+        </Link>
       ))}
     </VStack>
   )
@@ -81,6 +84,7 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
           size="sm"
           variant="ghost"
           _hover={{ bg: "app.panelBackgroundHover" }}
+          {...focusRing}
         >
           <BookCheck size={16} />
           <Text fontSize="xs" ml="1">
@@ -95,7 +99,11 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
               {t("review.forReview", { count: notes.length })}
             </Drawer.Title>
             <Drawer.CloseTrigger asChild>
-              <IconButton aria-label={t("review.close")} variant="ghost">
+              <IconButton
+                aria-label={t("review.close")}
+                variant="ghost"
+                {...focusRing}
+              >
                 <X size={16} />
               </IconButton>
             </Drawer.CloseTrigger>
@@ -103,8 +111,9 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
           <Drawer.Body>
             <VStack align="stretch" gap="3">
               {notes.map((note, i) => (
-                <Text
+                <Link
                   key={note.id}
+                  href={note.obsidianUrl}
                   color={
                     i === currentIndex
                       ? "app.accent"
@@ -116,11 +125,11 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
                     i === currentIndex || !note.isRead ? "bold" : undefined
                   }
                   fontSize="sm"
+                  textDecoration="none"
+                  {...focusRing}
                 >
-                  <a href={note.obsidianUrl} style={{ textDecoration: "none", color: "inherit" }}>
-                    {note.title}
-                  </a>
-                </Text>
+                  {note.title}
+                </Link>
               ))}
             </VStack>
           </Drawer.Body>

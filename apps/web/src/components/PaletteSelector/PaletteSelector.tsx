@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 
 const RouterLink = chakra(Link)
 
+import { focusRing } from "../../theme/focusRing"
 import { useColorPalette } from "../../context/ColorPalette/useColorPalette"
 import { useI18n } from "../../i18n"
 import { colorPaletteDefinitions } from "../../theme/palettes"
@@ -27,6 +28,7 @@ export const PaletteSelector = () => {
           color={colorPaletteDefinitions[palette].dark.accent}
           _hover={{ bg: "app.panelBackgroundHover" }}
           transition="background 0.15s"
+          {...focusRing}
         >
           <Palette size={20} />
         </RouterLink>
