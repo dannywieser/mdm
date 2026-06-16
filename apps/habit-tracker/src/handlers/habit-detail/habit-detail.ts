@@ -8,7 +8,7 @@ import { toLoggableError } from "mdm-util"
 import type { HabitResult } from "./habit-detail.types"
 
 import { scanHabitEntries } from "./habit-detail.files"
-import { buildHistory, buildScoreEntries, buildStreaks, calculateHabitScore, getWindowEntries } from "./habit-detail.util"
+import { buildHistory, buildScoreEntries, buildStreaks, calculateHabitScore, calculateLowestDaysTrackedPerPeriod, getWindowEntries } from "./habit-detail.util"
 
 export const habitDetailHandler: RequestHandler = async (request, response) => {
   let notesConfig: ResolvedNotesConfig | undefined
@@ -72,6 +72,9 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
     const allTimeHighScore = history.reduce((max, h) => Math.max(max, h.habitScore), 0)
     const allTimeHighStreak = streaks.reduce((max, s) => Math.max(max, s.length), 0)
     const allTimeHighWindowEntries = history.reduce((max, h) => Math.max(max, h.windowEntries), 0)
+    const lowestDaysTrackedPerPeriod = mode === "do-less"
+      ? calculateLowestDaysTrackedPerPeriod(entries, today, trackingWindowDays)
+      : undefined
 
     const result: HabitResult = {
       allTimeHighScore,
@@ -81,6 +84,7 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
       habitName: name,
       history,
       habitScore,
+      lowestDaysTrackedPerPeriod,
       mode,
       scoreEntries,
       streak,
