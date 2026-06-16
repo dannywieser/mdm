@@ -27,18 +27,9 @@ import { BarChart2, X } from "lucide-react"
 import { useViewsQuery } from "services"
 import { useI18n } from "../../i18n"
 
+import { focusRing } from "../../theme/focusRing"
 import { NotesSearchInput } from "../NotesSearchInput"
 import { PaletteSelector } from "../PaletteSelector"
-
-const focusVisibleRing = {
-  outline: "none",
-  _focusVisible: {
-    outlineWidth: "2px",
-    outlineStyle: "solid",
-    outlineColor: "app.accent",
-    outlineOffset: "2px",
-  },
-} as const
 
 function HeaderShell({ left, center, right }: { left: ReactNode; center?: ReactNode; right: ReactNode }) {
   return (
@@ -119,7 +110,7 @@ export function Header() {
                     asChild
                     fontWeight="semibold"
                     color="app.text"
-                    {...focusVisibleRing}
+                    {...focusRing}
                   >
                     <Link to="/">{t("app.name")}</Link>
                   </BreadcrumbLink>
@@ -138,7 +129,7 @@ export function Header() {
                     asChild
                     fontWeight="semibold"
                     color="app.text"
-                    {...focusVisibleRing}
+                    {...focusRing}
                   >
                     <Link to="/">{t("app.name")}</Link>
                   </BreadcrumbLink>
@@ -157,7 +148,7 @@ export function Header() {
                     asChild
                     fontWeight="semibold"
                     color="app.text"
-                    {...focusVisibleRing}
+                    {...focusRing}
                   >
                     <Link to="/">{t("app.name")}</Link>
                   </BreadcrumbLink>
@@ -176,7 +167,7 @@ export function Header() {
                     asChild
                     fontWeight="semibold"
                     color="app.text"
-                    {...focusVisibleRing}
+                    {...focusRing}
                   >
                     <Link to="/">{t("app.name")}</Link>
                   </BreadcrumbLink>
@@ -212,7 +203,7 @@ export function Header() {
             cursor="pointer"
             _hover={{ bg: "app.panelBackgroundHover", color: "app.text" }}
             transition="background 0.15s, color 0.15s"
-            {...focusVisibleRing}
+            {...focusRing}
             onClick={() =>
               location.key !== "default" ? navigate(-1) : navigate("/")
             }
@@ -237,7 +228,7 @@ export function Header() {
                   color="app.text"
                   _hover={{ bg: "app.panelBackgroundHover" }}
                   transition="background 0.15s"
-                  {...focusVisibleRing}
+                  {...focusRing}
                 >
                   <BarChart2 size={20} />
                 </RouterLink>

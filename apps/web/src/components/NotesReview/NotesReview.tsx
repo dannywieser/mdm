@@ -9,6 +9,7 @@ import { fetchIsRead, useNotesQuery, useToggleRead } from "services"
 
 import { useI18n } from "../../i18n"
 
+import { focusRing } from "../../theme/focusRing"
 import type { NotesReviewRouteParamKey } from "./NotesReview.types"
 import { LinkedNotesList } from "../LinkedNotesList"
 import { MarkdownTree } from "../MarkdownTree"
@@ -188,13 +189,7 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
             width={{ base: "full", sm: "auto" }}
             onClick={handleMarkAsRead}
             loading={toggleRead.isPending}
-            outline="none"
-            _focusVisible={{
-              outlineWidth: "2px",
-              outlineStyle: "solid",
-              outlineColor: "app.accent",
-              outlineOffset: "2px",
-            }}
+            {...focusRing}
           >
             <BookCheck size={16} />
             {t("notes.markAsRead")}

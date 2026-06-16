@@ -1,6 +1,7 @@
 import { IconButton } from "@chakra-ui/react"
 import { ExternalLink } from "lucide-react"
 
+import { focusRing } from "../../theme/focusRing"
 import type { OpenInObsidianButtonProps } from "./OpenInObsidianButton.types"
 
 export const OpenInObsidianButton = ({ note }: OpenInObsidianButtonProps) => (
@@ -13,13 +14,7 @@ export const OpenInObsidianButton = ({ note }: OpenInObsidianButtonProps) => (
     color="app.accent"
     bg="app.panelBackground"
     _hover={{ bg: "app.panelBackgroundHover" }}
-    outline="none"
-    _focusVisible={{
-      outlineWidth: "2px",
-      outlineStyle: "solid",
-      outlineColor: "app.accent",
-      outlineOffset: "2px",
-    }}
+    {...focusRing}
   >
     <a href={note.obsidianUrl}>
       <ExternalLink size={16} />

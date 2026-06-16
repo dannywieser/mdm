@@ -3,6 +3,7 @@ import { BookCheck, X } from "lucide-react"
 
 import { useI18n } from "../../i18n"
 
+import { focusRing } from "../../theme/focusRing"
 import type { NotesReviewTableOfContentsProps } from "./NotesReviewTableOfContents.types"
 
 const TocList = ({ notes, currentIndex }: NotesReviewTableOfContentsProps) => {
@@ -37,13 +38,7 @@ const TocList = ({ notes, currentIndex }: NotesReviewTableOfContentsProps) => {
           textOverflow="ellipsis"
           whiteSpace="nowrap"
           textDecoration="none"
-          outline="none"
-          _focusVisible={{
-            outlineWidth: "2px",
-            outlineStyle: "solid",
-            outlineColor: "app.accent",
-            outlineOffset: "2px",
-          }}
+          {...focusRing}
         >
           {note.title}
         </Link>
@@ -89,13 +84,7 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
           size="sm"
           variant="ghost"
           _hover={{ bg: "app.panelBackgroundHover" }}
-          outline="none"
-          _focusVisible={{
-            outlineWidth: "2px",
-            outlineStyle: "solid",
-            outlineColor: "app.accent",
-            outlineOffset: "2px",
-          }}
+          {...focusRing}
         >
           <BookCheck size={16} />
           <Text fontSize="xs" ml="1">
@@ -113,13 +102,7 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
               <IconButton
                 aria-label={t("review.close")}
                 variant="ghost"
-                outline="none"
-                _focusVisible={{
-                  outlineWidth: "2px",
-                  outlineStyle: "solid",
-                  outlineColor: "app.accent",
-                  outlineOffset: "2px",
-                }}
+                {...focusRing}
               >
                 <X size={16} />
               </IconButton>
@@ -143,13 +126,7 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
                   }
                   fontSize="sm"
                   textDecoration="none"
-                  outline="none"
-                  _focusVisible={{
-                    outlineWidth: "2px",
-                    outlineStyle: "solid",
-                    outlineColor: "app.accent",
-                    outlineOffset: "2px",
-                  }}
+                  {...focusRing}
                 >
                   {note.title}
                 </Link>
