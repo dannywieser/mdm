@@ -84,18 +84,18 @@ export const buildNotesCreated = (
   last90Days: countNotesCreatedSince(notes, 90, now),
 })
 
+const calculateChangePercent = (current: number, previous: number): number => {
+  if (previous === 0) return current > 0 ? 100 : 0
+  return Math.round(((current - previous) / previous) * 100)
+}
+
 export const buildTrends = (
   notes: readonly ScannedNote[],
   now: Date,
 ): StatsTrends => {
   const current = countNotesCreatedSince(notes, 30, now)
   const previous = countNotesCreatedInRange(notes, 60, 30, now)
-  const changePercent =
-    previous === 0
-      ? current > 0
-        ? 100
-        : 0
-      : Math.round(((current - previous) / previous) * 100)
+  const changePercent = calculateChangePercent(current, previous)
   return {
     changePercent,
     notesLast30Days: current,

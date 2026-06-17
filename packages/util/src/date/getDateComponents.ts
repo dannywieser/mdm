@@ -19,9 +19,12 @@ export const getDateComponents = (
   })
   const parts = formatter.formatToParts(date)
 
+  const findPart = (type: string): string =>
+    parts.find((p) => p.type === type)?.value ?? "0"
+
   return {
-    day: parseInt(parts.find((part) => part.type === "day")!.value, 10),
-    month: parseInt(parts.find((part) => part.type === "month")!.value, 10),
-    year: parseInt(parts.find((part) => part.type === "year")!.value, 10),
+    day: parseInt(findPart("day"), 10),
+    month: parseInt(findPart("month"), 10),
+    year: parseInt(findPart("year"), 10),
   }
 }

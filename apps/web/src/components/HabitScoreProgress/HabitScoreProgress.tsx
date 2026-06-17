@@ -5,7 +5,7 @@ import { calculateOverflowRatio, calculateProgressFraction } from "./HabitScoreP
 
 const BAR_HEIGHT = "1.5"
 
-export function HabitScoreProgress({ score, targetScore }: HabitScoreProgressProps) {
+export function HabitScoreProgress({ score, targetScore }: Readonly<HabitScoreProgressProps>) {
   if (targetScore === undefined) return null
 
   const progressFraction = calculateProgressFraction(score, targetScore)

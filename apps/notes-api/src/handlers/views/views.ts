@@ -16,7 +16,7 @@ export const viewsHandler: RequestHandler = async (_request, response) => {
     const { createdDateProperty, dateFormats, deriveTitleDate, notesDirectory, obsidianVault, timezone, views } =
       notesConfig
 
-    const markdownFiles = (await collectMarkdownFiles(notesDirectory)).sort()
+    const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted((a, b) => a.localeCompare(b))
     const scannedNotes = await Promise.all(
       markdownFiles.map((filePath) =>
         scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, createdDateProperty, deriveTitleDate),

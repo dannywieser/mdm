@@ -35,9 +35,9 @@ export const scanMarkdownFile = async (
   notesDirectory: string,
   obsidianVault: string,
   dateFormats: readonly string[] = [],
-  createdDateProperty: string = "created",
-  deriveTitleDate: boolean = false,
-  attachmentsDirectory: string = "attachments",
+  createdDateProperty = "created",
+  deriveTitleDate = false,
+  attachmentsDirectory = "attachments",
 ): Promise<ScannedNote> => {
   const [source, stats] = await Promise.all([
     fs.readFile(filePath, "utf8"),

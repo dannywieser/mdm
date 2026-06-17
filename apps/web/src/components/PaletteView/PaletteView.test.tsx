@@ -29,7 +29,7 @@ const renderComponent = () =>
   )
 
 describe("PaletteView", () => {
-  afterEach(() => cleanup())
+  afterEach(() => { cleanup(); })
 
   beforeEach(() => {
     setPaletteMock.mockReset()

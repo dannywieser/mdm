@@ -29,7 +29,7 @@ export const createImageHandler = (
 ): RequestHandler => {
   return async (request, response) => {
     const sourcePath =
-      typeof request.query["path"] === "string" ? request.query["path"] : ""
+      typeof request.query.path === "string" ? request.query.path : ""
     const resolvedImagePath = resolveImagePath(sourcePath)
 
     if (!resolvedImagePath) {

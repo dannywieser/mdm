@@ -33,8 +33,6 @@ export const scanHabitEntries = async (
       if (!frontmatter) return null
 
       const rawValue = frontmatter[frontmatterProperty]
-      if (rawValue === undefined) return null
-
       if (typeof rawValue !== "string") {
         console.debug(`[habit] skipping ${basename}: "${frontmatterProperty}" is not a string`, { rawValue })
         return null

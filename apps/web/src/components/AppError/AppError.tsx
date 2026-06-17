@@ -3,7 +3,7 @@ import { Bug } from "lucide-react"
 
 import type { AppErrorProps } from "./AppError.types"
 
-export function AppError({ message }: AppErrorProps) {
+export function AppError({ message }: Readonly<AppErrorProps>) {
   return (
     <VStack align="center" gap={6} pt={16}>
       <Box color="app.iconMuted">

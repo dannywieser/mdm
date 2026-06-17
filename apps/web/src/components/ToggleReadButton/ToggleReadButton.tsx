@@ -25,7 +25,7 @@ export const ToggleReadButton = ({
       _hover={{
         bg: isRead ? "app.successHoverBackground" : "app.panelBackgroundHover",
       }}
-      onClick={() => toggleRead.mutate()}
+      onClick={() => { toggleRead.mutate(); }}
       loading={toggleRead.isPending}
     >
       {isRead ? <BookCheck size={16} /> : <Book size={16} />}

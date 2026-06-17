@@ -17,7 +17,7 @@ const createWrapper = () => {
     },
   })
 
-  function QueryWrapper({ children }: { children: ReactNode }) {
+  function QueryWrapper({ children }: Readonly<{ children: ReactNode }>) {
     return (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )

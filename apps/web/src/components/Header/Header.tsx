@@ -31,7 +31,7 @@ import { focusRing } from "../../theme/focusRing"
 import { NotesSearchInput } from "../NotesSearchInput"
 import { PaletteSelector } from "../PaletteSelector"
 
-function HeaderShell({ left, center, right }: { left: ReactNode; center?: ReactNode; right: ReactNode }) {
+function HeaderShell({ left, center, right }: Readonly<{ left: ReactNode; center?: ReactNode; right: ReactNode }>) {
   return (
     <Flex
       as="header"
@@ -92,100 +92,42 @@ export function Header() {
     : undefined
   const showNotesSearch = currentView?.component === "NotesGallery"
 
+  const renderBreadcrumbContent = () => {
+    const homeLink = (
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild fontWeight="semibold" color="app.text" {...focusRing}>
+          <Link to="/">{t("app.name")}</Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+    )
+    if (isStatsPage) return (
+      <>{homeLink}<BreadcrumbSeparator /><BreadcrumbItem><BreadcrumbCurrentLink color="app.textMuted">{t("header.stats")}</BreadcrumbCurrentLink></BreadcrumbItem></>
+    )
+    if (isColorsPage) return (
+      <>{homeLink}<BreadcrumbSeparator /><BreadcrumbItem><BreadcrumbCurrentLink color="app.textMuted">colors</BreadcrumbCurrentLink></BreadcrumbItem></>
+    )
+    if (currentView) return (
+      <>{homeLink}<BreadcrumbSeparator /><BreadcrumbItem><BreadcrumbCurrentLink color="app.textMuted">{currentView.name}</BreadcrumbCurrentLink></BreadcrumbItem></>
+    )
+    if (habitMatch) return (
+      <>{homeLink}<BreadcrumbSeparator /><BreadcrumbItem><BreadcrumbCurrentLink color="app.textMuted">{habitMatch.params.habitId}</BreadcrumbCurrentLink></BreadcrumbItem></>
+    )
+    return (
+      <BreadcrumbItem>
+        <BreadcrumbCurrentLink fontWeight="semibold" color="app.text">
+          {t("app.name")}
+        </BreadcrumbCurrentLink>
+      </BreadcrumbItem>
+    )
+  }
+
   return (
     <HeaderShell
       center={showNotesSearch ? <NotesSearchInput /> : null}
       left={
         <BreadcrumbRoot size="md">
-          <BreadcrumbList
-            display="flex"
-            alignItems="center"
-            listStyleType="none"
-            gap={1}
-          >
-            {isStatsPage ? (
-              <>
-                <BreadcrumbItem>
-                  <BreadcrumbLink
-                    asChild
-                    fontWeight="semibold"
-                    color="app.text"
-                    {...focusRing}
-                  >
-                    <Link to="/">{t("app.name")}</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbCurrentLink color="app.textMuted">
-                    {t("header.stats")}
-                  </BreadcrumbCurrentLink>
-                </BreadcrumbItem>
-              </>
-            ) : isColorsPage ? (
-              <>
-                <BreadcrumbItem>
-                  <BreadcrumbLink
-                    asChild
-                    fontWeight="semibold"
-                    color="app.text"
-                    {...focusRing}
-                  >
-                    <Link to="/">{t("app.name")}</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbCurrentLink color="app.textMuted">
-                    colors
-                  </BreadcrumbCurrentLink>
-                </BreadcrumbItem>
-              </>
-            ) : currentView ? (
-              <>
-                <BreadcrumbItem>
-                  <BreadcrumbLink
-                    asChild
-                    fontWeight="semibold"
-                    color="app.text"
-                    {...focusRing}
-                  >
-                    <Link to="/">{t("app.name")}</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbCurrentLink color="app.textMuted">
-                    {currentView.name}
-                  </BreadcrumbCurrentLink>
-                </BreadcrumbItem>
-              </>
-            ) : habitMatch ? (
-              <>
-                <BreadcrumbItem>
-                  <BreadcrumbLink
-                    asChild
-                    fontWeight="semibold"
-                    color="app.text"
-                    {...focusRing}
-                  >
-                    <Link to="/">{t("app.name")}</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbCurrentLink color="app.textMuted">
-                    {habitMatch.params.habitId}
-                  </BreadcrumbCurrentLink>
-                </BreadcrumbItem>
-              </>
-            ) : (
-              <BreadcrumbItem>
-                <BreadcrumbCurrentLink fontWeight="semibold" color="app.text">
-                  {t("app.name")}
-                </BreadcrumbCurrentLink>
-              </BreadcrumbItem>
-            )}
+          <BreadcrumbList display="flex" alignItems="center" listStyleType="none" gap={1}>
+            {renderBreadcrumbContent()}
           </BreadcrumbList>
         </BreadcrumbRoot>
       }
@@ -204,9 +146,10 @@ export function Header() {
             _hover={{ bg: "app.panelBackgroundHover", color: "app.text" }}
             transition="background 0.15s, color 0.15s"
             {...focusRing}
-            onClick={() =>
-              location.key !== "default" ? navigate(-1) : navigate("/")
-            }
+            onClick={() => {
+              if (location.key !== "default") void navigate(-1)
+              else void navigate("/")
+            }}
           >
             <X size={20} />
           </Box>

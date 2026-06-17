@@ -226,7 +226,7 @@ This is a note.`)
       "attachments",
     )
 
-    expect(note.frontmatter?.["cover"]).toBe(
+    expect(note.frontmatter?.cover).toBe(
       "attachments/games/citizen-sleeper-2/attach-20260616070917164.png",
     )
   })
@@ -253,7 +253,7 @@ This is a note.`)
       "attachments",
     )
 
-    expect(note.frontmatter?.["cover"]).toBe(
+    expect(note.frontmatter?.cover).toBe(
       "attachments/downtime/The Rogue Prince of Persia/attach-20260503144843356.jpg",
     )
   })
@@ -270,6 +270,6 @@ This is a note.`)
 
     const note = await scanMarkdownFile("/notes/games/note.md", "/notes", "vault")
 
-    expect(note.frontmatter?.["cover"]).toBe("https://example.com/cover.png")
+    expect(note.frontmatter?.cover).toBe("https://example.com/cover.png")
   })
 })

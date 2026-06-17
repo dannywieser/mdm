@@ -22,7 +22,7 @@ export const EMPTY_MARKDOWN_NODE: MarkdownNode = { type: "root", children: [] }
 export const parseMarkdownFile = async (
   note: ScannedNote,
   notesDirectory: string,
-  attachmentsDirectory: string = "attachments",
+  attachmentsDirectory = "attachments",
   allNotes: ScannedNote[] = [],
 ): Promise<Note> => {
   const source = await fs.readFile(note.fullPath, "utf8")
@@ -59,7 +59,7 @@ export const resolveFrontmatterImages = (
 ): NoteFrontmatter | null => {
   if (!frontmatter) return null
 
-  const cover = frontmatter["cover"]
+  const cover = frontmatter.cover
   if (!cover) return frontmatter
 
   const rawPath = Array.isArray(cover) ? cover[0] : cover
@@ -135,12 +135,12 @@ const replaceWikilinkPlaceholdersInNode = (
 
   for (const match of node.value.matchAll(WIKILINK_PLACEHOLDER_PATTERN)) {
     const matchedText = match[0]
-    const start = match.index ?? 0
+    const start = match.index
     const end = start + matchedText.length
-    const index = Number.parseInt(match[1] ?? "", 10)
-    const replacement = replacements[index]
+    const index = Number.parseInt(match[1], 10)
+    const replacement = replacements.at(index)
 
-    if (!replacement) {
+    if (replacement === undefined) {
       continue
     }
 
@@ -246,7 +246,7 @@ const visitMarkdownTree = (
     return
   }
 
-  node.children.forEach((childNode) => visitMarkdownTree(childNode, visitor))
+  node.children.forEach((childNode) => { visitMarkdownTree(childNode, visitor); })
 }
 
 const safeDecodeURIComponent = (value: string): string => {

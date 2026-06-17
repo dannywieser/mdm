@@ -7,7 +7,7 @@ import { HomeViewCard } from "../HomeViewCard"
 export function HomeViewGroupSection({
   group,
   views,
-}: HomeViewGroupSectionProps) {
+}: Readonly<HomeViewGroupSectionProps>) {
   return (
     <VStack align="stretch" gap={2} width="full">
       {group && (

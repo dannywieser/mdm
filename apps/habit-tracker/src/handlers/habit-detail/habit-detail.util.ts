@@ -37,7 +37,7 @@ export const calculateConsecutiveEntryStreak = (entries: HabitEntry[], reference
 const mostRecentDateOnOrBefore = (dates: string[], referenceDate: string): string | null => {
   const candidates = dates.filter((date) => date <= referenceDate)
   if (candidates.length === 0) return null
-  return candidates.reduce((latest, date) => (date > latest ? date : latest))
+  return candidates.reduce((latest, date) => (date > latest ? date : latest), candidates[0])
 }
 
 // "do-less" streak: how long it's been since the habit was last logged, as of
@@ -189,9 +189,9 @@ const buildConsecutiveEntryStreaks = (sortedDates: string[]): HabitStreak[] => {
   let runStart: string | undefined
 
   sortedDates.forEach((date, index) => {
-    if (runStart === undefined) runStart = date
+    runStart ??= date
 
-    const nextDate = sortedDates[index + 1]
+    const nextDate = sortedDates.at(index + 1)
     if (nextDate === undefined || nextDate !== addDays(date, 1)) {
       streaks.push({ start: runStart, end: date, length: daysBetween(runStart, date) + 1 })
       runStart = undefined
@@ -238,7 +238,7 @@ export const calculateLowestDaysTrackedPerPeriod = (
 ): number => {
   if (entries.length === 0) return 0
 
-  const uniqueDates = [...new Set(entries.map((e) => e.date))].sort()
+  const uniqueDates = [...new Set(entries.map((e) => e.date))].toSorted((a, b) => a.localeCompare(b))
   const firstEntryDate = uniqueDates[0]
 
   const counts: number[] = []

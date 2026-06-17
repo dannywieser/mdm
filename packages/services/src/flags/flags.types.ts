@@ -1,4 +1,4 @@
-export type ToggleFlagInput = {
+export interface ToggleFlagInput {
   id: string
   flag: string
 }

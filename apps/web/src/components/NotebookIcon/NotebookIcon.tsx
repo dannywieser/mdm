@@ -56,11 +56,16 @@ const notebookHline4 = keyframes`
 
 const ANIMATION = "2.4s infinite"
 
+const getStrokeProps = (dashLength: number, animation: string, animating: boolean) =>
+  animating
+    ? { strokeDasharray: dashLength, strokeDashoffset: dashLength, animation: `${animation} ${ANIMATION}` }
+    : {}
+
 export function NotebookIcon({
   animating = false,
   ariaLabel = "Notebook",
   size = 80,
-}: NotebookIconProps) {
+}: Readonly<NotebookIconProps>) {
   return (
     <chakra.svg
       xmlns="http://www.w3.org/2000/svg"
@@ -81,39 +86,27 @@ export function NotebookIcon({
         x="4"
         y="2"
         rx="2"
-        strokeDasharray={animating ? RECT_DASH_LENGTH : undefined}
-        strokeDashoffset={animating ? RECT_DASH_LENGTH : undefined}
-        animation={animating ? `${notebookRect} ${ANIMATION}` : undefined}
+        {...getStrokeProps(RECT_DASH_LENGTH, notebookRect, animating)}
       />
       <chakra.path
         d="M16 2v20"
-        strokeDasharray={animating ? VLINE_DASH_LENGTH : undefined}
-        strokeDashoffset={animating ? VLINE_DASH_LENGTH : undefined}
-        animation={animating ? `${notebookVline} ${ANIMATION}` : undefined}
+        {...getStrokeProps(VLINE_DASH_LENGTH, notebookVline, animating)}
       />
       <chakra.path
         d="M2 6h4"
-        strokeDasharray={animating ? HLINE_DASH_LENGTH : undefined}
-        strokeDashoffset={animating ? HLINE_DASH_LENGTH : undefined}
-        animation={animating ? `${notebookHline1} ${ANIMATION}` : undefined}
+        {...getStrokeProps(HLINE_DASH_LENGTH, notebookHline1, animating)}
       />
       <chakra.path
         d="M2 10h4"
-        strokeDasharray={animating ? HLINE_DASH_LENGTH : undefined}
-        strokeDashoffset={animating ? HLINE_DASH_LENGTH : undefined}
-        animation={animating ? `${notebookHline2} ${ANIMATION}` : undefined}
+        {...getStrokeProps(HLINE_DASH_LENGTH, notebookHline2, animating)}
       />
       <chakra.path
         d="M2 14h4"
-        strokeDasharray={animating ? HLINE_DASH_LENGTH : undefined}
-        strokeDashoffset={animating ? HLINE_DASH_LENGTH : undefined}
-        animation={animating ? `${notebookHline3} ${ANIMATION}` : undefined}
+        {...getStrokeProps(HLINE_DASH_LENGTH, notebookHline3, animating)}
       />
       <chakra.path
         d="M2 18h4"
-        strokeDasharray={animating ? HLINE_DASH_LENGTH : undefined}
-        strokeDashoffset={animating ? HLINE_DASH_LENGTH : undefined}
-        animation={animating ? `${notebookHline4} ${ANIMATION}` : undefined}
+        {...getStrokeProps(HLINE_DASH_LENGTH, notebookHline4, animating)}
       />
     </chakra.svg>
   )

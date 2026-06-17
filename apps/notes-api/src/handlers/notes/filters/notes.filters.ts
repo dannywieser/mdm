@@ -10,7 +10,7 @@ import type { ViewFilterContext } from "./notes.filters.types"
 
 import { MISSING, ON_THIS_DAY, TODAY } from "./constants"
 
-type FilterableNote = {
+interface FilterableNote {
   basename: string
 }
 
@@ -124,8 +124,8 @@ const isMatchingFilterValue = (
   return false
 }
 
-const matchesViewFilters = <T extends FilterableNote>(
-  note: T,
+const matchesViewFilters = (
+  note: FilterableNote,
   filters: Record<string, string>,
   context: ViewFilterContext,
 ): boolean =>
@@ -137,9 +137,8 @@ const matchesViewFilters = <T extends FilterableNote>(
 
 const isExcludeViewFilter = (filter: ViewFilter): filter is ExcludeViewFilter =>
   "$exclude" in filter &&
-  filter["$exclude"] !== null &&
-  typeof filter["$exclude"] === "object" &&
-  !Array.isArray(filter["$exclude"])
+  typeof filter.$exclude === "object" &&
+  !Array.isArray(filter.$exclude)
 
 const splitViewFilters = (
   viewFilters: readonly ViewFilter[],

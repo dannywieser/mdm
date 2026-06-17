@@ -169,19 +169,21 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
           />
         </Flex>
 
+        {!currentNote ? null : (
+        <>
         <Text fontSize="xl" fontWeight="semibold" color="app.text">
-          {currentNote!.title}
+          {currentNote.title}
         </Text>
 
-        <MarkdownTree content={currentNote!.content} />
-        <NoteBadges badges={badges} note={currentNote!} />
-        <LinkedNotesList notes={currentNote!.linkedNotes ?? []} />
+        <MarkdownTree content={currentNote.content} />
+        <NoteBadges badges={badges} note={currentNote} />
+        <LinkedNotesList notes={currentNote.linkedNotes ?? []} />
         <Flex
           flexDirection={{ base: "column", sm: "row" }}
           gap="2"
           justify="flex-end"
         >
-          <OpenInObsidianButton note={currentNote!} />
+          <OpenInObsidianButton note={currentNote} />
           <Button
             bg="app.successBackground"
             color="app.successText"
@@ -195,6 +197,7 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
             {t("notes.markAsRead")}
           </Button>
         </Flex>
+        </>)}
       </VStack>
     </Flex>
   )

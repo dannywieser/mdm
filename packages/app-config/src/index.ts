@@ -44,7 +44,7 @@ const isExcludeViewFilter = (value: unknown): value is ExcludeViewFilter => {
   const obj = value as Record<string, unknown>
   const keys = Object.keys(obj)
 
-  return keys.length === 1 && keys[0] === "$exclude" && isStringRecord(obj["$exclude"])
+  return keys.length === 1 && keys[0] === "$exclude" && isStringRecord(obj.$exclude)
 }
 
 const isViewFilter = (value: unknown): boolean => {
@@ -65,13 +65,13 @@ const isAppConfigView = (value: unknown): value is AppConfigView => {
   }
   const obj = value as Record<string, unknown>
   return (
-    isNonEmptyString(obj["id"]) &&
-    isNonEmptyString(obj["name"]) &&
-    isNonEmptyString(obj["component"]) &&
-    (obj["badges"] === undefined || isStringArray(obj["badges"])) &&
-    (obj["group"] === undefined || isNonEmptyString(obj["group"])) &&
-    Array.isArray(obj["filters"]) &&
-    (obj["filters"] as unknown[]).every(isViewFilter)
+    isNonEmptyString(obj.id) &&
+    isNonEmptyString(obj.name) &&
+    isNonEmptyString(obj.component) &&
+    (obj.badges === undefined || isStringArray(obj.badges)) &&
+    (obj.group === undefined || isNonEmptyString(obj.group)) &&
+    Array.isArray(obj.filters) &&
+    (obj.filters as unknown[]).every(isViewFilter)
   )
 }
 
@@ -82,11 +82,11 @@ const isHomeStatsConfig = (
     return false
   }
   const obj = value as Record<string, unknown>
-  if (obj["show"] === undefined) return true
-  if (obj["show"] === null || typeof obj["show"] !== "object" || Array.isArray(obj["show"])) {
+  if (obj.show === undefined) return true
+  if (obj.show === null || typeof obj.show !== "object" || Array.isArray(obj.show)) {
     return false
   }
-  const show = obj["show"] as Record<string, unknown>
+  const show = obj.show as Record<string, unknown>
   const boolKeys: (keyof HomeStatsShowConfig)[] = [
     "folderBreakdown",
     "modifiedToday",
@@ -109,15 +109,15 @@ const isHabitConfig = (value: unknown): value is HabitConfig => {
   }
   const obj = value as Record<string, unknown>
   return (
-    isNonEmptyString(obj["id"]) &&
-    isNonEmptyString(obj["name"]) &&
-    (obj["mode"] === "do-more" || obj["mode"] === "do-less") &&
-    isNonEmptyString(obj["frontmatterProperty"]) &&
-    typeof obj["trackingWindowDays"] === "number" &&
-    Number.isInteger(obj["trackingWindowDays"]) &&
-    obj["trackingWindowDays"] > 0 &&
-    (obj["targetScore"] === undefined ||
-      (typeof obj["targetScore"] === "number" && obj["targetScore"] > 0))
+    isNonEmptyString(obj.id) &&
+    isNonEmptyString(obj.name) &&
+    (obj.mode === "do-more" || obj.mode === "do-less") &&
+    isNonEmptyString(obj.frontmatterProperty) &&
+    typeof obj.trackingWindowDays === "number" &&
+    Number.isInteger(obj.trackingWindowDays) &&
+    obj.trackingWindowDays > 0 &&
+    (obj.targetScore === undefined ||
+      (typeof obj.targetScore === "number" && obj.targetScore > 0))
   )
 }
 
@@ -133,71 +133,38 @@ const DEFAULT_HOME_STATS_SHOW: HomeStatsShowConfig = {
   trends: true,
 }
 
-const validateAppConfig = (appConfig: unknown): AppConfig => {
-  if (!appConfig || typeof appConfig !== "object") {
-    throw new AppConfigError("app.config.json must be a JSON object")
+const assertOptionalString = (value: unknown, field: string): void => {
+  if (value !== undefined && !isNonEmptyString(value)) {
+    throw new AppConfigError(`app.config.json ${field} must be a non-empty string`)
   }
+}
 
-  const parsedConfig = appConfig as Record<string, unknown>
-  const attachmentsDirectory = parsedConfig["attachmentsDirectory"]
-  const createdDateProperty = parsedConfig["createdDateProperty"]
-  const dateFormats = parsedConfig["dateFormats"]
-  const deriveTitleDate = parsedConfig["deriveTitleDate"]
-  const habits = parsedConfig["habits"]
-  const homeStats = parsedConfig["homeStats"]
-  const obsidianVault = parsedConfig["obsidianVault"]
-  const timezone = parsedConfig["timezone"]
-  const views = parsedConfig["views"]
+const validateParsedConfig = (parsedConfig: Record<string, unknown>): void => {
+  const { obsidianVault, attachmentsDirectory, dateFormats, timezone, views, createdDateProperty, deriveTitleDate, homeStats, habits } = parsedConfig
 
   if (!isNonEmptyString(obsidianVault)) {
-    throw new AppConfigError(
-      "app.config.json requires a non-empty obsidianVault value",
-    )
+    throw new AppConfigError("app.config.json requires a non-empty obsidianVault value")
   }
 
-  if (
-    attachmentsDirectory !== undefined &&
-    !isNonEmptyString(attachmentsDirectory)
-  ) {
-    throw new AppConfigError(
-      "app.config.json attachmentsDirectory must be a non-empty string",
-    )
-  }
+  assertOptionalString(attachmentsDirectory, "attachmentsDirectory")
+  assertOptionalString(createdDateProperty, "createdDateProperty")
 
   if (dateFormats !== undefined && !isStringArray(dateFormats)) {
-    throw new AppConfigError(
-      "app.config.json dateFormats must be an array of non-empty strings",
-    )
+    throw new AppConfigError("app.config.json dateFormats must be an array of non-empty strings")
   }
 
-  if (
-    timezone !== undefined &&
-    (!isNonEmptyString(timezone) || !isValidTimezone(timezone))
-  ) {
-    throw new AppConfigError(
-      "app.config.json timezone must be a valid IANA timezone identifier",
-    )
+  if (timezone !== undefined && (!isNonEmptyString(timezone) || !isValidTimezone(timezone))) {
+    throw new AppConfigError("app.config.json timezone must be a valid IANA timezone identifier")
   }
 
-  if (
-    views !== undefined &&
-    (!Array.isArray(views) || !views.every(isAppConfigView))
-  ) {
+  if (views !== undefined && (!Array.isArray(views) || !views.every(isAppConfigView))) {
     throw new AppConfigError(
       "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges/group, and filters as string records or $exclude objects",
     )
   }
 
-  if (createdDateProperty !== undefined && !isNonEmptyString(createdDateProperty)) {
-    throw new AppConfigError(
-      "app.config.json createdDateProperty must be a non-empty string",
-    )
-  }
-
   if (deriveTitleDate !== undefined && typeof deriveTitleDate !== "boolean") {
-    throw new AppConfigError(
-      "app.config.json deriveTitleDate must be a boolean",
-    )
+    throw new AppConfigError("app.config.json deriveTitleDate must be a boolean")
   }
 
   if (homeStats !== undefined && !isHomeStatsConfig(homeStats)) {
@@ -206,14 +173,22 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
     )
   }
 
-  if (
-    habits !== undefined &&
-    (!Array.isArray(habits) || !habits.every(isHabitConfig))
-  ) {
+  if (habits !== undefined && (!Array.isArray(habits) || !habits.every(isHabitConfig))) {
     throw new AppConfigError(
       "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), a positive integer trackingWindowDays, and an optional positive targetScore",
     )
   }
+}
+
+const validateAppConfig = (appConfig: unknown): AppConfig => {
+  if (!appConfig || typeof appConfig !== "object") {
+    throw new AppConfigError("app.config.json must be a JSON object")
+  }
+
+  const parsedConfig = appConfig as Record<string, unknown>
+  validateParsedConfig(parsedConfig)
+
+  const { attachmentsDirectory, createdDateProperty, dateFormats, deriveTitleDate, habits, homeStats, obsidianVault, timezone, views } = parsedConfig
 
   return {
     attachmentsDirectory,
@@ -222,7 +197,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
     deriveTitleDate: typeof deriveTitleDate === "boolean" ? deriveTitleDate : undefined,
     habits: Array.isArray(habits) && habits.every(isHabitConfig) ? habits : undefined,
     homeStats: isHomeStatsConfig(homeStats) ? homeStats : undefined,
-    obsidianVault,
+    obsidianVault: obsidianVault as string,
     timezone: isNonEmptyString(timezone) ? timezone : undefined,
     views,
   }

@@ -18,7 +18,7 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
     const { createdDateProperty, dateFormats, deriveTitleDate, habits, notesDirectory, obsidianVault, timezone } =
       notesConfig
 
-    const habitId = String(request.params["id"])
+    const habitId = String(request.params.id)
     const habitConfig = habits.find((h) => h.id === habitId)
 
     if (!habitConfig) {

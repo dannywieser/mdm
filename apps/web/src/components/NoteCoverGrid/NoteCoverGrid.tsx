@@ -33,7 +33,7 @@ const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => (
         alt={note.title}
         aspectRatio={aspectRatio ?? DEFAULT_ASPECT_RATIO}
         objectFit="cover"
-        src={getCoverSrc(note.frontmatter!.cover)}
+        src={getCoverSrc(note.frontmatter?.cover ?? "")}
       />
       <Box
         background="rgba(0,0,0,0.65)"

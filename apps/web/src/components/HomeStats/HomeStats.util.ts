@@ -17,5 +17,5 @@ export const getChangeColor = (changePercent: number): string => {
   return "app.textMuted"
 }
 
-export const getMonthTicks = (notesPerDay: Array<{ date: string }>): string[] =>
+export const getMonthTicks = (notesPerDay: { date: string }[]): string[] =>
   notesPerDay.filter(({ date }) => date.endsWith("-01")).map(({ date }) => date)

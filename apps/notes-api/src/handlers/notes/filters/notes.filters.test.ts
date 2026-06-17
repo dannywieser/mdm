@@ -21,7 +21,7 @@ const parseDateFromFormatsMock = vi.mocked(parseDateFromFormats)
 describe("notes filter helpers", () => {
   beforeEach(() => {
     getValueByPathMock.mockImplementation((value, valuePath) =>
-      String(valuePath)
+      valuePath
         .split(".")
         .filter((segment) => segment.length > 0)
         .reduce<unknown>((currentValue, segment) => {
@@ -34,7 +34,7 @@ describe("notes filter helpers", () => {
     )
 
     parseDateFromFormatsMock.mockImplementation((dateValue) => {
-      const match = String(dateValue).match(/^(\d{4})\.(\d{2})\.(\d{2})$/)
+      const match = /^(\d{4})\.(\d{2})\.(\d{2})$/.exec(dateValue)
 
       if (!match) {
         return null
@@ -432,7 +432,7 @@ describe("notes filter helpers", () => {
       getDateComponentsMock.mockReturnValue({ day: 1, month: 6, year: 2026 })
 
       parseDateFromFormatsMock.mockImplementation((dateValue) => {
-        const match = String(dateValue).match(/^(\d{4})\.(\d{2})\.(\d{2})$/)
+        const match = /^(\d{4})\.(\d{2})\.(\d{2})$/.exec(dateValue)
         if (!match) return null
         return {
           day: parseInt(match[3], 10),
@@ -467,7 +467,7 @@ describe("notes filter helpers", () => {
       getDateComponentsMock.mockReturnValue({ day: 1, month: 6, year: 2026 })
 
       parseDateFromFormatsMock.mockImplementation((dateValue) => {
-        const match = String(dateValue).match(/^(\d{4})\.(\d{2})\.(\d{2})$/)
+        const match = /^(\d{4})\.(\d{2})\.(\d{2})$/.exec(dateValue)
         if (!match) return null
         return {
           day: parseInt(match[3], 10),

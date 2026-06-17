@@ -10,7 +10,7 @@ const Consumer = () => {
   return (
     <>
       <div>{palette}</div>
-      <button type="button" onClick={() => setPalette("solarized")}>
+      <button type="button" onClick={() => { setPalette("solarized"); }}>
         set-solarized
       </button>
     </>

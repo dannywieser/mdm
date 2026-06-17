@@ -15,9 +15,7 @@ export interface MarkdownNode {
   wikilinkType?: "matched" | "unmatched"
 }
 
-export interface NoteFrontmatter {
-  [key: string]: FrontmatterValue
-}
+export type NoteFrontmatter = Record<string, FrontmatterValue>;
 
 export interface Note {
   basename: string

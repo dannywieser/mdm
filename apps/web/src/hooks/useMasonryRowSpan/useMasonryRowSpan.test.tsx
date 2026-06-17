@@ -10,7 +10,7 @@ afterEach(() => {
 })
 
 class ResizeObserverStub {
-  static instances: ResizeObserverStub[] = []
+  static readonly instances: ResizeObserverStub[] = []
 
   callback: ResizeObserverCallback
   observed: Element | undefined

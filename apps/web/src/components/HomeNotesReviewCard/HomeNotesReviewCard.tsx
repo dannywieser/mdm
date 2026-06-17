@@ -11,7 +11,7 @@ import { Link } from "react-router-dom"
 
 import { fetchIsRead, type ViewSummary } from "services"
 
-export function HomeNotesReviewCard({ view }: { view: ViewSummary }) {
+export function HomeNotesReviewCard({ view }: Readonly<{ view: ViewSummary }>) {
   const readStates = useQueries({
     queries: view.noteIds.map((noteId) => ({
       queryKey: ["read", noteId],

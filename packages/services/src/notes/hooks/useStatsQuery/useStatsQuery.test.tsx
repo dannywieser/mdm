@@ -9,15 +9,15 @@ class ErrorBoundary extends Component<
   { children: ReactNode },
   { error: Error | null }
 > {
-  state = { error: null }
+  state: { error: Error | null } = { error: null }
   static getDerivedStateFromError(error: Error) {
     return { error }
   }
-  render() {
+  render(): ReactNode {
     if (this.state.error) {
       return <div data-testid="error">{this.state.error.message}</div>
     }
-    return this.props.children
+    return <>{this.props.children}</>
   }
 }
 
@@ -26,7 +26,7 @@ const createWrapper = () => {
     defaultOptions: { queries: { retry: false } },
   })
 
-  function QueryWrapper({ children }: { children: ReactNode }) {
+  function QueryWrapper({ children }: Readonly<{ children: ReactNode }>) {
     return (
       <QueryClientProvider client={queryClient}>
         <ErrorBoundary>
@@ -59,7 +59,7 @@ describe("useStatsQuery", () => {
       wrapper: createWrapper(),
     })
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    await waitFor(() => { expect(result.current.isSuccess).toBe(true); })
 
     expect(global.fetch).toHaveBeenCalledWith("/api/stats")
     expect(result.current.data).toEqual(responseBody)
@@ -67,7 +67,7 @@ describe("useStatsQuery", () => {
 
   test("throws to error boundary when the stats response is not ok", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }))
-    vi.spyOn(console, "error").mockImplementation(() => {})
+    vi.spyOn(console, "error").mockImplementation(() => undefined)
 
     renderHook(() => useStatsQuery(), { wrapper: createWrapper() })
 

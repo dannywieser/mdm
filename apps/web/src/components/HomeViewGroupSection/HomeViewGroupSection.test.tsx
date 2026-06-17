@@ -40,7 +40,7 @@ describe("HomeViewGroupSection", () => {
     )
 
     const heading = screen.getByRole("heading", { name: "Library" })
-    const section = heading.parentElement as HTMLElement
+    const section = heading.parentElement!
 
     expect(heading).toBeDefined()
     expect(within(section).getByRole("separator")).toBeDefined()
