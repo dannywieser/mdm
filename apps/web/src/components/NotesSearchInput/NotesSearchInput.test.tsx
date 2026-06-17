@@ -58,21 +58,21 @@ describe("NotesSearchInput", () => {
   test("renders an empty input by default", () => {
     renderAt("/notes/books")
 
-    const input = screen.getByRole("textbox", { name: "header.searchNotes" })
+    const input = screen.getByRole<HTMLInputElement>("textbox", { name: "header.searchNotes" })
     expect(input.value).toBe("")
   })
 
   test("initializes from the q search param", () => {
     renderAt("/notes/books?q=game")
 
-    const input = screen.getByRole("textbox", { name: "header.searchNotes" })
+    const input = screen.getByRole<HTMLInputElement>("textbox", { name: "header.searchNotes" })
     expect(input.value).toBe("game")
   })
 
   test("updates the search input value when typing", () => {
     renderAt("/notes/books")
 
-    const input = screen.getByRole("textbox", { name: "header.searchNotes" })
+    const input = screen.getByRole<HTMLInputElement>("textbox", { name: "header.searchNotes" })
     fireEvent.change(input, { target: { value: "game" } })
 
     expect(input.value).toBe("game")
@@ -81,7 +81,7 @@ describe("NotesSearchInput", () => {
   test("does not update the URL until the debounce delay elapses", () => {
     renderAt("/notes/books")
 
-    const input = screen.getByRole("textbox", { name: "header.searchNotes" })
+    const input = screen.getByRole<HTMLInputElement>("textbox", { name: "header.searchNotes" })
     fireEvent.change(input, { target: { value: "game" } })
 
     expect(locationState.search).toBe("")

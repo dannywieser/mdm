@@ -191,15 +191,15 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   const { attachmentsDirectory, createdDateProperty, dateFormats, deriveTitleDate, habits, homeStats, obsidianVault, timezone, views } = parsedConfig
 
   return {
-    attachmentsDirectory,
+    attachmentsDirectory: attachmentsDirectory as string | undefined,
     createdDateProperty: isNonEmptyString(createdDateProperty) ? createdDateProperty : undefined,
-    dateFormats,
+    dateFormats: dateFormats as string[] | undefined,
     deriveTitleDate: typeof deriveTitleDate === "boolean" ? deriveTitleDate : undefined,
     habits: Array.isArray(habits) && habits.every(isHabitConfig) ? habits : undefined,
     homeStats: isHomeStatsConfig(homeStats) ? homeStats : undefined,
     obsidianVault: obsidianVault as string,
     timezone: isNonEmptyString(timezone) ? timezone : undefined,
-    views,
+    views: views as AppConfigView[] | undefined,
   }
 }
 
