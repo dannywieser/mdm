@@ -1,8 +1,8 @@
 import { Box, Flex, Text, VStack } from "@chakra-ui/react"
 
 import { useI18n } from "../../i18n"
-import type { HabitScoreTier, ScoreBreakdownProps } from "./ScoreBreakdown.types"
-import { formatContributionAmount, formatTierLabel } from "./ScoreBreakdown.util"
+import type { HabitScoreTier, HabitScoreBreakdownProps } from "./HabitScoreBreakdown.types"
+import { formatContributionAmount, formatTierLabel } from "./HabitScoreBreakdown.util"
 
 function TierRows({ tiers, prefix, color }: Readonly<{ tiers: HabitScoreTier[]; prefix: string; color: string }>) {
   return (
@@ -19,7 +19,7 @@ function TierRows({ tiers, prefix, color }: Readonly<{ tiers: HabitScoreTier[]; 
   )
 }
 
-export function ScoreBreakdown({ mode, breakdown, habitScore }: Readonly<ScoreBreakdownProps>) {
+export function HabitScoreBreakdown({ mode, breakdown, habitScore }: Readonly<HabitScoreBreakdownProps>) {
   const { t } = useI18n()
   const { entryScores, daysTiers, streakTiers } = breakdown
   const daysColor = mode === "do-more" ? "green.500" : "red.500"

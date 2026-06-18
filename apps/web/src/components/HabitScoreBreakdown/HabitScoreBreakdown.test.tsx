@@ -4,8 +4,8 @@ import { afterEach, describe, expect, test, vi } from "vitest"
 
 import type { HabitScoreBreakdown } from "services"
 
-import { ScoreBreakdown } from "./ScoreBreakdown"
-import { formatContributionAmount, formatTierLabel } from "./ScoreBreakdown.util"
+import { HabitScoreBreakdown } from "./HabitScoreBreakdown"
+import { formatContributionAmount, formatTierLabel } from "./HabitScoreBreakdown.util"
 
 afterEach(cleanup)
 
@@ -19,10 +19,10 @@ const BREAKDOWN_5_DAYS: HabitScoreBreakdown = {
   streakTiers: [{ startDay: 1, endDay: 5, rate: 0.005, days: 5, amount: 12.6 }],
 }
 
-const renderBreakdown = (props: Partial<Parameters<typeof ScoreBreakdown>[0]> = {}) =>
+const renderBreakdown = (props: Partial<Parameters<typeof HabitScoreBreakdown>[0]> = {}) =>
   render(
     <ChakraProvider value={defaultSystem}>
-      <ScoreBreakdown
+      <HabitScoreBreakdown
         mode="do-more"
         breakdown={BREAKDOWN_5_DAYS}
         habitScore={525}
@@ -31,7 +31,7 @@ const renderBreakdown = (props: Partial<Parameters<typeof ScoreBreakdown>[0]> = 
     </ChakraProvider>,
   )
 
-describe("ScoreBreakdown", () => {
+describe("HabitScoreBreakdown", () => {
   test("renders section title and entry scores", () => {
     renderBreakdown()
 

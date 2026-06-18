@@ -33,7 +33,7 @@ import { HabitScoreProgress } from "../HabitScoreProgress"
 import { HabitScoreValue } from "../HabitScoreValue"
 import { HeatDots } from "../HeatDots"
 import { calculateHeatDotCount } from "../HeatDots/HeatDots.util"
-import { ScoreBreakdown } from "../ScoreBreakdown/ScoreBreakdown"
+import { HabitScoreBreakdown } from "../HabitScoreBreakdown/HabitScoreBreakdown"
 import type { HabitDetailRouteParamKey } from "./HabitDetail.types"
 import {
   calculateWindowFillPercentage,
@@ -385,7 +385,7 @@ export function HabitDetail() {
                     </Table.Body>
                   </Table.Root>
 
-                  <ScoreBreakdown
+                  <HabitScoreBreakdown
                     mode={habit.mode}
                     breakdown={habit.scoreBreakdown}
                     habitScore={habit.habitScore}
