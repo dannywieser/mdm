@@ -11,6 +11,16 @@ vi.mock("node:fs", () => ({
 const readFileMock = vi.mocked(fs.readFile)
 
 describe("readAppConfigFile", () => {
+  test("reads from APP_CONFIG_PATH when set", async () => {
+    process.env.APP_CONFIG_PATH = "/custom/path/app.config.json"
+    readFileMock.mockResolvedValue(JSON.stringify({ obsidianVault: "vault" }))
+
+    await readAppConfigFile()
+
+    expect(readFileMock).toHaveBeenCalledWith("/custom/path/app.config.json", "utf8")
+    delete process.env.APP_CONFIG_PATH
+  })
+
   test("returns the parsed contents of app.config.json", async () => {
     readFileMock.mockResolvedValue(JSON.stringify({ obsidianVault: "vault" }))
 

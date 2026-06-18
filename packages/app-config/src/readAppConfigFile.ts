@@ -4,7 +4,8 @@ import path from "node:path"
 const APP_CONFIG_FILENAME = "app.config.json"
 
 export const readAppConfigFile = async (): Promise<unknown> => {
-  const appConfigPath = path.join(process.cwd(), APP_CONFIG_FILENAME)
+  const appConfigPath =
+    process.env.APP_CONFIG_PATH?.trim() ?? path.join(process.cwd(), APP_CONFIG_FILENAME)
   let appConfigSource: string
 
   try {
