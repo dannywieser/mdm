@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useQueries } from "@tanstack/react-query"
 import { useParams } from "react-router-dom"
+import type { Note } from "markdown"
 
 import { fetchIsRead, useNotesQuery, useToggleRead } from "services"
 
 import type { NotesReviewProps, NotesReviewRouteParamKey } from "./NotesReview.types"
+import { areReadStatesSettled, buildTocNotes } from "./NotesReview.util"
 import { NotesReviewComplete } from "../NotesReviewComplete"
 import { NotesReviewContent } from "../NotesReviewContent"
 
@@ -17,7 +19,7 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
   const initialized = useRef(false)
 
   const notes = useMemo(() => data.notes, [data.notes])
-  const currentNote = notes[currentIndex] as (typeof notes)[number] | undefined
+  const currentNote = notes[currentIndex] as Note | undefined
   const toggleRead = useToggleRead({ noteId: currentNote?.id ?? "" })
 
   useEffect(() => {
@@ -33,22 +35,14 @@ export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
     })),
   })
 
-  const allReadStatesSettled =
-    readStates.length > 0 && readStates.every((s) => s.status !== "pending")
-
   useEffect(() => {
-    if (initialized.current || !allReadStatesSettled) return
+    if (initialized.current || !areReadStatesSettled(readStates)) return
     initialized.current = true
     const firstUnread = notes.findIndex((_, i) => readStates[i]?.data !== true)
     setCurrentIndex(firstUnread === -1 ? notes.length : firstUnread)
-  }, [allReadStatesSettled, notes, readStates])
+  }, [notes, readStates])
 
-  const tocNotes = notes.map((note, i) => ({
-    id: note.id,
-    obsidianUrl: note.obsidianUrl,
-    title: note.title,
-    isRead: readStates[i]?.data === true,
-  }))
+  const tocNotes = buildTocNotes(notes, readStates)
 
   const advanceToNextUnread = () => {
     const nextUnread = notes.findIndex(
