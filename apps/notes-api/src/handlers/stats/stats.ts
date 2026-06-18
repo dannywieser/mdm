@@ -6,6 +6,7 @@ import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 import path from "node:path"
 
+import { logger } from "../../logger"
 import { scanMarkdownFile } from "../notes/notes.scan"
 import { countFilesRecursive } from "./stats.files"
 import {
@@ -63,10 +64,10 @@ export const statsHandler: RequestHandler = async (_request, response) => {
       return
     }
 
-    console.error("Unable to load stats", {
-      error: toLoggableError(error),
-      notesConfig: notesConfig ?? null,
-    })
+    logger.error(
+      { error: toLoggableError(error), notesConfig: notesConfig ?? null },
+      "Unable to load stats",
+    )
     response.status(500).json({ error: "Unable to load stats" })
   }
 }

@@ -7,6 +7,7 @@ import { toLoggableError } from "mdm-util"
 
 import type { HabitResult } from "./habit-detail.types"
 
+import { logger } from "../../logger"
 import { scanHabitEntries } from "./habit-detail.files"
 import { buildHistory, buildScoreBreakdown, buildScoreEntries, buildStreaks, calculateHabitScore, calculateLowestDaysTrackedPerPeriod, getWindowEntries } from "./habit-detail.util"
 
@@ -28,18 +29,18 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
 
     const { id, name, mode, frontmatterProperty, targetScore, trackingWindowDays } = habitConfig
 
-    console.log("[habit] config resolved", {
-      habitId: id,
-      frontmatterProperty,
-      mode,
-      trackingWindowDays,
+    logger.debug({
       createdDateProperty,
       deriveTitleDate,
+      frontmatterProperty,
+      habitId: id,
+      mode,
       notesDirectory,
-    })
+      trackingWindowDays,
+    }, "[habit] config resolved")
 
     const filePaths = await collectMarkdownFiles(notesDirectory)
-    console.log(`[habit] collectMarkdownFiles found ${filePaths.length} file(s) in ${notesDirectory}`)
+    logger.debug({ count: filePaths.length, notesDirectory }, "[habit] collectMarkdownFiles found files")
 
     const entries = await scanHabitEntries(
       filePaths,
@@ -50,7 +51,7 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
       notesDirectory,
       obsidianVault,
     )
-    console.log(`[habit] scanHabitEntries matched ${entries.length} entr${entries.length === 1 ? "y" : "ies"} for "${frontmatterProperty}"`)
+    logger.debug({ count: entries.length, frontmatterProperty }, "[habit] scanHabitEntries matched entries")
 
     const today = new Date().toLocaleDateString("en-CA", { timeZone: timezone })
     const {
@@ -108,10 +109,10 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
       response.status(500).json({ error: error.message })
       return
     }
-    console.error("Unable to load habit", {
-      error: toLoggableError(error),
-      notesConfig: notesConfig ?? null,
-    })
+    logger.error(
+      { error: toLoggableError(error), notesConfig: notesConfig ?? null },
+      "Unable to load habit",
+    )
     response.status(500).json({ error: "Unable to load habit" })
   }
 }

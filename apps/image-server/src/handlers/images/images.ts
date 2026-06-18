@@ -4,6 +4,7 @@ import path from "node:path"
 
 import type { ImageRedisClient } from "./images.types"
 
+import { logger } from "../../logger"
 import {
   buildImgproxyUrlPath,
   DEFAULT_MAX_HEIGHT,
@@ -33,14 +34,14 @@ export const createImageHandler = (
     const resolvedImagePath = resolveImagePath(sourcePath)
 
     if (!resolvedImagePath) {
-      console.error("[image-server] invalid path rejected", { sourcePath })
+      logger.error({ sourcePath }, "invalid path rejected")
       response.status(400).json({ error: "A valid local image path is required" })
       return
     }
 
     if (!config.imgproxyEnabled) {
       const fullPath = path.join(config.imagesRoot, resolvedImagePath)
-      console.debug("[image-server] serving directly", { fullPath })
+      logger.debug({ fullPath }, "serving image directly")
       response.sendFile(fullPath)
       return
     }
@@ -50,7 +51,7 @@ export const createImageHandler = (
     try {
       const cached = await redisClient.get(cacheKey)
       if (cached) {
-        console.debug("[image-server] cache hit", { resolvedImagePath })
+        logger.debug({ resolvedImagePath }, "image cache hit")
         response.redirect(307, cached)
         return
       }
@@ -67,7 +68,7 @@ export const createImageHandler = (
 
     const redirectUrl = `${config.imgproxyPathPrefix}${upstreamPath}`
 
-    console.debug("[image-server] cache miss, redirecting", { resolvedImagePath, redirectUrl })
+    logger.debug({ redirectUrl, resolvedImagePath }, "image cache miss, redirecting")
 
     try {
       await redisClient.set(cacheKey, redirectUrl, { EX: config.cacheTtlSeconds })

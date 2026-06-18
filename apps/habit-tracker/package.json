@@ -7,7 +7,7 @@
     "prebuild": "turbo run build --filter=habit-tracker^...",
     "predev": "turbo run build --filter=habit-tracker^...",
     "pretest": "turbo run build --filter=habit-tracker^...",
-    "dev": "tsx watch --env-file=../../.env src/server.ts",
+    "dev": "tsx watch --env-file=../../.env src/server.ts | pino-pretty",
     "build": "tsc -p tsconfig.build.json",
     "lint": "eslint src --ext .ts",
     "test": "vitest run --config vitest.config.ts"
@@ -16,8 +16,9 @@
     "app-config": "1.8.0",
     "express": "5.2.1",
     "markdown": "1.8.0",
+    "mdm-logger": "1.0.0",
     "mdm-util": "1.8.0",
-    "morgan": "1.10.1",
+    "pino-http": "11.0.0",
     "services": "1.8.0"
   }
 }

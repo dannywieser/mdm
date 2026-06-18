@@ -5,6 +5,7 @@ import { AppConfigError, resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 
+import { logger } from "../../logger"
 import { applyViewFilter } from "./filters/notes.filters"
 import { EMPTY_MARKDOWN_NODE, parseMarkdownFile } from "./notes.parse"
 import { scanMarkdownFile } from "./notes.scan"
@@ -17,10 +18,10 @@ export const notesHandler: RequestHandler = async (request, response) => {
     const { attachmentsDirectory, createdDateProperty, dateFormats, deriveTitleDate, notesDirectory, obsidianVault, timezone, views } =
       notesConfig
 
-    console.log("[notes] config resolved", { notesDirectory, obsidianVault, timezone })
+    logger.debug({ notesDirectory, obsidianVault, timezone }, "[notes] config resolved")
 
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted((a, b) => a.localeCompare(b))
-    console.log(`[notes] collectMarkdownFiles found ${markdownFiles.length} file(s) in ${notesDirectory}`)
+    logger.debug({ count: markdownFiles.length, notesDirectory }, "[notes] collectMarkdownFiles found files")
 
     const scannedNotes = await Promise.all(
       markdownFiles.map((filePath) =>
@@ -32,12 +33,12 @@ export const notesHandler: RequestHandler = async (request, response) => {
         ? request.query.view
         : undefined
 
-    console.log(`[notes] applying view="${requestedView ?? "none"}" to ${scannedNotes.length} note(s)`)
+    logger.debug({ total: scannedNotes.length, view: requestedView ?? "none" }, "[notes] applying view filter")
     const filteredNotes = applyViewFilter(scannedNotes, views, requestedView, {
       dateFormats,
       timezone,
     })
-    console.log(`[notes] ${filteredNotes.length}/${scannedNotes.length} note(s) passed view filter`)
+    logger.debug({ passed: filteredNotes.length, total: scannedNotes.length }, "[notes] view filter applied")
 
     const includeContent = request.query.includeContent !== "false"
 
@@ -56,10 +57,10 @@ export const notesHandler: RequestHandler = async (request, response) => {
       return
     }
 
-    console.error("Unable to load notes", {
-      error: toLoggableError(error),
-      notesConfig: notesConfig ?? null,
-    })
+    logger.error(
+      { error: toLoggableError(error), notesConfig: notesConfig ?? null },
+      "Unable to load notes",
+    )
     response.status(500).json({ error: "Unable to load notes" })
   }
 }

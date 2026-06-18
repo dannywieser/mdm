@@ -2,11 +2,20 @@ import { toLoggableError } from "mdm-util"
 
 import type { FlagRedisClient } from "./flags.types"
 
+import { logger } from "../../logger"
 import { createFlagsHandler } from "./flags"
 import { getFlag, toggleFlag } from "./flags.util"
 
 vi.mock("mdm-util", () => ({
   toLoggableError: vi.fn(),
+}))
+
+vi.mock("../../logger", () => ({
+  logger: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+  },
 }))
 
 vi.mock("./flags.util", () => ({
@@ -133,7 +142,6 @@ describe("flagsHandler interface", () => {
       status: vi.fn().mockReturnThis(),
       json: vi.fn(),
     }
-    const errorSpy = vi.spyOn(console, "error").mockImplementation()
 
     const error = new Error("boom")
     toggleFlagMock.mockRejectedValue(error)
@@ -148,14 +156,12 @@ describe("flagsHandler interface", () => {
     )
 
     expect(toLoggableErrorMock).toHaveBeenCalledWith(error)
-    expect(errorSpy).toHaveBeenCalledWith("Unable to toggle flag", {
-      message: "boom",
-      stack: "stack",
-    })
+    expect(logger.error).toHaveBeenCalledWith(
+      { error: { message: "boom", stack: "stack" } },
+      "Unable to toggle flag",
+    )
     expect(response.status).toHaveBeenCalledWith(500)
     expect(response.json).toHaveBeenCalledWith({ error: "Unable to toggle flag" })
-
-    errorSpy.mockRestore()
   })
 
   test("returns 500 when retrieving fails", async () => {
@@ -163,7 +169,6 @@ describe("flagsHandler interface", () => {
       status: vi.fn().mockReturnThis(),
       json: vi.fn(),
     }
-    const errorSpy = vi.spyOn(console, "error").mockImplementation()
 
     const error = new Error("boom")
     getFlagMock.mockRejectedValue(error)
@@ -178,14 +183,12 @@ describe("flagsHandler interface", () => {
     )
 
     expect(toLoggableErrorMock).toHaveBeenCalledWith(error)
-    expect(errorSpy).toHaveBeenCalledWith("Unable to retrieve flag", {
-      message: "boom",
-      stack: "stack",
-    })
+    expect(logger.error).toHaveBeenCalledWith(
+      { error: { message: "boom", stack: "stack" } },
+      "Unable to retrieve flag",
+    )
     expect(response.status).toHaveBeenCalledWith(500)
     expect(response.json).toHaveBeenCalledWith({ error: "Unable to retrieve flag" })
-
-    errorSpy.mockRestore()
   })
 
   test("returns 400 when flag is not configured", async () => {

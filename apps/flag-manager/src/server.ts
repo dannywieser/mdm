@@ -1,7 +1,7 @@
 import express from "express"
 import { toLoggableError } from "mdm-util"
 import { createRedisClient } from "mdm-util/redis"
-import morgan from "morgan"
+import pinoHttp from "pino-http"
 
 import type {
   FlagDefinition,
@@ -11,6 +11,7 @@ import type {
 import { resolveFlagDefinitions } from "./config"
 import { createFlagsHandler } from "./handlers/flags/flags"
 import { healthHandler } from "./handlers/health/health"
+import { logger } from "./logger"
 
 export const createApp = (
   redisClient: FlagRedisClient,
@@ -18,7 +19,7 @@ export const createApp = (
 ) => {
   const app = express()
 
-  app.use(morgan("combined"))
+  app.use(pinoHttp({ logger }))
 
   const flagsHandler = createFlagsHandler(redisClient, flagDefinitions)
 
@@ -37,7 +38,7 @@ const startServer = async (): Promise<void> => {
   const flagDefinitions = await resolveFlagDefinitions()
 
   redisClient.on("error", (error) => {
-    console.error("Redis client error", error)
+    logger.error({ error }, "Redis client error")
   })
 
   await redisClient.connect()
@@ -45,19 +46,15 @@ const startServer = async (): Promise<void> => {
   const app = createApp(redisClient, flagDefinitions)
 
   app.listen(port, () => {
-    console.log(`flag-manager listening on ${port}`)
-    console.log(
-      "Resolved flag definitions",
-      JSON.stringify(flagDefinitions, null, 2),
-    )
+    logger.info({ flagDefinitions, port }, "flag-manager listening")
   })
 }
 
 if (require.main === module) {
   startServer().catch((error: unknown) => {
-    console.error(
+    logger.error(
+      { error: toLoggableError(error) },
       "Unable to start flag-manager due to configuration error",
-      toLoggableError(error),
     )
     throw error
   })

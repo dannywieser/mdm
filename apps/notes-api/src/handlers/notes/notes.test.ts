@@ -6,10 +6,19 @@ import request from "supertest"
 
 import type { ScannedNote } from "./notes.types"
 
+import { logger } from "../../logger"
 import { applyViewFilter } from "./filters/notes.filters"
 import { notesHandler } from "./notes"
 import { parseMarkdownFile } from "./notes.parse"
 import { scanMarkdownFile } from "./notes.scan"
+
+vi.mock("../../logger", () => ({
+  logger: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+  },
+}))
 
 vi.mock("app-config", async () => {
   const actualConfig =
@@ -308,7 +317,6 @@ describe("notes handler interface", () => {
     })
     collectMarkdownFilesMock.mockRejectedValue(new Error("boom"))
     toLoggableErrorMock.mockReturnValue({ message: "boom", stack: "stack" })
-    const errorSpy = vi.spyOn(console, "error").mockImplementation()
     const app = express()
     app.get("/notes", notesHandler)
 
@@ -321,14 +329,11 @@ describe("notes handler interface", () => {
     expect(scanMarkdownFileMock).not.toHaveBeenCalled()
     expect(parseMarkdownFileMock).not.toHaveBeenCalled()
     expect(toLoggableErrorMock).toHaveBeenCalledWith(expect.any(Error))
-    expect(errorSpy).toHaveBeenCalledTimes(1)
+    expect(logger.error).toHaveBeenCalledTimes(1)
 
-    const [, loggedPayload] = errorSpy.mock.calls[0] as [
-      string,
+    const [loggedContext] = vi.mocked(logger.error).mock.calls[0] as [
       {
-        error: {
-          message: string
-        }
+        error: { message: string }
         notesConfig: {
           attachmentsDirectory: string
           dateFormats: string[]
@@ -337,10 +342,11 @@ describe("notes handler interface", () => {
           views: unknown[]
         }
       },
+      string,
     ]
 
-    expect(loggedPayload.error.message).toBe("boom")
-    expect(loggedPayload.notesConfig).toEqual({
+    expect(loggedContext.error.message).toBe("boom")
+    expect(loggedContext.notesConfig).toEqual({
       attachmentsDirectory: "attachments",
       createdDateProperty: "created",
       dateFormats: [],
@@ -350,8 +356,6 @@ describe("notes handler interface", () => {
       timezone: "UTC",
       views: [],
     })
-
-    errorSpy.mockRestore()
   })
 })
 
