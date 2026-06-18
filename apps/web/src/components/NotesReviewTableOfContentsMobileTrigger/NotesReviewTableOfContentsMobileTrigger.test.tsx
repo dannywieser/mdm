@@ -2,10 +2,7 @@ import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
-import {
-  NotesReviewTableOfContentsMobileTrigger,
-  NotesReviewTableOfContentsSidebar,
-} from "./NotesReviewTableOfContents"
+import { NotesReviewTableOfContentsMobileTrigger } from "./NotesReviewTableOfContentsMobileTrigger"
 
 vi.mock("../../i18n", () => ({
   useI18n: () => ({ t: (key: string, values?: Record<string, string | number>) => {
@@ -25,24 +22,6 @@ afterEach(() => {
 
 const renderWith = (ui: React.ReactElement) =>
   render(<ChakraProvider value={defaultSystem}>{ui}</ChakraProvider>)
-
-describe("NotesReviewTableOfContentsSidebar", () => {
-  test("renders empty container when notes list is empty", () => {
-    renderWith(<NotesReviewTableOfContentsSidebar notes={[]} currentIndex={0} />)
-    expect(screen.queryByText(/review\.forReview/)).toBeNull()
-  })
-
-  test("renders the header with note count", () => {
-    renderWith(<NotesReviewTableOfContentsSidebar notes={notes} currentIndex={0} />)
-    expect(screen.getByText('review.forReview:{"count":2}')).toBeTruthy()
-  })
-
-  test("renders all note titles", () => {
-    renderWith(<NotesReviewTableOfContentsSidebar notes={notes} currentIndex={0} />)
-    expect(screen.getByText("Note One")).toBeTruthy()
-    expect(screen.getByText("Note Two")).toBeTruthy()
-  })
-})
 
 describe("NotesReviewTableOfContentsMobileTrigger", () => {
   test("renders nothing when notes list is empty", () => {
