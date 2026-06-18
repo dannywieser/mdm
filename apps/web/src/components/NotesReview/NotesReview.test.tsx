@@ -46,8 +46,11 @@ vi.mock("../OpenInObsidianButton", () => ({
   ),
 }))
 
-vi.mock("./NotesReviewTableOfContents", () => ({
+vi.mock("./NotesReviewTableOfContentsSidebar", () => ({
   NotesReviewTableOfContentsSidebar: () => null,
+}))
+
+vi.mock("./NotesReviewTableOfContentsMobileTrigger", () => ({
   NotesReviewTableOfContentsMobileTrigger: ({
     notes,
     currentIndex,
