@@ -2,7 +2,7 @@ import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
 import { cleanup, render, screen } from "@testing-library/react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
-import type { HabitScoreBreakdown } from "services"
+import type { HabitScoreBreakdown as HabitScoreBreakdownData } from "services"
 
 import { HabitScoreBreakdown } from "./HabitScoreBreakdown"
 import { formatContributionAmount, formatTierLabel } from "./HabitScoreBreakdown.util"
@@ -13,7 +13,7 @@ vi.mock("../../i18n", () => ({
   useI18n: () => ({ t: (key: string) => key }),
 }))
 
-const BREAKDOWN_5_DAYS: HabitScoreBreakdown = {
+const BREAKDOWN_5_DAYS: HabitScoreBreakdownData = {
   entryScores: 500,
   daysTiers: [{ startDay: 1, endDay: 5, rate: 0.005, days: 5, amount: 12.5 }],
   streakTiers: [{ startDay: 1, endDay: 5, rate: 0.005, days: 5, amount: 12.6 }],
