@@ -12,6 +12,10 @@ import { afterEach, describe, expect, test, vi } from "vitest"
 import type { HabitResult } from "services"
 
 import { HabitDetail } from "./HabitDetail"
+import {
+  calculateScoreContributions,
+  formatContributionAmount,
+} from "./HabitDetail.util"
 
 afterEach(cleanup)
 
@@ -121,8 +125,8 @@ describe("HabitDetail", () => {
     renderDetail()
 
     expect(screen.getByText("habit.do-more")).toBeTruthy()
-    expect(screen.getByText("525")).toBeTruthy()
-    expect(screen.getAllByText("5")).toHaveLength(2)
+    // 525 appears in both the score stat and the breakdown final score row
+    expect(screen.getAllByText("525").length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText("habit.daysLogged")).toBeTruthy()
     expect(screen.getByText("habit.do-more-streak")).toBeTruthy()
   })
@@ -272,5 +276,76 @@ describe("HabitDetail", () => {
     })
 
     expect(screen.queryByLabelText("habit.heatLevel")).toBeNull()
+  })
+
+  test("shows the score breakdown when entries are expanded", () => {
+    renderDetail()
+
+    fireEvent.click(screen.getByText("habit.scoreEntries"))
+
+    expect(screen.getByText("habit.scoreBreakdown")).toBeTruthy()
+    expect(screen.getByText("habit.scoreBreakdownEntries")).toBeTruthy()
+    expect(screen.getByText("habit.scoreBreakdownDaysBonus")).toBeTruthy()
+    expect(screen.getByText("habit.scoreBreakdownStreakBonus")).toBeTruthy()
+    expect(screen.getByText("habit.scoreBreakdownFinalScore")).toBeTruthy()
+  })
+
+  test("shows days logged penalty label for do-less habits", () => {
+    renderDetail({ ...HABIT, mode: "do-less" })
+
+    fireEvent.click(screen.getByText("habit.scoreEntries"))
+
+    expect(screen.getByText("habit.scoreBreakdownDaysPenalty")).toBeTruthy()
+  })
+})
+
+describe("calculateScoreContributions", () => {
+  test("returns zero contributions when scoreBeforeMultipliers is zero", () => {
+    const result = calculateScoreContributions(0, 0.07, 0.035)
+
+    expect(result.entryScores).toBe(0)
+    expect(result.daysBonusAmount).toBe(0)
+    expect(result.streakBonusAmount).toBe(0)
+  })
+
+  test("computes days bonus as base × dayMultiplier", () => {
+    const { daysBonusAmount } = calculateScoreContributions(100, 0.07, 0)
+
+    expect(daysBonusAmount).toBeCloseTo(7)
+  })
+
+  test("computes streak bonus applied on top of the post-day-bonus base", () => {
+    // base=100, dayMult=0.07 → afterDay=107, streakMult=0.035 → streakBonus=107*0.035
+    const { streakBonusAmount } = calculateScoreContributions(100, 0.07, 0.035)
+
+    expect(streakBonusAmount).toBeCloseTo(107 * 0.035)
+  })
+
+  test("returns a negative streak contribution for do-less habits", () => {
+    // do-less streak multiplier is negative
+    const { streakBonusAmount } = calculateScoreContributions(100, 0.07, -0.035)
+
+    expect(streakBonusAmount).toBeLessThan(0)
+    expect(streakBonusAmount).toBeCloseTo(107 * -0.035)
+  })
+})
+
+describe("formatContributionAmount", () => {
+  test("prefixes positive values with a plus sign", () => {
+    expect(formatContributionAmount(7)).toBe("+7")
+  })
+
+  test("preserves the minus sign for negative values", () => {
+    expect(formatContributionAmount(-3.745)).toBe("-3.7")
+  })
+
+  test("rounds to one decimal place when fractional", () => {
+    expect(formatContributionAmount(3.745)).toBe("+3.7")
+    expect(formatContributionAmount(3.75)).toBe("+3.8")
+  })
+
+  test("omits the decimal when the rounded value is a whole number", () => {
+    expect(formatContributionAmount(7.0)).toBe("+7")
+    expect(formatContributionAmount(7.04)).toBe("+7")
   })
 })

@@ -33,12 +33,103 @@ import { HabitScoreProgress } from "../HabitScoreProgress"
 import { HabitScoreValue } from "../HabitScoreValue"
 import { HeatDots } from "../HeatDots"
 import { calculateHeatDotCount } from "../HeatDots/HeatDots.util"
+import type { HabitMode } from "services"
+
 import type { HabitDetailRouteParamKey } from "./HabitDetail.types"
 import {
+  calculateScoreContributions,
   calculateWindowFillPercentage,
   formatChartDate,
+  formatContributionAmount,
   formatEntryValue,
 } from "./HabitDetail.util"
+
+interface ScoreBreakdownProps {
+  mode: HabitMode
+  scoreBeforeMultipliers: number
+  dayMultiplier: number
+  streakMultiplier: number
+  windowEntries: number
+  streak: number
+  habitScore: number
+  t: (key: string, values?: Record<string, string | number>) => string
+}
+
+function ScoreBreakdown({
+  mode,
+  scoreBeforeMultipliers,
+  dayMultiplier,
+  streakMultiplier,
+  windowEntries,
+  streak,
+  habitScore,
+  t,
+}: Readonly<ScoreBreakdownProps>) {
+  const { daysBonusAmount, streakBonusAmount } = calculateScoreContributions(
+    scoreBeforeMultipliers,
+    dayMultiplier,
+    streakMultiplier,
+  )
+
+  const daysLabel =
+    mode === "do-more"
+      ? t("habit.scoreBreakdownDaysBonus", { days: windowEntries })
+      : t("habit.scoreBreakdownDaysPenalty", { days: windowEntries })
+
+  const streakLabel = t("habit.scoreBreakdownStreakBonus", { streak })
+
+  const rowStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  }
+
+  return (
+    <Box
+      borderWidth="1px"
+      borderColor="app.border"
+      borderRadius="md"
+      overflow="hidden"
+      fontSize="xs"
+      color="app.text"
+    >
+      <Text
+        fontSize="xs"
+        color="app.textMuted"
+        letterSpacing="wide"
+        px={3}
+        py={2}
+        bg="app.panelBackgroundHover"
+        borderBottomWidth="1px"
+        borderColor="app.border"
+      >
+        {t("habit.scoreBreakdown")}
+      </Text>
+      <VStack align="stretch" gap={0} px={3} py={2}>
+        <Flex {...rowStyle} py={1.5} borderBottomWidth="1px" borderBottomColor="app.border">
+          <Text color="app.textMuted">{t("habit.scoreBreakdownEntries")}</Text>
+          <Text fontVariantNumeric="tabular-nums">{scoreBeforeMultipliers}</Text>
+        </Flex>
+        <Flex {...rowStyle} py={1.5} borderBottomWidth="1px" borderBottomColor="app.border">
+          <Text color="app.textMuted">{daysLabel}</Text>
+          <Text fontVariantNumeric="tabular-nums" color={mode === "do-more" ? "green.500" : "red.500"}>
+            {formatContributionAmount(daysBonusAmount)}
+          </Text>
+        </Flex>
+        <Flex {...rowStyle} py={1.5} borderBottomWidth="1px" borderBottomColor="app.border">
+          <Text color="app.textMuted">{streakLabel}</Text>
+          <Text fontVariantNumeric="tabular-nums" color="green.500">
+            {formatContributionAmount(streakBonusAmount)}
+          </Text>
+        </Flex>
+        <Flex {...rowStyle} py={1.5}>
+          <Text fontWeight="semibold">{t("habit.scoreBreakdownFinalScore")}</Text>
+          <Text fontWeight="semibold" fontVariantNumeric="tabular-nums">{habitScore}</Text>
+        </Flex>
+      </VStack>
+    </Box>
+  )
+}
 
 const TOOLTIP_STYLE = {
   backgroundColor: "var(--chakra-colors-chakra-body-bg, #fff)",
@@ -336,52 +427,65 @@ export function HabitDetail() {
                 </Flex>
               </Collapsible.Trigger>
               <Collapsible.Content>
-                <Table.Root
-                  bg="app.panelBackground"
-                  color="app.text"
-                  borderWidth="1px"
-                  borderColor="app.border"
-                  borderRadius="md"
-                  overflow="hidden"
-                >
-                  <Table.Header bg="app.panelBackgroundHover">
-                    <Table.Row bg="app.panelBackgroundHover">
-                      <Table.ColumnHeader
-                        color="app.textMuted"
-                        borderColor="app.border"
-                      >
-                        {t("habit.entryDate")}
-                      </Table.ColumnHeader>
-                      <Table.ColumnHeader
-                        color="app.textMuted"
-                        borderColor="app.border"
-                      >
-                        {t("habit.entryValue")}
-                      </Table.ColumnHeader>
-                    </Table.Row>
-                  </Table.Header>
-                  <Table.Body>
-                    {habit.scoreEntries.map((entry) => (
-                      <Table.Row
-                        key={entry.date}
-                        bg="app.panelBackground"
-                        _hover={{ bg: "app.panelBackgroundHover" }}
-                      >
-                        <Table.Cell borderColor="app.border">
-                          <Link href={entry.obsidianUrl} color="app.accent">
-                            {formatChartDate(entry.date)}
-                          </Link>
-                        </Table.Cell>
-                        <Table.Cell borderColor="app.border">
-                          {formatEntryValue(
-                            entry.value,
-                            entry.recentMultiplier,
-                          )}
-                        </Table.Cell>
+                <VStack align="stretch" gap={3}>
+                  <Table.Root
+                    bg="app.panelBackground"
+                    color="app.text"
+                    borderWidth="1px"
+                    borderColor="app.border"
+                    borderRadius="md"
+                    overflow="hidden"
+                  >
+                    <Table.Header bg="app.panelBackgroundHover">
+                      <Table.Row bg="app.panelBackgroundHover">
+                        <Table.ColumnHeader
+                          color="app.textMuted"
+                          borderColor="app.border"
+                        >
+                          {t("habit.entryDate")}
+                        </Table.ColumnHeader>
+                        <Table.ColumnHeader
+                          color="app.textMuted"
+                          borderColor="app.border"
+                        >
+                          {t("habit.entryValue")}
+                        </Table.ColumnHeader>
                       </Table.Row>
-                    ))}
-                  </Table.Body>
-                </Table.Root>
+                    </Table.Header>
+                    <Table.Body>
+                      {habit.scoreEntries.map((entry) => (
+                        <Table.Row
+                          key={entry.date}
+                          bg="app.panelBackground"
+                          _hover={{ bg: "app.panelBackgroundHover" }}
+                        >
+                          <Table.Cell borderColor="app.border">
+                            <Link href={entry.obsidianUrl} color="app.accent">
+                              {formatChartDate(entry.date)}
+                            </Link>
+                          </Table.Cell>
+                          <Table.Cell borderColor="app.border">
+                            {formatEntryValue(
+                              entry.value,
+                              entry.recentMultiplier,
+                            )}
+                          </Table.Cell>
+                        </Table.Row>
+                      ))}
+                    </Table.Body>
+                  </Table.Root>
+
+                  <ScoreBreakdown
+                    mode={habit.mode}
+                    scoreBeforeMultipliers={habit.scoreBeforeMultipliers}
+                    dayMultiplier={habit.dayMultiplier}
+                    streakMultiplier={habit.streakMultiplier}
+                    windowEntries={habit.windowEntries}
+                    streak={habit.streak}
+                    habitScore={habit.habitScore}
+                    t={t}
+                  />
+                </VStack>
               </Collapsible.Content>
             </Collapsible.Root>
           )}
