@@ -8,28 +8,3 @@ export const formatEntryValue = (value: number, recentMultiplier: number | undef
 
 export const calculateWindowFillPercentage = (windowEntries: number, trackingWindowDays: number): number =>
   Math.round((windowEntries / trackingWindowDays) * 100)
-
-export interface ScoreContributions {
-  entryScores: number
-  daysBonusAmount: number
-  streakBonusAmount: number
-}
-
-export const calculateScoreContributions = (
-  scoreBeforeMultipliers: number,
-  dayMultiplier: number,
-  streakMultiplier: number,
-): ScoreContributions => {
-  const afterDayBonus = scoreBeforeMultipliers * (1 + dayMultiplier)
-  return {
-    entryScores: scoreBeforeMultipliers,
-    daysBonusAmount: scoreBeforeMultipliers * dayMultiplier,
-    streakBonusAmount: afterDayBonus * streakMultiplier,
-  }
-}
-
-export const formatContributionAmount = (amount: number): string => {
-  const rounded = Math.round(amount * 10) / 10
-  const sign = rounded >= 0 ? "+" : ""
-  return `${sign}${rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(1)}`
-}

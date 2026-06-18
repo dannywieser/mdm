@@ -549,12 +549,12 @@ describe("calculateHabitScore", () => {
     expect(habitScore).toBe(Math.floor(85 * (1 + 0.01) * (1 + 0.005)))
   })
 
-  test("streak bonus example from spec: 10-day streak contributes a 5% bonus", () => {
+  test("10-day do-more streak applies tiered bonus (0.5% for days 1–5, 0.6% for days 6–10)", () => {
     // 10 consecutive days with value 1, all recent, do-more with 30 window days
     // baseScore = 10 * 1 * 10 = 100
-    // streak = 10 consecutive days with entries → streakMultiplier = 10 * 0.005 = 0.05 (the spec's "5% bonus")
-    // uniqueWindowDays = 10 → dayMultiplier (do-more) = 10 * 0.005 = 0.05
-    // final = 100 * (1 + 0.05) * (1 + 0.05) = 100 * 1.1025 = 110.25, floored to 110
+    // streak = 10 → tiered streakMultiplier = 5*0.005 + 5*0.006 = 0.055
+    // uniqueWindowDays = 10 → tiered dayMultiplier = 0.055
+    // final = 100 * (1 + 0.055) * (1 + 0.055) = 100 * 1.113025 = 111.3025, floored to 111
     const refDate = addDays(YEAR_START, 9)
     const entries = Array.from({ length: 10 }, (_, i) =>
       makeEntry(addDays(YEAR_START, i), 1),
@@ -566,15 +566,15 @@ describe("calculateHabitScore", () => {
       "do-more",
     )
     expect(streak).toBe(10)
-    expect(habitScore).toBe(110)
+    expect(habitScore).toBe(111)
   })
 
-  test("do-less streak example: a 10-day gap since the last entry contributes a 5% penalty", () => {
+  test("do-less 10-day streak applies tiered bonus reducing the score", () => {
     // Single entry 10 days before the reference date, do-less with 30 window days
     // baseScore = 1 * 10 = 10 (within the recent 14-day window)
-    // streak = days since last entry = 10 → streakMultiplier (do-less, negative) = -(10 * 0.005) = -0.05
-    // uniqueWindowDays = 1 → dayMultiplier (always positive) = 1 * 0.005 = 0.005
-    // final = 10 * (1 + 0.005) * (1 - 0.05) = 10 * 0.95475 = 9.5475, floored to 9
+    // streak = 10 → tiered streakMultiplier (do-less, negative) = -(5*0.005 + 5*0.006) = -0.055
+    // uniqueWindowDays = 1 → tiered dayMultiplier = 1*0.005 = 0.005
+    // final = 10 * (1 + 0.005) * (1 - 0.055) = 10 * 0.950225 = 9.50225, floored to 9
     const lastEntryDate = addDays(YEAR_START, 0)
     const refDate = addDays(YEAR_START, 10)
     const { habitScore, streak } = calculateHabitScore(
@@ -584,7 +584,7 @@ describe("calculateHabitScore", () => {
       "do-less",
     )
     expect(streak).toBe(10)
-    expect(habitScore).toBe(Math.floor(10 * (1 + 0.005) * (1 - 0.05)))
+    expect(habitScore).toBe(Math.floor(10 * (1 + 0.005) * (1 - 0.055)))
   })
 })
 

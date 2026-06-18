@@ -6,7 +6,19 @@ import type { HabitEntry, HabitHistoryEntry, HabitScoreEntry, HabitScoreResult, 
 
 const RECENT_WINDOW_DAYS = 14
 const RECENT_MULTIPLIER = 10
-const BONUS_PER_UNIT = 0.005
+const BONUS_TIER_SIZE = 5
+const BASE_BONUS_RATE = 0.005
+const BONUS_RATE_INCREMENT = 0.001
+
+// Tiered multiplier: each group of BONUS_TIER_SIZE days earns a higher per-day
+// rate (0.5% for days 1–5, 0.6% for days 6–10, etc.).
+const calculateTieredMultiplier = (count: number): number => {
+  let multiplier = 0
+  for (let i = 0; i < count; i++) {
+    multiplier += BASE_BONUS_RATE + Math.floor(i / BONUS_TIER_SIZE) * BONUS_RATE_INCREMENT
+  }
+  return multiplier
+}
 
 // A `windowDays`-day window ending on (and including) `referenceDate` spans
 // `windowDays - 1` days before it, so the inclusive [windowStart, referenceDate]
@@ -109,9 +121,9 @@ export const calculateHabitScore = (
   const streak = calculateStreak(entries, referenceDate, mode)
 
   const uniqueWindowDays = new Set(windowEntries.map((e) => e.date)).size
-  const streakMultiplier =
-    mode === "do-more" ? streak * BONUS_PER_UNIT : -(streak * BONUS_PER_UNIT)
-  const dayMultiplier = uniqueWindowDays * BONUS_PER_UNIT
+  const tieredStreakMultiplier = calculateTieredMultiplier(streak)
+  const streakMultiplier = mode === "do-more" ? tieredStreakMultiplier : -tieredStreakMultiplier
+  const dayMultiplier = calculateTieredMultiplier(uniqueWindowDays)
 
   // toFixed rounds away floating-point representation noise (e.g. 524.9999999999999)
   // before flooring, so the result reflects the mathematically exact score.

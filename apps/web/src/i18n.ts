@@ -24,11 +24,11 @@ const translations: Record<Locale, Record<string, string>> = {
     "habit.score": "score",
     "habit.scoreBreakdown": "score breakdown",
     "habit.scoreBreakdownEntries": "entry scores",
-    "habit.scoreBreakdownDaysBonus": "days logged bonus ({days} × 0.5%)",
-    "habit.scoreBreakdownDaysPenalty": "days logged penalty ({days} × 0.5%)",
-    "habit.scoreBreakdownStreakBonus": "streak bonus ({streak} × 0.5%)",
+    "habit.scoreBreakdownDaysBonus": "days logged bonus",
+    "habit.scoreBreakdownDaysPenalty": "days logged penalty",
+    "habit.scoreBreakdownStreakBonus": "streak bonus",
     "habit.scoreBreakdownFinalScore": "final score",
-    "habit.scoreEntries": "entries in current score",
+    "habit.scoreDetails": "current score details",
     "habit.scoreInfoDoLess":
       "lower scores are better — staying under the target keeps this habit in check",
     "habit.scoreInfoDoMore":

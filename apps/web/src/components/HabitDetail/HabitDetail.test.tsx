@@ -12,10 +12,6 @@ import { afterEach, describe, expect, test, vi } from "vitest"
 import type { HabitResult } from "services"
 
 import { HabitDetail } from "./HabitDetail"
-import {
-  calculateScoreContributions,
-  formatContributionAmount,
-} from "./HabitDetail.util"
 
 afterEach(cleanup)
 
@@ -184,8 +180,8 @@ describe("HabitDetail", () => {
   test("renders a table of score entries with their values and recency multipliers inline", () => {
     renderDetail()
 
-    expect(screen.getByText("habit.scoreEntries")).toBeTruthy()
-    fireEvent.click(screen.getByText("habit.scoreEntries"))
+    expect(screen.getByText("habit.scoreDetails")).toBeTruthy()
+    fireEvent.click(screen.getByText("habit.scoreDetails"))
     expect(screen.getByText("Jan 2")).toBeTruthy()
     expect(screen.getByText("9 (x10)")).toBeTruthy()
     expect(screen.getByText("Jan 1")).toBeTruthy()
@@ -198,7 +194,7 @@ describe("HabitDetail", () => {
 
     expect(content?.hasAttribute("hidden")).toBe(true)
 
-    fireEvent.click(screen.getByText("habit.scoreEntries"))
+    fireEvent.click(screen.getByText("habit.scoreDetails"))
 
     await waitFor(() => { expect(content?.hasAttribute("hidden")).toBe(false); })
   })
@@ -206,13 +202,13 @@ describe("HabitDetail", () => {
   test("omits the score entries table when there are no entries", () => {
     renderDetail({ ...HABIT, scoreEntries: [] })
 
-    expect(screen.queryByText("habit.scoreEntries")).toBeNull()
+    expect(screen.queryByText("habit.scoreDetails")).toBeNull()
   })
 
   test("links score entry dates to their notes via the obsidian url", () => {
     renderDetail()
 
-    fireEvent.click(screen.getByText("habit.scoreEntries"))
+    fireEvent.click(screen.getByText("habit.scoreDetails"))
     expect(screen.getByText("Jan 2").closest("a")).toHaveProperty(
       "href",
       "obsidian://open?vault=v&file=2026.01.02",
@@ -278,74 +274,12 @@ describe("HabitDetail", () => {
     expect(screen.queryByLabelText("habit.heatLevel")).toBeNull()
   })
 
-  test("shows the score breakdown when entries are expanded", () => {
+  test("shows the score breakdown section when entries are expanded", () => {
     renderDetail()
 
-    fireEvent.click(screen.getByText("habit.scoreEntries"))
+    fireEvent.click(screen.getByText("habit.scoreDetails"))
 
     expect(screen.getByText("habit.scoreBreakdown")).toBeTruthy()
-    expect(screen.getByText("habit.scoreBreakdownEntries")).toBeTruthy()
-    expect(screen.getByText("habit.scoreBreakdownDaysBonus")).toBeTruthy()
-    expect(screen.getByText("habit.scoreBreakdownStreakBonus")).toBeTruthy()
     expect(screen.getByText("habit.scoreBreakdownFinalScore")).toBeTruthy()
-  })
-
-  test("shows days logged penalty label for do-less habits", () => {
-    renderDetail({ ...HABIT, mode: "do-less" })
-
-    fireEvent.click(screen.getByText("habit.scoreEntries"))
-
-    expect(screen.getByText("habit.scoreBreakdownDaysPenalty")).toBeTruthy()
-  })
-})
-
-describe("calculateScoreContributions", () => {
-  test("returns zero contributions when scoreBeforeMultipliers is zero", () => {
-    const result = calculateScoreContributions(0, 0.07, 0.035)
-
-    expect(result.entryScores).toBe(0)
-    expect(result.daysBonusAmount).toBe(0)
-    expect(result.streakBonusAmount).toBe(0)
-  })
-
-  test("computes days bonus as base × dayMultiplier", () => {
-    const { daysBonusAmount } = calculateScoreContributions(100, 0.07, 0)
-
-    expect(daysBonusAmount).toBeCloseTo(7)
-  })
-
-  test("computes streak bonus applied on top of the post-day-bonus base", () => {
-    // base=100, dayMult=0.07 → afterDay=107, streakMult=0.035 → streakBonus=107*0.035
-    const { streakBonusAmount } = calculateScoreContributions(100, 0.07, 0.035)
-
-    expect(streakBonusAmount).toBeCloseTo(107 * 0.035)
-  })
-
-  test("returns a negative streak contribution for do-less habits", () => {
-    // do-less streak multiplier is negative
-    const { streakBonusAmount } = calculateScoreContributions(100, 0.07, -0.035)
-
-    expect(streakBonusAmount).toBeLessThan(0)
-    expect(streakBonusAmount).toBeCloseTo(107 * -0.035)
-  })
-})
-
-describe("formatContributionAmount", () => {
-  test("prefixes positive values with a plus sign", () => {
-    expect(formatContributionAmount(7)).toBe("+7")
-  })
-
-  test("preserves the minus sign for negative values", () => {
-    expect(formatContributionAmount(-3.745)).toBe("-3.7")
-  })
-
-  test("rounds to one decimal place when fractional", () => {
-    expect(formatContributionAmount(3.745)).toBe("+3.7")
-    expect(formatContributionAmount(3.75)).toBe("+3.8")
-  })
-
-  test("omits the decimal when the rounded value is a whole number", () => {
-    expect(formatContributionAmount(7.0)).toBe("+7")
-    expect(formatContributionAmount(7.04)).toBe("+7")
   })
 })

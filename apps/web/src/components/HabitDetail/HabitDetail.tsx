@@ -33,103 +33,13 @@ import { HabitScoreProgress } from "../HabitScoreProgress"
 import { HabitScoreValue } from "../HabitScoreValue"
 import { HeatDots } from "../HeatDots"
 import { calculateHeatDotCount } from "../HeatDots/HeatDots.util"
-import type { HabitMode } from "services"
-
+import { ScoreBreakdown } from "../ScoreBreakdown/ScoreBreakdown"
 import type { HabitDetailRouteParamKey } from "./HabitDetail.types"
 import {
-  calculateScoreContributions,
   calculateWindowFillPercentage,
   formatChartDate,
-  formatContributionAmount,
   formatEntryValue,
 } from "./HabitDetail.util"
-
-interface ScoreBreakdownProps {
-  mode: HabitMode
-  scoreBeforeMultipliers: number
-  dayMultiplier: number
-  streakMultiplier: number
-  windowEntries: number
-  streak: number
-  habitScore: number
-  t: (key: string, values?: Record<string, string | number>) => string
-}
-
-function ScoreBreakdown({
-  mode,
-  scoreBeforeMultipliers,
-  dayMultiplier,
-  streakMultiplier,
-  windowEntries,
-  streak,
-  habitScore,
-  t,
-}: Readonly<ScoreBreakdownProps>) {
-  const { daysBonusAmount, streakBonusAmount } = calculateScoreContributions(
-    scoreBeforeMultipliers,
-    dayMultiplier,
-    streakMultiplier,
-  )
-
-  const daysLabel =
-    mode === "do-more"
-      ? t("habit.scoreBreakdownDaysBonus", { days: windowEntries })
-      : t("habit.scoreBreakdownDaysPenalty", { days: windowEntries })
-
-  const streakLabel = t("habit.scoreBreakdownStreakBonus", { streak })
-
-  const rowStyle = {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  }
-
-  return (
-    <Box
-      borderWidth="1px"
-      borderColor="app.border"
-      borderRadius="md"
-      overflow="hidden"
-      fontSize="xs"
-      color="app.text"
-    >
-      <Text
-        fontSize="xs"
-        color="app.textMuted"
-        letterSpacing="wide"
-        px={3}
-        py={2}
-        bg="app.panelBackgroundHover"
-        borderBottomWidth="1px"
-        borderColor="app.border"
-      >
-        {t("habit.scoreBreakdown")}
-      </Text>
-      <VStack align="stretch" gap={0} px={3} py={2}>
-        <Flex {...rowStyle} py={1.5} borderBottomWidth="1px" borderBottomColor="app.border">
-          <Text color="app.textMuted">{t("habit.scoreBreakdownEntries")}</Text>
-          <Text fontVariantNumeric="tabular-nums">{scoreBeforeMultipliers}</Text>
-        </Flex>
-        <Flex {...rowStyle} py={1.5} borderBottomWidth="1px" borderBottomColor="app.border">
-          <Text color="app.textMuted">{daysLabel}</Text>
-          <Text fontVariantNumeric="tabular-nums" color={mode === "do-more" ? "green.500" : "red.500"}>
-            {formatContributionAmount(daysBonusAmount)}
-          </Text>
-        </Flex>
-        <Flex {...rowStyle} py={1.5} borderBottomWidth="1px" borderBottomColor="app.border">
-          <Text color="app.textMuted">{streakLabel}</Text>
-          <Text fontVariantNumeric="tabular-nums" color="green.500">
-            {formatContributionAmount(streakBonusAmount)}
-          </Text>
-        </Flex>
-        <Flex {...rowStyle} py={1.5}>
-          <Text fontWeight="semibold">{t("habit.scoreBreakdownFinalScore")}</Text>
-          <Text fontWeight="semibold" fontVariantNumeric="tabular-nums">{habitScore}</Text>
-        </Flex>
-      </VStack>
-    </Box>
-  )
-}
 
 const TOOLTIP_STYLE = {
   backgroundColor: "var(--chakra-colors-chakra-body-bg, #fff)",
@@ -422,7 +332,7 @@ export function HabitDetail() {
                     className="habit-score-entries-chevron"
                   />
                   <Text fontSize="xs" letterSpacing="wide">
-                    {t("habit.scoreEntries")}
+                    {t("habit.scoreDetails")}
                   </Text>
                 </Flex>
               </Collapsible.Trigger>
@@ -483,7 +393,6 @@ export function HabitDetail() {
                     windowEntries={habit.windowEntries}
                     streak={habit.streak}
                     habitScore={habit.habitScore}
-                    t={t}
                   />
                 </VStack>
               </Collapsible.Content>
