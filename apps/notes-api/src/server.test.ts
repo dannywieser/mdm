@@ -3,9 +3,9 @@ import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
 import { healthHandler } from "./handlers/health/health"
-import { logger } from "./logger"
 import { notesHandler } from "./handlers/notes/notes"
 import { statsHandler } from "./handlers/stats/stats"
+import { logger } from "./logger"
 import { createApp, logStartupConfig } from "./server"
 
 vi.mock("app-config", () => ({
@@ -17,7 +17,7 @@ vi.mock("mdm-util", () => ({
 }))
 
 vi.mock("pino-http", () => ({
-  default: () => (_req: unknown, _res: unknown, next: () => void) => next(),
+  default: () => (_req: unknown, _res: unknown, next: () => void) => { next() },
 }))
 
 vi.mock("./logger", () => ({
