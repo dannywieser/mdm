@@ -4,7 +4,7 @@ import { useI18n } from "../../i18n"
 
 import type { HeatDotsProps } from "./HeatDots.types"
 
-export function HeatDots({ count }: HeatDotsProps) {
+export function HeatDots({ count }: Readonly<HeatDotsProps>) {
   const { t } = useI18n()
 
   if (count <= 0) return null

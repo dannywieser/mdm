@@ -3,6 +3,7 @@ import { buildImageUrl } from "services"
 
 export function getCoverSrc(cover: FrontmatterValue): string {
   const path = Array.isArray(cover) ? cover[0] : cover
+  // eslint-disable-next-line sonarjs/slow-regex -- input is a bounded frontmatter value, not user-controlled input
   const unquotedPath = path.replace(/^["']+|["']+$/g, "")
   return buildImageUrl({ path: unquotedPath })
 }

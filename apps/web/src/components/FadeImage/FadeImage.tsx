@@ -15,7 +15,7 @@ export const FadeImage = ({
 }: FadeImageProps) => {
   const [loadedSrc, setLoadedSrc] = useState<string | undefined>(undefined)
   const loaded = loadedSrc === src
-  const onSettled = () => setLoadedSrc(src)
+  const onSettled = () => { setLoadedSrc(src); }
 
   return (
     <Box

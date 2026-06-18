@@ -42,7 +42,7 @@ export const parseMarkdownBodyDates = (
     return []
   }
 
-  const matches: Array<{ index: number; value: string }> = []
+  const matches: { index: number; value: string }[] = []
 
   for (const dateFormat of dateFormats) {
     if (!dateFormat) {
@@ -56,17 +56,16 @@ export const parseMarkdownBodyDates = (
 
     for (const match of body.matchAll(expression)) {
       const date = match[1]
-      const startIndex =
-        match.index === undefined ? -1 : match.index + match[0].indexOf(date)
-
-      if (date && startIndex >= 0) {
+      if (!date) continue
+      const startIndex = match.index + match[0].indexOf(date)
+      if (startIndex >= 0) {
         matches.push({ index: startIndex, value: date })
       }
     }
   }
 
   return matches
-    .sort((matchA, matchB) => matchA.index - matchB.index)
+    .toSorted((matchA, matchB) => matchA.index - matchB.index)
     .filter(
       (match, index, values) =>
         index === 0 ||

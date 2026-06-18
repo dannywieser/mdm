@@ -6,7 +6,6 @@ import { useNotesQuery } from "services"
 import { useI18n } from "../../i18n"
 
 import { AppError } from "../AppError"
-import { LoadingScreen } from "../LoadingScreen"
 import { NoteCoverGrid } from "../NoteCoverGrid"
 import { filterNotesWithCovers } from "../NoteCoverGrid/NoteCoverGrid.util"
 
@@ -16,13 +15,12 @@ import { getMonthName, getMostRecentYear, groupNotesByMonth } from "./NotesGalle
 export const NotesGalleryByMonth = ({ aspectRatio, badges = [], year }: NotesGalleryByMonthProps) => {
   const { t } = useI18n()
   const { view } = useParams<NotesGalleryByMonthRouteParamKey>()
-  const { data, error, isLoading } = useNotesQuery({ includeContent: false, view })
+  const { data, error } = useNotesQuery({ includeContent: false, view })
   const [selectedMonth, setSelectedMonth] = useState<"all" | number>("all")
 
-  if (isLoading) return <LoadingScreen />
   if (error) return <AppError message={error.message} />
 
-  const notesWithCovers = filterNotesWithCovers(data?.notes ?? [])
+  const notesWithCovers = filterNotesWithCovers(data.notes)
   const targetYear = year ?? getMostRecentYear(notesWithCovers)
   const notesByMonth = groupNotesByMonth(notesWithCovers, targetYear)
   const months = [...notesByMonth.keys()]

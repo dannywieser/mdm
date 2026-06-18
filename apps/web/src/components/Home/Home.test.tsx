@@ -158,7 +158,7 @@ describe("Home", () => {
     )
 
     const libraryHeading = screen.getByRole("heading", { name: "Library" })
-    const librarySection = libraryHeading.parentElement as HTMLElement
+    const librarySection = libraryHeading.parentElement!
 
     expect(libraryHeading).toBeTruthy()
     expect(within(librarySection).getByRole("separator")).toBeTruthy()

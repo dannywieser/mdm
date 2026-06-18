@@ -19,7 +19,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
 
     console.log("[notes] config resolved", { notesDirectory, obsidianVault, timezone })
 
-    const markdownFiles = (await collectMarkdownFiles(notesDirectory)).sort()
+    const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted((a, b) => a.localeCompare(b))
     console.log(`[notes] collectMarkdownFiles found ${markdownFiles.length} file(s) in ${notesDirectory}`)
 
     const scannedNotes = await Promise.all(
@@ -28,8 +28,8 @@ export const notesHandler: RequestHandler = async (request, response) => {
       ),
     )
     const requestedView =
-      typeof request.query["view"] === "string"
-        ? request.query["view"]
+      typeof request.query.view === "string"
+        ? request.query.view
         : undefined
 
     console.log(`[notes] applying view="${requestedView ?? "none"}" to ${scannedNotes.length} note(s)`)
@@ -39,7 +39,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
     })
     console.log(`[notes] ${filteredNotes.length}/${scannedNotes.length} note(s) passed view filter`)
 
-    const includeContent = request.query["includeContent"] !== "false"
+    const includeContent = request.query.includeContent !== "false"
 
     const parsedNotes = includeContent
       ? await Promise.all(

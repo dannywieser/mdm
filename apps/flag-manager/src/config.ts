@@ -10,7 +10,7 @@ const isValidFlagDefinition = (value: unknown): value is FlagDefinition => {
     return false
   }
 
-  const expiresInDays = (value as Record<string, unknown>)["expiresInDays"]
+  const expiresInDays = (value as Record<string, unknown>).expiresInDays
 
   return (
     expiresInDays === undefined ||
@@ -61,7 +61,7 @@ export const resolveFlagDefinitions = async (): Promise<
     throw new FlagConfigError("app.config.json must be a JSON object")
   }
 
-  const flags = (parsedAppConfig as Record<string, unknown>)["flags"]
+  const flags = (parsedAppConfig as Record<string, unknown>).flags
 
   return validateFlagDefinitions(flags)
 }

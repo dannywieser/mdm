@@ -1,6 +1,6 @@
 export type { ToggleFlagInput, ToggleFlagResult } from "services"
 
-export type FlagRedisClient = {
+export interface FlagRedisClient {
   get: (key: string) => Promise<string | null>
   set: (
     key: string,
@@ -11,6 +11,6 @@ export type FlagRedisClient = {
   ) => Promise<unknown>
 }
 
-export type FlagDefinition = {
+export interface FlagDefinition {
   expiresInDays?: number
 }

@@ -21,7 +21,7 @@ export function NotesSearchInput() {
   }
 
   useEffect(() => {
-    return () => clearTimeout(debounceTimeoutRef.current)
+    return () => { clearTimeout(debounceTimeoutRef.current); }
   }, [])
 
   const handleChange = (nextValue: string) => {
@@ -63,7 +63,7 @@ export function NotesSearchInput() {
         aria-label={t("header.searchNotes")}
         placeholder={t("header.searchNotes")}
         value={value}
-        onChange={(event) => handleChange(event.target.value)}
+        onChange={(event) => { handleChange(event.target.value); }}
         size="sm"
         ps={8}
         borderColor="app.border"

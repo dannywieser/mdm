@@ -31,7 +31,7 @@ describe("notes parse helpers", () => {
 
     const taskItems = findNodesByType(note.content, "listItem")
     expect(taskItems).toHaveLength(2)
-    expect(taskItems.map((item) => item.checked).sort()).toEqual([false, true])
+    expect(taskItems.map((item) => item.checked).toSorted((a, b) => Number(a) - Number(b))).toEqual([false, true])
   })
 
   test("parseMarkdownFile returns a markdown node tree with scanned note metadata", async () => {
@@ -85,7 +85,7 @@ describe("notes parse helpers", () => {
     )
 
     const image = findNodesByType(note.content, "image")[0]
-    expect(image?.url).toBe(
+    expect(image.url).toBe(
       "/images?path=attachments%2Ffolder%2Ffile-name%2Fattach-20260525090751252.jpg",
     )
   })
@@ -109,7 +109,7 @@ describe("notes parse helpers", () => {
     )
 
     const image = findNodesByType(note.content, "image")[0]
-    expect(image?.url).toBe("/images?path=attachments%2Froot-note%2Fattach-123.jpg")
+    expect(image.url).toBe("/images?path=attachments%2Froot-note%2Fattach-123.jpg")
   })
 
   test("parseMarkdownFile uses configured attachmentsDirectory for bare-filename images", async () => {
@@ -128,7 +128,7 @@ describe("notes parse helpers", () => {
     )
 
     const image = findNodesByType(note.content, "image")[0]
-    expect(image?.url).toBe("/images?path=assets%2Ftopic%2Fnote%2Fphoto.png")
+    expect(image.url).toBe("/images?path=assets%2Ftopic%2Fnote%2Fphoto.png")
   })
 
   test("parseMarkdownFile rewrites obsidian wikilink image embeds to attachment path", async () => {
@@ -150,7 +150,7 @@ describe("notes parse helpers", () => {
     )
 
     const image = findNodesByType(note.content, "image")[0]
-    expect(image?.url).toBe(
+    expect(image.url).toBe(
       "/images?path=attachments%2Ffolder%2Ffile-name%2Fattach-20260523155741791.jpg",
     )
   })
@@ -174,7 +174,7 @@ describe("notes parse helpers", () => {
     )
 
     const image = findNodesByType(note.content, "image")[0]
-    expect(image?.url).toBe(
+    expect(image.url).toBe(
       "/images?path=attachments%2Froot-note%2Fattach-20260523155741791.jpg",
     )
   })
@@ -197,7 +197,7 @@ describe("notes parse helpers", () => {
     )
 
     const images = findNodesByType(note.content, "image")
-    expect(images.map((image) => image.url).sort()).toEqual([
+    expect(images.map((image) => image.url ?? "").toSorted((a, b) => a.localeCompare(b))).toEqual([
       "/images?path=attachments%2Ffolder%2Fnote%2Fphoto-a.jpg",
       "/images?path=attachments%2Ffolder%2Fnote%2Fphoto-b.jpg",
     ])
@@ -221,7 +221,7 @@ describe("notes parse helpers", () => {
     )
 
     const image = findNodesByType(note.content, "image")[0]
-    expect(image?.url).toBe("/images?path=daily%2Fassets%2Fhome%20page.png")
+    expect(image.url).toBe("/images?path=daily%2Fassets%2Fhome%20page.png")
   })
 
   test("parseMarkdownFile keeps external markdown image urls unchanged", async () => {
@@ -242,7 +242,7 @@ describe("notes parse helpers", () => {
     )
 
     const image = findNodesByType(note.content, "image")[0]
-    expect(image?.url).toBe("https://example.com/image.png")
+    expect(image.url).toBe("https://example.com/image.png")
   })
 
   test("parseMarkdownFile replaces unmatched wikilink with unmatched wikilink text node", async () => {
@@ -289,7 +289,7 @@ describe("notes parse helpers", () => {
     )
 
     const linkNode = findNodesByType(note.content, "link")[0]
-    expect(linkNode?.url).toBe("obsidian://open?vault=vault&file=topic%2Fother-note")
+    expect(linkNode.url).toBe("obsidian://open?vault=vault&file=topic%2Fother-note")
     expect(extractNodeText(linkNode)).toBe("other-note")
     expect(note.linkedNotes).toHaveLength(1)
     expect(note.linkedNotes?.[0]).toMatchObject({

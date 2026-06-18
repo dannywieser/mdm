@@ -1,3 +1,4 @@
+import vitest from '@vitest/eslint-plugin'
 import { defineConfig } from 'eslint/config'
 import globals from 'globals'
 import react from 'eslint-plugin-react'
@@ -27,6 +28,13 @@ export default defineConfig([
       react: {
         version: 'detect'
       }
+    }
+  },
+  {
+    files: ['**/*.test.{ts,tsx}'],
+    plugins: { vitest },
+    rules: {
+      ...vitest.configs.recommended.rules
     }
   }
 ])

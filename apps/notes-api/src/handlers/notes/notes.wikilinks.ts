@@ -2,6 +2,7 @@ import type { ScannedNote, WikilinkReplacement } from "./notes.types"
 
 export const WIKILINK_PLACEHOLDER_PATTERN = /WLPH(\d+)ENDWL/g
 
+// eslint-disable-next-line sonarjs/slow-regex -- pattern is bounded by wikilink delimiters; not user-controlled input
 const WIKILINK_PATTERN = /(?<!!)\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g
 export const OBSIDIAN_WIKILINK_EMBED_PATTERN = /!\[\[([^\]|]+)(?:\|[^\]]*)?]]/g
 
@@ -30,7 +31,7 @@ export const resolveWikilinks = (
     WIKILINK_PATTERN,
     (_, noteRef: string, alias: string | undefined) => {
       const noteName = noteRef.trim()
-      const displayText = alias?.trim() || noteName
+      const displayText = (alias?.trim() ?? "") || noteName
       const matchedNote =
         allNotes.find((n) => n.title.toLowerCase() === noteName.toLowerCase()) ?? null
 
@@ -52,9 +53,9 @@ export const applyWikilinkReplacements = (
   replacements: WikilinkReplacement[],
 ): string =>
   html.replace(WIKILINK_PLACEHOLDER_PATTERN, (_, indexStr: string) => {
-    const replacement = replacements[parseInt(indexStr, 10)]
+    const replacement = replacements.at(parseInt(indexStr, 10))
 
-    if (!replacement) {
+    if (replacement === undefined) {
       return ""
     }
 

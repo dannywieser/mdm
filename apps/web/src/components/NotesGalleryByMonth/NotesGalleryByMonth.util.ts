@@ -14,7 +14,7 @@ export function groupNotesByMonth(notes: Note[], year: number): Map<number, Note
 
   for (const note of notes) {
     const yearMonth = getNoteYearMonth(note)
-    if (!yearMonth || yearMonth.year !== year) continue
+    if (yearMonth?.year !== year) continue
 
     const monthNotes = groups.get(yearMonth.month) ?? []
     monthNotes.push(note)

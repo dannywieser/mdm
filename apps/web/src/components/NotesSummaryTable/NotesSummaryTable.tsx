@@ -5,7 +5,6 @@ import { useNotesQuery } from "services"
 import { useI18n } from "../../i18n"
 
 import { AppError } from "../AppError"
-import { LoadingScreen } from "../LoadingScreen"
 
 import type {
   NotesSummaryTableProps,
@@ -15,10 +14,9 @@ import { getColumnLabel, resolveBadgeValues } from "./NotesSummaryTable.util"
 
 export const NotesSummaryTable = ({ badges = [] }: NotesSummaryTableProps) => {
   const { view } = useParams<NotesSummaryTableRouteParamKey>()
-  const { data, error, isLoading } = useNotesQuery({ view })
+  const { data, error } = useNotesQuery({ view })
   const { t } = useI18n()
 
-  if (isLoading) return <LoadingScreen />
   if (error) return <AppError message={error.message} />
 
   return (

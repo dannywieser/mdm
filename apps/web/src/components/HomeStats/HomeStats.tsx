@@ -29,7 +29,7 @@ import {
   getMonthTicks,
 } from "./HomeStats.util"
 
-export function HomeStats({ staleTime }: HomeStatsProps) {
+export function HomeStats({ staleTime }: Readonly<HomeStatsProps>) {
   const { t } = useI18n()
   const { data } = useStatsQuery({ staleTime })
   const { homeStats } = data

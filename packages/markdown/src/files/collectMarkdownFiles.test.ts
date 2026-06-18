@@ -35,12 +35,12 @@ describe("collectMarkdownFiles", () => {
 
     const markdownFiles = await collectMarkdownFiles("/notes")
 
-    expect(markdownFiles.sort()).toEqual(
+    expect(markdownFiles.toSorted((a, b) => a.localeCompare(b))).toEqual(
       [
         "/notes/root.md",
         "/notes/nested/child.markdown",
         "/notes/nested/deep/upper.MD",
-      ].sort(),
+      ].toSorted((a, b) => a.localeCompare(b)),
     )
     expect(readdirMock).toHaveBeenNthCalledWith(1, "/notes", { withFileTypes: true })
     expect(readdirMock).toHaveBeenNthCalledWith(2, "/notes/nested", { withFileTypes: true })

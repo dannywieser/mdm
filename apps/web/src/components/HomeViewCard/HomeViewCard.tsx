@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import type { ViewSummary } from "services"
 import { HomeNotesReviewCard } from "../HomeNotesReviewCard"
 
-export function HomeViewCard({ view }: { view: ViewSummary }) {
+export function HomeViewCard({ view }: Readonly<{ view: ViewSummary }>) {
   if (view.count === 0) {
     return null
   }

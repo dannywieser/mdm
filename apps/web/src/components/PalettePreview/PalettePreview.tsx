@@ -2,11 +2,11 @@ import { Box, Flex } from "@chakra-ui/react"
 
 import type { PalettePreviewProps } from "./PalettePreview.types"
 
-function Bar({ w, bg, opacity = 1 }: { w: number; bg: string; opacity?: number }) {
+function Bar({ w, bg, opacity = 1 }: Readonly<{ w: number; bg: string; opacity?: number }>) {
   return <Box h="3px" w={`${w}px`} bg={bg} borderRadius="2px" opacity={opacity} />
 }
 
-export function PalettePreview({ paletteName, colors }: PalettePreviewProps) {
+export function PalettePreview({ paletteName, colors }: Readonly<PalettePreviewProps>) {
   const gradientId = `palette-preview-gradient-${paletteName}`
   const panelProps = {
     bg: colors.panelBackground,

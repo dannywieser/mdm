@@ -19,7 +19,7 @@ export const createRedisClient = (redisUrl: string): RedisClient => {
     get: async (key) => {
       const value = await client.get(key)
 
-      return value === null ? null : value.toString()
+      return value
     },
     on: (event, listener) => {
       client.on(event, listener)

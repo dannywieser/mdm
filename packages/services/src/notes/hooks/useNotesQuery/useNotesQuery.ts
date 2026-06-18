@@ -5,7 +5,7 @@ import type { UseNotesQueryParams } from "./useNotesQuery.types"
 
 import { getBaseUrl } from "../../../config"
 
-const fetchNotes = async (view?: string, includeContent: boolean = true): Promise<NotesResponse> => {
+const fetchNotes = async (view?: string, includeContent = true): Promise<NotesResponse> => {
   const params = new URLSearchParams()
   if (view) params.set("view", view)
   if (!includeContent) params.set("includeContent", "false")

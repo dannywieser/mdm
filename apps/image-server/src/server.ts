@@ -62,6 +62,6 @@ if (require.main === module) {
       "Unable to start image-server due to configuration error",
       toLoggableError(error),
     )
-    process.exit(1)
+    throw error
   })
 }

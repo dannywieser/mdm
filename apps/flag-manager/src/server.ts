@@ -59,6 +59,6 @@ if (require.main === module) {
       "Unable to start flag-manager due to configuration error",
       toLoggableError(error),
     )
-    process.exit(1)
+    throw error
   })
 }

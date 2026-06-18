@@ -6,7 +6,6 @@ import { useNotesQuery } from "services"
 import { useI18n } from "../../i18n"
 
 import { AppError } from "../AppError"
-import { LoadingScreen } from "../LoadingScreen"
 import { NoteCoverGrid } from "../NoteCoverGrid"
 import { filterNotesWithCovers } from "../NoteCoverGrid/NoteCoverGrid.util"
 
@@ -16,13 +15,12 @@ import { groupNotesByYear } from "./NotesGalleryByYear.util"
 export const NotesGalleryByYear = ({ aspectRatio, badges = [] }: NotesGalleryByYearProps) => {
   const { t } = useI18n()
   const { view } = useParams<NotesGalleryByYearRouteParamKey>()
-  const { data, error, isLoading } = useNotesQuery({ includeContent: false, view })
+  const { data, error } = useNotesQuery({ includeContent: false, view })
   const [selectedYear, setSelectedYear] = useState<"all" | number>("all")
 
-  if (isLoading) return <LoadingScreen />
   if (error) return <AppError message={error.message} />
 
-  const notesWithCovers = filterNotesWithCovers(data?.notes ?? [])
+  const notesWithCovers = filterNotesWithCovers(data.notes)
   const notesByYear = groupNotesByYear(notesWithCovers)
   const years = [...notesByYear.keys()]
   const visibleYears = selectedYear === "all" ? years : years.filter((year) => year === selectedYear)

@@ -16,7 +16,7 @@ import { HeatDots } from "../HeatDots"
 import { calculateHeatDotCount } from "../HeatDots/HeatDots.util"
 import type { HabitCardProps } from "./HabitCard.types"
 
-export function HabitCard({ habit }: HabitCardProps) {
+export function HabitCard({ habit }: Readonly<HabitCardProps>) {
   const { t } = useI18n()
   const heatDotCount = calculateHeatDotCount(
     habit.mode,

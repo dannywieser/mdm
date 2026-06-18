@@ -5,7 +5,6 @@ import { useI18n } from "../../i18n"
 import {
   colorPaletteDefinitions,
   colorPaletteOptions,
-  type ColorPaletteName,
 } from "../../theme/palettes"
 
 import { PalettePreview } from "../PalettePreview"
@@ -34,7 +33,7 @@ export function PaletteView() {
               data-testid={`palette-option-${option.value}`}
               aria-label={option.i18nKey}
               aria-pressed={isActive}
-              onClick={() => setPalette(option.value as ColorPaletteName)}
+              onClick={() => { setPalette(option.value); }}
               borderWidth="2px"
               borderColor={isActive ? "app.accent" : "app.border"}
               borderRadius="lg"

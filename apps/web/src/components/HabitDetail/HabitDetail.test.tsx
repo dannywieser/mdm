@@ -196,7 +196,7 @@ describe("HabitDetail", () => {
 
     fireEvent.click(screen.getByText("habit.scoreEntries"))
 
-    await waitFor(() => expect(content?.hasAttribute("hidden")).toBe(false))
+    await waitFor(() => { expect(content?.hasAttribute("hidden")).toBe(false); })
   })
 
   test("omits the score entries table when there are no entries", () => {

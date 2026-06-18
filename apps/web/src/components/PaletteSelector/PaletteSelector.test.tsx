@@ -27,7 +27,7 @@ const renderComponent = () =>
   )
 
 describe("PaletteSelector", () => {
-  afterEach(() => cleanup())
+  afterEach(() => { cleanup(); })
 
   beforeEach(() => {
     useColorPaletteMock.mockReturnValue({

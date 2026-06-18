@@ -10,7 +10,7 @@ afterEach(() => {
 })
 
 class ResizeObserverStub {
-  static instances: ResizeObserverStub[] = []
+  static readonly instances: ResizeObserverStub[] = []
 
   callback: ResizeObserverCallback
   observed: Element | undefined
@@ -59,7 +59,7 @@ const TestComponent = ({ heightPx }: { heightPx: number }) => {
 
 describe("useMasonryRowSpan", () => {
   test("computes the row span from the element height on mount", () => {
-    ResizeObserverStub.instances = []
+    ResizeObserverStub.instances.length = 0
     vi.stubGlobal("ResizeObserver", ResizeObserverStub)
 
     const { getByTestId } = render(<TestComponent heightPx={100} />)
@@ -68,7 +68,7 @@ describe("useMasonryRowSpan", () => {
   })
 
   test("recomputes the row span when the observer reports a resize", () => {
-    ResizeObserverStub.instances = []
+    ResizeObserverStub.instances.length = 0
     vi.stubGlobal("ResizeObserver", ResizeObserverStub)
 
     const { getByTestId, rerender } = render(<TestComponent heightPx={100} />)

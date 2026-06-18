@@ -17,7 +17,9 @@ setImagesBaseUrl(import.meta.env.VITE_IMAGES_BASE_URL ?? '')
 
 const queryClient = new QueryClient()
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root')
+if (!rootElement) throw new Error('Root element not found')
+createRoot(rootElement).render(
   <StrictMode>
     <ColorPaletteProvider>
       <QueryClientProvider client={queryClient}>

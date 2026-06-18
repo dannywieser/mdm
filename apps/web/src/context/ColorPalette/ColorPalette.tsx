@@ -1,10 +1,7 @@
 import { ChakraProvider } from "@chakra-ui/react"
 import { useEffect, useMemo, useState, type ReactNode } from "react"
 
-import {
-  colorPaletteSystems,
-  defaultColorPaletteSystem,
-} from "../../theme/system"
+import { colorPaletteSystems } from "../../theme/system"
 import {
   defaultColorPalette,
   isColorPaletteName,
@@ -45,13 +42,13 @@ export const ColorPaletteProvider = ({ children }: { children: ReactNode }) => {
 
     apply(media.matches)
 
-    const onChange = (e: MediaQueryListEvent) => apply(e.matches)
+    const onChange = (e: MediaQueryListEvent) => { apply(e.matches); }
     media.addEventListener("change", onChange)
-    return () => media.removeEventListener("change", onChange)
+    return () => { media.removeEventListener("change", onChange); }
   }, [])
 
   const system = useMemo(
-    () => colorPaletteSystems[palette] ?? defaultColorPaletteSystem,
+    () => colorPaletteSystems[palette],
     [palette],
   )
 

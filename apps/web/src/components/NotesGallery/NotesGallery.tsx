@@ -4,7 +4,6 @@ import { useParams, useSearchParams } from "react-router-dom"
 import { useNotesQuery } from "services"
 
 import { AppError } from "../AppError"
-import { LoadingScreen } from "../LoadingScreen"
 import { NoteCoverGrid } from "../NoteCoverGrid"
 import { filterNotesWithCovers } from "../NoteCoverGrid/NoteCoverGrid.util"
 
@@ -15,12 +14,12 @@ import { SEARCH_PARAM_KEY } from "../NotesSearchInput/NotesSearchInput.constants
 export const NotesGallery = ({ aspectRatio, badges = [] }: NotesGalleryProps) => {
   const { view } = useParams<NotesGalleryRouteParamKey>()
   const [searchParams] = useSearchParams()
-  const { data, error, isLoading } = useNotesQuery({ includeContent: false, view })
+  const { data, error } = useNotesQuery({ includeContent: false, view })
 
   const searchQuery = searchParams.get(SEARCH_PARAM_KEY) ?? ""
   const notesWithCovers = useMemo(
-    () => filterNotesWithCovers(data?.notes ?? []),
-    [data?.notes],
+    () => filterNotesWithCovers(data.notes),
+    [data.notes],
   )
   const searchIndex = useMemo(() => buildSearchIndex(notesWithCovers), [notesWithCovers])
   const filteredNotes = useMemo(
@@ -28,7 +27,6 @@ export const NotesGallery = ({ aspectRatio, badges = [] }: NotesGalleryProps) =>
     [searchIndex, searchQuery],
   )
 
-  if (isLoading) return <LoadingScreen />
   if (error) return <AppError message={error.message} />
 
   return <NoteCoverGrid aspectRatio={aspectRatio} badges={badges} notes={filteredNotes} />

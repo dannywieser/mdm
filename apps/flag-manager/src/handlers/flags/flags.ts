@@ -23,15 +23,16 @@ export const createFlagsHandler = (
 
     const normalizedFlag = flag.trim()
     const normalizedId = id.trim()
-    const flagDefinition = flagDefinitions[normalizedFlag]
     const isGetRequest = request.method === "GET"
 
-    if (!flagDefinition) {
+    if (!(normalizedFlag in flagDefinitions)) {
       response
         .status(400)
         .json({ error: `Flag "${normalizedFlag}" is not configured` })
       return
     }
+
+    const flagDefinition = flagDefinitions[normalizedFlag]
 
     try {
       const input = {

@@ -29,10 +29,6 @@ vi.mock("services", async (importOriginal) => {
   }
 })
 
-vi.mock("../LoadingScreen", () => ({
-  LoadingScreen: () => <div data-testid="loading-screen" />,
-}))
-
 vi.mock("../AppError", () => ({
   AppError: ({ message }: { message: string }) => <div data-testid="app-error">{message}</div>,
 }))
@@ -51,23 +47,10 @@ const noteWithCover = {
 }
 
 describe("NotesGallery", () => {
-  test("renders the loading screen while fetching", () => {
-    useNotesQueryMock.mockReturnValue({
-      data: undefined,
-      error: undefined,
-      isLoading: true,
-    })
-
-    renderGallery()
-
-    expect(screen.getByTestId("loading-screen")).toBeTruthy()
-  })
-
   test("renders an error state", () => {
     useNotesQueryMock.mockReturnValue({
-      data: undefined,
+      data: { notes: [] },
       error: new Error("Request failed"),
-      isLoading: false,
     })
 
     renderGallery()

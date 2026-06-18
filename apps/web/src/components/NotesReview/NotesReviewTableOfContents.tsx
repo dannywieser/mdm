@@ -6,6 +6,12 @@ import { useI18n } from "../../i18n"
 import { focusRing } from "../../theme/focusRing"
 import type { NotesReviewTableOfContentsProps } from "./NotesReviewTableOfContents.types"
 
+const getNoteColor = (isCurrentIndex: boolean, isRead: boolean): string | undefined => {
+  if (isCurrentIndex) return "app.accent"
+  if (isRead) return "app.textMuted"
+  return undefined
+}
+
 const TocList = ({ notes, currentIndex }: NotesReviewTableOfContentsProps) => {
   const { t } = useI18n()
 
@@ -25,13 +31,7 @@ const TocList = ({ notes, currentIndex }: NotesReviewTableOfContentsProps) => {
           key={note.id}
           href={note.obsidianUrl}
           display="block"
-          color={
-            i === currentIndex
-              ? "app.accent"
-              : note.isRead
-                ? "app.textMuted"
-                : undefined
-          }
+          color={getNoteColor(i === currentIndex, note.isRead)}
           fontWeight={i === currentIndex || !note.isRead ? "bold" : undefined}
           fontSize={i === currentIndex ? "sm" : "xs"}
           overflow="hidden"
@@ -114,13 +114,7 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
                 <Link
                   key={note.id}
                   href={note.obsidianUrl}
-                  color={
-                    i === currentIndex
-                      ? "app.accent"
-                      : note.isRead
-                        ? "app.textMuted"
-                        : undefined
-                  }
+                  color={getNoteColor(i === currentIndex, note.isRead)}
                   fontWeight={
                     i === currentIndex || !note.isRead ? "bold" : undefined
                   }
