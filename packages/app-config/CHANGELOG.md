@@ -1,5 +1,11 @@
 # app-config
 
+## 1.9.0
+
+### Patch Changes
+
+- mdm-util@1.9.0
+
 ## 1.8.0
 
 ### Patch Changes

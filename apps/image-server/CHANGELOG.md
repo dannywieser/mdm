@@ -1,5 +1,16 @@
 # image-server
 
+## 1.2.0
+
+### Minor Changes
+
+- 8e352f2: Replace morgan and console logging with Pino structured JSON logging across all backend services. Log level is controlled via the `LOG_LEVEL` environment variable (default: `info`).
+
+### Patch Changes
+
+- 3942cd8: Add stricter ESLint rule sets (strictTypeChecked, sonarjs, jsx-a11y, vitest, n) and fix all resulting errors across the monorepo.
+  - mdm-util@1.9.0
+
 ## 1.1.4
 
 ### Patch Changes

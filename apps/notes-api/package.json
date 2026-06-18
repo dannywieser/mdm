@@ -1,6 +1,6 @@
 {
   "name": "notes-api",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "private": true,
   "main": "dist/server.js",
   "scripts": {
@@ -13,14 +13,14 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "app-config": "1.8.0",
+    "app-config": "1.9.0",
     "express": "5.2.1",
-    "markdown": "1.8.0",
+    "markdown": "1.9.0",
     "mdm-logger": "1.0.0",
-    "mdm-util": "1.8.0",
+    "mdm-util": "1.9.0",
     "pino-http": "11.0.0",
     "remark": "13.0.0",
-    "services": "1.8.0",
+    "services": "1.8.1",
     "remark-gfm": "1.0.0",
     "remark-html": "13.0.2"
   }
