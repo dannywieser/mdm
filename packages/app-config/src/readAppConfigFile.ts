@@ -5,47 +5,18 @@ import { AppConfigError } from "./AppConfigError"
 
 const APP_CONFIG_FILENAME = "app.config.json"
 
-const findAppConfigPath = async (): Promise<string> => {
-  let currentDirectory = process.cwd()
-
-  while (currentDirectory) {
-    const appConfigPath = path.join(currentDirectory, APP_CONFIG_FILENAME)
-    const hasAppConfig = await fs
-      .access(appConfigPath)
-      .then(() => true)
-      .catch(() => false)
-
-    if (hasAppConfig) {
-      return appConfigPath
-    }
-
-    const parentDirectory = path.dirname(currentDirectory)
-
-    if (parentDirectory === currentDirectory) {
-      break
-    }
-
-    currentDirectory = parentDirectory
-  }
-
-  throw new AppConfigError(
-    "app.config.json is required. Copy app.config.example.json to app.config.json.",
-  )
-}
-
-/**
- * Locates app.config.json by searching upward from the current working
- * directory, then reads and parses it as JSON.
- *
- * @returns The parsed contents of app.config.json.
- */
 export const readAppConfigFile = async (): Promise<unknown> => {
-  const appConfigPath = await findAppConfigPath()
+  const appConfigPath = path.join(process.cwd(), APP_CONFIG_FILENAME)
   let appConfigSource: string
 
   try {
     appConfigSource = await fs.readFile(appConfigPath, "utf8")
-  } catch {
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+      throw new AppConfigError(
+        "app.config.json is required. Copy app.config.example.json to app.config.json.",
+      )
+    }
     throw new AppConfigError("app.config.json must be readable")
   }
 

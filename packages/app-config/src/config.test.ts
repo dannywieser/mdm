@@ -16,7 +16,6 @@ import {
 
 vi.mock("node:fs", () => ({
   promises: {
-    access: vi.fn(),
     readFile: vi.fn(),
   },
 }))
@@ -28,7 +27,6 @@ vi.mock("mdm-util", () => ({
   isValidTimezone: vi.fn(),
 }))
 
-const accessMock = vi.mocked(fs.access)
 const isNonEmptyStringMock = vi.mocked(isNonEmptyString)
 const isStringArrayMock = vi.mocked(isStringArray)
 const isStringRecordMock = vi.mocked(isStringRecord)
@@ -37,7 +35,6 @@ const readFileMock = vi.mocked(fs.readFile)
 
 describe("config", () => {
   beforeEach(() => {
-    accessMock.mockResolvedValue(undefined)
     clearConfigCache()
     process.env.NOTES_ROOT = "/notes-root"
 
@@ -441,7 +438,8 @@ describe("config", () => {
   })
 
   test("throws when config file is missing", async () => {
-    accessMock.mockRejectedValue(new Error("ENOENT"))
+    const err = Object.assign(new Error("ENOENT"), { code: "ENOENT" })
+    readFileMock.mockRejectedValue(err)
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
       new AppConfigError(
@@ -754,7 +752,6 @@ describe("config", () => {
     await resolveNotesDirectory()
     await resolveNotesDirectory()
 
-    expect(accessMock).toHaveBeenCalledTimes(1)
     expect(readFileMock).toHaveBeenCalledTimes(1)
   })
 })
