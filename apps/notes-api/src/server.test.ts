@@ -3,6 +3,7 @@ import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
 import { healthHandler } from "./handlers/health/health"
+import { logger } from "./logger"
 import { notesHandler } from "./handlers/notes/notes"
 import { statsHandler } from "./handlers/stats/stats"
 import { createApp, logStartupConfig } from "./server"
@@ -13,6 +14,18 @@ vi.mock("app-config", () => ({
 
 vi.mock("mdm-util", () => ({
   toLoggableError: vi.fn(),
+}))
+
+vi.mock("pino-http", () => ({
+  default: () => (_req: unknown, _res: unknown, next: () => void) => next(),
+}))
+
+vi.mock("./logger", () => ({
+  logger: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+  },
 }))
 
 vi.mock("./handlers/health/health", () => ({
@@ -72,8 +85,6 @@ describe("notes-api server interface", () => {
   })
 
   test("logs the resolved notes config on startup", async () => {
-    const logSpy = vi.spyOn(console, "log").mockImplementation()
-
     resolveNotesConfigMock.mockResolvedValue({
       attachmentsDirectory: "attachments",
       dateFormats: ["YYYY.MM.DD"],
@@ -85,10 +96,9 @@ describe("notes-api server interface", () => {
 
     await logStartupConfig()
 
-    expect(logSpy).toHaveBeenCalledWith(
-      "Resolved notes config",
-      JSON.stringify(
-        {
+    expect(logger.info).toHaveBeenCalledWith(
+      {
+        notesConfig: {
           attachmentsDirectory: "attachments",
           dateFormats: ["YYYY.MM.DD"],
           notesDirectory: "/notes",
@@ -96,17 +106,12 @@ describe("notes-api server interface", () => {
           timezone: "UTC",
           views: [],
         },
-        null,
-        2,
-      ),
+      },
+      "Resolved notes config",
     )
-
-    logSpy.mockRestore()
   })
 
   test("logs startup config resolution failures", async () => {
-    const errorSpy = vi.spyOn(console, "error").mockImplementation()
-
     resolveNotesConfigMock.mockRejectedValue(new Error("boom"))
     toLoggableErrorMock.mockReturnValue({ message: "boom", stack: "stack" })
 
@@ -114,11 +119,9 @@ describe("notes-api server interface", () => {
 
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(toLoggableErrorMock).toHaveBeenCalledWith(expect.any(Error))
-    expect(errorSpy).toHaveBeenCalledWith(
+    expect(logger.error).toHaveBeenCalledWith(
+      { error: { message: "boom", stack: "stack" } },
       "Unable to resolve notes config on startup",
-      { message: "boom", stack: "stack" },
     )
-
-    errorSpy.mockRestore()
   })
 })
