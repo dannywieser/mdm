@@ -11,6 +11,12 @@ const reviewItemIn = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `
 
+const fadeInUp = (delay: number) => ({
+  animation: `${reviewItemIn} 0.25s ease forwards`,
+  animationDelay: `${delay}s`,
+  opacity: 0,
+})
+
 export const NotesReviewComplete = ({ isLoading, reviewedNotes }: NotesReviewCompleteProps) => {
   const { t } = useI18n()
 
@@ -28,11 +34,7 @@ export const NotesReviewComplete = ({ isLoading, reviewedNotes }: NotesReviewCom
                   key={note.id}
                   color="fg.muted"
                   fontSize="sm"
-                  css={{
-                    animation: `${reviewItemIn} 0.25s ease forwards`,
-                    animationDelay: `${i * 0.06}s`,
-                    opacity: 0,
-                  }}
+                  css={fadeInUp(i * 0.06)}
                 >
                   <a
                     href={note.obsidianUrl}
@@ -47,21 +49,13 @@ export const NotesReviewComplete = ({ isLoading, reviewedNotes }: NotesReviewCom
           <Text
             fontSize="lg"
             fontWeight="semibold"
-            css={{
-              animation: `${reviewItemIn} 0.25s ease forwards`,
-              animationDelay: `${reviewedNotes.length * 0.06 + 0.1}s`,
-              opacity: 0,
-            }}
+            css={fadeInUp(reviewedNotes.length * 0.06 + 0.1)}
           >
             {t("review.complete")}
           </Text>
           <Text
             fontSize="sm"
-            css={{
-              animation: `${reviewItemIn} 0.25s ease forwards`,
-              animationDelay: `${reviewedNotes.length * 0.06 + 0.3}s`,
-              opacity: 0,
-            }}
+            css={fadeInUp(reviewedNotes.length * 0.06 + 0.3)}
           >
             <Link to="/">{t("review.backToHome")}</Link>
           </Text>
