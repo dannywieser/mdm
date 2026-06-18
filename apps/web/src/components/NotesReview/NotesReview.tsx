@@ -5,8 +5,8 @@ import { useParams } from "react-router-dom"
 import { fetchIsRead, useNotesQuery, useToggleRead } from "services"
 
 import type { NotesReviewProps, NotesReviewRouteParamKey } from "./NotesReview.types"
-import { NotesReviewComplete } from "./NotesReviewComplete"
-import { NotesReviewContent } from "./NotesReviewContent"
+import { NotesReviewComplete } from "../NotesReviewComplete"
+import { NotesReviewContent } from "../NotesReviewContent"
 
 export const NotesReview = ({ badges = [] }: NotesReviewProps) => {
   const { view } = useParams<NotesReviewRouteParamKey>()

@@ -1,6 +1,6 @@
 import type { Note } from "markdown"
 
-import type { TocNote } from "./NotesReviewTableOfContents.types"
+import type { TocNote } from "../NotesReviewTableOfContents/NotesReviewTableOfContents.types"
 
 export interface NotesReviewContentProps {
   badges: string[]

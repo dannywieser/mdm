@@ -3,8 +3,8 @@ import { BookCheck, X } from "lucide-react"
 
 import { useI18n } from "../../i18n"
 import { focusRing } from "../../theme/focusRing"
-import type { NotesReviewTableOfContentsProps } from "./NotesReviewTableOfContents.types"
-import { getNoteColor } from "./NotesReviewTableOfContents.util"
+import type { NotesReviewTableOfContentsProps } from "../NotesReviewTableOfContents/NotesReviewTableOfContents.types"
+import { getNoteColor } from "../NotesReviewTableOfContents/NotesReviewTableOfContents.util"
 
 export const NotesReviewTableOfContentsMobileTrigger = ({
   notes,

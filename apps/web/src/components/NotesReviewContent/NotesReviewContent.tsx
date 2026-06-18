@@ -7,8 +7,8 @@ import { LinkedNotesList } from "../LinkedNotesList"
 import { MarkdownTree } from "../MarkdownTree"
 import { NoteBadges } from "../NoteBadges"
 import { OpenInObsidianButton } from "../OpenInObsidianButton"
-import { NotesReviewTableOfContentsMobileTrigger } from "./NotesReviewTableOfContentsMobileTrigger"
-import { NotesReviewTableOfContentsSidebar } from "./NotesReviewTableOfContentsSidebar"
+import { NotesReviewTableOfContentsMobileTrigger } from "../NotesReviewTableOfContentsMobileTrigger"
+import { NotesReviewTableOfContentsSidebar } from "../NotesReviewTableOfContentsSidebar"
 import type { NotesReviewContentProps } from "./NotesReviewContent.types"
 
 export const NotesReviewContent = ({
