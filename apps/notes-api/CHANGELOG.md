@@ -1,5 +1,20 @@
 # notes-api
 
+## 1.9.0
+
+### Minor Changes
+
+- 8e352f2: Replace morgan and console logging with Pino structured JSON logging across all backend services. Log level is controlled via the `LOG_LEVEL` environment variable (default: `info`).
+
+### Patch Changes
+
+- 3942cd8: Add stricter ESLint rule sets (strictTypeChecked, sonarjs, jsx-a11y, vitest, n) and fix all resulting errors across the monorepo.
+- bede171: Fix cover frontmatter image paths not being resolved to the attachments directory, causing broken cover images in the web app.
+  - app-config@1.9.0
+  - markdown@1.9.0
+  - mdm-util@1.9.0
+  - services@1.8.1
+
 ## 1.8.0
 
 ### Minor Changes

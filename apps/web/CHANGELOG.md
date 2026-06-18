@@ -1,5 +1,21 @@
 # web
 
+## 1.9.0
+
+### Minor Changes
+
+- dbc54d9: Add score breakdown inside the HabitDetail collapsible section, showing entry scores subtotal, days logged bonus/penalty, streak bonus, and final score.
+- dbc54d9: Switch streak and days-logged bonuses to a tiered rate (0.5% for days 1–5, 0.6% for days 6–10, etc.) and expose a per-tier score breakdown in the habit detail collapsible section.
+
+### Patch Changes
+
+- 3942cd8: Add stricter ESLint rule sets (strictTypeChecked, sonarjs, jsx-a11y, vitest, n) and fix all resulting errors across the monorepo.
+- b91600f: Fix NotesReview table of contents link color not adapting to the selected color palette.
+- dce521d: Fix mismatched keyboard focus outlines on header links and buttons (breadcrumb, stats, palette selector, close), markdown links in note content, and the buttons on the notes review screen, to use the consistent accent-colored focus ring used elsewhere in the app.
+- 9b09021: Add more masonry grid columns on large screens (xl: 5, 2xl: 8) so the notes gallery shows more, smaller cards.
+  - mdm-util@1.9.0
+  - services@1.8.1
+
 ## 1.8.0
 
 ### Minor Changes

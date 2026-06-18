@@ -1,5 +1,12 @@
 # services
 
+## 1.8.1
+
+### Patch Changes
+
+- app-config@1.9.0
+- markdown@1.9.0
+
 ## 1.8.0
 
 ### Minor Changes
