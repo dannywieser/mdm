@@ -8,8 +8,10 @@ import { habitDetailHandler } from "./habit-detail"
 import { scanHabitEntries } from "./habit-detail.files"
 import {
   buildHistory,
+  buildScoreBreakdown,
   buildScoreEntries,
   buildStreaks,
+  buildTieredBreakdown,
   calculateBaseScore,
   calculateConsecutiveEntryStreak,
   calculateDaysSinceLastEntry,
@@ -869,6 +871,83 @@ describe("calculateLowestDaysTrackedPerPeriod", () => {
     ]
     // Both periods have 2 entries
     expect(calculateLowestDaysTrackedPerPeriod(entries, "2025-01-20", 10)).toBe(2)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// buildTieredBreakdown
+// ---------------------------------------------------------------------------
+
+describe("buildTieredBreakdown", () => {
+  test("returns empty array for count 0", () => {
+    expect(buildTieredBreakdown(0, 100)).toEqual([])
+  })
+
+  test("returns one tier for count ≤ 5", () => {
+    const tiers = buildTieredBreakdown(5, 100)
+
+    expect(tiers).toHaveLength(1)
+    expect(tiers[0]).toMatchObject({ startDay: 1, endDay: 5, rate: 0.005, days: 5 })
+    expect(tiers[0]?.amount).toBeCloseTo(100 * 5 * 0.005)
+  })
+
+  test("returns two tiers with escalating rates for count 10", () => {
+    const tiers = buildTieredBreakdown(10, 100)
+
+    expect(tiers).toHaveLength(2)
+    expect(tiers[0]).toMatchObject({ startDay: 1, endDay: 5, rate: 0.005, days: 5 })
+    expect(tiers[1]).toMatchObject({ startDay: 6, endDay: 10, rate: 0.006, days: 5 })
+  })
+
+  test("last tier is partial when count is not a multiple of 5", () => {
+    const tiers = buildTieredBreakdown(12, 100)
+
+    expect(tiers).toHaveLength(3)
+    expect(tiers[2]).toMatchObject({ startDay: 11, endDay: 12, rate: 0.007, days: 2 })
+    expect(tiers[2]?.amount).toBeCloseTo(100 * 2 * 0.007)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// buildScoreBreakdown
+// ---------------------------------------------------------------------------
+
+describe("buildScoreBreakdown", () => {
+  test("entryScores matches scoreBeforeMultipliers", () => {
+    const result = buildScoreBreakdown(500, 0.025, 0.025, 5, 5)
+
+    expect(result.entryScores).toBe(500)
+  })
+
+  test("days tiers are derived from uniqueWindowDays", () => {
+    const result = buildScoreBreakdown(500, 0.025, 0.025, 5, 5)
+
+    expect(result.daysTiers).toHaveLength(1)
+    expect(result.daysTiers[0]).toMatchObject({ startDay: 1, endDay: 5, rate: 0.005, days: 5 })
+  })
+
+  test("streak tier amounts are negated for do-less (negative streakMultiplier)", () => {
+    const result = buildScoreBreakdown(500, 0.025, -0.025, 5, 5)
+
+    for (const tier of result.streakTiers) {
+      expect(tier.amount).toBeLessThan(0)
+    }
+  })
+
+  test("streak tiers are computed on the post-day-bonus base", () => {
+    const base = 100
+    const dayMult = 0.025
+    const result = buildScoreBreakdown(base, dayMult, 0.025, 5, 5)
+    const afterDay = base * (1 + dayMult)
+
+    expect(result.streakTiers[0]?.amount).toBeCloseTo(afterDay * 5 * 0.005)
+  })
+
+  test("returns empty tier arrays when counts are zero", () => {
+    const result = buildScoreBreakdown(0, 0, 0, 0, 0)
+
+    expect(result.daysTiers).toHaveLength(0)
+    expect(result.streakTiers).toHaveLength(0)
   })
 })
 

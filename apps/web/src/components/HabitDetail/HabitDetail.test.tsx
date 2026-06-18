@@ -86,9 +86,14 @@ const HABIT: HabitResult = {
   windowStart: "2025-12-29",
   rawScore: 5,
   scoreBeforeMultipliers: 5,
-  streakMultiplier: 1,
-  dayMultiplier: 1,
+  streakMultiplier: 0.025,
+  dayMultiplier: 0.025,
   recentEntryAdditions: 0,
+  scoreBreakdown: {
+    entryScores: 5,
+    daysTiers: [{ startDay: 1, endDay: 5, rate: 0.005, days: 5, amount: 0.125 }],
+    streakTiers: [{ startDay: 1, endDay: 5, rate: 0.005, days: 5, amount: 0.128 }],
+  },
 }
 
 const renderDetail = (data: HabitResult = HABIT) => {

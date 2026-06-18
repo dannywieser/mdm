@@ -387,11 +387,7 @@ export function HabitDetail() {
 
                   <ScoreBreakdown
                     mode={habit.mode}
-                    scoreBeforeMultipliers={habit.scoreBeforeMultipliers}
-                    dayMultiplier={habit.dayMultiplier}
-                    streakMultiplier={habit.streakMultiplier}
-                    windowEntries={habit.windowEntries}
-                    streak={habit.streak}
+                    breakdown={habit.scoreBreakdown}
                     habitScore={habit.habitScore}
                   />
                 </VStack>

@@ -1,4 +1,5 @@
 import type { HabitMode } from "app-config"
+import type { HabitScoreBreakdown, HabitScoreTier } from "services"
 
 import { addDays, buildDateRange, daysBetween, getDateWindowStart } from "mdm-util"
 
@@ -106,6 +107,36 @@ export const calculateBaseScore = (
   referenceDate: string,
 ): number =>
   calculateRawScore(windowEntries) + calculateRecentEntryAdditions(windowEntries, referenceDate)
+
+export const buildTieredBreakdown = (count: number, baseAmount: number): HabitScoreTier[] => {
+  const tiers: HabitScoreTier[] = []
+  for (let i = 0; i < count; i += BONUS_TIER_SIZE) {
+    const tierIndex = Math.floor(i / BONUS_TIER_SIZE)
+    const startDay = i + 1
+    const daysInTier = Math.min(BONUS_TIER_SIZE, count - i)
+    const endDay = i + daysInTier
+    const rate = BASE_BONUS_RATE + tierIndex * BONUS_RATE_INCREMENT
+    tiers.push({ startDay, endDay, rate, days: daysInTier, amount: baseAmount * daysInTier * rate })
+  }
+  return tiers
+}
+
+export const buildScoreBreakdown = (
+  scoreBeforeMultipliers: number,
+  dayMultiplier: number,
+  streakMultiplier: number,
+  uniqueWindowDays: number,
+  streak: number,
+): HabitScoreBreakdown => {
+  const afterDayBonus = scoreBeforeMultipliers * (1 + dayMultiplier)
+  const streakSign = streakMultiplier >= 0 ? 1 : -1
+  const daysTiers = buildTieredBreakdown(uniqueWindowDays, scoreBeforeMultipliers)
+  const streakTiers = buildTieredBreakdown(streak, afterDayBonus).map((tier) => ({
+    ...tier,
+    amount: tier.amount * streakSign,
+  }))
+  return { entryScores: scoreBeforeMultipliers, daysTiers, streakTiers }
+}
 
 export const calculateHabitScore = (
   entries: HabitEntry[],

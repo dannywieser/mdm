@@ -1,27 +1,9 @@
-import type { HabitMode } from "services"
+import type { HabitMode, HabitScoreBreakdown, HabitScoreTier } from "services"
 
-export type { HabitMode }
+export type { HabitMode, HabitScoreBreakdown, HabitScoreTier }
 
 export interface ScoreBreakdownProps {
   mode: HabitMode
-  scoreBeforeMultipliers: number
-  dayMultiplier: number
-  streakMultiplier: number
-  windowEntries: number
-  streak: number
+  breakdown: HabitScoreBreakdown
   habitScore: number
-}
-
-export interface BonusTier {
-  startDay: number
-  endDay: number
-  rate: number
-  days: number
-  amount: number
-}
-
-export interface ScoreContributions {
-  entryScores: number
-  daysTiers: BonusTier[]
-  streakTiers: BonusTier[]
 }

@@ -1,14 +1,10 @@
 import { Box, Flex, Text, VStack } from "@chakra-ui/react"
 
 import { useI18n } from "../../i18n"
-import type { BonusTier, ScoreBreakdownProps } from "./ScoreBreakdown.types"
-import {
-  calculateScoreContributions,
-  formatContributionAmount,
-  formatTierLabel,
-} from "./ScoreBreakdown.util"
+import type { HabitScoreTier, ScoreBreakdownProps } from "./ScoreBreakdown.types"
+import { formatContributionAmount, formatTierLabel } from "./ScoreBreakdown.util"
 
-function TierRows({ tiers, prefix, color }: Readonly<{ tiers: BonusTier[]; prefix: string; color: string }>) {
+function TierRows({ tiers, prefix, color }: Readonly<{ tiers: HabitScoreTier[]; prefix: string; color: string }>) {
   return (
     <>
       {tiers.map((tier) => (
@@ -23,24 +19,9 @@ function TierRows({ tiers, prefix, color }: Readonly<{ tiers: BonusTier[]; prefi
   )
 }
 
-export function ScoreBreakdown({
-  mode,
-  scoreBeforeMultipliers,
-  dayMultiplier,
-  streakMultiplier,
-  windowEntries,
-  streak,
-  habitScore,
-}: Readonly<ScoreBreakdownProps>) {
+export function ScoreBreakdown({ mode, breakdown, habitScore }: Readonly<ScoreBreakdownProps>) {
   const { t } = useI18n()
-  const { daysTiers, streakTiers } = calculateScoreContributions(
-    scoreBeforeMultipliers,
-    dayMultiplier,
-    streakMultiplier,
-    windowEntries,
-    streak,
-  )
-
+  const { entryScores, daysTiers, streakTiers } = breakdown
   const daysColor = mode === "do-more" ? "green.500" : "red.500"
 
   return (
@@ -67,7 +48,7 @@ export function ScoreBreakdown({
       <VStack align="stretch" gap={0} px={3} py={2} divideY="1px" divideColor="app.border">
         <Flex justify="space-between" align="center" py={1.5}>
           <Text color="app.textMuted">{t("habit.scoreBreakdownEntries")}</Text>
-          <Text fontVariantNumeric="tabular-nums">{scoreBeforeMultipliers}</Text>
+          <Text fontVariantNumeric="tabular-nums">{entryScores}</Text>
         </Flex>
         {daysTiers.length > 0 && (
           <VStack align="stretch" gap={1} py={1.5}>

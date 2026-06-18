@@ -39,6 +39,20 @@ export interface HabitScoreEntry {
   obsidianUrl: string
 }
 
+export interface HabitScoreTier {
+  startDay: number
+  endDay: number
+  rate: number
+  days: number
+  amount: number
+}
+
+export interface HabitScoreBreakdown {
+  entryScores: number
+  daysTiers: HabitScoreTier[]
+  streakTiers: HabitScoreTier[]
+}
+
 export interface HabitResult {
   allTimeHighScore: number
   allTimeHighStreak: number
@@ -61,4 +75,5 @@ export interface HabitResult {
   streakMultiplier: number
   dayMultiplier: number
   recentEntryAdditions: number
+  scoreBreakdown: HabitScoreBreakdown
 }
