@@ -14,10 +14,8 @@ import type { NotesReviewRouteParamKey } from "./NotesReview.types"
 import { LinkedNotesList } from "../LinkedNotesList"
 import { MarkdownTree } from "../MarkdownTree"
 import { NoteBadges } from "../NoteBadges"
-import {
-  NotesReviewTableOfContentsMobileTrigger,
-  NotesReviewTableOfContentsSidebar,
-} from "./NotesReviewTableOfContents"
+import { NotesReviewTableOfContentsMobileTrigger } from "./NotesReviewTableOfContentsMobileTrigger"
+import { NotesReviewTableOfContentsSidebar } from "./NotesReviewTableOfContentsSidebar"
 import { OpenInObsidianButton } from "../OpenInObsidianButton"
 import { NotebookIcon } from "../NotebookIcon"
 import type { NotesReviewProps } from "./NotesReview.types"
