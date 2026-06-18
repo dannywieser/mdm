@@ -7,7 +7,7 @@
     "prebuild": "turbo run build --filter=notes-api^...",
     "predev": "turbo run build --filter=notes-api^...",
     "pretest": "turbo run build --filter=notes-api^...",
-    "dev": "tsx watch --env-file=../../.env src/server.ts",
+    "dev": "tsx watch --env-file=../../.env src/server.ts | pino-pretty",
     "build": "tsc -p tsconfig.build.json",
     "lint": "eslint src --ext .ts",
     "test": "vitest run --config vitest.config.ts"
