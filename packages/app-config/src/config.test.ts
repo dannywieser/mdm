@@ -10,7 +10,6 @@ import path from "node:path"
 import {
   clearConfigCache,
   resolveNotesConfig,
-  resolveNotesDirectory,
 } from "./index"
 
 vi.mock("node:fs", () => ({
@@ -78,9 +77,9 @@ describe("config", () => {
       }),
     )
 
-    await expect(resolveNotesDirectory()).resolves.toBe(
-      path.resolve("/notes-root"),
-    )
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      notesDirectory: path.resolve("/notes-root"),
+    })
   })
 
   test("resolves notes config with directory and obsidian vault", async () => {
@@ -303,7 +302,7 @@ describe("config", () => {
     const err = Object.assign(new Error("ENOENT"), { code: "ENOENT" })
     readFileMock.mockRejectedValue(err)
 
-    await expect(resolveNotesDirectory()).rejects.toEqual(
+    await expect(resolveNotesConfig()).rejects.toEqual(
       new Error(
         "app.config.json is required. Copy app.config.example.json to app.config.json.",
       ),
@@ -313,7 +312,7 @@ describe("config", () => {
   test("throws when config json is invalid", async () => {
     readFileMock.mockResolvedValue("{broken")
 
-    await expect(resolveNotesDirectory()).rejects.toEqual(
+    await expect(resolveNotesConfig()).rejects.toEqual(
       new Error("app.config.json must contain valid JSON"),
     )
   })
@@ -321,7 +320,7 @@ describe("config", () => {
   test("throws when config file cannot be read", async () => {
     readFileMock.mockRejectedValue(new Error("EACCES"))
 
-    await expect(resolveNotesDirectory()).rejects.toEqual(
+    await expect(resolveNotesConfig()).rejects.toEqual(
       new Error("app.config.json must be readable"),
     )
   })
@@ -329,7 +328,7 @@ describe("config", () => {
   test("throws when required config fields are missing", async () => {
     readFileMock.mockResolvedValue(JSON.stringify({}))
 
-    await expect(resolveNotesDirectory()).rejects.toEqual(
+    await expect(resolveNotesConfig()).rejects.toEqual(
       new Error(
         "app.config.json requires a non-empty obsidianVault value",
       ),
@@ -344,7 +343,7 @@ describe("config", () => {
       }),
     )
 
-    await expect(resolveNotesDirectory()).rejects.toEqual(
+    await expect(resolveNotesConfig()).rejects.toEqual(
       new Error(
         "app.config.json dateFormats must be an array of non-empty strings",
       ),
@@ -359,7 +358,7 @@ describe("config", () => {
       }),
     )
 
-    await expect(resolveNotesDirectory()).rejects.toEqual(
+    await expect(resolveNotesConfig()).rejects.toEqual(
       new Error("NOTES_ROOT environment variable is required"),
     )
   })
@@ -417,8 +416,8 @@ describe("config", () => {
       }),
     )
 
-    await resolveNotesDirectory()
-    await resolveNotesDirectory()
+    await resolveNotesConfig()
+    await resolveNotesConfig()
 
     expect(readFileMock).toHaveBeenCalledTimes(1)
   })

@@ -102,9 +102,6 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
   return cachedNotesConfig
 }
 
-export const resolveNotesDirectory = async (): Promise<string> =>
-  (await resolveNotesConfig()).notesDirectory
-
 export const clearConfigCache = (): void => {
   cachedNotesConfig = undefined
 }
