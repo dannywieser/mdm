@@ -6,10 +6,10 @@ import { useI18n } from "../../i18n"
 import { focusRing } from "../../theme/focusRing"
 import type { NotesReviewTableOfContentsProps } from "./NotesReviewTableOfContents.types"
 
-const getNoteColor = (isCurrentIndex: boolean, isRead: boolean): string | undefined => {
+const getNoteColor = (isCurrentIndex: boolean, isRead: boolean): string => {
   if (isCurrentIndex) return "app.accent"
   if (isRead) return "app.textMuted"
-  return undefined
+  return "app.text"
 }
 
 const TocList = ({ notes, currentIndex }: NotesReviewTableOfContentsProps) => {
