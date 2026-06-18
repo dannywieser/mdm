@@ -33,6 +33,7 @@ import { HabitScoreProgress } from "../HabitScoreProgress"
 import { HabitScoreValue } from "../HabitScoreValue"
 import { HeatDots } from "../HeatDots"
 import { calculateHeatDotCount } from "../HeatDots/HeatDots.util"
+import { HabitScoreBreakdown } from "../HabitScoreBreakdown/HabitScoreBreakdown"
 import type { HabitDetailRouteParamKey } from "./HabitDetail.types"
 import {
   calculateWindowFillPercentage,
@@ -331,57 +332,65 @@ export function HabitDetail() {
                     className="habit-score-entries-chevron"
                   />
                   <Text fontSize="xs" letterSpacing="wide">
-                    {t("habit.scoreEntries")}
+                    {t("habit.scoreDetails")}
                   </Text>
                 </Flex>
               </Collapsible.Trigger>
               <Collapsible.Content>
-                <Table.Root
-                  bg="app.panelBackground"
-                  color="app.text"
-                  borderWidth="1px"
-                  borderColor="app.border"
-                  borderRadius="md"
-                  overflow="hidden"
-                >
-                  <Table.Header bg="app.panelBackgroundHover">
-                    <Table.Row bg="app.panelBackgroundHover">
-                      <Table.ColumnHeader
-                        color="app.textMuted"
-                        borderColor="app.border"
-                      >
-                        {t("habit.entryDate")}
-                      </Table.ColumnHeader>
-                      <Table.ColumnHeader
-                        color="app.textMuted"
-                        borderColor="app.border"
-                      >
-                        {t("habit.entryValue")}
-                      </Table.ColumnHeader>
-                    </Table.Row>
-                  </Table.Header>
-                  <Table.Body>
-                    {habit.scoreEntries.map((entry) => (
-                      <Table.Row
-                        key={entry.date}
-                        bg="app.panelBackground"
-                        _hover={{ bg: "app.panelBackgroundHover" }}
-                      >
-                        <Table.Cell borderColor="app.border">
-                          <Link href={entry.obsidianUrl} color="app.accent">
-                            {formatChartDate(entry.date)}
-                          </Link>
-                        </Table.Cell>
-                        <Table.Cell borderColor="app.border">
-                          {formatEntryValue(
-                            entry.value,
-                            entry.recentMultiplier,
-                          )}
-                        </Table.Cell>
+                <VStack align="stretch" gap={3}>
+                  <Table.Root
+                    bg="app.panelBackground"
+                    color="app.text"
+                    borderWidth="1px"
+                    borderColor="app.border"
+                    borderRadius="md"
+                    overflow="hidden"
+                  >
+                    <Table.Header bg="app.panelBackgroundHover">
+                      <Table.Row bg="app.panelBackgroundHover">
+                        <Table.ColumnHeader
+                          color="app.textMuted"
+                          borderColor="app.border"
+                        >
+                          {t("habit.entryDate")}
+                        </Table.ColumnHeader>
+                        <Table.ColumnHeader
+                          color="app.textMuted"
+                          borderColor="app.border"
+                        >
+                          {t("habit.entryValue")}
+                        </Table.ColumnHeader>
                       </Table.Row>
-                    ))}
-                  </Table.Body>
-                </Table.Root>
+                    </Table.Header>
+                    <Table.Body>
+                      {habit.scoreEntries.map((entry) => (
+                        <Table.Row
+                          key={entry.date}
+                          bg="app.panelBackground"
+                          _hover={{ bg: "app.panelBackgroundHover" }}
+                        >
+                          <Table.Cell borderColor="app.border">
+                            <Link href={entry.obsidianUrl} color="app.accent">
+                              {formatChartDate(entry.date)}
+                            </Link>
+                          </Table.Cell>
+                          <Table.Cell borderColor="app.border">
+                            {formatEntryValue(
+                              entry.value,
+                              entry.recentMultiplier,
+                            )}
+                          </Table.Cell>
+                        </Table.Row>
+                      ))}
+                    </Table.Body>
+                  </Table.Root>
+
+                  <HabitScoreBreakdown
+                    mode={habit.mode}
+                    breakdown={habit.scoreBreakdown}
+                    habitScore={habit.habitScore}
+                  />
+                </VStack>
               </Collapsible.Content>
             </Collapsible.Root>
           )}

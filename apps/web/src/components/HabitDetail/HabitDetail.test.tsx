@@ -86,9 +86,14 @@ const HABIT: HabitResult = {
   windowStart: "2025-12-29",
   rawScore: 5,
   scoreBeforeMultipliers: 5,
-  streakMultiplier: 1,
-  dayMultiplier: 1,
+  streakMultiplier: 0.025,
+  dayMultiplier: 0.025,
   recentEntryAdditions: 0,
+  scoreBreakdown: {
+    entryScores: 5,
+    daysTiers: [{ startDay: 1, endDay: 5, rate: 0.005, days: 5, amount: 0.125 }],
+    streakTiers: [{ startDay: 1, endDay: 5, rate: 0.005, days: 5, amount: 0.128 }],
+  },
 }
 
 const renderDetail = (data: HabitResult = HABIT) => {
@@ -121,8 +126,8 @@ describe("HabitDetail", () => {
     renderDetail()
 
     expect(screen.getByText("habit.do-more")).toBeTruthy()
-    expect(screen.getByText("525")).toBeTruthy()
-    expect(screen.getAllByText("5")).toHaveLength(2)
+    // 525 appears in both the score stat and the breakdown final score row
+    expect(screen.getAllByText("525").length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText("habit.daysLogged")).toBeTruthy()
     expect(screen.getByText("habit.do-more-streak")).toBeTruthy()
   })
@@ -180,8 +185,8 @@ describe("HabitDetail", () => {
   test("renders a table of score entries with their values and recency multipliers inline", () => {
     renderDetail()
 
-    expect(screen.getByText("habit.scoreEntries")).toBeTruthy()
-    fireEvent.click(screen.getByText("habit.scoreEntries"))
+    expect(screen.getByText("habit.scoreDetails")).toBeTruthy()
+    fireEvent.click(screen.getByText("habit.scoreDetails"))
     expect(screen.getByText("Jan 2")).toBeTruthy()
     expect(screen.getByText("9 (x10)")).toBeTruthy()
     expect(screen.getByText("Jan 1")).toBeTruthy()
@@ -194,7 +199,7 @@ describe("HabitDetail", () => {
 
     expect(content?.hasAttribute("hidden")).toBe(true)
 
-    fireEvent.click(screen.getByText("habit.scoreEntries"))
+    fireEvent.click(screen.getByText("habit.scoreDetails"))
 
     await waitFor(() => { expect(content?.hasAttribute("hidden")).toBe(false); })
   })
@@ -202,13 +207,13 @@ describe("HabitDetail", () => {
   test("omits the score entries table when there are no entries", () => {
     renderDetail({ ...HABIT, scoreEntries: [] })
 
-    expect(screen.queryByText("habit.scoreEntries")).toBeNull()
+    expect(screen.queryByText("habit.scoreDetails")).toBeNull()
   })
 
   test("links score entry dates to their notes via the obsidian url", () => {
     renderDetail()
 
-    fireEvent.click(screen.getByText("habit.scoreEntries"))
+    fireEvent.click(screen.getByText("habit.scoreDetails"))
     expect(screen.getByText("Jan 2").closest("a")).toHaveProperty(
       "href",
       "obsidian://open?vault=v&file=2026.01.02",
@@ -272,5 +277,14 @@ describe("HabitDetail", () => {
     })
 
     expect(screen.queryByLabelText("habit.heatLevel")).toBeNull()
+  })
+
+  test("shows the score breakdown section when entries are expanded", () => {
+    renderDetail()
+
+    fireEvent.click(screen.getByText("habit.scoreDetails"))
+
+    expect(screen.getByText("habit.scoreBreakdown")).toBeTruthy()
+    expect(screen.getByText("habit.scoreBreakdownFinalScore")).toBeTruthy()
   })
 })

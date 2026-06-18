@@ -8,8 +8,10 @@ import { habitDetailHandler } from "./habit-detail"
 import { scanHabitEntries } from "./habit-detail.files"
 import {
   buildHistory,
+  buildScoreBreakdown,
   buildScoreEntries,
   buildStreaks,
+  buildTieredBreakdown,
   calculateBaseScore,
   calculateConsecutiveEntryStreak,
   calculateDaysSinceLastEntry,
@@ -549,12 +551,12 @@ describe("calculateHabitScore", () => {
     expect(habitScore).toBe(Math.floor(85 * (1 + 0.01) * (1 + 0.005)))
   })
 
-  test("streak bonus example from spec: 10-day streak contributes a 5% bonus", () => {
+  test("10-day do-more streak applies tiered bonus (0.5% for days 1–5, 0.6% for days 6–10)", () => {
     // 10 consecutive days with value 1, all recent, do-more with 30 window days
     // baseScore = 10 * 1 * 10 = 100
-    // streak = 10 consecutive days with entries → streakMultiplier = 10 * 0.005 = 0.05 (the spec's "5% bonus")
-    // uniqueWindowDays = 10 → dayMultiplier (do-more) = 10 * 0.005 = 0.05
-    // final = 100 * (1 + 0.05) * (1 + 0.05) = 100 * 1.1025 = 110.25, floored to 110
+    // streak = 10 → tiered streakMultiplier = 5*0.005 + 5*0.006 = 0.055
+    // uniqueWindowDays = 10 → tiered dayMultiplier = 0.055
+    // final = 100 * (1 + 0.055) * (1 + 0.055) = 100 * 1.113025 = 111.3025, floored to 111
     const refDate = addDays(YEAR_START, 9)
     const entries = Array.from({ length: 10 }, (_, i) =>
       makeEntry(addDays(YEAR_START, i), 1),
@@ -566,15 +568,15 @@ describe("calculateHabitScore", () => {
       "do-more",
     )
     expect(streak).toBe(10)
-    expect(habitScore).toBe(110)
+    expect(habitScore).toBe(111)
   })
 
-  test("do-less streak example: a 10-day gap since the last entry contributes a 5% penalty", () => {
+  test("do-less 10-day streak applies tiered bonus reducing the score", () => {
     // Single entry 10 days before the reference date, do-less with 30 window days
     // baseScore = 1 * 10 = 10 (within the recent 14-day window)
-    // streak = days since last entry = 10 → streakMultiplier (do-less, negative) = -(10 * 0.005) = -0.05
-    // uniqueWindowDays = 1 → dayMultiplier (always positive) = 1 * 0.005 = 0.005
-    // final = 10 * (1 + 0.005) * (1 - 0.05) = 10 * 0.95475 = 9.5475, floored to 9
+    // streak = 10 → tiered streakMultiplier (do-less, negative) = -(5*0.005 + 5*0.006) = -0.055
+    // uniqueWindowDays = 1 → tiered dayMultiplier = 1*0.005 = 0.005
+    // final = 10 * (1 + 0.005) * (1 - 0.055) = 10 * 0.950225 = 9.50225, floored to 9
     const lastEntryDate = addDays(YEAR_START, 0)
     const refDate = addDays(YEAR_START, 10)
     const { habitScore, streak } = calculateHabitScore(
@@ -584,7 +586,7 @@ describe("calculateHabitScore", () => {
       "do-less",
     )
     expect(streak).toBe(10)
-    expect(habitScore).toBe(Math.floor(10 * (1 + 0.005) * (1 - 0.05)))
+    expect(habitScore).toBe(Math.floor(10 * (1 + 0.005) * (1 - 0.055)))
   })
 })
 
@@ -869,6 +871,83 @@ describe("calculateLowestDaysTrackedPerPeriod", () => {
     ]
     // Both periods have 2 entries
     expect(calculateLowestDaysTrackedPerPeriod(entries, "2025-01-20", 10)).toBe(2)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// buildTieredBreakdown
+// ---------------------------------------------------------------------------
+
+describe("buildTieredBreakdown", () => {
+  test("returns empty array for count 0", () => {
+    expect(buildTieredBreakdown(0, 100)).toEqual([])
+  })
+
+  test("returns one tier for count ≤ 5", () => {
+    const tiers = buildTieredBreakdown(5, 100)
+
+    expect(tiers).toHaveLength(1)
+    expect(tiers[0]).toMatchObject({ startDay: 1, endDay: 5, rate: 0.005, days: 5 })
+    expect(tiers[0]?.amount).toBeCloseTo(100 * 5 * 0.005)
+  })
+
+  test("returns two tiers with escalating rates for count 10", () => {
+    const tiers = buildTieredBreakdown(10, 100)
+
+    expect(tiers).toHaveLength(2)
+    expect(tiers[0]).toMatchObject({ startDay: 1, endDay: 5, rate: 0.005, days: 5 })
+    expect(tiers[1]).toMatchObject({ startDay: 6, endDay: 10, rate: 0.006, days: 5 })
+  })
+
+  test("last tier is partial when count is not a multiple of 5", () => {
+    const tiers = buildTieredBreakdown(12, 100)
+
+    expect(tiers).toHaveLength(3)
+    expect(tiers[2]).toMatchObject({ startDay: 11, endDay: 12, rate: 0.007, days: 2 })
+    expect(tiers[2]?.amount).toBeCloseTo(100 * 2 * 0.007)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// buildScoreBreakdown
+// ---------------------------------------------------------------------------
+
+describe("buildScoreBreakdown", () => {
+  test("entryScores matches scoreBeforeMultipliers", () => {
+    const result = buildScoreBreakdown(500, 0.025, 0.025, 5, 5)
+
+    expect(result.entryScores).toBe(500)
+  })
+
+  test("days tiers are derived from uniqueWindowDays", () => {
+    const result = buildScoreBreakdown(500, 0.025, 0.025, 5, 5)
+
+    expect(result.daysTiers).toHaveLength(1)
+    expect(result.daysTiers[0]).toMatchObject({ startDay: 1, endDay: 5, rate: 0.005, days: 5 })
+  })
+
+  test("streak tier amounts are negated for do-less (negative streakMultiplier)", () => {
+    const result = buildScoreBreakdown(500, 0.025, -0.025, 5, 5)
+
+    for (const tier of result.streakTiers) {
+      expect(tier.amount).toBeLessThan(0)
+    }
+  })
+
+  test("streak tiers are computed on the post-day-bonus base", () => {
+    const base = 100
+    const dayMult = 0.025
+    const result = buildScoreBreakdown(base, dayMult, 0.025, 5, 5)
+    const afterDay = base * (1 + dayMult)
+
+    expect(result.streakTiers[0]?.amount).toBeCloseTo(afterDay * 5 * 0.005)
+  })
+
+  test("returns empty tier arrays when counts are zero", () => {
+    const result = buildScoreBreakdown(0, 0, 0, 0, 0)
+
+    expect(result.daysTiers).toHaveLength(0)
+    expect(result.streakTiers).toHaveLength(0)
   })
 })
 
