@@ -29,7 +29,6 @@ export const statsHandler: RequestHandler = async (_request, response) => {
       createdDateProperty,
       dateFormats,
       deriveTitleDate,
-      homeStats,
       notesDirectory,
       obsidianVault,
       timezone,
@@ -48,7 +47,6 @@ export const statsHandler: RequestHandler = async (_request, response) => {
 
     response.status(200).json({
       folderBreakdown: buildFolderBreakdown(scannedNotes),
-      homeStats,
       modifiedToday: countModifiedToday(scannedNotes, timezone),
       notesCreated: buildNotesCreated(scannedNotes, now),
       notesPerDay: buildNotesPerDay(scannedNotes, timezone, now),

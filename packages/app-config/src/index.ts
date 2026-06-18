@@ -11,7 +11,6 @@ import type {
   AppConfigView,
   ExcludeViewFilter,
   HabitConfig,
-  HomeStatsShowConfig,
   ResolvedNotesConfig,
 } from "./types"
 
@@ -23,8 +22,6 @@ export type {
   ExcludeViewFilter,
   HabitConfig,
   HabitMode,
-  HomeStatsConfig,
-  HomeStatsShowConfig,
   NotesView,
   ResolvedNotesConfig,
   ViewFilter,
@@ -73,34 +70,6 @@ const isAppConfigView = (value: unknown): value is AppConfigView => {
   )
 }
 
-const isHomeStatsConfig = (
-  value: unknown,
-): value is { show?: Partial<HomeStatsShowConfig> } => {
-  if (value === null || typeof value !== "object" || Array.isArray(value)) {
-    return false
-  }
-  const obj = value as Record<string, unknown>
-  if (obj.show === undefined) return true
-  if (obj.show === null || typeof obj.show !== "object" || Array.isArray(obj.show)) {
-    return false
-  }
-  const show = obj.show as Record<string, unknown>
-  const boolKeys: (keyof HomeStatsShowConfig)[] = [
-    "folderBreakdown",
-    "modifiedToday",
-    "notesCreated",
-    "notesPerDay",
-    "notesWithoutCreatedDate",
-    "totalAttachments",
-    "totalFolders",
-    "totalNotes",
-    "trends",
-  ]
-  return boolKeys.every(
-    (key) => show[key] === undefined || typeof show[key] === "boolean",
-  )
-}
-
 const isHabitConfig = (value: unknown): value is HabitConfig => {
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
     return false
@@ -119,18 +88,6 @@ const isHabitConfig = (value: unknown): value is HabitConfig => {
   )
 }
 
-const DEFAULT_HOME_STATS_SHOW: HomeStatsShowConfig = {
-  folderBreakdown: true,
-  modifiedToday: true,
-  notesCreated: true,
-  notesPerDay: true,
-  notesWithoutCreatedDate: true,
-  totalAttachments: true,
-  totalFolders: true,
-  totalNotes: true,
-  trends: true,
-}
-
 const assertOptionalString = (value: unknown, field: string): void => {
   if (value !== undefined && !isNonEmptyString(value)) {
     throw new Error(`app.config.json ${field} must be a non-empty string`)
@@ -138,7 +95,7 @@ const assertOptionalString = (value: unknown, field: string): void => {
 }
 
 const validateParsedConfig = (parsedConfig: Record<string, unknown>): void => {
-  const { obsidianVault, attachmentsDirectory, dateFormats, timezone, views, createdDateProperty, deriveTitleDate, homeStats, habits } = parsedConfig
+  const { obsidianVault, attachmentsDirectory, dateFormats, timezone, views, createdDateProperty, deriveTitleDate, habits } = parsedConfig
 
   if (!isNonEmptyString(obsidianVault)) {
     throw new Error("app.config.json requires a non-empty obsidianVault value")
@@ -165,12 +122,6 @@ const validateParsedConfig = (parsedConfig: Record<string, unknown>): void => {
     throw new Error("app.config.json deriveTitleDate must be a boolean")
   }
 
-  if (homeStats !== undefined && !isHomeStatsConfig(homeStats)) {
-    throw new Error(
-      "app.config.json homeStats.show must be an object with boolean values for each display section",
-    )
-  }
-
   if (habits !== undefined && (!Array.isArray(habits) || !habits.every(isHabitConfig))) {
     throw new Error(
       "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), a positive integer trackingWindowDays, and an optional positive targetScore",
@@ -186,7 +137,7 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
   const parsedConfig = appConfig as Record<string, unknown>
   validateParsedConfig(parsedConfig)
 
-  const { attachmentsDirectory, createdDateProperty, dateFormats, deriveTitleDate, habits, homeStats, obsidianVault, timezone, views } = parsedConfig
+  const { attachmentsDirectory, createdDateProperty, dateFormats, deriveTitleDate, habits, obsidianVault, timezone, views } = parsedConfig
 
   return {
     attachmentsDirectory: attachmentsDirectory as string | undefined,
@@ -194,7 +145,6 @@ const validateAppConfig = (appConfig: unknown): AppConfig => {
     dateFormats: dateFormats as string[] | undefined,
     deriveTitleDate: typeof deriveTitleDate === "boolean" ? deriveTitleDate : undefined,
     habits: Array.isArray(habits) && habits.every(isHabitConfig) ? habits : undefined,
-    homeStats: isHomeStatsConfig(homeStats) ? homeStats : undefined,
     obsidianVault: obsidianVault as string,
     timezone: isNonEmptyString(timezone) ? timezone : undefined,
     views: views as AppConfigView[] | undefined,
@@ -224,9 +174,6 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
     dateFormats: appConfig.dateFormats ?? [],
     deriveTitleDate: appConfig.deriveTitleDate ?? false,
     habits: appConfig.habits ?? [],
-    homeStats: {
-      show: { ...DEFAULT_HOME_STATS_SHOW, ...appConfig.homeStats?.show },
-    },
     notesDirectory: path.resolve(noteRootDirectory),
     obsidianVault: appConfig.obsidianVault,
     timezone: appConfig.timezone ?? "UTC",

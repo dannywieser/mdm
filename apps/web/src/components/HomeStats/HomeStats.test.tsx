@@ -28,24 +28,11 @@ vi.mock("../../i18n", () => ({
   useI18n: () => ({ t: (key: string) => key }),
 }))
 
-const defaultShow = {
-  folderBreakdown: true,
-  modifiedToday: true,
-  notesCreated: true,
-  notesPerDay: true,
-  notesWithoutCreatedDate: true,
-  totalAttachments: true,
-  totalFolders: true,
-  totalNotes: true,
-  trends: true,
-}
-
 const defaultData = {
   folderBreakdown: [
     { count: 17, folder: "projects" },
     { count: 6, folder: "archive" },
   ],
-  homeStats: { show: defaultShow },
   modifiedToday: 3,
   notesCreated: { last30Days: 11, last365Days: 80, last90Days: 45 },
   notesPerDay: [{ count: 2, date: "2026-06-01" }],
@@ -88,39 +75,6 @@ describe("HomeStats", () => {
     expect(screen.getByText("+22%")).toBeTruthy()
   })
 
-  test("hides totalNotes when show.totalNotes is false", () => {
-    renderComponent({
-      ...defaultData,
-      homeStats: {
-        show: { ...defaultShow, totalNotes: false },
-      },
-    })
-
-    expect(screen.queryByText("stats.totalNotes")).toBeNull()
-  })
-
-  test("hides modifiedToday when show.modifiedToday is false", () => {
-    renderComponent({
-      ...defaultData,
-      homeStats: {
-        show: { ...defaultShow, modifiedToday: false },
-      },
-    })
-
-    expect(screen.queryByText("stats.modifiedToday")).toBeNull()
-  })
-
-  test("hides folderBreakdown when show.folderBreakdown is false", () => {
-    renderComponent({
-      ...defaultData,
-      homeStats: {
-        show: { ...defaultShow, folderBreakdown: false },
-      },
-    })
-
-    expect(screen.queryByText("projects")).toBeNull()
-  })
-
   test("renders notesWithoutCreatedDate when count is greater than zero", () => {
     renderComponent()
 
@@ -134,14 +88,6 @@ describe("HomeStats", () => {
     expect(screen.queryByText("stats.missingCreatedDate")).toBeNull()
   })
 
-  test("hides notesWithoutCreatedDate when show.notesWithoutCreatedDate is false", () => {
-    renderComponent({
-      ...defaultData,
-      homeStats: { show: { ...defaultShow, notesWithoutCreatedDate: false } },
-    })
-
-    expect(screen.queryByText("stats.missingCreatedDate")).toBeNull()
-  })
 })
 
 describe("HomeStats util", () => {

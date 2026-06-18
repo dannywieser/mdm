@@ -44,7 +44,6 @@ const BASE_CONFIG = {
   obsidianVault: "vault",
   timezone: "UTC",
   attachmentsDirectory: "attachments",
-  homeStats: { show: {} },
   views: [],
 }
 
@@ -80,7 +79,7 @@ describe("habitsHandler", () => {
     vi.mocked(resolveNotesConfig).mockResolvedValue({
       ...BASE_CONFIG,
       habits: [HABIT_DO_MORE, HABIT_DO_LESS],
-    } as never)
+    })
     vi.mocked(scanHabitEntries).mockImplementation((_paths, property) =>
       Promise.resolve(
         property === "exercise"
@@ -120,7 +119,7 @@ describe("habitsHandler", () => {
   })
 
   test("returns an empty array when no habits are configured", async () => {
-    vi.mocked(resolveNotesConfig).mockResolvedValue({ ...BASE_CONFIG, habits: [] } as never)
+    vi.mocked(resolveNotesConfig).mockResolvedValue({ ...BASE_CONFIG, habits: [] })
 
     const { response, status, json } = makeResponse()
     await habitsHandler({} as never, response, vi.fn())
@@ -130,7 +129,7 @@ describe("habitsHandler", () => {
   })
 
   test("returns generic 500 on unexpected error", async () => {
-    vi.mocked(resolveNotesConfig).mockResolvedValue({ ...BASE_CONFIG, habits: [HABIT_DO_MORE] } as never)
+    vi.mocked(resolveNotesConfig).mockResolvedValue({ ...BASE_CONFIG, habits: [HABIT_DO_MORE] })
     vi.mocked(collectMarkdownFiles).mockRejectedValue(new Error("boom"))
 
     const { response, status, json } = makeResponse()

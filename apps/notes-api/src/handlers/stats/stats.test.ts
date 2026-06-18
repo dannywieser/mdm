@@ -68,26 +68,11 @@ const countFoldersMock = vi.mocked(countFolders)
 const countModifiedTodayMock = vi.mocked(countModifiedToday)
 const countNotesWithoutCreatedDateMock = vi.mocked(countNotesWithoutCreatedDate)
 
-const mockHomeStats = {
-  show: {
-    folderBreakdown: true,
-    modifiedToday: true,
-    notesCreated: true,
-    notesPerDay: true,
-    notesWithoutCreatedDate: true,
-    totalAttachments: true,
-    totalFolders: true,
-    totalNotes: true,
-    trends: true,
-  },
-}
-
 const mockConfig = {
   attachmentsDirectory: "attachments",
   createdDateProperty: "created",
   dateFormats: ["YYYY.MM.DD"],
   deriveTitleDate: false,
-  homeStats: mockHomeStats,
   notesDirectory: "/notes",
   obsidianVault: "vault",
   timezone: "UTC",
@@ -142,7 +127,6 @@ describe("stats handler interface", () => {
     expect(response.status).toBe(200)
     expect(response.body).toEqual({
       folderBreakdown: [{ count: 5, folder: "notes" }],
-      homeStats: mockHomeStats,
       modifiedToday: 1,
       notesCreated: { last30Days: 3, last365Days: 40, last90Days: 15 },
       notesPerDay: [{ count: 1, date: "2026-06-01" }],

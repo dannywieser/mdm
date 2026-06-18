@@ -83,7 +83,6 @@ const BASE_CONFIG = {
   obsidianVault: "vault",
   timezone: "UTC",
   attachmentsDirectory: "attachments",
-  homeStats: { show: {} },
   views: [],
 }
 
@@ -1188,7 +1187,7 @@ describe("habitDetailHandler", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date("2025-01-03T12:00:00Z"))
-    vi.mocked(resolveNotesConfig).mockResolvedValue(mockConfig as never)
+    vi.mocked(resolveNotesConfig).mockResolvedValue(mockConfig)
     vi.mocked(collectMarkdownFiles).mockResolvedValue([])
     vi.mocked(scanHabitEntries).mockResolvedValue(mockEntries)
   })
