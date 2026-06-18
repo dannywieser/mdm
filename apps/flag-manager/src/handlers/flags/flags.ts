@@ -4,6 +4,7 @@ import { toLoggableError } from "mdm-util"
 
 import type { FlagDefinition, FlagRedisClient } from "./flags.types"
 
+import { logger } from "../../logger"
 import { getFlag, toggleFlag } from "./flags.util"
 
 const isValidPathValue = (value: unknown): value is string =>
@@ -52,7 +53,7 @@ export const createFlagsHandler = (
         ? "Unable to retrieve flag"
         : "Unable to toggle flag"
 
-      console.error(errorMessage, toLoggableError(error))
+      logger.error({ error: toLoggableError(error) }, errorMessage)
       response.status(500).json({ error: errorMessage })
     }
   }

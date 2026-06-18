@@ -1,14 +1,15 @@
 import express from "express"
-import morgan from "morgan"
+import pinoHttp from "pino-http"
 
 import { habitDetailHandler } from "./handlers/habit-detail/habit-detail"
 import { habitsHandler } from "./handlers/habits/habits"
 import { healthHandler } from "./handlers/health/health"
+import { logger } from "./logger"
 
 export const createApp = () => {
   const app = express()
 
-  app.use(morgan("combined"))
+  app.use(pinoHttp({ logger }))
 
   app.get("/health", healthHandler)
   app.get("/habits", habitsHandler)
@@ -22,6 +23,6 @@ if (require.main === module) {
   const port = Number(process.env.PORT ?? 3003)
 
   app.listen(port, () => {
-    console.log(`habit-tracker listening on ${port}`)
+    logger.info({ port }, "habit-tracker listening")
   })
 }

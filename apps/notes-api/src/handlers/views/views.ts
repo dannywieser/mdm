@@ -5,6 +5,7 @@ import { AppConfigError, resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 
+import { logger } from "../../logger"
 import { scanMarkdownFile } from "../notes/notes.scan"
 import { buildViews } from "./views.util"
 
@@ -34,10 +35,10 @@ export const viewsHandler: RequestHandler = async (_request, response) => {
       return
     }
 
-    console.error("Unable to load views", {
-      error: toLoggableError(error),
-      notesConfig: notesConfig ?? null,
-    })
+    logger.error(
+      { error: toLoggableError(error), notesConfig: notesConfig ?? null },
+      "Unable to load views",
+    )
     response.status(500).json({ error: "Unable to load views" })
   }
 }

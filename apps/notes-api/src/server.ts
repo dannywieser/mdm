@@ -1,17 +1,18 @@
 import { resolveNotesConfig } from "app-config"
 import express from "express"
 import { toLoggableError } from "mdm-util"
-import morgan from "morgan"
+import pinoHttp from "pino-http"
 
 import { healthHandler } from "./handlers/health/health"
 import { notesHandler } from "./handlers/notes/notes"
 import { statsHandler } from "./handlers/stats/stats"
 import { viewsHandler } from "./handlers/views/views"
+import { logger } from "./logger"
 
 export const createApp = () => {
   const app = express()
 
-  app.use(morgan("combined"))
+  app.use(pinoHttp({ logger }))
 
   app.get("/health", healthHandler)
   app.get("/notes", notesHandler)
@@ -24,12 +25,11 @@ export const createApp = () => {
 export const logStartupConfig = async (): Promise<void> => {
   try {
     const notesConfig = await resolveNotesConfig()
-
-    console.log("Resolved notes config", JSON.stringify(notesConfig, null, 2))
+    logger.info({ notesConfig }, "Resolved notes config")
   } catch (error) {
-    console.error(
+    logger.error(
+      { error: toLoggableError(error) },
       "Unable to resolve notes config on startup",
-      toLoggableError(error),
     )
   }
 }
@@ -39,7 +39,7 @@ if (require.main === module) {
   const port = Number(process.env.PORT ?? 3000)
 
   app.listen(port, () => {
-    console.log(`notes-api listening on ${port}`)
+    logger.info({ port }, "notes-api listening")
     void logStartupConfig()
   })
 }

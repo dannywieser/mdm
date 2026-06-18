@@ -1,7 +1,7 @@
 import express from "express"
 import { toLoggableError } from "mdm-util"
 import { createRedisClient } from "mdm-util/redis"
-import morgan from "morgan"
+import pinoHttp from "pino-http"
 
 import type { ImageRedisClient } from "./handlers/images/images.types"
 
@@ -10,6 +10,7 @@ import {
   createImageHandler,
   resolveImageProxyConfig,
 } from "./handlers/images/images"
+import { logger } from "./logger"
 
 const noopRedisClient: ImageRedisClient = {
   get: () => Promise.resolve(null),
@@ -19,7 +20,7 @@ const noopRedisClient: ImageRedisClient = {
 export const createApp = (redisClient: ImageRedisClient = noopRedisClient) => {
   const app = express()
 
-  app.use(morgan("combined"))
+  app.use(pinoHttp({ logger }))
 
   app.get("/health", healthHandler)
   app.get("/images", createImageHandler(resolveImageProxyConfig(), redisClient))
@@ -34,7 +35,7 @@ if (require.main === module) {
     const redisClient = createRedisClient(redisUrl)
 
     redisClient.on("error", (error) => {
-      console.error("Redis client error", toLoggableError(error))
+      logger.error({ error: toLoggableError(error) }, "Redis client error")
     })
 
     let cacheClient: ImageRedisClient = noopRedisClient
@@ -42,9 +43,9 @@ if (require.main === module) {
       await redisClient.connect()
       cacheClient = redisClient
     } catch (error) {
-      console.error(
+      logger.error(
+        { error: toLoggableError(error) },
         "Redis unavailable, image caching disabled",
-        toLoggableError(error),
       )
     }
 
@@ -53,14 +54,14 @@ if (require.main === module) {
     const { imagesRoot } = resolveImageProxyConfig()
 
     app.listen(port, () => {
-      console.log(`image-server listening on ${port}`, { imagesRoot })
+      logger.info({ imagesRoot, port }, "image-server listening")
     })
   }
 
   start().catch((error: unknown) => {
-    console.error(
+    logger.error(
+      { error: toLoggableError(error) },
       "Unable to start image-server due to configuration error",
-      toLoggableError(error),
     )
     throw error
   })

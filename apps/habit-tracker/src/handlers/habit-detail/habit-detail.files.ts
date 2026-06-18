@@ -4,6 +4,8 @@ import path from "node:path"
 
 import type { HabitEntry } from "./habit-detail.types"
 
+import { logger } from "../../logger"
+
 const resolveNoteDate = (
   frontmatter: Record<string, string | string[]> | null,
   basename: string,
@@ -34,19 +36,19 @@ export const scanHabitEntries = async (
 
       const rawValue = frontmatter[frontmatterProperty]
       if (typeof rawValue !== "string") {
-        console.debug(`[habit] skipping ${basename}: "${frontmatterProperty}" is not a string`, { rawValue })
+        logger.debug({ basename, frontmatterProperty, rawValue }, "[habit] skipping: property is not a string")
         return null
       }
 
       const cleanedValue = rawValue.replace(/^"(.*)"$/, "$1")
       if (!/^-?\d+(\.\d+)?$/.test(cleanedValue)) {
-        console.debug(`[habit] skipping ${basename}: "${frontmatterProperty}" is not a numeric value`, { rawValue })
+        logger.debug({ basename, frontmatterProperty, rawValue }, "[habit] skipping: property is not a numeric value")
         return null
       }
 
       const numValue = parseFloat(cleanedValue)
       if (numValue < 1 || numValue > 10) {
-        console.debug(`[habit] skipping ${basename}: "${frontmatterProperty}" value out of 1-10 range`, { rawValue })
+        logger.debug({ basename, frontmatterProperty, rawValue }, "[habit] skipping: value out of 1-10 range")
         return null
       }
 
@@ -58,15 +60,16 @@ export const scanHabitEntries = async (
         dateFormats,
       )
       if (!date) {
-        console.debug(`[habit] skipping ${basename}: unable to resolve a note date`, {
+        logger.debug({
+          basename,
           createdDateProperty,
           deriveTitleDate,
           frontmatterCreatedValue: frontmatter[createdDateProperty],
-        })
+        }, "[habit] skipping: unable to resolve a note date")
         return null
       }
 
-      console.debug(`[habit] matched ${basename}`, { date, value: numValue })
+      logger.debug({ basename, date, value: numValue }, "[habit] matched entry")
       return { date, value: numValue, obsidianUrl: buildObsidianUrl(obsidianVault, notesDirectory, filePath) }
     }),
   )

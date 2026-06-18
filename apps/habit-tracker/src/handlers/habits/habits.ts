@@ -7,6 +7,7 @@ import { toLoggableError } from "mdm-util"
 
 import type { HabitSummary } from "./habits.types"
 
+import { logger } from "../../logger"
 import { scanHabitEntries } from "../habit-detail/habit-detail.files"
 import { calculateHabitScore } from "../habit-detail/habit-detail.util"
 
@@ -57,10 +58,10 @@ export const habitsHandler: RequestHandler = async (_request, response) => {
       response.status(500).json({ error: error.message })
       return
     }
-    console.error("Unable to load habits", {
-      error: toLoggableError(error),
-      notesConfig: notesConfig ?? null,
-    })
+    logger.error(
+      { error: toLoggableError(error), notesConfig: notesConfig ?? null },
+      "Unable to load habits",
+    )
     response.status(500).json({ error: "Unable to load habits" })
   }
 }
