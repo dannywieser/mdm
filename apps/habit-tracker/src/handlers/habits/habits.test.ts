@@ -1,4 +1,4 @@
-import { AppConfigError, resolveNotesConfig } from "app-config"
+import { resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 
 import type { HabitEntry } from "../habit-detail/habit-detail.types"
@@ -8,7 +8,6 @@ import { scanHabitEntries } from "../habit-detail/habit-detail.files"
 import { habitsHandler } from "./habits"
 
 vi.mock("app-config", () => ({
-  AppConfigError: class AppConfigError extends Error {},
   resolveNotesConfig: vi.fn(),
 }))
 
@@ -128,16 +127,6 @@ describe("habitsHandler", () => {
 
     expect(status).toHaveBeenCalledWith(200)
     expect(json).toHaveBeenCalledWith([])
-  })
-
-  test("returns 500 with config error message on AppConfigError", async () => {
-    vi.mocked(resolveNotesConfig).mockRejectedValue(new AppConfigError("app.config.json is required"))
-
-    const { response, status, json } = makeResponse()
-    await habitsHandler({} as never, response, vi.fn())
-
-    expect(status).toHaveBeenCalledWith(500)
-    expect(json).toHaveBeenCalledWith({ error: "app.config.json is required" })
   })
 
   test("returns generic 500 on unexpected error", async () => {

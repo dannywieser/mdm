@@ -1,4 +1,4 @@
-import { AppConfigError, readAppConfigFile } from "app-config"
+import { readAppConfigFile } from "app-config"
 import { isNonEmptyString } from "mdm-util"
 
 import type { FlagDefinition } from "./handlers/flags/flags.types"
@@ -52,9 +52,7 @@ export const resolveFlagDefinitions = async (): Promise<
   try {
     parsedAppConfig = await readAppConfigFile()
   } catch (error) {
-    throw error instanceof AppConfigError
-      ? new FlagConfigError(error.message)
-      : error
+    throw new FlagConfigError(error instanceof Error ? error.message : "Unable to read app.config.json")
   }
 
   if (!parsedAppConfig || typeof parsedAppConfig !== "object") {

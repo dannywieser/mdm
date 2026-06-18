@@ -1,6 +1,5 @@
 import { promises as fs } from "node:fs"
 
-import { AppConfigError } from "./AppConfigError"
 import { readAppConfigFile } from "./readAppConfigFile"
 
 vi.mock("node:fs", () => ({
@@ -25,7 +24,7 @@ describe("readAppConfigFile", () => {
     readFileMock.mockRejectedValue(err)
 
     await expect(readAppConfigFile()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json is required. Copy app.config.example.json to app.config.json.",
       ),
     )
@@ -35,7 +34,7 @@ describe("readAppConfigFile", () => {
     readFileMock.mockRejectedValue(new Error("EACCES"))
 
     await expect(readAppConfigFile()).rejects.toEqual(
-      new AppConfigError("app.config.json must be readable"),
+      new Error("app.config.json must be readable"),
     )
   })
 
@@ -43,7 +42,7 @@ describe("readAppConfigFile", () => {
     readFileMock.mockResolvedValue("{broken")
 
     await expect(readAppConfigFile()).rejects.toEqual(
-      new AppConfigError("app.config.json must contain valid JSON"),
+      new Error("app.config.json must contain valid JSON"),
     )
   })
 })

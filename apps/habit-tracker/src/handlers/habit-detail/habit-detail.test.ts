@@ -1,4 +1,4 @@
-import { AppConfigError, resolveNotesConfig } from "app-config"
+import { resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 import { addDays } from "mdm-util"
 
@@ -24,7 +24,6 @@ import {
 } from "./habit-detail.util"
 
 vi.mock("app-config", () => ({
-  AppConfigError: class AppConfigError extends Error {},
   resolveNotesConfig: vi.fn(),
 }))
 
@@ -1297,16 +1296,6 @@ describe("habitDetailHandler", () => {
     const { response, json } = makeResponse()
     await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
     expect(getJsonResult(json).lowestDaysTrackedPerPeriod).toBeUndefined()
-  })
-
-  test("returns 500 with config error message on AppConfigError", async () => {
-    vi.mocked(resolveNotesConfig).mockRejectedValue(
-      new AppConfigError("app.config.json is required"),
-    )
-    const { response, status, json } = makeResponse()
-    await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
-    expect(status).toHaveBeenCalledWith(500)
-    expect(json).toHaveBeenCalledWith({ error: "app.config.json is required" })
   })
 
   test("returns generic 500 on unexpected error", async () => {

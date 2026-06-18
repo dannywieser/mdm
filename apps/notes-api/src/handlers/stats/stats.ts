@@ -1,7 +1,7 @@
 import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler } from "express"
 
-import { AppConfigError, resolveNotesConfig } from "app-config"
+import { resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 import path from "node:path"
@@ -59,11 +59,6 @@ export const statsHandler: RequestHandler = async (_request, response) => {
       trends: buildTrends(scannedNotes, now),
     })
   } catch (error) {
-    if (error instanceof AppConfigError) {
-      response.status(500).json({ error: error.message })
-      return
-    }
-
     logger.error(
       { error: toLoggableError(error), notesConfig: notesConfig ?? null },
       "Unable to load stats",

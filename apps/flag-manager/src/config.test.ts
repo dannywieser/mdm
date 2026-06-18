@@ -1,10 +1,9 @@
-import { AppConfigError, readAppConfigFile } from "app-config"
+import { readAppConfigFile } from "app-config"
 import { isNonEmptyString } from "mdm-util"
 
 import { FlagConfigError, resolveFlagDefinitions } from "./config"
 
 vi.mock("app-config", () => ({
-  AppConfigError: class AppConfigError extends Error {},
   readAppConfigFile: vi.fn(),
 }))
 
@@ -69,7 +68,7 @@ describe("flag-manager config", () => {
 
   test("wraps app config errors as flag config errors", async () => {
     readAppConfigFileMock.mockRejectedValue(
-      new AppConfigError("app.config.json must be readable"),
+      new Error("app.config.json must be readable"),
     )
 
     await expect(resolveFlagDefinitions()).rejects.toEqual(

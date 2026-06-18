@@ -1,4 +1,4 @@
-import { AppConfigError, resolveNotesConfig } from "app-config"
+import { resolveNotesConfig } from "app-config"
 import express from "express"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
@@ -165,19 +165,6 @@ describe("stats handler interface", () => {
       mockConfig.timezone,
     )
     expect(countFilesRecursiveMock).toHaveBeenCalledWith("/notes/attachments")
-  })
-
-  test("returns a 500 with the config error message when config resolution fails", async () => {
-    resolveNotesConfigMock.mockRejectedValue(
-      new AppConfigError("app.config.json is required."),
-    )
-    const app = express()
-    app.get("/stats", statsHandler)
-
-    const response = await request(app).get("/stats")
-
-    expect(response.status).toBe(500)
-    expect(response.body).toEqual({ error: "app.config.json is required." })
   })
 
   test("returns a generic 500 for unexpected errors", async () => {

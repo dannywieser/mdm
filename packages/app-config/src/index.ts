@@ -15,7 +15,6 @@ import type {
   ResolvedNotesConfig,
 } from "./types"
 
-import { AppConfigError } from "./AppConfigError"
 import { readAppConfigFile } from "./readAppConfigFile"
 
 export type {
@@ -31,7 +30,6 @@ export type {
   ViewFilter,
 } from "./types"
 
-export { AppConfigError } from "./AppConfigError"
 export { readAppConfigFile } from "./readAppConfigFile"
 
 let cachedNotesConfig: ResolvedNotesConfig | undefined
@@ -135,7 +133,7 @@ const DEFAULT_HOME_STATS_SHOW: HomeStatsShowConfig = {
 
 const assertOptionalString = (value: unknown, field: string): void => {
   if (value !== undefined && !isNonEmptyString(value)) {
-    throw new AppConfigError(`app.config.json ${field} must be a non-empty string`)
+    throw new Error(`app.config.json ${field} must be a non-empty string`)
   }
 }
 
@@ -143,38 +141,38 @@ const validateParsedConfig = (parsedConfig: Record<string, unknown>): void => {
   const { obsidianVault, attachmentsDirectory, dateFormats, timezone, views, createdDateProperty, deriveTitleDate, homeStats, habits } = parsedConfig
 
   if (!isNonEmptyString(obsidianVault)) {
-    throw new AppConfigError("app.config.json requires a non-empty obsidianVault value")
+    throw new Error("app.config.json requires a non-empty obsidianVault value")
   }
 
   assertOptionalString(attachmentsDirectory, "attachmentsDirectory")
   assertOptionalString(createdDateProperty, "createdDateProperty")
 
   if (dateFormats !== undefined && !isStringArray(dateFormats)) {
-    throw new AppConfigError("app.config.json dateFormats must be an array of non-empty strings")
+    throw new Error("app.config.json dateFormats must be an array of non-empty strings")
   }
 
   if (timezone !== undefined && (!isNonEmptyString(timezone) || !isValidTimezone(timezone))) {
-    throw new AppConfigError("app.config.json timezone must be a valid IANA timezone identifier")
+    throw new Error("app.config.json timezone must be a valid IANA timezone identifier")
   }
 
   if (views !== undefined && (!Array.isArray(views) || !views.every(isAppConfigView))) {
-    throw new AppConfigError(
+    throw new Error(
       "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges/group, and filters as string records or $exclude objects",
     )
   }
 
   if (deriveTitleDate !== undefined && typeof deriveTitleDate !== "boolean") {
-    throw new AppConfigError("app.config.json deriveTitleDate must be a boolean")
+    throw new Error("app.config.json deriveTitleDate must be a boolean")
   }
 
   if (homeStats !== undefined && !isHomeStatsConfig(homeStats)) {
-    throw new AppConfigError(
+    throw new Error(
       "app.config.json homeStats.show must be an object with boolean values for each display section",
     )
   }
 
   if (habits !== undefined && (!Array.isArray(habits) || !habits.every(isHabitConfig))) {
-    throw new AppConfigError(
+    throw new Error(
       "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), a positive integer trackingWindowDays, and an optional positive targetScore",
     )
   }
@@ -182,7 +180,7 @@ const validateParsedConfig = (parsedConfig: Record<string, unknown>): void => {
 
 const validateAppConfig = (appConfig: unknown): AppConfig => {
   if (!appConfig || typeof appConfig !== "object") {
-    throw new AppConfigError("app.config.json must be a JSON object")
+    throw new Error("app.config.json must be a JSON object")
   }
 
   const parsedConfig = appConfig as Record<string, unknown>
@@ -215,7 +213,7 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
   const noteRootDirectory = process.env.NOTES_ROOT?.trim()
 
   if (!isNonEmptyString(noteRootDirectory)) {
-    throw new AppConfigError(
+    throw new Error(
       "NOTES_ROOT environment variable is required",
     )
   }

@@ -8,7 +8,6 @@ import { promises as fs } from "node:fs"
 import path from "node:path"
 
 import {
-  AppConfigError,
   clearConfigCache,
   resolveNotesConfig,
   resolveNotesDirectory,
@@ -280,7 +279,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesConfig()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json homeStats.show must be an object with boolean values for each display section",
       ),
     )
@@ -295,7 +294,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesConfig()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json homeStats.show must be an object with boolean values for each display section",
       ),
     )
@@ -325,7 +324,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesConfig()).rejects.toEqual(
-      new AppConfigError("app.config.json createdDateProperty must be a non-empty string"),
+      new Error("app.config.json createdDateProperty must be a non-empty string"),
     )
   })
 
@@ -353,7 +352,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesConfig()).rejects.toEqual(
-      new AppConfigError("app.config.json deriveTitleDate must be a boolean"),
+      new Error("app.config.json deriveTitleDate must be a boolean"),
     )
   })
 
@@ -391,7 +390,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesConfig()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json attachmentsDirectory must be a non-empty string",
       ),
     )
@@ -431,7 +430,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesConfig()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json timezone must be a valid IANA timezone identifier",
       ),
     )
@@ -442,7 +441,7 @@ describe("config", () => {
     readFileMock.mockRejectedValue(err)
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json is required. Copy app.config.example.json to app.config.json.",
       ),
     )
@@ -452,7 +451,7 @@ describe("config", () => {
     readFileMock.mockResolvedValue("{broken")
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError("app.config.json must contain valid JSON"),
+      new Error("app.config.json must contain valid JSON"),
     )
   })
 
@@ -460,7 +459,7 @@ describe("config", () => {
     readFileMock.mockRejectedValue(new Error("EACCES"))
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError("app.config.json must be readable"),
+      new Error("app.config.json must be readable"),
     )
   })
 
@@ -468,7 +467,7 @@ describe("config", () => {
     readFileMock.mockResolvedValue(JSON.stringify({}))
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json requires a non-empty obsidianVault value",
       ),
     )
@@ -483,7 +482,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json dateFormats must be an array of non-empty strings",
       ),
     )
@@ -504,7 +503,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges/group, and filters as string records or $exclude objects",
       ),
     )
@@ -527,7 +526,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges/group, and filters as string records or $exclude objects",
       ),
     )
@@ -549,7 +548,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges/group, and filters as string records or $exclude objects",
       ),
     )
@@ -572,7 +571,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges/group, and filters as string records or $exclude objects",
       ),
     )
@@ -587,7 +586,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError("NOTES_ROOT environment variable is required"),
+      new Error("NOTES_ROOT environment variable is required"),
     )
   })
 
@@ -665,7 +664,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), a positive integer trackingWindowDays, and an optional positive targetScore",
       ),
     )
@@ -688,7 +687,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), a positive integer trackingWindowDays, and an optional positive targetScore",
       ),
     )
@@ -711,7 +710,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), a positive integer trackingWindowDays, and an optional positive targetScore",
       ),
     )
@@ -735,7 +734,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesDirectory()).rejects.toEqual(
-      new AppConfigError(
+      new Error(
         "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), a positive integer trackingWindowDays, and an optional positive targetScore",
       ),
     )
