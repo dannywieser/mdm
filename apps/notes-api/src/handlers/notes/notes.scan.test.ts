@@ -226,6 +226,29 @@ This is a note.`)
     )
   })
 
+  test("scanMarkdownFile passes through cover path that already has directory components", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "",
+      frontmatter: {
+        cover: "attachments/downtime/The Rogue Prince of Persia/attach-20260503144843356.jpg",
+      },
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile(
+      "/notes/downtime/the-rogue-prince-of-persia.md",
+      "/notes",
+      "vault",
+    )
+
+    expect(note.frontmatter?.cover).toBe(
+      "attachments/downtime/The Rogue Prince of Persia/attach-20260503144843356.jpg",
+    )
+  })
+
   test("scanMarkdownFile leaves external url in cover frontmatter unchanged", async () => {
     readFileMock.mockResolvedValue("")
     parseFrontMatterMock.mockReturnValue({

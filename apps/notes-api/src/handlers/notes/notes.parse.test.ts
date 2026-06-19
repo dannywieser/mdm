@@ -199,6 +199,27 @@ describe("notes parse helpers", () => {
     expect(image.url).toBe("/images?path=daily%2Fassets%2Fhome%20page.png")
   })
 
+  test("parseMarkdownFile passes through markdown image url that already has directory components", async () => {
+    readFileMock.mockResolvedValue("![Cover](attachments/daily/journal/cover.jpg)")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![Cover](attachments/daily/journal/cover.jpg)",
+      frontmatter: null,
+    })
+
+    const note = await parseMarkdownFile(
+      createScannedNote({
+        basename: "journal.md",
+        folder: "daily",
+        fullPath: "/notes/daily/journal.md",
+        title: "journal",
+      }),
+      "/notes",
+    )
+
+    const image = findNodesByType(note.content, "image")[0]
+    expect(image.url).toBe("/images?path=attachments%2Fdaily%2Fjournal%2Fcover.jpg")
+  })
+
   test("parseMarkdownFile keeps external markdown image urls unchanged", async () => {
     readFileMock.mockResolvedValue("![Screenshot](https://example.com/image.png)")
     parseFrontMatterMock.mockReturnValue({

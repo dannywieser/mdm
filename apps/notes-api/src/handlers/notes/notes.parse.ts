@@ -178,6 +178,16 @@ const replaceWikilinkPlaceholdersInNode = (
   return parts
 }
 
+const resolveMultiComponentImagePath = (decodedImagePath: string, noteRelativePath: string): string => {
+  if (decodedImagePath.startsWith("/")) {
+    return decodedImagePath.replace(/^\/+/, "")
+  }
+  if (decodedImagePath.startsWith("./") || decodedImagePath.startsWith("../")) {
+    return path.posix.join(path.posix.dirname(noteRelativePath), decodedImagePath)
+  }
+  return decodedImagePath
+}
+
 const resolveLocalImagePath = (
   rawImagePath: string,
   noteRelativePath: string,
@@ -207,11 +217,8 @@ const resolveLocalImagePath = (
     return attachmentSubPath
   }
 
-  const normalizedImagePath = path.posix.normalize(
-    decodedImagePath.startsWith("/")
-      ? decodedImagePath.replace(/^\/+/, "")
-      : path.posix.join(path.posix.dirname(noteRelativePath), decodedImagePath),
-  )
+  const resolvedImagePath = resolveMultiComponentImagePath(decodedImagePath, noteRelativePath)
+  const normalizedImagePath = path.posix.normalize(resolvedImagePath)
 
   if (
     normalizedImagePath === "" ||
