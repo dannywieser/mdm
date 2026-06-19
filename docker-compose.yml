@@ -22,6 +22,7 @@ services:
       context: .
       dockerfile: infra/docker/notes-api.Dockerfile
     environment:
+      APP_CONFIG_PATH: "/app/app.config.json"
       PORT: "3000"
       NOTES_ROOT: "/data/notes"
     expose:
@@ -52,6 +53,7 @@ services:
     depends_on:
       - redis
     environment:
+      APP_CONFIG_PATH: "/app/app.config.json"
       PORT: "3001"
       REDIS_URL: "redis://redis:6379"
     expose:
@@ -79,6 +81,7 @@ services:
       context: .
       dockerfile: infra/docker/habit-tracker.Dockerfile
     environment:
+      APP_CONFIG_PATH: "/app/app.config.json"
       PORT: "3003"
       NOTES_ROOT: "/data/notes"
     expose:
@@ -110,6 +113,7 @@ services:
       - imgproxy
       - redis
     environment:
+      APP_CONFIG_PATH: "/app/app.config.json"
       PORT: "3002"
       IMGPROXY_PATH_PREFIX: "/imgproxy"
       IMAGES_ROOT: "/data/images"
