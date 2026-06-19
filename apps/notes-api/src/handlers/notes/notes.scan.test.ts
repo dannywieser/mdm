@@ -38,20 +38,19 @@ describe("resolveCreatedDate", () => {
   test("returns the resolved date as an ISO string", () => {
     resolveDateFromFrontmatterOrTitleMock.mockReturnValueOnce(new Date("2025-06-15T00:00:00.000Z"))
     expect(
-      resolveCreatedDate({ created: "2025.06.15" }, "", "created", false, ["YYYY.MM.DD"]),
+      resolveCreatedDate({ created: "2025.06.15" }, "", "created", ["YYYY.MM.DD"]),
     ).toBe("2025-06-15T00:00:00.000Z")
     expect(resolveDateFromFrontmatterOrTitleMock).toHaveBeenCalledWith(
       { created: "2025.06.15" },
       "",
       "created",
-      false,
       ["YYYY.MM.DD"],
     )
   })
 
   test("returns null when no date can be resolved", () => {
     resolveDateFromFrontmatterOrTitleMock.mockReturnValueOnce(null)
-    expect(resolveCreatedDate(null, "", "created", false, [])).toBeNull()
+    expect(resolveCreatedDate(null, "", "created", [])).toBeNull()
   })
 })
 
@@ -222,7 +221,6 @@ This is a note.`)
       "vault",
       [],
       "created",
-      false,
       "attachments",
     )
 
@@ -249,7 +247,6 @@ This is a note.`)
       "vault",
       [],
       "created",
-      false,
       "attachments",
     )
 

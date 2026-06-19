@@ -10,11 +10,10 @@ const resolveNoteDate = (
   frontmatter: Record<string, string | string[]> | null,
   basename: string,
   createdDateProperty: string,
-  deriveTitleDate: boolean,
   dateFormats: readonly string[],
 ): string | null => {
   const title = basename.replace(/\.[^.]+$/, "")
-  const date = resolveDateFromFrontmatterOrTitle(frontmatter, title, createdDateProperty, deriveTitleDate, dateFormats)
+  const date = resolveDateFromFrontmatterOrTitle(frontmatter, title, createdDateProperty, dateFormats)
   return date ? date.toISOString().slice(0, 10) : null
 }
 
@@ -22,7 +21,6 @@ export const scanHabitEntries = async (
   filePaths: string[],
   frontmatterProperty: string,
   createdDateProperty: string,
-  deriveTitleDate: boolean,
   dateFormats: readonly string[],
   notesDirectory: string,
   obsidianVault: string,
@@ -56,14 +54,12 @@ export const scanHabitEntries = async (
         frontmatter,
         basename,
         createdDateProperty,
-        deriveTitleDate,
         dateFormats,
       )
       if (!date) {
         logger.debug({
           basename,
           createdDateProperty,
-          deriveTitleDate,
           frontmatterCreatedValue: frontmatter[createdDateProperty],
         }, "[habit] skipping: unable to resolve a note date")
         return null

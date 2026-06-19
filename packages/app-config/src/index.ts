@@ -44,7 +44,6 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
       ? rawConfig.createdDateProperty
       : "created",
     dateFormats: appConfig.dateFormats ?? [],
-    deriveTitleDate: appConfig.deriveTitleDate ?? false,
     habits: appConfig.habits ?? [],
     notesDirectory: path.resolve(noteRootDirectory),
     obsidianVault: appConfig.obsidianVault,

@@ -105,7 +105,6 @@ describe("config", () => {
       attachmentsDirectory: "attachments",
       createdDateProperty: "created",
       dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
-      deriveTitleDate: false,
       habits: [],
       notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
@@ -144,7 +143,6 @@ describe("config", () => {
       attachmentsDirectory: "attachments",
       createdDateProperty: "created",
       dateFormats: [],
-      deriveTitleDate: false,
       habits: [],
       notesDirectory: path.resolve("/notes-root"),
       obsidianVault: "vault",
@@ -191,24 +189,6 @@ describe("config", () => {
 
     await expect(resolveNotesConfig()).resolves.toMatchObject({
       attachmentsDirectory: "assets",
-    })
-  })
-
-  test("defaults deriveTitleDate to false when omitted", async () => {
-    mockReadFile.mockResolvedValue(JSON.stringify({ obsidianVault: "vault" }))
-
-    await expect(resolveNotesConfig()).resolves.toMatchObject({
-      deriveTitleDate: false,
-    })
-  })
-
-  test("uses configured deriveTitleDate when provided", async () => {
-    mockReadFile.mockResolvedValue(
-      JSON.stringify({ deriveTitleDate: true, obsidianVault: "vault" }),
-    )
-
-    await expect(resolveNotesConfig()).resolves.toMatchObject({
-      deriveTitleDate: true,
     })
   })
 

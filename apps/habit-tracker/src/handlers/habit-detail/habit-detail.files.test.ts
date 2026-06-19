@@ -34,7 +34,6 @@ describe("scanHabitEntries", () => {
       ["/notes/2026.05.31.md"],
       "drinking",
       "created",
-      false,
       DATE_FORMATS,
       "/notes",
       "vault",
@@ -56,7 +55,6 @@ describe("scanHabitEntries", () => {
       ["/notes/2026.05.13.md"],
       "drinking",
       "created",
-      false,
       DATE_FORMATS,
       "/notes",
       "vault",
@@ -71,7 +69,7 @@ describe("scanHabitEntries", () => {
     readFileMock.mockResolvedValue("body only")
     parseFrontMatterMock.mockReturnValue({ body: "body only", frontmatter: null })
 
-    const entries = await scanHabitEntries(["/notes/no-frontmatter.md"], "drinking", "created", false, DATE_FORMATS, "/notes", "vault")
+    const entries = await scanHabitEntries(["/notes/no-frontmatter.md"], "drinking", "created", DATE_FORMATS, "/notes", "vault")
 
     expect(entries).toEqual([])
   })
@@ -83,7 +81,7 @@ describe("scanHabitEntries", () => {
       frontmatter: { topic: "drinking" },
     })
 
-    const entries = await scanHabitEntries(["/notes/missing-property.md"], "drinking", "created", false, DATE_FORMATS, "/notes", "vault")
+    const entries = await scanHabitEntries(["/notes/missing-property.md"], "drinking", "created", DATE_FORMATS, "/notes", "vault")
 
     expect(entries).toEqual([])
   })
@@ -95,24 +93,24 @@ describe("scanHabitEntries", () => {
       frontmatter: { created: "2026.05.31", drinking: '"15"' },
     })
 
-    const entries = await scanHabitEntries(["/notes/out-of-range.md"], "drinking", "created", false, DATE_FORMATS, "/notes", "vault")
+    const entries = await scanHabitEntries(["/notes/out-of-range.md"], "drinking", "created", DATE_FORMATS, "/notes", "vault")
 
     expect(entries).toEqual([])
   })
 
-  test("skips notes whose date cannot be resolved", async () => {
+  test("skips notes whose date cannot be resolved from frontmatter or title", async () => {
     readFileMock.mockResolvedValue("---\ndrinking: \"3\"\n---\nbody")
     parseFrontMatterMock.mockReturnValue({
       body: "body",
       frontmatter: { drinking: '"3"' },
     })
 
-    const entries = await scanHabitEntries(["/notes/no-date.md"], "drinking", "created", false, DATE_FORMATS, "/notes", "vault")
+    const entries = await scanHabitEntries(["/notes/no-date.md"], "drinking", "created", DATE_FORMATS, "/notes", "vault")
 
     expect(entries).toEqual([])
   })
 
-  test("derives the date from the title when deriveTitleDate is enabled and frontmatter has no usable date", async () => {
+  test("derives the date from the title when frontmatter has no usable date", async () => {
     readFileMock.mockResolvedValue("---\ndrinking: \"3\"\n---\nbody")
     parseFrontMatterMock.mockReturnValue({
       body: "body",
@@ -123,7 +121,6 @@ describe("scanHabitEntries", () => {
       ["/notes/2026.05.31 (Sun).md"],
       "drinking",
       "created",
-      true,
       DATE_FORMATS,
       "/notes",
       "vault",

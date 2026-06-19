@@ -15,7 +15,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { attachmentsDirectory, createdDateProperty, dateFormats, deriveTitleDate, notesDirectory, obsidianVault, timezone, views } =
+    const { attachmentsDirectory, createdDateProperty, dateFormats, notesDirectory, obsidianVault, timezone, views } =
       notesConfig
 
     logger.debug({ notesDirectory, obsidianVault, timezone }, "[notes] config resolved")
@@ -25,7 +25,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
 
     const scannedNotes = await Promise.all(
       markdownFiles.map((filePath) =>
-        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, createdDateProperty, deriveTitleDate, attachmentsDirectory),
+        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, createdDateProperty, attachmentsDirectory),
       ),
     )
     const requestedView =

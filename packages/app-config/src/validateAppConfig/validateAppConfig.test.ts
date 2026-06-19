@@ -14,7 +14,6 @@ describe("validateAppConfig", () => {
   test("returns validated config for minimal valid input", () => {
     expect(validateAppConfig(VALID_RAW)).toEqual({
       dateFormats: undefined,
-      deriveTitleDate: undefined,
       habits: [],
       obsidianVault: "vault",
       timezone: undefined,
@@ -94,23 +93,5 @@ describe("validateAppConfig", () => {
     ).toThrow(
       "app.config.json timezone must be a valid IANA timezone identifier",
     )
-  })
-
-  test("returns undefined deriveTitleDate when omitted", () => {
-    expect(validateAppConfig(VALID_RAW)).toMatchObject({
-      deriveTitleDate: undefined,
-    })
-  })
-
-  test("returns validated deriveTitleDate when provided", () => {
-    expect(
-      validateAppConfig({ ...VALID_RAW, deriveTitleDate: true }),
-    ).toMatchObject({ deriveTitleDate: true })
-  })
-
-  test("throws when deriveTitleDate is not a boolean", () => {
-    expect(() =>
-      validateAppConfig({ ...VALID_RAW, deriveTitleDate: "yes" }),
-    ).toThrow("app.config.json deriveTitleDate must be a boolean")
   })
 })

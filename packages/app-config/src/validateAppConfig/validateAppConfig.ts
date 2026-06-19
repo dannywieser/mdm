@@ -28,14 +28,6 @@ const validateTimezone = (value: unknown): string | undefined => {
   return value
 }
 
-const validateDeriveTitleDate = (value: unknown): boolean | undefined => {
-  if (value === undefined) return undefined
-  if (typeof value !== "boolean") {
-    throw new Error("app.config.json deriveTitleDate must be a boolean")
-  }
-  return value
-}
-
 export const validateAppConfig = (raw: unknown): AppConfig => {
   if (!raw || typeof raw !== "object") {
     throw new Error("app.config.json must be a JSON object")
@@ -46,9 +38,8 @@ export const validateAppConfig = (raw: unknown): AppConfig => {
   const obsidianVault = validateObsidianVault(config.obsidianVault)
   const dateFormats = validateDateFormats(config.dateFormats)
   const timezone = validateTimezone(config.timezone)
-  const deriveTitleDate = validateDeriveTitleDate(config.deriveTitleDate)
   const habits = validateHabits(config.habits)
   const views = validateViews(config.views)
 
-  return { dateFormats, deriveTitleDate, habits, obsidianVault, timezone, views }
+  return { dateFormats, habits, obsidianVault, timezone, views }
 }

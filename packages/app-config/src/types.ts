@@ -30,7 +30,6 @@ export interface ResolvedNotesConfig {
   attachmentsDirectory: string
   createdDateProperty: string
   dateFormats: string[]
-  deriveTitleDate: boolean
   habits: HabitConfig[]
   notesDirectory: string
   obsidianVault: string
@@ -40,7 +39,6 @@ export interface ResolvedNotesConfig {
 
 export interface AppConfig {
   dateFormats?: string[]
-  deriveTitleDate?: boolean
   habits?: HabitConfig[]
   obsidianVault: string
   timezone?: string

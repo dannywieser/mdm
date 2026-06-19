@@ -16,7 +16,7 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { createdDateProperty, dateFormats, deriveTitleDate, habits, notesDirectory, obsidianVault, timezone } =
+    const { createdDateProperty, dateFormats, habits, notesDirectory, obsidianVault, timezone } =
       notesConfig
 
     const habitId = String(request.params.id)
@@ -31,7 +31,6 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
 
     logger.debug({
       createdDateProperty,
-      deriveTitleDate,
       frontmatterProperty,
       habitId: id,
       mode,
@@ -46,7 +45,6 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
       filePaths,
       frontmatterProperty,
       createdDateProperty,
-      deriveTitleDate,
       dateFormats,
       notesDirectory,
       obsidianVault,

@@ -88,7 +88,6 @@ describe("notes handler interface", () => {
       attachmentsDirectory: "attachments",
       createdDateProperty: "created",
       dateFormats: ["YYYY.MM.DD"],
-      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -143,8 +142,8 @@ describe("notes handler interface", () => {
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(scanMarkdownFileMock.mock.calls).toEqual([
-      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"], "created", false, "attachments"],
-      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"], "created", false, "attachments"],
+      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"], "created", "attachments"],
+      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"], "created", "attachments"],
     ])
     expect(applyViewFilterMock).toHaveBeenCalledWith(
       scannedNotes,
@@ -189,7 +188,6 @@ describe("notes handler interface", () => {
       attachmentsDirectory: "attachments",
       createdDateProperty: "created",
       dateFormats: [],
-      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -256,7 +254,6 @@ describe("notes handler interface", () => {
       attachmentsDirectory: "attachments",
       createdDateProperty: "created",
       dateFormats: [],
-      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -287,7 +284,6 @@ describe("notes handler interface", () => {
       attachmentsDirectory: "attachments",
       createdDateProperty: "created",
       dateFormats: [],
-      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -328,7 +324,6 @@ describe("notes handler interface", () => {
       attachmentsDirectory: "attachments",
       createdDateProperty: "created",
       dateFormats: [],
-      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",

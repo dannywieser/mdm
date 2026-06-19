@@ -16,7 +16,7 @@ export const habitsHandler: RequestHandler = async (_request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { createdDateProperty, dateFormats, deriveTitleDate, habits, notesDirectory, obsidianVault, timezone } =
+    const { createdDateProperty, dateFormats, habits, notesDirectory, obsidianVault, timezone } =
       notesConfig
 
     const filePaths = await collectMarkdownFiles(notesDirectory)
@@ -28,7 +28,6 @@ export const habitsHandler: RequestHandler = async (_request, response) => {
           filePaths,
           frontmatterProperty,
           createdDateProperty,
-          deriveTitleDate,
           dateFormats,
           notesDirectory,
           obsidianVault,

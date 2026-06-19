@@ -15,10 +15,9 @@ export const resolveCreatedDate = (
   frontmatter: NoteFrontmatter | null,
   title: string,
   createdDateProperty: string,
-  deriveTitleDate: boolean,
   dateFormats: readonly string[],
 ): string | null => {
-  const date = resolveDateFromFrontmatterOrTitle(frontmatter, title, createdDateProperty, deriveTitleDate, dateFormats)
+  const date = resolveDateFromFrontmatterOrTitle(frontmatter, title, createdDateProperty, dateFormats)
   return date ? date.toISOString() : null
 }
 
@@ -36,7 +35,6 @@ export const scanMarkdownFile = async (
   obsidianVault: string,
   dateFormats: readonly string[] = [],
   createdDateProperty = "created",
-  deriveTitleDate = false,
   attachmentsDirectory = "attachments",
 ): Promise<ScannedNote> => {
   const [source, stats] = await Promise.all([
@@ -61,7 +59,7 @@ export const scanMarkdownFile = async (
   return {
     basename,
     titleOrBodyDates,
-    createdDate: resolveCreatedDate(frontmatter, title, createdDateProperty, deriveTitleDate, dateFormats),
+    createdDate: resolveCreatedDate(frontmatter, title, createdDateProperty, dateFormats),
     folder: path.relative(notesDirectory, path.dirname(filePath)).split(path.sep).join("/"),
     frontmatter: resolvedFrontmatter,
     fullPath: filePath,
