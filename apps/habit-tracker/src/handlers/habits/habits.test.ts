@@ -43,7 +43,7 @@ const BASE_CONFIG = {
   notesDirectory: "/notes",
   obsidianVault: "vault",
   timezone: "UTC",
-  attachmentsDirectory: "attachments",
+  attachmentsDirectory: "/images",
   views: [],
 }
 

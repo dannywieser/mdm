@@ -219,39 +219,10 @@ This is a note.`)
       "/notes/games/citizen-sleeper-2.md",
       "/notes",
       "vault",
-      [],
-      "created",
-      "attachments",
     )
 
     expect(note.frontmatter?.cover).toBe(
-      "attachments/games/citizen-sleeper-2/attach-20260616070917164.png",
-    )
-  })
-
-  test("scanMarkdownFile leaves cover path unchanged when it already starts with the attachments directory", async () => {
-    readFileMock.mockResolvedValue("")
-    parseFrontMatterMock.mockReturnValue({
-      body: "",
-      frontmatter: {
-        cover: "attachments/downtime/The Rogue Prince of Persia/attach-20260503144843356.jpg",
-      },
-    })
-    parseMarkdownBodyDatesMock.mockReturnValue([])
-    createFileIDMock.mockReturnValue("some-id")
-    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
-
-    const note = await scanMarkdownFile(
-      "/notes/downtime/the-rogue-prince-of-persia.md",
-      "/notes",
-      "vault",
-      [],
-      "created",
-      "attachments",
-    )
-
-    expect(note.frontmatter?.cover).toBe(
-      "attachments/downtime/The Rogue Prince of Persia/attach-20260503144843356.jpg",
+      "games/citizen-sleeper-2/attach-20260616070917164.png",
     )
   })
 

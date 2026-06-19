@@ -26,6 +26,7 @@ describe("config", () => {
     vi.resetModules()
     ;({ resolveNotesConfig } = await import("./index"))
     process.env.NOTES_ROOT = "/notes-root"
+    process.env.IMAGES_ROOT = "/images-root"
 
     mockIsNonEmptyString.mockImplementation(
       (value): value is string =>
@@ -102,7 +103,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesConfig()).resolves.toEqual({
-      attachmentsDirectory: "attachments",
+      attachmentsDirectory: "/images-root",
       createdDateProperty: "created",
       dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
       habits: [],
@@ -140,7 +141,7 @@ describe("config", () => {
     )
 
     await expect(resolveNotesConfig()).resolves.toEqual({
-      attachmentsDirectory: "attachments",
+      attachmentsDirectory: "/images-root",
       createdDateProperty: "created",
       dateFormats: [],
       habits: [],
@@ -169,26 +170,11 @@ describe("config", () => {
     })
   })
 
-  test("defaults attachmentsDirectory to attachments when omitted", async () => {
-    mockReadFile.mockResolvedValue(
-      JSON.stringify({ obsidianVault: "vault" }),
-    )
+  test("resolves attachmentsDirectory from IMAGES_ROOT env var", async () => {
+    mockReadFile.mockResolvedValue(JSON.stringify({ obsidianVault: "vault" }))
 
     await expect(resolveNotesConfig()).resolves.toMatchObject({
-      attachmentsDirectory: "attachments",
-    })
-  })
-
-  test("uses configured attachmentsDirectory when provided", async () => {
-    mockReadFile.mockResolvedValue(
-      JSON.stringify({
-        attachmentsDirectory: "assets",
-        obsidianVault: "vault",
-      }),
-    )
-
-    await expect(resolveNotesConfig()).resolves.toMatchObject({
-      attachmentsDirectory: "assets",
+      attachmentsDirectory: "/images-root",
     })
   })
 

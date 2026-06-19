@@ -37,9 +37,7 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
   }
 
   cachedNotesConfig = {
-    attachmentsDirectory: isNonEmptyString(rawConfig.attachmentsDirectory)
-      ? rawConfig.attachmentsDirectory
-      : "attachments",
+    attachmentsDirectory: process.env.IMAGES_ROOT?.trim() ?? "",
     createdDateProperty: isNonEmptyString(rawConfig.createdDateProperty)
       ? rawConfig.createdDateProperty
       : "created",
