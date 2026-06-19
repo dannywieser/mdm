@@ -1,5 +1,4 @@
 {
-  "attachmentsDirectory": "attachments",
   "dateFormats": ["YYYY.MM.DD", "YY/MM/DD"],
   "obsidianVault": "vault-name",
   "timezone": "America/Edmonton",

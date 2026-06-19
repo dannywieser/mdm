@@ -1,4 +1,4 @@
-import { AppConfigError, resolveNotesConfig } from "app-config"
+import { resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 import { addDays } from "mdm-util"
 
@@ -24,7 +24,6 @@ import {
 } from "./habit-detail.util"
 
 vi.mock("app-config", () => ({
-  AppConfigError: class AppConfigError extends Error {},
   resolveNotesConfig: vi.fn(),
 }))
 
@@ -83,8 +82,7 @@ const BASE_CONFIG = {
   notesDirectory: "/notes",
   obsidianVault: "vault",
   timezone: "UTC",
-  attachmentsDirectory: "attachments",
-  homeStats: { show: {} },
+  attachmentsDirectory: "/images",
   views: [],
 }
 
@@ -1189,7 +1187,7 @@ describe("habitDetailHandler", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date("2025-01-03T12:00:00Z"))
-    vi.mocked(resolveNotesConfig).mockResolvedValue(mockConfig as never)
+    vi.mocked(resolveNotesConfig).mockResolvedValue(mockConfig)
     vi.mocked(collectMarkdownFiles).mockResolvedValue([])
     vi.mocked(scanHabitEntries).mockResolvedValue(mockEntries)
   })
@@ -1297,16 +1295,6 @@ describe("habitDetailHandler", () => {
     const { response, json } = makeResponse()
     await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
     expect(getJsonResult(json).lowestDaysTrackedPerPeriod).toBeUndefined()
-  })
-
-  test("returns 500 with config error message on AppConfigError", async () => {
-    vi.mocked(resolveNotesConfig).mockRejectedValue(
-      new AppConfigError("app.config.json is required"),
-    )
-    const { response, status, json } = makeResponse()
-    await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
-    expect(status).toHaveBeenCalledWith(500)
-    expect(json).toHaveBeenCalledWith({ error: "app.config.json is required" })
   })
 
   test("returns generic 500 on unexpected error", async () => {

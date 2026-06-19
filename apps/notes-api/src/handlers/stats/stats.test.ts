@@ -1,4 +1,4 @@
-import { AppConfigError, resolveNotesConfig } from "app-config"
+import { resolveNotesConfig } from "app-config"
 import express from "express"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
@@ -68,26 +68,11 @@ const countFoldersMock = vi.mocked(countFolders)
 const countModifiedTodayMock = vi.mocked(countModifiedToday)
 const countNotesWithoutCreatedDateMock = vi.mocked(countNotesWithoutCreatedDate)
 
-const mockHomeStats = {
-  show: {
-    folderBreakdown: true,
-    modifiedToday: true,
-    notesCreated: true,
-    notesPerDay: true,
-    notesWithoutCreatedDate: true,
-    totalAttachments: true,
-    totalFolders: true,
-    totalNotes: true,
-    trends: true,
-  },
-}
-
 const mockConfig = {
-  attachmentsDirectory: "attachments",
+  attachmentsDirectory: "/images",
   createdDateProperty: "created",
   dateFormats: ["YYYY.MM.DD"],
   deriveTitleDate: false,
-  homeStats: mockHomeStats,
   notesDirectory: "/notes",
   obsidianVault: "vault",
   timezone: "UTC",
@@ -142,7 +127,6 @@ describe("stats handler interface", () => {
     expect(response.status).toBe(200)
     expect(response.body).toEqual({
       folderBreakdown: [{ count: 5, folder: "notes" }],
-      homeStats: mockHomeStats,
       modifiedToday: 1,
       notesCreated: { last30Days: 3, last365Days: 40, last90Days: 15 },
       notesPerDay: [{ count: 1, date: "2026-06-01" }],
@@ -164,20 +148,7 @@ describe("stats handler interface", () => {
       expect.any(Array),
       mockConfig.timezone,
     )
-    expect(countFilesRecursiveMock).toHaveBeenCalledWith("/notes/attachments")
-  })
-
-  test("returns a 500 with the config error message when config resolution fails", async () => {
-    resolveNotesConfigMock.mockRejectedValue(
-      new AppConfigError("app.config.json is required."),
-    )
-    const app = express()
-    app.get("/stats", statsHandler)
-
-    const response = await request(app).get("/stats")
-
-    expect(response.status).toBe(500)
-    expect(response.body).toEqual({ error: "app.config.json is required." })
+    expect(countFilesRecursiveMock).toHaveBeenCalledWith("/images")
   })
 
   test("returns a generic 500 for unexpected errors", async () => {

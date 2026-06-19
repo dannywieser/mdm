@@ -1,10 +1,9 @@
 import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler } from "express"
 
-import { AppConfigError, resolveNotesConfig } from "app-config"
+import { resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
-import path from "node:path"
 
 import { logger } from "../../logger"
 import { scanMarkdownFile } from "../notes/notes.scan"
@@ -28,8 +27,6 @@ export const statsHandler: RequestHandler = async (_request, response) => {
       attachmentsDirectory,
       createdDateProperty,
       dateFormats,
-      deriveTitleDate,
-      homeStats,
       notesDirectory,
       obsidianVault,
       timezone,
@@ -38,17 +35,15 @@ export const statsHandler: RequestHandler = async (_request, response) => {
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted((a, b) => a.localeCompare(b))
     const scannedNotes = await Promise.all(
       markdownFiles.map((filePath) =>
-        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, createdDateProperty, deriveTitleDate),
+        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, createdDateProperty),
       ),
     )
 
     const now = new Date()
-    const attachmentsPath = path.join(notesDirectory, attachmentsDirectory)
-    const totalAttachments = await countFilesRecursive(attachmentsPath)
+    const totalAttachments = await countFilesRecursive(attachmentsDirectory)
 
     response.status(200).json({
       folderBreakdown: buildFolderBreakdown(scannedNotes),
-      homeStats,
       modifiedToday: countModifiedToday(scannedNotes, timezone),
       notesCreated: buildNotesCreated(scannedNotes, now),
       notesPerDay: buildNotesPerDay(scannedNotes, timezone, now),
@@ -59,11 +54,6 @@ export const statsHandler: RequestHandler = async (_request, response) => {
       trends: buildTrends(scannedNotes, now),
     })
   } catch (error) {
-    if (error instanceof AppConfigError) {
-      response.status(500).json({ error: error.message })
-      return
-    }
-
     logger.error(
       { error: toLoggableError(error), notesConfig: notesConfig ?? null },
       "Unable to load stats",

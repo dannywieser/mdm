@@ -32,11 +32,6 @@ import {
 export function HomeStats({ staleTime }: Readonly<HomeStatsProps>) {
   const { t } = useI18n()
   const { data } = useStatsQuery({ staleTime })
-  const { homeStats } = data
-  const show = homeStats.show
-
-  const hasTopStats =
-    show.totalNotes || show.totalFolders || show.totalAttachments
 
   return (
     <VStack align="center" gap={6} pt={16} px={4} pb={16}>
@@ -50,103 +45,89 @@ export function HomeStats({ staleTime }: Readonly<HomeStatsProps>) {
         maxW="2xl"
       >
         <VStack align="stretch" gap={4}>
-          {hasTopStats && (
-            <SimpleGrid columns={3} gap={3}>
-              {show.totalNotes && (
-                <StatRoot size="sm">
-                  <StatLabel color="app.textMuted">
-                    {t("stats.totalNotes")}
-                  </StatLabel>
-                  <StatValueText>
-                    {data.totalNotes.toLocaleString()}
-                  </StatValueText>
-                </StatRoot>
-              )}
-              {show.totalFolders && (
-                <StatRoot size="sm">
-                  <StatLabel color="app.textMuted">
-                    {t("stats.folders")}
-                  </StatLabel>
-                  <StatValueText>
-                    {data.totalFolders.toLocaleString()}
-                  </StatValueText>
-                </StatRoot>
-              )}
-              {show.totalAttachments && (
-                <StatRoot size="sm">
-                  <StatLabel color="app.textMuted">
-                    {t("stats.attachments")}
-                  </StatLabel>
-                  <StatValueText>
-                    {data.totalAttachments.toLocaleString()}
-                  </StatValueText>
-                </StatRoot>
-              )}
-            </SimpleGrid>
-          )}
+          <SimpleGrid columns={3} gap={3}>
+            <StatRoot size="sm">
+              <StatLabel color="app.textMuted">
+                {t("stats.totalNotes")}
+              </StatLabel>
+              <StatValueText>
+                {data.totalNotes.toLocaleString()}
+              </StatValueText>
+            </StatRoot>
+            <StatRoot size="sm">
+              <StatLabel color="app.textMuted">
+                {t("stats.folders")}
+              </StatLabel>
+              <StatValueText>
+                {data.totalFolders.toLocaleString()}
+              </StatValueText>
+            </StatRoot>
+            <StatRoot size="sm">
+              <StatLabel color="app.textMuted">
+                {t("stats.attachments")}
+              </StatLabel>
+              <StatValueText>
+                {data.totalAttachments.toLocaleString()}
+              </StatValueText>
+            </StatRoot>
+          </SimpleGrid>
 
-          {show.modifiedToday && (
-            <Text fontSize="sm" color="app.textMuted">
-              {t("stats.modifiedToday")}{" "}
-              <Text as="span" fontWeight="semibold" color="app.text">
-                {data.modifiedToday}
+          <Text fontSize="sm" color="app.textMuted">
+            {t("stats.modifiedToday")}{" "}
+            <Text as="span" fontWeight="semibold" color="app.text">
+              {data.modifiedToday}
+            </Text>
+          </Text>
+
+          <Box>
+            <Text fontSize="xs" color="app.textMuted" mb={2}>
+              {t("stats.created")}
+            </Text>
+            <SimpleGrid columns={3} gap={3}>
+              <StatRoot size="sm">
+                <StatLabel color="app.textMuted">
+                  {t("stats.last30Days")}
+                </StatLabel>
+                <StatValueText>{data.notesCreated.last30Days}</StatValueText>
+              </StatRoot>
+              <StatRoot size="sm">
+                <StatLabel color="app.textMuted">
+                  {t("stats.last90Days")}
+                </StatLabel>
+                <StatValueText>{data.notesCreated.last90Days}</StatValueText>
+              </StatRoot>
+              <StatRoot size="sm">
+                <StatLabel color="app.textMuted">
+                  {t("stats.lastYear")}
+                </StatLabel>
+                <StatValueText>
+                  {data.notesCreated.last365Days}
+                </StatValueText>
+              </StatRoot>
+            </SimpleGrid>
+          </Box>
+
+          <Box>
+            <Text fontSize="xs" color="app.textMuted" mb={1}>
+              {t("stats.trend")}
+            </Text>
+            <Text fontSize="sm">
+              <Text
+                as="span"
+                fontWeight="semibold"
+                color={getChangeColor(data.trends.changePercent)}
+              >
+                {formatChangePercent(data.trends.changePercent)}
+              </Text>
+              <Text as="span" color="app.textMuted">
+                {" "}
+                ({data.trends.notesLast30Days} vs{" "}
+                {data.trends.notesPrevious30Days} notes)
               </Text>
             </Text>
-          )}
+          </Box>
 
-          {show.notesCreated && (
-            <Box>
-              <Text fontSize="xs" color="app.textMuted" mb={2}>
-                {t("stats.created")}
-              </Text>
-              <SimpleGrid columns={3} gap={3}>
-                <StatRoot size="sm">
-                  <StatLabel color="app.textMuted">
-                    {t("stats.last30Days")}
-                  </StatLabel>
-                  <StatValueText>{data.notesCreated.last30Days}</StatValueText>
-                </StatRoot>
-                <StatRoot size="sm">
-                  <StatLabel color="app.textMuted">
-                    {t("stats.last90Days")}
-                  </StatLabel>
-                  <StatValueText>{data.notesCreated.last90Days}</StatValueText>
-                </StatRoot>
-                <StatRoot size="sm">
-                  <StatLabel color="app.textMuted">
-                    {t("stats.lastYear")}
-                  </StatLabel>
-                  <StatValueText>
-                    {data.notesCreated.last365Days}
-                  </StatValueText>
-                </StatRoot>
-              </SimpleGrid>
-            </Box>
-          )}
-
-          {show.trends && (
-            <Box>
-              <Text fontSize="xs" color="app.textMuted" mb={1}>
-                {t("stats.trend")}
-              </Text>
-              <Text fontSize="sm">
-                <Text
-                  as="span"
-                  fontWeight="semibold"
-                  color={getChangeColor(data.trends.changePercent)}
-                >
-                  {formatChangePercent(data.trends.changePercent)}
-                </Text>
-                <Text as="span" color="app.textMuted">
-                  {" "}
-                  ({data.trends.notesLast30Days} vs{" "}
-                  {data.trends.notesPrevious30Days} notes)
-                </Text>
-              </Text>
-            </Box>
-          )}
-
-          {show.notesPerDay && data.notesPerDay.length > 0 && (
+          {data.notesPerDay.length > 0 && (
             <Box>
               <Text fontSize="xs" color="app.textMuted" mb={2}>
                 {t("stats.notesPerDay")}
@@ -211,7 +192,7 @@ export function HomeStats({ staleTime }: Readonly<HomeStatsProps>) {
             </Box>
           )}
 
-          {show.notesWithoutCreatedDate && data.notesWithoutCreatedDate > 0 && (
+          {data.notesWithoutCreatedDate > 0 && (
             <Text fontSize="sm" color="app.textMuted">
               {t("stats.missingCreatedDate")}{" "}
               <Text as="span" fontWeight="semibold" color="app.text">
@@ -220,7 +201,7 @@ export function HomeStats({ staleTime }: Readonly<HomeStatsProps>) {
             </Text>
           )}
 
-          {show.folderBreakdown && data.folderBreakdown.length > 0 && (
+          {data.folderBreakdown.length > 0 && (
             <Box>
               <Text fontSize="xs" color="app.textMuted" mb={2}>
                 {t("stats.byFolder")}

@@ -1,4 +1,4 @@
-import { AppConfigError, resolveNotesConfig } from "app-config"
+import { resolveNotesConfig } from "app-config"
 import express from "express"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
@@ -64,28 +64,6 @@ const parseMarkdownFileMock = vi.mocked(parseMarkdownFile)
 const scanMarkdownFileMock = vi.mocked(scanMarkdownFile)
 
 describe("notes handler interface", () => {
-  test("returns an error when notes directory config cannot be resolved", async () => {
-    resolveNotesConfigMock.mockRejectedValue(
-      new AppConfigError(
-        "app.config.json is required. Copy app.config.example.json to app.config.json.",
-      ),
-    )
-    const app = express()
-    app.get("/notes", notesHandler)
-
-    const response = await request(app).get("/notes")
-
-    expect(response.status).toBe(500)
-    expect(response.body).toEqual({
-      error:
-        "app.config.json is required. Copy app.config.example.json to app.config.json.",
-    })
-    expect(resolveNotesConfigMock).toHaveBeenCalled()
-    expect(applyViewFilterMock).not.toHaveBeenCalled()
-    expect(collectMarkdownFilesMock).not.toHaveBeenCalled()
-    expect(scanMarkdownFileMock).not.toHaveBeenCalled()
-    expect(parseMarkdownFileMock).not.toHaveBeenCalled()
-  })
 
   test("returns notes and only parses filtered notes after scanning", async () => {
     const scannedNotes = [
@@ -107,10 +85,9 @@ describe("notes handler interface", () => {
     ]
 
     resolveNotesConfigMock.mockResolvedValue({
-      attachmentsDirectory: "attachments",
+      attachmentsDirectory: "/images",
       createdDateProperty: "created",
       dateFormats: ["YYYY.MM.DD"],
-      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -165,8 +142,8 @@ describe("notes handler interface", () => {
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(scanMarkdownFileMock.mock.calls).toEqual([
-      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"], "created", false, "attachments"],
-      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"], "created", false, "attachments"],
+      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"], "created"],
+      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"], "created"],
     ])
     expect(applyViewFilterMock).toHaveBeenCalledWith(
       scannedNotes,
@@ -189,7 +166,6 @@ describe("notes handler interface", () => {
     expect(parseMarkdownFileMock).toHaveBeenCalledWith(
       scannedNotes[0],
       "/notes",
-      "attachments",
       scannedNotes,
     )
   })
@@ -208,10 +184,9 @@ describe("notes handler interface", () => {
     })
 
     resolveNotesConfigMock.mockResolvedValue({
-      attachmentsDirectory: "attachments",
+      attachmentsDirectory: "/images",
       createdDateProperty: "created",
       dateFormats: [],
-      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -275,10 +250,9 @@ describe("notes handler interface", () => {
     })
 
     resolveNotesConfigMock.mockResolvedValue({
-      attachmentsDirectory: "attachments",
+      attachmentsDirectory: "/images",
       createdDateProperty: "created",
       dateFormats: [],
-      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -306,10 +280,9 @@ describe("notes handler interface", () => {
 
   test("returns an error when util loading fails", async () => {
     resolveNotesConfigMock.mockResolvedValue({
-      attachmentsDirectory: "attachments",
+      attachmentsDirectory: "/images",
       createdDateProperty: "created",
       dateFormats: [],
-      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",
@@ -347,10 +320,9 @@ describe("notes handler interface", () => {
 
     expect(loggedContext.error.message).toBe("boom")
     expect(loggedContext.notesConfig).toEqual({
-      attachmentsDirectory: "attachments",
+      attachmentsDirectory: "/images",
       createdDateProperty: "created",
       dateFormats: [],
-      deriveTitleDate: false,
       notesDirectory: "/notes",
       obsidianVault: "vault",
       timezone: "UTC",

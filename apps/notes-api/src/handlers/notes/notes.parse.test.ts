@@ -48,7 +48,6 @@ describe("notes parse helpers", () => {
         title: "welcome",
       }),
       "/notes",
-      "attachments",
     )
 
     expect(note).toMatchObject({
@@ -81,12 +80,11 @@ describe("notes parse helpers", () => {
         title: "file-name",
       }),
       "/notes",
-      "attachments",
     )
 
     const image = findNodesByType(note.content, "image")[0]
     expect(image.url).toBe(
-      "/images?path=attachments%2Ffolder%2Ffile-name%2Fattach-20260525090751252.jpg",
+      "/images?path=folder%2Ffile-name%2Fattach-20260525090751252.jpg",
     )
   })
 
@@ -105,30 +103,10 @@ describe("notes parse helpers", () => {
         title: "root-note",
       }),
       "/notes",
-      "attachments",
     )
 
     const image = findNodesByType(note.content, "image")[0]
-    expect(image.url).toBe("/images?path=attachments%2Froot-note%2Fattach-123.jpg")
-  })
-
-  test("parseMarkdownFile uses configured attachmentsDirectory for bare-filename images", async () => {
-    readFileMock.mockResolvedValue("![](photo.png)")
-    parseFrontMatterMock.mockReturnValue({
-      body: "![](photo.png)",
-      frontmatter: null,
-    })
-
-    const note = await parseMarkdownFile(
-      createScannedNote({
-        fullPath: "/notes/topic/note.md",
-      }),
-      "/notes",
-      "assets",
-    )
-
-    const image = findNodesByType(note.content, "image")[0]
-    expect(image.url).toBe("/images?path=assets%2Ftopic%2Fnote%2Fphoto.png")
+    expect(image.url).toBe("/images?path=root-note%2Fattach-123.jpg")
   })
 
   test("parseMarkdownFile rewrites obsidian wikilink image embeds to attachment path", async () => {
@@ -146,12 +124,11 @@ describe("notes parse helpers", () => {
         title: "file-name",
       }),
       "/notes",
-      "attachments",
     )
 
     const image = findNodesByType(note.content, "image")[0]
     expect(image.url).toBe(
-      "/images?path=attachments%2Ffolder%2Ffile-name%2Fattach-20260523155741791.jpg",
+      "/images?path=folder%2Ffile-name%2Fattach-20260523155741791.jpg",
     )
   })
 
@@ -170,12 +147,11 @@ describe("notes parse helpers", () => {
         title: "root-note",
       }),
       "/notes",
-      "attachments",
     )
 
     const image = findNodesByType(note.content, "image")[0]
     expect(image.url).toBe(
-      "/images?path=attachments%2Froot-note%2Fattach-20260523155741791.jpg",
+      "/images?path=root-note%2Fattach-20260523155741791.jpg",
     )
   })
 
@@ -193,13 +169,12 @@ describe("notes parse helpers", () => {
         fullPath: "/notes/folder/note.md",
       }),
       "/notes",
-      "attachments",
     )
 
     const images = findNodesByType(note.content, "image")
     expect(images.map((image) => image.url ?? "").toSorted((a, b) => a.localeCompare(b))).toEqual([
-      "/images?path=attachments%2Ffolder%2Fnote%2Fphoto-a.jpg",
-      "/images?path=attachments%2Ffolder%2Fnote%2Fphoto-b.jpg",
+      "/images?path=folder%2Fnote%2Fphoto-a.jpg",
+      "/images?path=folder%2Fnote%2Fphoto-b.jpg",
     ])
   })
 
@@ -222,6 +197,27 @@ describe("notes parse helpers", () => {
 
     const image = findNodesByType(note.content, "image")[0]
     expect(image.url).toBe("/images?path=daily%2Fassets%2Fhome%20page.png")
+  })
+
+  test("parseMarkdownFile passes through markdown image url that already has directory components", async () => {
+    readFileMock.mockResolvedValue("![Cover](attachments/daily/journal/cover.jpg)")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![Cover](attachments/daily/journal/cover.jpg)",
+      frontmatter: null,
+    })
+
+    const note = await parseMarkdownFile(
+      createScannedNote({
+        basename: "journal.md",
+        folder: "daily",
+        fullPath: "/notes/daily/journal.md",
+        title: "journal",
+      }),
+      "/notes",
+    )
+
+    const image = findNodesByType(note.content, "image")[0]
+    expect(image.url).toBe("/images?path=attachments%2Fdaily%2Fjournal%2Fcover.jpg")
   })
 
   test("parseMarkdownFile keeps external markdown image urls unchanged", async () => {
@@ -255,7 +251,6 @@ describe("notes parse helpers", () => {
     const note = await parseMarkdownFile(
       createScannedNote({ fullPath: "/notes/topic/note.md" }),
       "/notes",
-      "attachments",
       [],
     )
 
@@ -284,7 +279,6 @@ describe("notes parse helpers", () => {
     const note = await parseMarkdownFile(
       createScannedNote({ fullPath: "/notes/topic/note.md" }),
       "/notes",
-      "attachments",
       [linkedScannedNote],
     )
 
@@ -322,7 +316,6 @@ describe("notes parse helpers", () => {
     const note = await parseMarkdownFile(
       createScannedNote({ fullPath: "/notes/topic/note.md" }),
       "/notes",
-      "attachments",
       [linkedScannedNote],
     )
 
@@ -351,7 +344,6 @@ describe("notes parse helpers", () => {
     const note = await parseMarkdownFile(
       createScannedNote({ fullPath: "/notes/topic/note.md" }),
       "/notes",
-      "attachments",
       [linkedScannedNote],
     )
 
@@ -386,7 +378,6 @@ describe("notes parse helpers", () => {
     const note = await parseMarkdownFile(
       createScannedNote({ fullPath: "/notes/topic/note.md" }),
       "/notes",
-      "attachments",
       [linkedNote, deepNote],
     )
 

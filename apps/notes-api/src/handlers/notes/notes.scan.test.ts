@@ -38,20 +38,19 @@ describe("resolveCreatedDate", () => {
   test("returns the resolved date as an ISO string", () => {
     resolveDateFromFrontmatterOrTitleMock.mockReturnValueOnce(new Date("2025-06-15T00:00:00.000Z"))
     expect(
-      resolveCreatedDate({ created: "2025.06.15" }, "", "created", false, ["YYYY.MM.DD"]),
+      resolveCreatedDate({ created: "2025.06.15" }, "", "created", ["YYYY.MM.DD"]),
     ).toBe("2025-06-15T00:00:00.000Z")
     expect(resolveDateFromFrontmatterOrTitleMock).toHaveBeenCalledWith(
       { created: "2025.06.15" },
       "",
       "created",
-      false,
       ["YYYY.MM.DD"],
     )
   })
 
   test("returns null when no date can be resolved", () => {
     resolveDateFromFrontmatterOrTitleMock.mockReturnValueOnce(null)
-    expect(resolveCreatedDate(null, "", "created", false, [])).toBeNull()
+    expect(resolveCreatedDate(null, "", "created", [])).toBeNull()
   })
 })
 
@@ -220,18 +219,14 @@ This is a note.`)
       "/notes/games/citizen-sleeper-2.md",
       "/notes",
       "vault",
-      [],
-      "created",
-      false,
-      "attachments",
     )
 
     expect(note.frontmatter?.cover).toBe(
-      "attachments/games/citizen-sleeper-2/attach-20260616070917164.png",
+      "games/citizen-sleeper-2/attach-20260616070917164.png",
     )
   })
 
-  test("scanMarkdownFile leaves cover path unchanged when it already starts with the attachments directory", async () => {
+  test("scanMarkdownFile passes through cover path that already has directory components", async () => {
     readFileMock.mockResolvedValue("")
     parseFrontMatterMock.mockReturnValue({
       body: "",
@@ -247,10 +242,6 @@ This is a note.`)
       "/notes/downtime/the-rogue-prince-of-persia.md",
       "/notes",
       "vault",
-      [],
-      "created",
-      false,
-      "attachments",
     )
 
     expect(note.frontmatter?.cover).toBe(

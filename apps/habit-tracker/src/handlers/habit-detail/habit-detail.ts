@@ -1,7 +1,7 @@
 import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler } from "express"
 
-import { AppConfigError, resolveNotesConfig } from "app-config"
+import { resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 
@@ -16,7 +16,7 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { createdDateProperty, dateFormats, deriveTitleDate, habits, notesDirectory, obsidianVault, timezone } =
+    const { createdDateProperty, dateFormats, habits, notesDirectory, obsidianVault, timezone } =
       notesConfig
 
     const habitId = String(request.params.id)
@@ -31,7 +31,6 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
 
     logger.debug({
       createdDateProperty,
-      deriveTitleDate,
       frontmatterProperty,
       habitId: id,
       mode,
@@ -46,7 +45,6 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
       filePaths,
       frontmatterProperty,
       createdDateProperty,
-      deriveTitleDate,
       dateFormats,
       notesDirectory,
       obsidianVault,
@@ -105,10 +103,6 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
 
     response.status(200).json(result)
   } catch (error) {
-    if (error instanceof AppConfigError) {
-      response.status(500).json({ error: error.message })
-      return
-    }
     logger.error(
       { error: toLoggableError(error), notesConfig: notesConfig ?? null },
       "Unable to load habit",

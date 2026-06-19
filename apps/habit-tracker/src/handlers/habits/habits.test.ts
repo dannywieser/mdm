@@ -1,4 +1,4 @@
-import { AppConfigError, resolveNotesConfig } from "app-config"
+import { resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 
 import type { HabitEntry } from "../habit-detail/habit-detail.types"
@@ -8,7 +8,6 @@ import { scanHabitEntries } from "../habit-detail/habit-detail.files"
 import { habitsHandler } from "./habits"
 
 vi.mock("app-config", () => ({
-  AppConfigError: class AppConfigError extends Error {},
   resolveNotesConfig: vi.fn(),
 }))
 
@@ -44,8 +43,7 @@ const BASE_CONFIG = {
   notesDirectory: "/notes",
   obsidianVault: "vault",
   timezone: "UTC",
-  attachmentsDirectory: "attachments",
-  homeStats: { show: {} },
+  attachmentsDirectory: "/images",
   views: [],
 }
 
@@ -81,7 +79,7 @@ describe("habitsHandler", () => {
     vi.mocked(resolveNotesConfig).mockResolvedValue({
       ...BASE_CONFIG,
       habits: [HABIT_DO_MORE, HABIT_DO_LESS],
-    } as never)
+    })
     vi.mocked(scanHabitEntries).mockImplementation((_paths, property) =>
       Promise.resolve(
         property === "exercise"
@@ -121,7 +119,7 @@ describe("habitsHandler", () => {
   })
 
   test("returns an empty array when no habits are configured", async () => {
-    vi.mocked(resolveNotesConfig).mockResolvedValue({ ...BASE_CONFIG, habits: [] } as never)
+    vi.mocked(resolveNotesConfig).mockResolvedValue({ ...BASE_CONFIG, habits: [] })
 
     const { response, status, json } = makeResponse()
     await habitsHandler({} as never, response, vi.fn())
@@ -130,18 +128,8 @@ describe("habitsHandler", () => {
     expect(json).toHaveBeenCalledWith([])
   })
 
-  test("returns 500 with config error message on AppConfigError", async () => {
-    vi.mocked(resolveNotesConfig).mockRejectedValue(new AppConfigError("app.config.json is required"))
-
-    const { response, status, json } = makeResponse()
-    await habitsHandler({} as never, response, vi.fn())
-
-    expect(status).toHaveBeenCalledWith(500)
-    expect(json).toHaveBeenCalledWith({ error: "app.config.json is required" })
-  })
-
   test("returns generic 500 on unexpected error", async () => {
-    vi.mocked(resolveNotesConfig).mockResolvedValue({ ...BASE_CONFIG, habits: [HABIT_DO_MORE] } as never)
+    vi.mocked(resolveNotesConfig).mockResolvedValue({ ...BASE_CONFIG, habits: [HABIT_DO_MORE] })
     vi.mocked(collectMarkdownFiles).mockRejectedValue(new Error("boom"))
 
     const { response, status, json } = makeResponse()

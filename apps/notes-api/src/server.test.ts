@@ -86,7 +86,7 @@ describe("notes-api server interface", () => {
 
   test("logs the resolved notes config on startup", async () => {
     resolveNotesConfigMock.mockResolvedValue({
-      attachmentsDirectory: "attachments",
+      attachmentsDirectory: "/images",
       dateFormats: ["YYYY.MM.DD"],
       notesDirectory: "/notes",
       obsidianVault: "vault",
@@ -99,7 +99,7 @@ describe("notes-api server interface", () => {
     expect(logger.info).toHaveBeenCalledWith(
       {
         notesConfig: {
-          attachmentsDirectory: "attachments",
+          attachmentsDirectory: "/images",
           dateFormats: ["YYYY.MM.DD"],
           notesDirectory: "/notes",
           obsidianVault: "vault",

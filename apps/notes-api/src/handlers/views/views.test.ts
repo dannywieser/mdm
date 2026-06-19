@@ -1,4 +1,4 @@
-import { AppConfigError, resolveNotesConfig } from "app-config"
+import { resolveNotesConfig } from "app-config"
 import express from "express"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
@@ -43,24 +43,11 @@ const scanMarkdownFileMock = vi.mocked(scanMarkdownFile)
 const buildViewsMock = vi.mocked(buildViews)
 
 const mockConfig = {
-  attachmentsDirectory: "attachments",
+  attachmentsDirectory: "/images",
   createdDateProperty: "created",
   dateFormats: ["YYYY.MM.DD"],
   deriveTitleDate: false,
   habits: [],
-  homeStats: {
-    show: {
-      folderBreakdown: true,
-      modifiedToday: true,
-      notesCreated: true,
-      notesPerDay: true,
-      notesWithoutCreatedDate: true,
-      totalAttachments: true,
-      totalFolders: true,
-      totalNotes: true,
-      trends: true,
-    },
-  },
   notesDirectory: "/notes",
   obsidianVault: "vault",
   timezone: "UTC",
@@ -137,19 +124,6 @@ describe("views handler interface", () => {
       dateFormats: mockConfig.dateFormats,
       timezone: mockConfig.timezone,
     })
-  })
-
-  test("returns a 500 with the config error message when config resolution fails", async () => {
-    resolveNotesConfigMock.mockRejectedValue(
-      new AppConfigError("app.config.json is required."),
-    )
-    const app = express()
-    app.get("/views", viewsHandler)
-
-    const response = await request(app).get("/views")
-
-    expect(response.status).toBe(500)
-    expect(response.body).toEqual({ error: "app.config.json is required." })
   })
 
   test("returns a generic 500 for unexpected errors", async () => {

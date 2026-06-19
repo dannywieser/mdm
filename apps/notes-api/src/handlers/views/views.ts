@@ -1,7 +1,7 @@
 import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler } from "express"
 
-import { AppConfigError, resolveNotesConfig } from "app-config"
+import { resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 
@@ -14,13 +14,13 @@ export const viewsHandler: RequestHandler = async (_request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { createdDateProperty, dateFormats, deriveTitleDate, notesDirectory, obsidianVault, timezone, views } =
+    const { createdDateProperty, dateFormats, notesDirectory, obsidianVault, timezone, views } =
       notesConfig
 
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted((a, b) => a.localeCompare(b))
     const scannedNotes = await Promise.all(
       markdownFiles.map((filePath) =>
-        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, createdDateProperty, deriveTitleDate),
+        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, createdDateProperty),
       ),
     )
 
@@ -30,11 +30,6 @@ export const viewsHandler: RequestHandler = async (_request, response) => {
       views: buildViews(scannedNotes, views, context),
     })
   } catch (error) {
-    if (error instanceof AppConfigError) {
-      response.status(500).json({ error: error.message })
-      return
-    }
-
     logger.error(
       { error: toLoggableError(error), notesConfig: notesConfig ?? null },
       "Unable to load views",
