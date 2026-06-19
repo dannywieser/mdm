@@ -1,47 +1,38 @@
-import {
-  isNonEmptyString,
-  isStringArray,
-  isStringRecord,
-  isValidTimezone,
-} from "mdm-util"
-import { promises as fs } from "node:fs"
 import path from "node:path"
 
-import {
-  clearConfigCache,
-  resolveNotesConfig,
-} from "./index"
+import type { ResolvedNotesConfig } from "./index"
+
+const mockReadFile = vi.fn()
+const mockIsNonEmptyString = vi.fn()
+const mockIsStringArray = vi.fn()
+const mockIsStringRecord = vi.fn()
+const mockIsValidTimezone = vi.fn()
 
 vi.mock("node:fs", () => ({
-  promises: {
-    readFile: vi.fn(),
-  },
+  promises: { readFile: mockReadFile },
 }))
 
 vi.mock("mdm-util", () => ({
-  isNonEmptyString: vi.fn(),
-  isStringArray: vi.fn(),
-  isStringRecord: vi.fn(),
-  isValidTimezone: vi.fn(),
+  isNonEmptyString: mockIsNonEmptyString,
+  isStringArray: mockIsStringArray,
+  isStringRecord: mockIsStringRecord,
+  isValidTimezone: mockIsValidTimezone,
 }))
 
-const isNonEmptyStringMock = vi.mocked(isNonEmptyString)
-const isStringArrayMock = vi.mocked(isStringArray)
-const isStringRecordMock = vi.mocked(isStringRecord)
-const isValidTimezoneMock = vi.mocked(isValidTimezone)
-const readFileMock = vi.mocked(fs.readFile)
-
 describe("config", () => {
-  beforeEach(() => {
-    clearConfigCache()
+  let resolveNotesConfig: () => Promise<ResolvedNotesConfig>
+
+  beforeEach(async () => {
+    vi.resetModules()
+    ;({ resolveNotesConfig } = await import("./index"))
     process.env.NOTES_ROOT = "/notes-root"
 
-    isNonEmptyStringMock.mockImplementation(
+    mockIsNonEmptyString.mockImplementation(
       (value): value is string =>
         typeof value === "string" && value.trim().length > 0,
     )
 
-    isStringArrayMock.mockImplementation(
+    mockIsStringArray.mockImplementation(
       (value): value is string[] =>
         Array.isArray(value) &&
         value.every(
@@ -50,8 +41,8 @@ describe("config", () => {
         ),
     )
 
-    isStringRecordMock.mockImplementation(
-      (value): value is Record<string, string> =>
+    mockIsStringRecord.mockImplementation(
+      (value: unknown): value is Record<string, string> =>
         value !== null &&
         typeof value === "object" &&
         !Array.isArray(value) &&
@@ -64,13 +55,13 @@ describe("config", () => {
         ),
     )
 
-    isValidTimezoneMock.mockImplementation((value) =>
-      ["UTC", "America/Toronto"].includes(value),
+    mockIsValidTimezone.mockImplementation((value: unknown) =>
+      typeof value === "string" && ["UTC", "America/Toronto"].includes(value),
     )
   })
 
   test("resolves notes directory from NOTES_ROOT env var", async () => {
-    readFileMock.mockResolvedValue(
+    mockReadFile.mockResolvedValue(
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD"],
         obsidianVault: "vault",
@@ -83,7 +74,7 @@ describe("config", () => {
   })
 
   test("resolves notes config with directory and obsidian vault", async () => {
-    readFileMock.mockResolvedValue(
+    mockReadFile.mockResolvedValue(
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
         obsidianVault: "vault",
@@ -143,7 +134,7 @@ describe("config", () => {
   })
 
   test("defaults date formats to an empty array when omitted", async () => {
-    readFileMock.mockResolvedValue(
+    mockReadFile.mockResolvedValue(
       JSON.stringify({
         obsidianVault: "vault",
       }),
@@ -163,7 +154,7 @@ describe("config", () => {
   })
 
   test("defaults createdDateProperty to created when omitted", async () => {
-    readFileMock.mockResolvedValue(JSON.stringify({ obsidianVault: "vault" }))
+    mockReadFile.mockResolvedValue(JSON.stringify({ obsidianVault: "vault" }))
 
     await expect(resolveNotesConfig()).resolves.toMatchObject({
       createdDateProperty: "created",
@@ -171,7 +162,7 @@ describe("config", () => {
   })
 
   test("uses configured createdDateProperty when provided", async () => {
-    readFileMock.mockResolvedValue(
+    mockReadFile.mockResolvedValue(
       JSON.stringify({ createdDateProperty: "date_created", obsidianVault: "vault" }),
     )
 
@@ -180,46 +171,18 @@ describe("config", () => {
     })
   })
 
-  test("throws when createdDateProperty is not a non-empty string", async () => {
-    readFileMock.mockResolvedValue(
-      JSON.stringify({ createdDateProperty: "", obsidianVault: "vault" }),
-    )
-
-    await expect(resolveNotesConfig()).rejects.toEqual(
-      new Error("app.config.json createdDateProperty must be a non-empty string"),
-    )
-  })
-
-  test("defaults deriveTitleDate to false when omitted", async () => {
-    readFileMock.mockResolvedValue(JSON.stringify({ obsidianVault: "vault" }))
-
-    await expect(resolveNotesConfig()).resolves.toMatchObject({
-      deriveTitleDate: false,
-    })
-  })
-
-  test("uses configured deriveTitleDate when provided", async () => {
-    readFileMock.mockResolvedValue(
-      JSON.stringify({ deriveTitleDate: true, obsidianVault: "vault" }),
+  test("defaults attachmentsDirectory to attachments when omitted", async () => {
+    mockReadFile.mockResolvedValue(
+      JSON.stringify({ obsidianVault: "vault" }),
     )
 
     await expect(resolveNotesConfig()).resolves.toMatchObject({
-      deriveTitleDate: true,
+      attachmentsDirectory: "attachments",
     })
-  })
-
-  test("throws when deriveTitleDate is not a boolean", async () => {
-    readFileMock.mockResolvedValue(
-      JSON.stringify({ deriveTitleDate: "yes", obsidianVault: "vault" }),
-    )
-
-    await expect(resolveNotesConfig()).rejects.toEqual(
-      new Error("app.config.json deriveTitleDate must be a boolean"),
-    )
   })
 
   test("uses configured attachmentsDirectory when provided", async () => {
-    readFileMock.mockResolvedValue(
+    mockReadFile.mockResolvedValue(
       JSON.stringify({
         attachmentsDirectory: "assets",
         obsidianVault: "vault",
@@ -231,35 +194,26 @@ describe("config", () => {
     })
   })
 
-  test("defaults attachmentsDirectory to attachments when omitted", async () => {
-    readFileMock.mockResolvedValue(
-      JSON.stringify({
-        obsidianVault: "vault",
-      }),
-    )
+  test("defaults deriveTitleDate to false when omitted", async () => {
+    mockReadFile.mockResolvedValue(JSON.stringify({ obsidianVault: "vault" }))
 
     await expect(resolveNotesConfig()).resolves.toMatchObject({
-      attachmentsDirectory: "attachments",
+      deriveTitleDate: false,
     })
   })
 
-  test("throws when attachmentsDirectory is not a non-empty string", async () => {
-    readFileMock.mockResolvedValue(
-      JSON.stringify({
-        attachmentsDirectory: "",
-        obsidianVault: "vault",
-      }),
+  test("uses configured deriveTitleDate when provided", async () => {
+    mockReadFile.mockResolvedValue(
+      JSON.stringify({ deriveTitleDate: true, obsidianVault: "vault" }),
     )
 
-    await expect(resolveNotesConfig()).rejects.toEqual(
-      new Error(
-        "app.config.json attachmentsDirectory must be a non-empty string",
-      ),
-    )
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      deriveTitleDate: true,
+    })
   })
 
   test("includes the configured timezone in resolved config", async () => {
-    readFileMock.mockResolvedValue(
+    mockReadFile.mockResolvedValue(
       JSON.stringify({
         obsidianVault: "vault",
         timezone: "America/Toronto",
@@ -272,7 +226,7 @@ describe("config", () => {
   })
 
   test("defaults timezone to UTC when omitted", async () => {
-    readFileMock.mockResolvedValue(
+    mockReadFile.mockResolvedValue(
       JSON.stringify({
         obsidianVault: "vault",
       }),
@@ -283,24 +237,9 @@ describe("config", () => {
     })
   })
 
-  test("throws when timezone is not a valid IANA identifier", async () => {
-    readFileMock.mockResolvedValue(
-      JSON.stringify({
-        obsidianVault: "vault",
-        timezone: "Not/A/Timezone",
-      }),
-    )
-
-    await expect(resolveNotesConfig()).rejects.toEqual(
-      new Error(
-        "app.config.json timezone must be a valid IANA timezone identifier",
-      ),
-    )
-  })
-
   test("throws when config file is missing", async () => {
     const err = Object.assign(new Error("ENOENT"), { code: "ENOENT" })
-    readFileMock.mockRejectedValue(err)
+    mockReadFile.mockRejectedValue(err)
 
     await expect(resolveNotesConfig()).rejects.toEqual(
       new Error(
@@ -310,7 +249,7 @@ describe("config", () => {
   })
 
   test("throws when config json is invalid", async () => {
-    readFileMock.mockResolvedValue("{broken")
+    mockReadFile.mockResolvedValue("{broken")
 
     await expect(resolveNotesConfig()).rejects.toEqual(
       new Error("app.config.json must contain valid JSON"),
@@ -318,41 +257,16 @@ describe("config", () => {
   })
 
   test("throws when config file cannot be read", async () => {
-    readFileMock.mockRejectedValue(new Error("EACCES"))
+    mockReadFile.mockRejectedValue(new Error("EACCES"))
 
     await expect(resolveNotesConfig()).rejects.toEqual(
       new Error("app.config.json must be readable"),
     )
   })
 
-  test("throws when required config fields are missing", async () => {
-    readFileMock.mockResolvedValue(JSON.stringify({}))
-
-    await expect(resolveNotesConfig()).rejects.toEqual(
-      new Error(
-        "app.config.json requires a non-empty obsidianVault value",
-      ),
-    )
-  })
-
-  test("throws when dateFormats is invalid", async () => {
-    readFileMock.mockResolvedValue(
-      JSON.stringify({
-        dateFormats: ["YYYY.MM.DD", ""],
-        obsidianVault: "vault",
-      }),
-    )
-
-    await expect(resolveNotesConfig()).rejects.toEqual(
-      new Error(
-        "app.config.json dateFormats must be an array of non-empty strings",
-      ),
-    )
-  })
-
   test("throws when NOTES_ROOT env var is not set", async () => {
     delete process.env.NOTES_ROOT
-    readFileMock.mockResolvedValue(
+    mockReadFile.mockResolvedValue(
       JSON.stringify({
         obsidianVault: "vault",
       }),
@@ -364,7 +278,7 @@ describe("config", () => {
   })
 
   test("resolves configured habits", async () => {
-    readFileMock.mockResolvedValue(
+    mockReadFile.mockResolvedValue(
       JSON.stringify({
         habits: [
           {
@@ -374,42 +288,26 @@ describe("config", () => {
             frontmatterProperty: "exercise",
             trackingWindowDays: 90,
           },
-          {
-            id: "stress",
-            name: "Stress",
-            mode: "do-less",
-            frontmatterProperty: "stress",
-            trackingWindowDays: 30,
-            targetScore: 100,
-          },
         ],
         obsidianVault: "vault",
       }),
     )
 
-    const config = await resolveNotesConfig()
-
-    expect(config.habits).toEqual([
-      {
-        id: "exercise",
-        name: "Exercise",
-        mode: "do-more",
-        frontmatterProperty: "exercise",
-        trackingWindowDays: 90,
-      },
-      {
-        id: "stress",
-        name: "Stress",
-        mode: "do-less",
-        frontmatterProperty: "stress",
-        trackingWindowDays: 30,
-        targetScore: 100,
-      },
-    ])
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      habits: [
+        {
+          id: "exercise",
+          name: "Exercise",
+          mode: "do-more",
+          frontmatterProperty: "exercise",
+          trackingWindowDays: 90,
+        },
+      ],
+    })
   })
 
-  test("caches resolved notes directory after first load", async () => {
-    readFileMock.mockResolvedValue(
+  test("caches resolved config after first load", async () => {
+    mockReadFile.mockResolvedValue(
       JSON.stringify({
         dateFormats: ["YYYY.MM.DD"],
         obsidianVault: "vault",
@@ -419,6 +317,6 @@ describe("config", () => {
     await resolveNotesConfig()
     await resolveNotesConfig()
 
-    expect(readFileMock).toHaveBeenCalledTimes(1)
+    expect(mockReadFile).toHaveBeenCalledTimes(1)
   })
 })

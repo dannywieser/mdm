@@ -39,8 +39,6 @@ export interface ResolvedNotesConfig {
 }
 
 export interface AppConfig {
-  attachmentsDirectory?: string
-  createdDateProperty?: string
   dateFormats?: string[]
   deriveTitleDate?: boolean
   habits?: HabitConfig[]
