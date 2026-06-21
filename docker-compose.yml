@@ -122,7 +122,7 @@ services:
       - "3002"
     volumes:
       - ./app.config.json:/app/app.config.json:ro
-      - ${IMAGES_ROOT:-./notes}:/data/images:ro
+      - ${NOTES_ROOT:-./notes}:/data/notes:ro
     healthcheck:
       test:
         [
@@ -145,7 +145,7 @@ services:
       IMGPROXY_BIND: ":8080"
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: "/"
       IMGPROXY_USE_ETAG: "true"
-      IMGPROXY_QUALITY: "75"
+      IMGPROXY_QUALITY: "85"
       IMGPROXY_ENFORCE_WEBP: "true"
     expose:
       - "8080"
