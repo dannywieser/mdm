@@ -36,7 +36,7 @@
 
 - Keep each React component in `apps/web/src/components/<ComponentName>/` with colocated `<ComponentName>.tsx`, `<ComponentName>.types.ts`, and `<ComponentName>.test.tsx` files.
 - Keep each hook in `apps/web/src/hooks/<hookName>/` with colocated `<hookName>.ts`, `<hookName>.types.ts`, and `<hookName>.test.tsx` files.
-- Add a colocated `<name>.util.ts` file only when helper logic is needed by that component or hook.
+- Add a colocated `<name>.util.ts` file only when helper logic is needed by that component or hook. Every `.util.ts` must have a colocated `<name>.util.test.ts` that tests its functions directly.
 - For shared page chrome (like the app header), define it in a parent route layout so sibling routes (for example `/` and `/notes/:view`) render the same shell.
 
 ## changesets guidelines
@@ -78,7 +78,7 @@ Changesets are **not** required for:
 - Use `test` (not `it`) in tests, and write descriptions that read naturally without implying an `it` prefix.
 - All changes and additions to the codebase should be accompanied by appropriate unit tests that cover the new functionality and ensure that existing functionality is not broken. Tests should be written using Vitest and should follow best practices for test organization and structure.
 - Use global Vitest config (`clearMocks: true`) for mock cleanup; never call manual global mock cleanup helpers in individual tests.
-- Prefer mocking for all dependencies external to the file/unit being tested.
+- Prefer mocking for all dependencies external to the file/unit being tested. In particular, a component's `.test.tsx` must mock its colocated `.util.ts` module (via `vi.mock`) and assert on how the component uses the util's return values — the util's own logic is covered in `<name>.util.test.ts`, not in the component test.
 - In particular always mock platform libraries like `fs` and `path` when testing file handling logic, to avoid unintended side effects and ensure test reliability.
 - In `apps/web` tests, mock the i18n module so `t(...)`/`translate(...)` returns translation keys, and assert on keys instead of translated copy.
 
