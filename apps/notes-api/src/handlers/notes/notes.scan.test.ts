@@ -1,10 +1,16 @@
 import type { Mock } from "vitest"
 
+import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
 import { parseFrontMatter, parseMarkdownBodyDates, resolveDateFromFrontmatterOrTitle } from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
 
 import { FILE_ID_NAMESPACE, resolveCreatedDate, scanMarkdownFile } from "./notes.scan"
+
+vi.mock("app-config", () => ({
+  resolveNotesConfig: vi.fn(),
+}))
 
 vi.mock("node:fs", () => ({
   promises: {
@@ -27,12 +33,15 @@ vi.mock("mdm-util", () => ({
   createFileID: vi.fn(),
 }))
 
+const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
 const createFileIDMock = vi.mocked(createFileID)
 const readFileMock = fs.readFile as Mock
 const statMock = fs.stat as Mock
 const parseFrontMatterMock = vi.mocked(parseFrontMatter)
 const parseMarkdownBodyDatesMock = vi.mocked(parseMarkdownBodyDates)
 const resolveDateFromFrontmatterOrTitleMock = vi.mocked(resolveDateFromFrontmatterOrTitle)
+
+const defaultConfig = createMockNotesConfig()
 
 describe("resolveCreatedDate", () => {
   test("returns the resolved date as an ISO string", () => {
@@ -55,7 +64,17 @@ describe("resolveCreatedDate", () => {
 })
 
 describe("notes scan helpers", () => {
+  beforeEach(() => {
+    resolveNotesConfigMock.mockResolvedValue(defaultConfig)
+  })
+
   test("scanMarkdownFile returns filterable metadata without parsed markdown content", async () => {
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      dateFormats: ["YYYY.MM.DD"],
+      obsidianVault: "dgw",
+    })
+
     const createdDate = new Date("2026-05-26T00:00:00.000Z")
     const modifiedDate = new Date("2026-05-26T01:00:00.000Z")
 
@@ -73,12 +92,7 @@ describe("notes scan helpers", () => {
       mtime: modifiedDate,
     })
 
-    const note = await scanMarkdownFile(
-      "/notes/topic/welcome.md",
-      "/notes",
-      "dgw",
-      ["YYYY.MM.DD"],
-    )
+    const note = await scanMarkdownFile("/notes/topic/welcome.md")
 
     expect(note).toEqual({
       basename: "welcome.md",
@@ -119,16 +133,17 @@ describe("notes scan helpers", () => {
       mtime: new Date("2026-05-26T01:00:00.000Z"),
     })
 
-    const note = await scanMarkdownFile(
-      "/notes/daily/briefing/2026-06-01.md",
-      "/notes",
-      "dgw",
-    )
+    const note = await scanMarkdownFile("/notes/daily/briefing/2026-06-01.md")
 
     expect(note.folder).toBe("daily/briefing")
   })
 
   test("scanMarkdownFile includes date-like frontmatter values in titleOrBodyDates", async () => {
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      dateFormats: ["YYYY.MM.DD"],
+    })
+
     readFileMock.mockResolvedValue("# Note")
     parseFrontMatterMock.mockReturnValue({
       body: "# Note",
@@ -149,7 +164,7 @@ describe("notes scan helpers", () => {
       mtime: new Date("2026-06-01T01:00:00.000Z"),
     })
 
-    const note = await scanMarkdownFile("/notes/note.md", "/notes", "vault", ["YYYY.MM.DD"])
+    const note = await scanMarkdownFile("/notes/note.md")
 
     expect(note.titleOrBodyDates).toEqual(["2026.06.01", "2025.12.31"])
     expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith("2026.06.01", ["YYYY.MM.DD"])
@@ -158,6 +173,12 @@ describe("notes scan helpers", () => {
   })
 
   test("scanMarkdownFile uses parsed frontmatter and escapes obsidian file paths", async () => {
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
+      obsidianVault: "vault name",
+    })
+
     readFileMock.mockResolvedValue(`---
 topic:
   - AI
@@ -186,12 +207,7 @@ This is a note.`)
       mtime: new Date("2026-05-26T01:00:00.000Z"),
     })
 
-    const note = await scanMarkdownFile(
-      "/notes/daily/2026.05.27 (Wed) á.md",
-      "/notes",
-      "vault name",
-      ["YYYY.MM.DD", "YY/MM/DD"],
-    )
+    const note = await scanMarkdownFile("/notes/daily/2026.05.27 (Wed) á.md")
 
     expect(note.titleOrBodyDates).toEqual(["2026.05.26", "26/05/27"])
     expect(note.frontmatter).toEqual({
@@ -215,11 +231,7 @@ This is a note.`)
     createFileIDMock.mockReturnValue("some-id")
     statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
 
-    const note = await scanMarkdownFile(
-      "/notes/games/citizen-sleeper-2.md",
-      "/notes",
-      "vault",
-    )
+    const note = await scanMarkdownFile("/notes/games/citizen-sleeper-2.md")
 
     expect(note.frontmatter?.cover).toBe(
       "games/citizen-sleeper-2/attach-20260616070917164.png",
@@ -227,6 +239,11 @@ This is a note.`)
   })
 
   test("scanMarkdownFile prepends attachmentsDirectory to bare cover filename", async () => {
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      attachmentsDirectory: "attachments",
+    })
+
     readFileMock.mockResolvedValue("")
     parseFrontMatterMock.mockReturnValue({
       body: "",
@@ -236,14 +253,7 @@ This is a note.`)
     createFileIDMock.mockReturnValue("some-id")
     statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
 
-    const note = await scanMarkdownFile(
-      "/notes/games/citizen-sleeper-2.md",
-      "/notes",
-      "vault",
-      [],
-      "created",
-      "attachments",
-    )
+    const note = await scanMarkdownFile("/notes/games/citizen-sleeper-2.md")
 
     expect(note.frontmatter?.cover).toBe(
       "attachments/games/citizen-sleeper-2/attach-20260616070917164.png",
@@ -262,11 +272,7 @@ This is a note.`)
     createFileIDMock.mockReturnValue("some-id")
     statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
 
-    const note = await scanMarkdownFile(
-      "/notes/downtime/the-rogue-prince-of-persia.md",
-      "/notes",
-      "vault",
-    )
+    const note = await scanMarkdownFile("/notes/downtime/the-rogue-prince-of-persia.md")
 
     expect(note.frontmatter?.cover).toBe(
       "attachments/downtime/The Rogue Prince of Persia/attach-20260503144843356.jpg",
@@ -283,7 +289,7 @@ This is a note.`)
     createFileIDMock.mockReturnValue("some-id")
     statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
 
-    const note = await scanMarkdownFile("/notes/games/note.md", "/notes", "vault")
+    const note = await scanMarkdownFile("/notes/games/note.md")
 
     expect(note.frontmatter?.cover).toBe("https://example.com/cover.png")
   })

@@ -1,3 +1,4 @@
+import { resolveNotesConfig } from "app-config"
 import { buildObsidianUrl, parseFrontMatter, resolveDateFromFrontmatterOrTitle } from "markdown"
 import { promises as fs } from "node:fs"
 import path from "node:path"
@@ -20,11 +21,8 @@ const resolveNoteDate = (
 export const scanHabitEntries = async (
   filePaths: string[],
   frontmatterProperty: string,
-  createdDateProperty: string,
-  dateFormats: readonly string[],
-  notesDirectory: string,
-  obsidianVault: string,
 ): Promise<HabitEntry[]> => {
+  const { createdDateProperty, dateFormats, notesDirectory, obsidianVault } = await resolveNotesConfig()
   const results = await Promise.all(
     filePaths.map(async (filePath) => {
       const basename = path.basename(filePath)

@@ -15,18 +15,15 @@ export const notesHandler: RequestHandler = async (request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { attachmentsDirectory, createdDateProperty, dateFormats, notesDirectory, obsidianVault, timezone, views } =
-      notesConfig
+    const { notesDirectory, obsidianVault } = notesConfig
 
-    logger.debug({ notesDirectory, obsidianVault, timezone }, "[notes] config resolved")
+    logger.debug({ notesDirectory, obsidianVault }, "[notes] config resolved")
 
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted((a, b) => a.localeCompare(b))
     logger.debug({ count: markdownFiles.length, notesDirectory }, "[notes] collectMarkdownFiles found files")
 
     const scannedNotes = await Promise.all(
-      markdownFiles.map((filePath) =>
-        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, createdDateProperty, attachmentsDirectory),
-      ),
+      markdownFiles.map((filePath) => scanMarkdownFile(filePath)),
     )
     const requestedView =
       typeof request.query.view === "string"
@@ -34,17 +31,14 @@ export const notesHandler: RequestHandler = async (request, response) => {
         : undefined
 
     logger.debug({ total: scannedNotes.length, view: requestedView ?? "none" }, "[notes] applying view filter")
-    const filteredNotes = applyViewFilter(scannedNotes, views, requestedView, {
-      dateFormats,
-      timezone,
-    })
+    const filteredNotes = await applyViewFilter(scannedNotes, requestedView)
     logger.debug({ passed: filteredNotes.length, total: scannedNotes.length }, "[notes] view filter applied")
 
     const includeContent = request.query.includeContent !== "false"
 
     const parsedNotes = includeContent
       ? await Promise.all(
-          filteredNotes.map((note) => parseMarkdownFile(note, notesDirectory, scannedNotes, attachmentsDirectory)),
+          filteredNotes.map((note) => parseMarkdownFile(note, scannedNotes)),
         )
       : filteredNotes.map((note) => ({ ...note, content: EMPTY_MARKDOWN_NODE }))
 

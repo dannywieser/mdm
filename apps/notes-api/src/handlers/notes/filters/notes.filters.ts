@@ -1,5 +1,6 @@
-import type { ExcludeViewFilter, NotesView, ViewFilter } from "app-config"
+import type { ExcludeViewFilter, ViewFilter } from "app-config"
 
+import { resolveNotesConfig } from "app-config"
 import {
   getDateComponents,
   getValueByPath,
@@ -159,12 +160,13 @@ const splitViewFilters = (
     { excludeFilters: [], includeFilters: [] },
   )
 
-export const applyViewFilter = <T extends FilterableNote>(
+export const applyViewFilter = async <T extends FilterableNote>(
   notes: readonly T[],
-  configuredViews: readonly NotesView[],
   requestedViewId: string | undefined,
-  context: ViewFilterContext = { dateFormats: [], timezone: "UTC" },
-): T[] => {
+): Promise<T[]> => {
+  const { dateFormats, timezone, views: configuredViews } = await resolveNotesConfig()
+  const context: ViewFilterContext = { dateFormats, timezone }
+
   if (!requestedViewId) {
     return [...notes]
   }

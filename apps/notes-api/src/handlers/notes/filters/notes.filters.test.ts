@@ -1,5 +1,7 @@
 import type { Note } from "markdown"
 
+import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
 import {
   getDateComponents,
   getValueByPath,
@@ -8,18 +10,27 @@ import {
 
 import { applyViewFilter } from "./notes.filters"
 
+vi.mock("app-config", () => ({
+  resolveNotesConfig: vi.fn(),
+}))
+
 vi.mock("mdm-util", () => ({
   getDateComponents: vi.fn(),
   getValueByPath: vi.fn(),
   parseDateFromFormats: vi.fn(),
 }))
 
+const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
 const getDateComponentsMock = vi.mocked(getDateComponents)
 const getValueByPathMock = vi.mocked(getValueByPath)
 const parseDateFromFormatsMock = vi.mocked(parseDateFromFormats)
 
+const defaultConfig = createMockNotesConfig()
+
 describe("notes filter helpers", () => {
   beforeEach(() => {
+    resolveNotesConfigMock.mockResolvedValue(defaultConfig)
+
     getValueByPathMock.mockImplementation((value, valuePath) =>
       valuePath
         .split(".")
@@ -48,16 +59,16 @@ describe("notes filter helpers", () => {
     })
   })
 
-  test("applyViewFilter returns all notes when no view is requested", () => {
+  test("applyViewFilter returns all notes when no view is requested", async () => {
     const notes = [createMockNote("book.md"), createMockNote("movie.md")]
 
-    const filtered = applyViewFilter(notes, [], undefined)
+    const filtered = await applyViewFilter(notes, undefined)
 
     expect(filtered).toEqual(notes)
     expect(getValueByPathMock).not.toHaveBeenCalled()
   })
 
-  test("applyViewFilter filters notes using configured view filters", () => {
+  test("applyViewFilter filters notes using configured view filters", async () => {
     const notes = [
       createMockNote("book.md", {
         folder: "downtime",
@@ -80,9 +91,9 @@ describe("notes filter helpers", () => {
       }),
     ]
 
-    const filtered = applyViewFilter(
-      notes,
-      [
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      views: [
         {
           component: "NotesList",
           filters: [
@@ -95,14 +106,15 @@ describe("notes filter helpers", () => {
           name: "books",
         },
       ],
-      "books",
-    )
+    })
+
+    const filtered = await applyViewFilter(notes, "books")
 
     expect(filtered).toEqual([notes[0]])
     expect(getValueByPathMock).toHaveBeenCalled()
   })
 
-  test("applyViewFilter supports array frontmatter values", () => {
+  test("applyViewFilter supports array frontmatter values", async () => {
     const notes = [
       createMockNote("read.md", {
         frontmatter: {
@@ -116,9 +128,9 @@ describe("notes filter helpers", () => {
       }),
     ]
 
-    const filtered = applyViewFilter(
-      notes,
-      [
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      views: [
         {
           component: "NotesList",
           filters: [{ "frontmatter.topic": "Reading" }],
@@ -126,8 +138,9 @@ describe("notes filter helpers", () => {
           name: "reading",
         },
       ],
-      "reading",
-    )
+    })
+
+    const filtered = await applyViewFilter(notes, "reading")
 
     expect(filtered).toEqual([notes[0]])
     expect(getValueByPathMock).toHaveBeenCalledWith(
@@ -136,7 +149,7 @@ describe("notes filter helpers", () => {
     )
   })
 
-  test("applyViewFilter matches notes satisfying any filter group (OR logic)", () => {
+  test("applyViewFilter matches notes satisfying any filter group (OR logic)", async () => {
     const notes = [
       createMockNote("book.md", {
         frontmatter: { type: "book" },
@@ -149,9 +162,9 @@ describe("notes filter helpers", () => {
       }),
     ]
 
-    const filtered = applyViewFilter(
-      notes,
-      [
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      views: [
         {
           component: "NotesList",
           filters: [
@@ -162,13 +175,14 @@ describe("notes filter helpers", () => {
           name: "downtime",
         },
       ],
-      "downtime",
-    )
+    })
+
+    const filtered = await applyViewFilter(notes, "downtime")
 
     expect(filtered).toEqual([notes[0], notes[1]])
   })
 
-  test("applyViewFilter applies exclusion filters as AND conditions", () => {
+  test("applyViewFilter applies exclusion filters as AND conditions", async () => {
     const notes = [
       createMockNote("book.md", {
         folder: "downtime",
@@ -184,9 +198,9 @@ describe("notes filter helpers", () => {
       }),
     ]
 
-    const filtered = applyViewFilter(
-      notes,
-      [
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      views: [
         {
           component: "NotesList",
           filters: [
@@ -197,13 +211,14 @@ describe("notes filter helpers", () => {
           name: "books",
         },
       ],
-      "books",
-    )
+    })
+
+    const filtered = await applyViewFilter(notes, "books")
 
     expect(filtered).toEqual([notes[0]])
   })
 
-  test("applyViewFilter supports $missing for absent frontmatter properties", () => {
+  test("applyViewFilter supports $missing for absent frontmatter properties", async () => {
     const notes = [
       createMockNote("no-type.md", {
         frontmatter: { topic: "Reading" },
@@ -216,9 +231,9 @@ describe("notes filter helpers", () => {
       }),
     ]
 
-    const filtered = applyViewFilter(
-      notes,
-      [
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      views: [
         {
           component: "NotesList",
           filters: [{ "frontmatter.type": "$missing" }],
@@ -226,18 +241,19 @@ describe("notes filter helpers", () => {
           name: "missing-type",
         },
       ],
-      "missing-type",
-    )
+    })
+
+    const filtered = await applyViewFilter(notes, "missing-type")
 
     expect(filtered).toEqual([notes[0], notes[2]])
   })
 
-  test("applyViewFilter returns all notes when view name is not configured", () => {
+  test("applyViewFilter returns all notes when view name is not configured", async () => {
     const notes = [createMockNote("book.md"), createMockNote("movie.md")]
 
-    const filtered = applyViewFilter(
-      notes,
-      [
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      views: [
         {
           component: "NotesList",
           filters: [{ folder: "downtime" }],
@@ -245,15 +261,16 @@ describe("notes filter helpers", () => {
           name: "books",
         },
       ],
-      "missing",
-    )
+    })
+
+    const filtered = await applyViewFilter(notes, "missing")
 
     expect(filtered).toEqual(notes)
     expect(getValueByPathMock).not.toHaveBeenCalled()
   })
 
   describe("$onThisDay keyword", () => {
-    test("matches notes where createdDate falls on the same month and day in a previous year", () => {
+    test("matches notes where createdDate falls on the same month and day in a previous year", async () => {
       const notes = [
         createMockNote("past.md", { createdDate: "2024-05-27T08:00:00.000Z" }),
         createMockNote("different-day.md", {
@@ -264,6 +281,18 @@ describe("notes filter helpers", () => {
         }),
       ]
 
+      resolveNotesConfigMock.mockResolvedValue({
+        ...defaultConfig,
+        views: [
+          {
+            component: "NotesList",
+            filters: [{ createdDate: "$onThisDay" }],
+            id: "memories",
+            name: "memories",
+          },
+        ],
+      })
+
       getDateComponentsMock
         .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
         .mockReturnValueOnce({ day: 27, month: 5, year: 2024 })
@@ -272,24 +301,12 @@ describe("notes filter helpers", () => {
         .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
         .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
 
-      const filtered = applyViewFilter(
-        notes,
-        [
-          {
-            component: "NotesList",
-            filters: [{ createdDate: "$onThisDay" }],
-            id: "memories",
-            name: "memories",
-          },
-        ],
-        "memories",
-        { dateFormats: [], timezone: "UTC" },
-      )
+      const filtered = await applyViewFilter(notes, "memories")
 
       expect(filtered).toEqual([notes[0]])
     })
 
-    test("matches notes where modifiedDate falls on the same month and day in a previous year", () => {
+    test("matches notes where modifiedDate falls on the same month and day in a previous year", async () => {
       const notes = [
         createMockNote("past.md", { modifiedDate: "2023-05-27T10:00:00.000Z" }),
         createMockNote("other.md", {
@@ -297,15 +314,9 @@ describe("notes filter helpers", () => {
         }),
       ]
 
-      getDateComponentsMock
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2023 })
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
-        .mockReturnValueOnce({ day: 27, month: 6, year: 2023 })
-
-      const filtered = applyViewFilter(
-        notes,
-        [
+      resolveNotesConfigMock.mockResolvedValue({
+        ...defaultConfig,
+        views: [
           {
             component: "NotesList",
             filters: [{ modifiedDate: "$onThisDay" }],
@@ -313,14 +324,20 @@ describe("notes filter helpers", () => {
             name: "memories",
           },
         ],
-        "memories",
-        { dateFormats: [], timezone: "UTC" },
-      )
+      })
+
+      getDateComponentsMock
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2023 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 6, year: 2023 })
+
+      const filtered = await applyViewFilter(notes, "memories")
 
       expect(filtered).toEqual([notes[0]])
     })
 
-    test("matches notes where any titleOrBodyDate falls on the same month and day in a previous year", () => {
+    test("matches notes where any titleOrBodyDate falls on the same month and day in a previous year", async () => {
       const notes = [
         createMockNote("has-match.md", {
           titleOrBodyDates: ["2024.05.27", "2024.06.01"],
@@ -329,14 +346,10 @@ describe("notes filter helpers", () => {
         createMockNote("this-year.md", { titleOrBodyDates: ["2026.05.27"] }),
       ]
 
-      getDateComponentsMock
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
-
-      const filtered = applyViewFilter(
-        notes,
-        [
+      resolveNotesConfigMock.mockResolvedValue({
+        ...defaultConfig,
+        dateFormats: ["YYYY.MM.DD"],
+        views: [
           {
             component: "NotesList",
             filters: [{ titleOrBodyDates: "$onThisDay" }],
@@ -344,9 +357,14 @@ describe("notes filter helpers", () => {
             name: "memories",
           },
         ],
-        "memories",
-        { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" },
-      )
+      })
+
+      getDateComponentsMock
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+
+      const filtered = await applyViewFilter(notes, "memories")
 
       expect(filtered).toEqual([notes[0]])
       expect(parseDateFromFormatsMock).toHaveBeenCalledWith("2024.05.27", [
@@ -354,7 +372,7 @@ describe("notes filter helpers", () => {
       ])
     })
 
-    test("applies the configured timezone when determining today's date", () => {
+    test("applies the configured timezone when determining today's date", async () => {
       const notes = [
         createMockNote("may-26.md", {
           createdDate: "2025-05-26T08:00:00.000Z",
@@ -364,15 +382,10 @@ describe("notes filter helpers", () => {
         }),
       ]
 
-      getDateComponentsMock
-        .mockReturnValueOnce({ day: 26, month: 5, year: 2026 })
-        .mockReturnValueOnce({ day: 26, month: 5, year: 2025 })
-        .mockReturnValueOnce({ day: 26, month: 5, year: 2026 })
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2025 })
-
-      const filtered = applyViewFilter(
-        notes,
-        [
+      resolveNotesConfigMock.mockResolvedValue({
+        ...defaultConfig,
+        timezone: "America/Toronto",
+        views: [
           {
             component: "NotesList",
             filters: [{ createdDate: "$onThisDay" }],
@@ -380,14 +393,20 @@ describe("notes filter helpers", () => {
             name: "memories",
           },
         ],
-        "memories",
-        { dateFormats: [], timezone: "America/Toronto" },
-      )
+      })
+
+      getDateComponentsMock
+        .mockReturnValueOnce({ day: 26, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 26, month: 5, year: 2025 })
+        .mockReturnValueOnce({ day: 26, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2025 })
+
+      const filtered = await applyViewFilter(notes, "memories")
 
       expect(filtered).toEqual([notes[0]])
     })
 
-    test("does not match notes from the current year", () => {
+    test("does not match notes from the current year", async () => {
       const notes = [
         createMockNote("this-year.md", {
           createdDate: "2026-05-27T08:00:00.000Z",
@@ -397,15 +416,9 @@ describe("notes filter helpers", () => {
         }),
       ]
 
-      getDateComponentsMock
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
-        .mockReturnValueOnce({ day: 27, month: 5, year: 2025 })
-
-      const filtered = applyViewFilter(
-        notes,
-        [
+      resolveNotesConfigMock.mockResolvedValue({
+        ...defaultConfig,
+        views: [
           {
             component: "NotesList",
             filters: [{ createdDate: "$onThisDay" }],
@@ -413,22 +426,41 @@ describe("notes filter helpers", () => {
             name: "memories",
           },
         ],
-        "memories",
-        { dateFormats: [], timezone: "UTC" },
-      )
+      })
+
+      getDateComponentsMock
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2025 })
+
+      const filtered = await applyViewFilter(notes, "memories")
 
       expect(filtered).toEqual([notes[1]])
     })
   })
 
   describe("$today keyword", () => {
-    test("matches notes where any titleOrBodyDate is today", () => {
+    test("matches notes where any titleOrBodyDate is today", async () => {
       const notes = [
         createMockNote("today.md", { titleOrBodyDates: ["2026.06.01"] }),
         createMockNote("yesterday.md", { titleOrBodyDates: ["2026.05.31"] }),
         createMockNote("no-dates.md", { titleOrBodyDates: [] }),
       ]
 
+      resolveNotesConfigMock.mockResolvedValue({
+        ...defaultConfig,
+        dateFormats: ["YYYY.MM.DD"],
+        views: [
+          {
+            component: "NotesReview",
+            filters: [{ titleOrBodyDates: "$today" }],
+            id: "today",
+            name: "Today",
+          },
+        ],
+      })
+
       getDateComponentsMock.mockReturnValue({ day: 1, month: 6, year: 2026 })
 
       parseDateFromFormatsMock.mockImplementation((dateValue) => {
@@ -441,29 +473,30 @@ describe("notes filter helpers", () => {
         }
       })
 
-      const filtered = applyViewFilter(
-        notes,
-        [
-          {
-            component: "NotesReview",
-            filters: [{ titleOrBodyDates: "$today" }],
-            id: "today",
-            name: "Today",
-          },
-        ],
-        "today",
-        { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" },
-      )
+      const filtered = await applyViewFilter(notes, "today")
 
       expect(filtered).toEqual([notes[0]])
     })
 
-    test("does not match notes from a previous year on the same date", () => {
+    test("does not match notes from a previous year on the same date", async () => {
       const notes = [
         createMockNote("this-year.md", { titleOrBodyDates: ["2026.06.01"] }),
         createMockNote("last-year.md", { titleOrBodyDates: ["2025.06.01"] }),
       ]
 
+      resolveNotesConfigMock.mockResolvedValue({
+        ...defaultConfig,
+        dateFormats: ["YYYY.MM.DD"],
+        views: [
+          {
+            component: "NotesReview",
+            filters: [{ titleOrBodyDates: "$today" }],
+            id: "today",
+            name: "Today",
+          },
+        ],
+      })
+
       getDateComponentsMock.mockReturnValue({ day: 1, month: 6, year: 2026 })
 
       parseDateFromFormatsMock.mockImplementation((dateValue) => {
@@ -476,19 +509,7 @@ describe("notes filter helpers", () => {
         }
       })
 
-      const filtered = applyViewFilter(
-        notes,
-        [
-          {
-            component: "NotesReview",
-            filters: [{ titleOrBodyDates: "$today" }],
-            id: "today",
-            name: "Today",
-          },
-        ],
-        "today",
-        { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" },
-      )
+      const filtered = await applyViewFilter(notes, "today")
 
       expect(filtered).toEqual([notes[0]])
     })

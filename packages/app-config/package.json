@@ -8,6 +8,10 @@
     ".": {
       "types": "./index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./testing": {
+      "types": "./testing.d.ts",
+      "default": "./dist/testing.js"
     }
   },
   "scripts": {

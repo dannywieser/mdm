@@ -16,8 +16,7 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { createdDateProperty, dateFormats, habits, notesDirectory, obsidianVault, timezone } =
-      notesConfig
+    const { habits, notesDirectory, timezone } = notesConfig
 
     const habitId = String(request.params.id)
     const habitConfig = habits.find((h) => h.id === habitId)
@@ -30,7 +29,6 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
     const { id, name, mode, frontmatterProperty, targetScore, trackingWindowDays } = habitConfig
 
     logger.debug({
-      createdDateProperty,
       frontmatterProperty,
       habitId: id,
       mode,
@@ -41,14 +39,7 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
     const filePaths = await collectMarkdownFiles(notesDirectory)
     logger.debug({ count: filePaths.length, notesDirectory }, "[habit] collectMarkdownFiles found files")
 
-    const entries = await scanHabitEntries(
-      filePaths,
-      frontmatterProperty,
-      createdDateProperty,
-      dateFormats,
-      notesDirectory,
-      obsidianVault,
-    )
+    const entries = await scanHabitEntries(filePaths, frontmatterProperty)
     logger.debug({ count: entries.length, frontmatterProperty }, "[habit] scanHabitEntries matched entries")
 
     const today = new Date().toLocaleDateString("en-CA", { timeZone: timezone })

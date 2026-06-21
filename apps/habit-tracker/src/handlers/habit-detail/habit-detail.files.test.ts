@@ -1,7 +1,13 @@
+import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
 import { parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
 
 import { scanHabitEntries } from "./habit-detail.files"
+
+vi.mock("app-config", () => ({
+  resolveNotesConfig: vi.fn(),
+}))
 
 vi.mock("node:fs", () => ({
   promises: {
@@ -17,12 +23,17 @@ vi.mock("markdown", async (importOriginal) => {
   }
 })
 
+const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
 const readFileMock = vi.mocked(fs.readFile)
 const parseFrontMatterMock = vi.mocked(parseFrontMatter)
 
-const DATE_FORMATS = ["YYYY.MM.DD"]
+const defaultConfig = createMockNotesConfig({ dateFormats: ["YYYY.MM.DD"] })
 
 describe("scanHabitEntries", () => {
+  beforeEach(() => {
+    resolveNotesConfigMock.mockResolvedValue(defaultConfig)
+  })
+
   test("strips surrounding quotes from frontmatter values before parsing the numeric value", async () => {
     readFileMock.mockResolvedValue("---\ndrinking: \"3\"\n---\nbody")
     parseFrontMatterMock.mockReturnValue({
@@ -30,14 +41,7 @@ describe("scanHabitEntries", () => {
       frontmatter: { created: "2026.05.31", drinking: '"3"' },
     })
 
-    const entries = await scanHabitEntries(
-      ["/notes/2026.05.31.md"],
-      "drinking",
-      "created",
-      DATE_FORMATS,
-      "/notes",
-      "vault",
-    )
+    const entries = await scanHabitEntries(["/notes/2026.05.31.md"], "drinking")
 
     expect(entries).toEqual([
       { date: "2026-05-31", value: 3, obsidianUrl: "obsidian://open?vault=vault&file=2026.05.31" },
@@ -51,14 +55,7 @@ describe("scanHabitEntries", () => {
       frontmatter: { created: "2026.05.13", drinking: "5" },
     })
 
-    const entries = await scanHabitEntries(
-      ["/notes/2026.05.13.md"],
-      "drinking",
-      "created",
-      DATE_FORMATS,
-      "/notes",
-      "vault",
-    )
+    const entries = await scanHabitEntries(["/notes/2026.05.13.md"], "drinking")
 
     expect(entries).toEqual([
       { date: "2026-05-13", value: 5, obsidianUrl: "obsidian://open?vault=vault&file=2026.05.13" },
@@ -69,7 +66,7 @@ describe("scanHabitEntries", () => {
     readFileMock.mockResolvedValue("body only")
     parseFrontMatterMock.mockReturnValue({ body: "body only", frontmatter: null })
 
-    const entries = await scanHabitEntries(["/notes/no-frontmatter.md"], "drinking", "created", DATE_FORMATS, "/notes", "vault")
+    const entries = await scanHabitEntries(["/notes/no-frontmatter.md"], "drinking")
 
     expect(entries).toEqual([])
   })
@@ -81,7 +78,7 @@ describe("scanHabitEntries", () => {
       frontmatter: { topic: "drinking" },
     })
 
-    const entries = await scanHabitEntries(["/notes/missing-property.md"], "drinking", "created", DATE_FORMATS, "/notes", "vault")
+    const entries = await scanHabitEntries(["/notes/missing-property.md"], "drinking")
 
     expect(entries).toEqual([])
   })
@@ -93,7 +90,7 @@ describe("scanHabitEntries", () => {
       frontmatter: { created: "2026.05.31", drinking: '"15"' },
     })
 
-    const entries = await scanHabitEntries(["/notes/out-of-range.md"], "drinking", "created", DATE_FORMATS, "/notes", "vault")
+    const entries = await scanHabitEntries(["/notes/out-of-range.md"], "drinking")
 
     expect(entries).toEqual([])
   })
@@ -105,7 +102,7 @@ describe("scanHabitEntries", () => {
       frontmatter: { drinking: '"3"' },
     })
 
-    const entries = await scanHabitEntries(["/notes/no-date.md"], "drinking", "created", DATE_FORMATS, "/notes", "vault")
+    const entries = await scanHabitEntries(["/notes/no-date.md"], "drinking")
 
     expect(entries).toEqual([])
   })
@@ -117,14 +114,7 @@ describe("scanHabitEntries", () => {
       frontmatter: { drinking: '"3"' },
     })
 
-    const entries = await scanHabitEntries(
-      ["/notes/2026.05.31 (Sun).md"],
-      "drinking",
-      "created",
-      DATE_FORMATS,
-      "/notes",
-      "vault",
-    )
+    const entries = await scanHabitEntries(["/notes/2026.05.31 (Sun).md"], "drinking")
 
     expect(entries).toEqual([
       { date: "2026-05-31", value: 3, obsidianUrl: "obsidian://open?vault=vault&file=2026.05.31%20(Sun)" },

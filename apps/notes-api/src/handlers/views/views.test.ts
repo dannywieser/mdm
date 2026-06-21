@@ -1,4 +1,5 @@
 import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
 import express from "express"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
@@ -42,15 +43,9 @@ const collectMarkdownFilesMock = vi.mocked(collectMarkdownFiles)
 const scanMarkdownFileMock = vi.mocked(scanMarkdownFile)
 const buildViewsMock = vi.mocked(buildViews)
 
-const mockConfig = {
+const mockConfig = createMockNotesConfig({
   attachmentsDirectory: "images",
-  createdDateProperty: "created",
   dateFormats: ["YYYY.MM.DD"],
-  deriveTitleDate: false,
-  habits: [],
-  notesDirectory: "/notes",
-  obsidianVault: "vault",
-  timezone: "UTC",
   views: [
     {
       badges: ["folder", "frontmatter.type"],
@@ -60,7 +55,7 @@ const mockConfig = {
       name: "Books",
     },
   ],
-}
+})
 
 const mockNote = {
   basename: "a.md",
@@ -81,7 +76,7 @@ describe("views handler interface", () => {
     resolveNotesConfigMock.mockResolvedValue(mockConfig)
     collectMarkdownFilesMock.mockResolvedValue(["/notes/a.md"])
     scanMarkdownFileMock.mockResolvedValue(mockNote)
-    buildViewsMock.mockReturnValue([
+    buildViewsMock.mockResolvedValue([
       {
         badges: ["folder", "frontmatter.type"],
         component: "NotesList",
@@ -114,16 +109,13 @@ describe("views handler interface", () => {
     })
   })
 
-  test("passes the correct context to buildViews", async () => {
+  test("passes scanned notes to buildViews", async () => {
     const app = express()
     app.get("/views", viewsHandler)
 
     await request(app).get("/views")
 
-    expect(buildViewsMock).toHaveBeenCalledWith(expect.any(Array), mockConfig.views, {
-      dateFormats: mockConfig.dateFormats,
-      timezone: mockConfig.timezone,
-    })
+    expect(buildViewsMock).toHaveBeenCalledWith(expect.any(Array))
   })
 
   test("returns a generic 500 for unexpected errors", async () => {

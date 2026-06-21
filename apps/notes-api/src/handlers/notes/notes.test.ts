@@ -142,33 +142,12 @@ describe("notes handler interface", () => {
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(scanMarkdownFileMock.mock.calls).toEqual([
-      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"], "created", "images"],
-      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"], "created", "images"],
+      ["/notes/a.md"],
+      ["/notes/b.md"],
     ])
-    expect(applyViewFilterMock).toHaveBeenCalledWith(
-      scannedNotes,
-      [
-        {
-          component: "NotesList",
-          filters: [
-            {
-              folder: "notes",
-            },
-          ],
-          id: "notes-only",
-          name: "notes-only",
-        },
-      ],
-      undefined,
-      { dateFormats: ["YYYY.MM.DD"], timezone: "UTC" },
-    )
+    expect(applyViewFilterMock).toHaveBeenCalledWith(scannedNotes, undefined)
     expect(parseMarkdownFileMock).toHaveBeenCalledTimes(1)
-    expect(parseMarkdownFileMock).toHaveBeenCalledWith(
-      scannedNotes[0],
-      "/notes",
-      scannedNotes,
-      "images",
-    )
+    expect(parseMarkdownFileMock).toHaveBeenCalledWith(scannedNotes[0], scannedNotes)
   })
 
   test("passes requested view to filter function", async () => {
@@ -221,24 +200,7 @@ describe("notes handler interface", () => {
     const response = await request(app).get("/notes?view=books")
 
     expect(response.status).toBe(200)
-    expect(applyViewFilterMock).toHaveBeenCalledWith(
-      [scannedNote],
-      [
-        {
-          component: "NotesList",
-          filters: [
-            {
-              "frontmatter.type": "book",
-              folder: "downtime",
-            },
-          ],
-          id: "books",
-          name: "books",
-        },
-      ],
-      "books",
-      { dateFormats: [], timezone: "UTC" },
-    )
+    expect(applyViewFilterMock).toHaveBeenCalledWith([scannedNote], "books")
   })
 
   test("skips markdown body parsing when includeContent=false", async () => {

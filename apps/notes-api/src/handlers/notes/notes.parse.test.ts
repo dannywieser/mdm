@@ -1,12 +1,18 @@
 import type { MarkdownNode } from "markdown"
 import type { Mock } from "vitest"
 
+import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
 import { parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
 
 import type { ScannedNote } from "./notes.types"
 
 import { parseMarkdownFile } from "./notes.parse"
+
+vi.mock("app-config", () => ({
+  resolveNotesConfig: vi.fn(),
+}))
 
 vi.mock("node:fs", () => ({
   promises: {
@@ -18,16 +24,23 @@ vi.mock("markdown", () => ({
   parseFrontMatter: vi.fn(),
 }))
 
+const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
 const readFileMock = fs.readFile as Mock
 const parseFrontMatterMock = vi.mocked(parseFrontMatter)
 
+const defaultConfig = createMockNotesConfig()
+
 describe("notes parse helpers", () => {
+  beforeEach(() => {
+    resolveNotesConfigMock.mockResolvedValue(defaultConfig)
+  })
+
   test("parseMarkdownFile preserves task list state in markdown node tree", async () => {
     const body = "- [x] Done\n- [ ] Todo\n"
     readFileMock.mockResolvedValue(body)
     parseFrontMatterMock.mockReturnValue({ body, frontmatter: null })
 
-    const note = await parseMarkdownFile(createScannedNote(), "/notes")
+    const note = await parseMarkdownFile(createScannedNote())
 
     const taskItems = findNodesByType(note.content, "listItem")
     expect(taskItems).toHaveLength(2)
@@ -47,7 +60,6 @@ describe("notes parse helpers", () => {
         fullPath: "/notes/topic/welcome.md",
         title: "welcome",
       }),
-      "/notes",
     )
 
     expect(note).toMatchObject({
@@ -79,7 +91,6 @@ describe("notes parse helpers", () => {
         fullPath: "/notes/folder/file-name.md",
         title: "file-name",
       }),
-      "/notes",
     )
 
     const image = findNodesByType(note.content, "image")[0]
@@ -102,7 +113,6 @@ describe("notes parse helpers", () => {
         fullPath: "/notes/root-note.md",
         title: "root-note",
       }),
-      "/notes",
     )
 
     const image = findNodesByType(note.content, "image")[0]
@@ -123,7 +133,6 @@ describe("notes parse helpers", () => {
         fullPath: "/notes/folder/file-name.md",
         title: "file-name",
       }),
-      "/notes",
     )
 
     const image = findNodesByType(note.content, "image")[0]
@@ -146,7 +155,6 @@ describe("notes parse helpers", () => {
         fullPath: "/notes/root-note.md",
         title: "root-note",
       }),
-      "/notes",
     )
 
     const image = findNodesByType(note.content, "image")[0]
@@ -168,7 +176,6 @@ describe("notes parse helpers", () => {
       createScannedNote({
         fullPath: "/notes/folder/note.md",
       }),
-      "/notes",
     )
 
     const images = findNodesByType(note.content, "image")
@@ -179,6 +186,7 @@ describe("notes parse helpers", () => {
   })
 
   test("parseMarkdownFile prepends attachmentsDirectory to bare-filename images", async () => {
+    resolveNotesConfigMock.mockResolvedValue({ ...defaultConfig, attachmentsDirectory: "attachments" })
     readFileMock.mockResolvedValue("![](attach-20260525090751252.jpg)")
     parseFrontMatterMock.mockReturnValue({
       body: "![](attach-20260525090751252.jpg)",
@@ -192,9 +200,6 @@ describe("notes parse helpers", () => {
         fullPath: "/notes/folder/file-name.md",
         title: "file-name",
       }),
-      "/notes",
-      [],
-      "attachments",
     )
 
     const image = findNodesByType(note.content, "image")[0]
@@ -217,7 +222,6 @@ describe("notes parse helpers", () => {
         fullPath: "/notes/daily/journal.md",
         title: "journal",
       }),
-      "/notes",
     )
 
     const image = findNodesByType(note.content, "image")[0]
@@ -238,7 +242,6 @@ describe("notes parse helpers", () => {
         fullPath: "/notes/daily/journal.md",
         title: "journal",
       }),
-      "/notes",
     )
 
     const image = findNodesByType(note.content, "image")[0]
@@ -259,7 +262,6 @@ describe("notes parse helpers", () => {
         fullPath: "/notes/daily/journal.md",
         title: "journal",
       }),
-      "/notes",
     )
 
     const image = findNodesByType(note.content, "image")[0]
@@ -275,7 +277,6 @@ describe("notes parse helpers", () => {
 
     const note = await parseMarkdownFile(
       createScannedNote({ fullPath: "/notes/topic/note.md" }),
-      "/notes",
       [],
     )
 
@@ -303,7 +304,6 @@ describe("notes parse helpers", () => {
 
     const note = await parseMarkdownFile(
       createScannedNote({ fullPath: "/notes/topic/note.md" }),
-      "/notes",
       [linkedScannedNote],
     )
 
@@ -340,7 +340,6 @@ describe("notes parse helpers", () => {
 
     const note = await parseMarkdownFile(
       createScannedNote({ fullPath: "/notes/topic/note.md" }),
-      "/notes",
       [linkedScannedNote],
     )
 
@@ -368,7 +367,6 @@ describe("notes parse helpers", () => {
 
     const note = await parseMarkdownFile(
       createScannedNote({ fullPath: "/notes/topic/note.md" }),
-      "/notes",
       [linkedScannedNote],
     )
 
@@ -402,7 +400,6 @@ describe("notes parse helpers", () => {
 
     const note = await parseMarkdownFile(
       createScannedNote({ fullPath: "/notes/topic/note.md" }),
-      "/notes",
       [linkedNote, deepNote],
     )
 
