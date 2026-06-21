@@ -1,4 +1,5 @@
 import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
 import express from "express"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
@@ -42,15 +43,9 @@ const collectMarkdownFilesMock = vi.mocked(collectMarkdownFiles)
 const scanMarkdownFileMock = vi.mocked(scanMarkdownFile)
 const buildViewsMock = vi.mocked(buildViews)
 
-const mockConfig = {
+const mockConfig = createMockNotesConfig({
   attachmentsDirectory: "images",
-  createdDateProperty: "created",
   dateFormats: ["YYYY.MM.DD"],
-  deriveTitleDate: false,
-  habits: [],
-  notesDirectory: "/notes",
-  obsidianVault: "vault",
-  timezone: "UTC",
   views: [
     {
       badges: ["folder", "frontmatter.type"],
@@ -60,7 +55,7 @@ const mockConfig = {
       name: "Books",
     },
   ],
-}
+})
 
 const mockNote = {
   basename: "a.md",

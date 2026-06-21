@@ -1,6 +1,7 @@
 import type { Mock } from "vitest"
 
 import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
 import { parseFrontMatter, parseMarkdownBodyDates, resolveDateFromFrontmatterOrTitle } from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
@@ -40,16 +41,7 @@ const parseFrontMatterMock = vi.mocked(parseFrontMatter)
 const parseMarkdownBodyDatesMock = vi.mocked(parseMarkdownBodyDates)
 const resolveDateFromFrontmatterOrTitleMock = vi.mocked(resolveDateFromFrontmatterOrTitle)
 
-const defaultConfig = {
-  attachmentsDirectory: "",
-  createdDateProperty: "created",
-  dateFormats: [] as string[],
-  habits: [],
-  notesDirectory: "/notes",
-  obsidianVault: "vault",
-  timezone: "UTC",
-  views: [],
-}
+const defaultConfig = createMockNotesConfig()
 
 describe("resolveCreatedDate", () => {
   test("returns the resolved date as an ISO string", () => {

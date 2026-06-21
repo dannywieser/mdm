@@ -2,6 +2,7 @@ import type { MarkdownNode } from "markdown"
 import type { Mock } from "vitest"
 
 import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
 import { parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
 
@@ -27,16 +28,7 @@ const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
 const readFileMock = fs.readFile as Mock
 const parseFrontMatterMock = vi.mocked(parseFrontMatter)
 
-const defaultConfig = {
-  attachmentsDirectory: "",
-  createdDateProperty: "created",
-  dateFormats: [] as string[],
-  habits: [],
-  notesDirectory: "/notes",
-  obsidianVault: "vault",
-  timezone: "UTC",
-  views: [],
-}
+const defaultConfig = createMockNotesConfig()
 
 describe("notes parse helpers", () => {
   beforeEach(() => {

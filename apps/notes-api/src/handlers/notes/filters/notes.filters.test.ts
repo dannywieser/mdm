@@ -1,6 +1,7 @@
 import type { Note } from "markdown"
 
 import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
 import {
   getDateComponents,
   getValueByPath,
@@ -24,16 +25,7 @@ const getDateComponentsMock = vi.mocked(getDateComponents)
 const getValueByPathMock = vi.mocked(getValueByPath)
 const parseDateFromFormatsMock = vi.mocked(parseDateFromFormats)
 
-const defaultConfig = {
-  attachmentsDirectory: "",
-  createdDateProperty: "created",
-  dateFormats: [] as string[],
-  habits: [],
-  notesDirectory: "/notes",
-  obsidianVault: "vault",
-  timezone: "UTC",
-  views: [],
-}
+const defaultConfig = createMockNotesConfig()
 
 describe("notes filter helpers", () => {
   beforeEach(() => {

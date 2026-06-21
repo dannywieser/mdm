@@ -1,4 +1,5 @@
 import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
 
 import type { ScannedNote } from "../notes/notes.types"
 
@@ -16,16 +17,7 @@ vi.mock("../notes/filters/notes.filters", () => ({
 const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
 const applyViewFilterMock = vi.mocked(applyViewFilter)
 
-const defaultConfig = {
-  attachmentsDirectory: "",
-  createdDateProperty: "created",
-  dateFormats: [] as string[],
-  habits: [],
-  notesDirectory: "/notes",
-  obsidianVault: "vault",
-  timezone: "UTC",
-  views: [],
-}
+const defaultConfig = createMockNotesConfig()
 
 const createNote = (overrides: Partial<ScannedNote> & { id: string }): ScannedNote => ({
   basename: "note.md",

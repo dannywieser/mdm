@@ -1,4 +1,5 @@
 import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
 import { parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
 
@@ -26,16 +27,7 @@ const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
 const readFileMock = vi.mocked(fs.readFile)
 const parseFrontMatterMock = vi.mocked(parseFrontMatter)
 
-const defaultConfig = {
-  attachmentsDirectory: "",
-  createdDateProperty: "created",
-  dateFormats: ["YYYY.MM.DD"] as string[],
-  habits: [],
-  notesDirectory: "/notes",
-  obsidianVault: "vault",
-  timezone: "UTC",
-  views: [],
-}
+const defaultConfig = createMockNotesConfig({ dateFormats: ["YYYY.MM.DD"] })
 
 describe("scanHabitEntries", () => {
   beforeEach(() => {
