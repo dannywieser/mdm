@@ -24,7 +24,6 @@ services:
     environment:
       APP_CONFIG_PATH: "/app/app.config.json"
       PORT: "3000"
-      NOTES_ROOT: "/data/notes"
     expose:
       - "3000"
     volumes:
@@ -83,7 +82,6 @@ services:
     environment:
       APP_CONFIG_PATH: "/app/app.config.json"
       PORT: "3003"
-      NOTES_ROOT: "/data/notes"
     expose:
       - "3003"
     volumes:
@@ -116,7 +114,6 @@ services:
       APP_CONFIG_PATH: "/app/app.config.json"
       PORT: "3002"
       IMGPROXY_PATH_PREFIX: "/imgproxy"
-      NOTES_ROOT: "/data/notes"
       REDIS_URL: "redis://redis:6379"
     expose:
       - "3002"
@@ -152,7 +149,7 @@ services:
     ports:
       - "127.0.0.1:8080:8080"
     volumes:
-      - ${IMAGES_ROOT:-./notes}:/data/images:ro
+      - ${NOTES_ROOT:-./notes}:/data/notes:ro
 
   redis:
     restart: unless-stopped
