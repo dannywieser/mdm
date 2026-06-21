@@ -21,8 +21,11 @@ export interface ImageProxyConfig {
   maxHeight: number
 }
 
-const buildCacheKey = (resolvedPath: string, maxWidth: number, maxHeight: number): string =>
-  `image:${resolvedPath}:${maxWidth}:${maxHeight}`
+const buildCacheKey = (
+  resolvedPath: string,
+  maxWidth: number,
+  maxHeight: number,
+): string => `image:${resolvedPath}:${maxWidth}:${maxHeight}`
 
 export const createImageHandler = (
   config: ImageProxyConfig,
@@ -35,7 +38,9 @@ export const createImageHandler = (
 
     if (!resolvedImagePath) {
       logger.error({ sourcePath }, "invalid path rejected")
-      response.status(400).json({ error: "A valid local image path is required" })
+      response
+        .status(400)
+        .json({ error: "A valid local image path is required" })
       return
     }
 
@@ -46,7 +51,11 @@ export const createImageHandler = (
       return
     }
 
-    const cacheKey = buildCacheKey(resolvedImagePath, config.maxWidth, config.maxHeight)
+    const cacheKey = buildCacheKey(
+      resolvedImagePath,
+      config.maxWidth,
+      config.maxHeight,
+    )
 
     try {
       const cached = await redisClient.get(cacheKey)
@@ -68,10 +77,15 @@ export const createImageHandler = (
 
     const redirectUrl = `${config.imgproxyPathPrefix}${upstreamPath}`
 
-    logger.debug({ redirectUrl, resolvedImagePath }, "image cache miss, redirecting")
+    logger.debug(
+      { redirectUrl, resolvedImagePath },
+      "image cache miss, redirecting",
+    )
 
     try {
-      await redisClient.set(cacheKey, redirectUrl, { EX: config.cacheTtlSeconds })
+      await redisClient.set(cacheKey, redirectUrl, {
+        EX: config.cacheTtlSeconds,
+      })
     } catch {
       // non-fatal — redirect still works without caching
     }
@@ -86,11 +100,18 @@ export const resolveImageProxyConfig = (): ImageProxyConfig => {
   const cacheTtlSeconds = Number(process.env.IMAGE_CACHE_TTL_SECONDS ?? 86400)
 
   return {
-    cacheTtlSeconds: Number.isFinite(cacheTtlSeconds) && cacheTtlSeconds > 0 ? cacheTtlSeconds : 86400,
+    cacheTtlSeconds:
+      Number.isFinite(cacheTtlSeconds) && cacheTtlSeconds > 0
+        ? cacheTtlSeconds
+        : 86400,
     imgproxyEnabled: process.env.IMAGE_PROXY_ENABLED !== "false",
     imgproxyPathPrefix: process.env.IMGPROXY_PATH_PREFIX ?? "/imgproxy",
-    imagesRoot: process.env.IMAGES_ROOT ?? "/data/images",
-    maxWidth: Number.isFinite(maxWidth) && maxWidth > 0 ? maxWidth : DEFAULT_MAX_WIDTH,
-    maxHeight: Number.isFinite(maxHeight) && maxHeight > 0 ? maxHeight : DEFAULT_MAX_HEIGHT,
+    imagesRoot: process.env.NOTES_ROOT ?? "/data/notes",
+    maxWidth:
+      Number.isFinite(maxWidth) && maxWidth > 0 ? maxWidth : DEFAULT_MAX_WIDTH,
+    maxHeight:
+      Number.isFinite(maxHeight) && maxHeight > 0
+        ? maxHeight
+        : DEFAULT_MAX_HEIGHT,
   }
 }
