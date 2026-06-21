@@ -2,7 +2,7 @@ import type { RequestHandler } from "express"
 
 import path from "node:path"
 
-import type { ImageRedisClient } from "./images.types"
+import type { ImageProxyConfig, ImageRedisClient } from "./images.types"
 
 import { logger } from "../../logger"
 import {
@@ -11,15 +11,6 @@ import {
   DEFAULT_MAX_WIDTH,
   resolveImagePath,
 } from "./images.util"
-
-export interface ImageProxyConfig {
-  cacheTtlSeconds: number
-  imgproxyEnabled: boolean
-  imgproxyPathPrefix: string
-  imagesRoot: string
-  maxWidth: number
-  maxHeight: number
-}
 
 const buildCacheKey = (
   resolvedPath: string,
