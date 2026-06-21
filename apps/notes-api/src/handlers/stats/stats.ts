@@ -4,6 +4,7 @@ import type { RequestHandler } from "express"
 import { resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
+import path from "node:path"
 
 import { logger } from "../../logger"
 import { scanMarkdownFile } from "../notes/notes.scan"
@@ -40,7 +41,10 @@ export const statsHandler: RequestHandler = async (_request, response) => {
     )
 
     const now = new Date()
-    const totalAttachments = await countFilesRecursive(attachmentsDirectory)
+    const absoluteAttachmentsDir = attachmentsDirectory
+      ? path.join(notesDirectory, attachmentsDirectory)
+      : ""
+    const totalAttachments = await countFilesRecursive(absoluteAttachmentsDir)
 
     response.status(200).json({
       folderBreakdown: buildFolderBreakdown(scannedNotes),

@@ -85,7 +85,7 @@ describe("notes handler interface", () => {
     ]
 
     resolveNotesConfigMock.mockResolvedValue({
-      attachmentsDirectory: "/images",
+      attachmentsDirectory: "images",
       createdDateProperty: "created",
       dateFormats: ["YYYY.MM.DD"],
       notesDirectory: "/notes",
@@ -142,8 +142,8 @@ describe("notes handler interface", () => {
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(scanMarkdownFileMock.mock.calls).toEqual([
-      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"], "created"],
-      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"], "created"],
+      ["/notes/a.md", "/notes", "vault", ["YYYY.MM.DD"], "created", "images"],
+      ["/notes/b.md", "/notes", "vault", ["YYYY.MM.DD"], "created", "images"],
     ])
     expect(applyViewFilterMock).toHaveBeenCalledWith(
       scannedNotes,
@@ -167,6 +167,7 @@ describe("notes handler interface", () => {
       scannedNotes[0],
       "/notes",
       scannedNotes,
+      "images",
     )
   })
 
@@ -184,7 +185,7 @@ describe("notes handler interface", () => {
     })
 
     resolveNotesConfigMock.mockResolvedValue({
-      attachmentsDirectory: "/images",
+      attachmentsDirectory: "images",
       createdDateProperty: "created",
       dateFormats: [],
       notesDirectory: "/notes",
@@ -250,7 +251,7 @@ describe("notes handler interface", () => {
     })
 
     resolveNotesConfigMock.mockResolvedValue({
-      attachmentsDirectory: "/images",
+      attachmentsDirectory: "images",
       createdDateProperty: "created",
       dateFormats: [],
       notesDirectory: "/notes",
@@ -280,7 +281,7 @@ describe("notes handler interface", () => {
 
   test("returns an error when util loading fails", async () => {
     resolveNotesConfigMock.mockResolvedValue({
-      attachmentsDirectory: "/images",
+      attachmentsDirectory: "images",
       createdDateProperty: "created",
       dateFormats: [],
       notesDirectory: "/notes",
@@ -320,7 +321,7 @@ describe("notes handler interface", () => {
 
     expect(loggedContext.error.message).toBe("boom")
     expect(loggedContext.notesConfig).toEqual({
-      attachmentsDirectory: "/images",
+      attachmentsDirectory: "images",
       createdDateProperty: "created",
       dateFormats: [],
       notesDirectory: "/notes",

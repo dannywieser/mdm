@@ -43,7 +43,7 @@ const scanMarkdownFileMock = vi.mocked(scanMarkdownFile)
 const buildViewsMock = vi.mocked(buildViews)
 
 const mockConfig = {
-  attachmentsDirectory: "/images",
+  attachmentsDirectory: "images",
   createdDateProperty: "created",
   dateFormats: ["YYYY.MM.DD"],
   deriveTitleDate: false,

@@ -226,6 +226,30 @@ This is a note.`)
     )
   })
 
+  test("scanMarkdownFile prepends attachmentsDirectory to bare cover filename", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "",
+      frontmatter: { cover: "attach-20260616070917164.png" },
+    })
+    parseMarkdownBodyDatesMock.mockReturnValue([])
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile(
+      "/notes/games/citizen-sleeper-2.md",
+      "/notes",
+      "vault",
+      [],
+      "created",
+      "attachments",
+    )
+
+    expect(note.frontmatter?.cover).toBe(
+      "attachments/games/citizen-sleeper-2/attach-20260616070917164.png",
+    )
+  })
+
   test("scanMarkdownFile passes through cover path that already has directory components", async () => {
     readFileMock.mockResolvedValue("")
     parseFrontMatterMock.mockReturnValue({

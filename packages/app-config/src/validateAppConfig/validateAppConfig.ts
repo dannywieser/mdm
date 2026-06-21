@@ -28,6 +28,14 @@ const validateTimezone = (value: unknown): string | undefined => {
   return value
 }
 
+const validateAttachmentsDirectory = (value: unknown): string | undefined => {
+  if (value === undefined) return undefined
+  if (!isNonEmptyString(value)) {
+    throw new Error("app.config.json attachmentsDirectory must be a non-empty string")
+  }
+  return value
+}
+
 export const validateAppConfig = (raw: unknown): AppConfig => {
   if (!raw || typeof raw !== "object") {
     throw new Error("app.config.json must be a JSON object")
@@ -36,10 +44,11 @@ export const validateAppConfig = (raw: unknown): AppConfig => {
   const config = raw as Record<string, unknown>
 
   const obsidianVault = validateObsidianVault(config.obsidianVault)
+  const attachmentsDirectory = validateAttachmentsDirectory(config.attachmentsDirectory)
   const dateFormats = validateDateFormats(config.dateFormats)
   const timezone = validateTimezone(config.timezone)
   const habits = validateHabits(config.habits)
   const views = validateViews(config.views)
 
-  return { dateFormats, habits, obsidianVault, timezone, views }
+  return { attachmentsDirectory, dateFormats, habits, obsidianVault, timezone, views }
 }

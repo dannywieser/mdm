@@ -38,6 +38,7 @@ export interface ResolvedNotesConfig {
 }
 
 export interface AppConfig {
+  attachmentsDirectory?: string
   dateFormats?: string[]
   habits?: HabitConfig[]
   obsidianVault: string

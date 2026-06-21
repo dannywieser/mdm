@@ -69,7 +69,7 @@ const countModifiedTodayMock = vi.mocked(countModifiedToday)
 const countNotesWithoutCreatedDateMock = vi.mocked(countNotesWithoutCreatedDate)
 
 const mockConfig = {
-  attachmentsDirectory: "/images",
+  attachmentsDirectory: "images",
   createdDateProperty: "created",
   dateFormats: ["YYYY.MM.DD"],
   deriveTitleDate: false,
@@ -148,7 +148,7 @@ describe("stats handler interface", () => {
       expect.any(Array),
       mockConfig.timezone,
     )
-    expect(countFilesRecursiveMock).toHaveBeenCalledWith("/images")
+    expect(countFilesRecursiveMock).toHaveBeenCalledWith("/notes/images")
   })
 
   test("returns a generic 500 for unexpected errors", async () => {

@@ -178,6 +178,31 @@ describe("notes parse helpers", () => {
     ])
   })
 
+  test("parseMarkdownFile prepends attachmentsDirectory to bare-filename images", async () => {
+    readFileMock.mockResolvedValue("![](attach-20260525090751252.jpg)")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![](attach-20260525090751252.jpg)",
+      frontmatter: null,
+    })
+
+    const note = await parseMarkdownFile(
+      createScannedNote({
+        basename: "file-name.md",
+        folder: "folder",
+        fullPath: "/notes/folder/file-name.md",
+        title: "file-name",
+      }),
+      "/notes",
+      [],
+      "attachments",
+    )
+
+    const image = findNodesByType(note.content, "image")[0]
+    expect(image.url).toBe(
+      "/images?path=attachments%2Ffolder%2Ffile-name%2Fattach-20260525090751252.jpg",
+    )
+  })
+
   test("parseMarkdownFile rewrites relative markdown images to image server urls", async () => {
     readFileMock.mockResolvedValue("![Screenshot](./assets/home%20page.png)")
     parseFrontMatterMock.mockReturnValue({

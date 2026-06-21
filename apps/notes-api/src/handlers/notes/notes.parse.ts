@@ -23,6 +23,7 @@ export const parseMarkdownFile = async (
   note: ScannedNote,
   notesDirectory: string,
   allNotes: ScannedNote[] = [],
+  attachmentsDirectory = "",
 ): Promise<Note> => {
   const source = await fs.readFile(note.fullPath, "utf8")
   const { body } = parseFrontMatter(source)
@@ -35,11 +36,12 @@ export const parseMarkdownFile = async (
     processedBody,
     normalizedRelativePath,
     replacements,
+    attachmentsDirectory,
   )
 
   const linkedNotes = await Promise.all(
     linkedNoteRefs.map((linkedNote) =>
-      parseMarkdownFile(linkedNote, notesDirectory, []),
+      parseMarkdownFile(linkedNote, notesDirectory, [], attachmentsDirectory),
     ),
   )
 
@@ -53,6 +55,7 @@ export const parseMarkdownFile = async (
 export const resolveFrontmatterImages = (
   frontmatter: NoteFrontmatter | null,
   noteRelativePath: string,
+  attachmentsDirectory = "",
 ): NoteFrontmatter | null => {
   if (!frontmatter) return null
 
@@ -62,7 +65,7 @@ export const resolveFrontmatterImages = (
   const rawPath = Array.isArray(cover) ? cover[0] : cover
   if (!rawPath) return frontmatter
 
-  const resolvedPath = resolveLocalImagePath(rawPath, noteRelativePath)
+  const resolvedPath = resolveLocalImagePath(rawPath, noteRelativePath, attachmentsDirectory)
   if (!resolvedPath) return frontmatter
 
   return { ...frontmatter, cover: resolvedPath }
@@ -72,6 +75,7 @@ const buildMarkdownTree = (
   markdownBody: string,
   noteRelativePath: string,
   replacements: WikilinkReplacement[],
+  attachmentsDirectory = "",
 ): MarkdownNode => {
   const normalizedBody = normalizeObsidianWikiEmbeds(markdownBody)
   const parsedTree = remark().use(remarkGfm).parse(normalizedBody)
@@ -87,7 +91,7 @@ const buildMarkdownTree = (
       return
     }
 
-    const imagePath = resolveLocalImagePath(node.url, noteRelativePath)
+    const imagePath = resolveLocalImagePath(node.url, noteRelativePath, attachmentsDirectory)
 
     if (!imagePath) {
       return
@@ -191,6 +195,7 @@ const resolveMultiComponentImagePath = (decodedImagePath: string, noteRelativePa
 const resolveLocalImagePath = (
   rawImagePath: string,
   noteRelativePath: string,
+  attachmentsDirectory = "",
 ): string | null => {
   const sanitizedImagePath = rawImagePath.trim()
 
@@ -209,12 +214,11 @@ const resolveLocalImagePath = (
   if (!decodedImagePath.includes("/")) {
     const noteDir = path.posix.dirname(noteRelativePath)
     const noteStem = path.posix.basename(noteRelativePath).replace(/\.[^.]+$/, "")
-    const attachmentSubPath =
-      noteDir === "."
-        ? path.posix.join(noteStem, decodedImagePath)
-        : path.posix.join(noteDir, noteStem, decodedImagePath)
-
-    return attachmentSubPath
+    const parts: string[] = []
+    if (attachmentsDirectory) parts.push(attachmentsDirectory)
+    if (noteDir !== ".") parts.push(noteDir)
+    parts.push(noteStem, decodedImagePath)
+    return path.posix.join(...parts)
   }
 
   const resolvedImagePath = resolveMultiComponentImagePath(decodedImagePath, noteRelativePath)

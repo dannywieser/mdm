@@ -291,12 +291,10 @@ This repository is a Turborepo monorepo with this structure:
   - `/imgproxy/*` → `imgproxy:8080/*` (used by `image-server` redirects)
 - `app.config.json` is mounted into the `notes-api` and `habit-tracker` containers as `/app/app.config.json` (read-only).
 - Configure `noteRootDirectory` in `app.config.json` using a path valid inside the container (for example `/data/notes`).
-- Host notes are mounted into the `notes-api` and `habit-tracker` containers with `NOTES_ROOT`:
+- Host notes (and attachments) are mounted into all services with `NOTES_ROOT`:
   - default: `./notes` on the host maps to `/data/notes`
   - override: `NOTES_ROOT=/absolute/path/on/host docker compose up --build`
-- Host images are mounted into the image services with `IMAGES_ROOT`:
-  - default: `./notes` on the host maps to `/data/images`
-  - override: `IMAGES_ROOT=/absolute/path/on/host docker compose up --build`
+- Set `attachmentsDirectory` in `app.config.json` to the folder name (relative to `NOTES_ROOT`) where Obsidian stores attachments (e.g. `"attachments"`). Bare-filename images in notes resolve to `<attachmentsDirectory>/<noteDir>/<noteStem>/<filename>`.
 - Notes markdown image paths now resolve through `/images?path=<encoded-relative-path>` for imgproxy optimization.
 - If local and container config values differ, create a separate Docker-specific config file and mount it to `/app/app.config.json`.
 - `notes-api`, `flag-manager`, `habit-tracker`, and `image-server` each define a Docker healthcheck that polls their `/health` endpoint; `web` waits for all of them to report healthy before starting.
