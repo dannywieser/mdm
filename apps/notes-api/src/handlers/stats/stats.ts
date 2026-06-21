@@ -24,20 +24,11 @@ export const statsHandler: RequestHandler = async (_request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const {
-      attachmentsDirectory,
-      createdDateProperty,
-      dateFormats,
-      notesDirectory,
-      obsidianVault,
-      timezone,
-    } = notesConfig
+    const { attachmentsDirectory, notesDirectory, timezone } = notesConfig
 
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted((a, b) => a.localeCompare(b))
     const scannedNotes = await Promise.all(
-      markdownFiles.map((filePath) =>
-        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, createdDateProperty),
-      ),
+      markdownFiles.map((filePath) => scanMarkdownFile(filePath)),
     )
 
     const now = new Date()

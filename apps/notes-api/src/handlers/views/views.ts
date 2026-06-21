@@ -14,20 +14,15 @@ export const viewsHandler: RequestHandler = async (_request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { createdDateProperty, dateFormats, notesDirectory, obsidianVault, timezone, views } =
-      notesConfig
+    const { notesDirectory } = notesConfig
 
     const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted((a, b) => a.localeCompare(b))
     const scannedNotes = await Promise.all(
-      markdownFiles.map((filePath) =>
-        scanMarkdownFile(filePath, notesDirectory, obsidianVault, dateFormats, createdDateProperty),
-      ),
+      markdownFiles.map((filePath) => scanMarkdownFile(filePath)),
     )
 
-    const context = { dateFormats, timezone }
-
     response.status(200).json({
-      views: buildViews(scannedNotes, views, context),
+      views: await buildViews(scannedNotes),
     })
   } catch (error) {
     logger.error(

@@ -1,5 +1,6 @@
 import type { MarkdownNode, Note, NoteFrontmatter } from "markdown"
 
+import { resolveNotesConfig } from "app-config"
 import { parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
 import path from "node:path"
@@ -21,10 +22,9 @@ export const EMPTY_MARKDOWN_NODE: MarkdownNode = { type: "root", children: [] }
 
 export const parseMarkdownFile = async (
   note: ScannedNote,
-  notesDirectory: string,
   allNotes: ScannedNote[] = [],
-  attachmentsDirectory = "",
 ): Promise<Note> => {
+  const { attachmentsDirectory, notesDirectory } = await resolveNotesConfig()
   const source = await fs.readFile(note.fullPath, "utf8")
   const { body } = parseFrontMatter(source)
   const relativePath = path.relative(notesDirectory, note.fullPath)
@@ -41,7 +41,7 @@ export const parseMarkdownFile = async (
 
   const linkedNotes = await Promise.all(
     linkedNoteRefs.map((linkedNote) =>
-      parseMarkdownFile(linkedNote, notesDirectory, [], attachmentsDirectory),
+      parseMarkdownFile(linkedNote, []),
     ),
   )
 

@@ -1,28 +1,28 @@
-import type { NotesView } from "app-config"
+import { resolveNotesConfig } from "app-config"
 
-import type { ViewFilterContext } from "../notes/filters/notes.filters.types"
 import type { ScannedNote } from "../notes/notes.types"
 import type { ViewSummary } from "./views.types"
 
 import { applyViewFilter } from "../notes/filters/notes.filters"
 
-export const buildViews = (
+export const buildViews = async (
   notes: readonly ScannedNote[],
-  views: readonly NotesView[],
-  context: ViewFilterContext,
-): ViewSummary[] =>
-  views.map((view) => {
-    const matchedNotes = applyViewFilter(notes, views, view.id, context)
-
-    return {
-      aspectRatio: view.aspectRatio,
-      badges: view.badges,
-      component: view.component,
-      count: matchedNotes.length,
-      group: view.group,
-      id: view.id,
-      layout: view.layout,
-      name: view.name,
-      noteIds: matchedNotes.map((note) => note.id),
-    }
-  })
+): Promise<ViewSummary[]> => {
+  const { views } = await resolveNotesConfig()
+  return Promise.all(
+    views.map(async (view) => {
+      const matchedNotes = await applyViewFilter(notes, view.id)
+      return {
+        aspectRatio: view.aspectRatio,
+        badges: view.badges,
+        component: view.component,
+        count: matchedNotes.length,
+        group: view.group,
+        id: view.id,
+        layout: view.layout,
+        name: view.name,
+        noteIds: matchedNotes.map((note) => note.id),
+      }
+    }),
+  )
+}

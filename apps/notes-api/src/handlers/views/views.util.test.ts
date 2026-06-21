@@ -1,13 +1,31 @@
+import { resolveNotesConfig } from "app-config"
+
 import type { ScannedNote } from "../notes/notes.types"
 
 import { applyViewFilter } from "../notes/filters/notes.filters"
 import { buildViews } from "./views.util"
 
+vi.mock("app-config", () => ({
+  resolveNotesConfig: vi.fn(),
+}))
+
 vi.mock("../notes/filters/notes.filters", () => ({
   applyViewFilter: vi.fn(),
 }))
 
+const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
 const applyViewFilterMock = vi.mocked(applyViewFilter)
+
+const defaultConfig = {
+  attachmentsDirectory: "",
+  createdDateProperty: "created",
+  dateFormats: [] as string[],
+  habits: [],
+  notesDirectory: "/notes",
+  obsidianVault: "vault",
+  timezone: "UTC",
+  views: [],
+}
 
 const createNote = (overrides: Partial<ScannedNote> & { id: string }): ScannedNote => ({
   basename: "note.md",
@@ -24,8 +42,12 @@ const createNote = (overrides: Partial<ScannedNote> & { id: string }): ScannedNo
 })
 
 describe("views util", () => {
+  beforeEach(() => {
+    resolveNotesConfigMock.mockResolvedValue(defaultConfig)
+  })
+
   describe("buildViews", () => {
-    test("returns view metadata, counts, and matched note ids per configured view", () => {
+    test("returns view metadata, counts, and matched note ids per configured view", async () => {
       const noteA = createNote({ id: "a" })
       const noteB = createNote({ id: "b" })
       const notes = [noteA, noteB]
@@ -44,13 +66,14 @@ describe("views util", () => {
           name: "Games",
         },
       ]
-      const context = { dateFormats: [], timezone: "UTC" }
+
+      resolveNotesConfigMock.mockResolvedValue({ ...defaultConfig, views })
 
       applyViewFilterMock
-        .mockReturnValueOnce([noteA, noteB])
-        .mockReturnValueOnce([])
+        .mockResolvedValueOnce([noteA, noteB])
+        .mockResolvedValueOnce([])
 
-      const result = buildViews(notes, views, context)
+      const result = await buildViews(notes)
 
       expect(result).toEqual([
         {
@@ -69,14 +92,14 @@ describe("views util", () => {
           noteIds: [],
         },
       ])
-      expect(applyViewFilterMock).toHaveBeenCalledWith(notes, views, "books", context)
-      expect(applyViewFilterMock).toHaveBeenCalledWith(notes, views, "games", context)
+      expect(applyViewFilterMock).toHaveBeenCalledWith(notes, "books")
+      expect(applyViewFilterMock).toHaveBeenCalledWith(notes, "games")
     })
 
-    test("returns an empty array when there are no views", () => {
+    test("returns an empty array when there are no views", async () => {
       const notes = [createNote({ id: "a" })]
 
-      expect(buildViews(notes, [], { dateFormats: [], timezone: "UTC" })).toEqual([])
+      expect(await buildViews(notes)).toEqual([])
       expect(applyViewFilterMock).not.toHaveBeenCalled()
     })
   })

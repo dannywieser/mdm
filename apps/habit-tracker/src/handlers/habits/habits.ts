@@ -16,22 +16,14 @@ export const habitsHandler: RequestHandler = async (_request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { createdDateProperty, dateFormats, habits, notesDirectory, obsidianVault, timezone } =
-      notesConfig
+    const { habits, notesDirectory, timezone } = notesConfig
 
     const filePaths = await collectMarkdownFiles(notesDirectory)
     const today = new Date().toLocaleDateString("en-CA", { timeZone: timezone })
 
     const summaries: HabitSummary[] = await Promise.all(
       habits.map(async ({ id, name, mode, frontmatterProperty, targetScore, trackingWindowDays }) => {
-        const entries = await scanHabitEntries(
-          filePaths,
-          frontmatterProperty,
-          createdDateProperty,
-          dateFormats,
-          notesDirectory,
-          obsidianVault,
-        )
+        const entries = await scanHabitEntries(filePaths, frontmatterProperty)
         const { habitScore, streak, uniqueWindowDays } = calculateHabitScore(
           entries,
           today,

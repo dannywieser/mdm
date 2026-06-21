@@ -81,7 +81,7 @@ describe("views handler interface", () => {
     resolveNotesConfigMock.mockResolvedValue(mockConfig)
     collectMarkdownFilesMock.mockResolvedValue(["/notes/a.md"])
     scanMarkdownFileMock.mockResolvedValue(mockNote)
-    buildViewsMock.mockReturnValue([
+    buildViewsMock.mockResolvedValue([
       {
         badges: ["folder", "frontmatter.type"],
         component: "NotesList",
@@ -114,16 +114,13 @@ describe("views handler interface", () => {
     })
   })
 
-  test("passes the correct context to buildViews", async () => {
+  test("passes scanned notes to buildViews", async () => {
     const app = express()
     app.get("/views", viewsHandler)
 
     await request(app).get("/views")
 
-    expect(buildViewsMock).toHaveBeenCalledWith(expect.any(Array), mockConfig.views, {
-      dateFormats: mockConfig.dateFormats,
-      timezone: mockConfig.timezone,
-    })
+    expect(buildViewsMock).toHaveBeenCalledWith(expect.any(Array))
   })
 
   test("returns a generic 500 for unexpected errors", async () => {
