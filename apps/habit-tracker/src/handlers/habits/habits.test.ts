@@ -23,7 +23,7 @@ vi.mock("../habit-detail/habit-detail.files", () => ({
   scanHabitEntries: vi.fn(),
 }))
 
-const makeEntry = (date: string, value: number): HabitEntry => ({ date, value })
+const makeEntry = (date: string, value: number): HabitEntry => ({ date, obsidianUrl: "", value })
 
 const makeResponse = () => {
   const json = vi.fn<(payload: HabitSummary[] | { error: string }) => void>()

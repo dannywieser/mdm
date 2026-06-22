@@ -1,4 +1,5 @@
 import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
 import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
@@ -85,28 +86,18 @@ describe("notes-api server interface", () => {
   })
 
   test("logs the resolved notes config on startup", async () => {
-    resolveNotesConfigMock.mockResolvedValue({
+    const config = createMockNotesConfig({
       attachmentsDirectory: "images",
       dateFormats: ["YYYY.MM.DD"],
       notesDirectory: "/notes",
       obsidianVault: "vault",
-      timezone: "UTC",
-      views: [],
     })
+    resolveNotesConfigMock.mockResolvedValue(config)
 
     await logStartupConfig()
 
     expect(logger.info).toHaveBeenCalledWith(
-      {
-        notesConfig: {
-          attachmentsDirectory: "images",
-          dateFormats: ["YYYY.MM.DD"],
-          notesDirectory: "/notes",
-          obsidianVault: "vault",
-          timezone: "UTC",
-          views: [],
-        },
-      },
+      { notesConfig: config },
       "Resolved notes config",
     )
   })

@@ -1,4 +1,5 @@
 import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
 import express from "express"
 import { collectMarkdownFiles } from "markdown"
 import { countFilesRecursive, toLoggableError } from "mdm-util"
@@ -63,16 +64,14 @@ const countFoldersMock = vi.mocked(countFolders)
 const countModifiedTodayMock = vi.mocked(countModifiedToday)
 const countNotesWithoutCreatedDateMock = vi.mocked(countNotesWithoutCreatedDate)
 
-const mockConfig = {
+const mockConfig = createMockNotesConfig({
   attachmentsDirectory: "images",
   createdDateProperty: "created",
   dateFormats: ["YYYY.MM.DD"],
-  deriveTitleDate: false,
   notesDirectory: "/notes",
   obsidianVault: "vault",
   timezone: "UTC",
-  views: [],
-}
+})
 
 const mockNote = {
   basename: "a.md",
