@@ -65,7 +65,6 @@ const parseMarkdownFileMock = vi.mocked(parseMarkdownFile)
 const scanMarkdownFileMock = vi.mocked(scanMarkdownFile)
 
 describe("notes handler interface", () => {
-
   test("returns notes and only parses filtered notes after scanning", async () => {
     const scannedNotes = [
       createScannedNote({
@@ -85,26 +84,28 @@ describe("notes handler interface", () => {
       }),
     ]
 
-    resolveNotesConfigMock.mockResolvedValue(createMockNotesConfig({
-      attachmentsDirectory: "images",
-      createdDateProperty: "created",
-      dateFormats: ["YYYY.MM.DD"],
-      notesDirectory: "/notes",
-      obsidianVault: "vault",
-      timezone: "UTC",
-      views: [
-        {
-          component: "NotesList",
-          filters: [
-            {
-              folder: "notes",
-            },
-          ],
-          id: "notes-only",
-          name: "notes-only",
-        },
-      ],
-    }))
+    resolveNotesConfigMock.mockResolvedValue(
+      createMockNotesConfig({
+        attachmentsDirectory: "images",
+        createdDateProperty: "created",
+        dateFormats: ["YYYY.MM.DD"],
+        notesDirectory: "/notes",
+        obsidianVault: "vault",
+        timezone: "UTC",
+        views: [
+          {
+            component: "NotesList",
+            filters: [
+              {
+                folder: "notes",
+              },
+            ],
+            id: "notes-only",
+            name: "notes-only",
+          },
+        ],
+      }),
+    )
     collectMarkdownFilesMock.mockResolvedValue(["/notes/b.md", "/notes/a.md"])
     scanMarkdownFileMock
       .mockResolvedValueOnce(scannedNotes[0])
@@ -138,8 +139,6 @@ describe("notes handler interface", () => {
         titleOrBodyDates: ["2026.05.26"],
       }),
     ])
-    expect(body.notesDirectory).toBe("/notes")
-    expect(body.obsidianVault).toBe("vault")
     expect(resolveNotesConfigMock).toHaveBeenCalled()
     expect(collectMarkdownFilesMock).toHaveBeenCalledWith("/notes")
     expect(scanMarkdownFileMock.mock.calls).toEqual([
@@ -148,7 +147,10 @@ describe("notes handler interface", () => {
     ])
     expect(applyViewFilterMock).toHaveBeenCalledWith(scannedNotes, undefined)
     expect(parseMarkdownFileMock).toHaveBeenCalledTimes(1)
-    expect(parseMarkdownFileMock).toHaveBeenCalledWith(scannedNotes[0], scannedNotes)
+    expect(parseMarkdownFileMock).toHaveBeenCalledWith(
+      scannedNotes[0],
+      scannedNotes,
+    )
   })
 
   test("passes requested view to filter function", async () => {
@@ -164,27 +166,29 @@ describe("notes handler interface", () => {
       title: "a",
     })
 
-    resolveNotesConfigMock.mockResolvedValue(createMockNotesConfig({
-      attachmentsDirectory: "images",
-      createdDateProperty: "created",
-      dateFormats: [],
-      notesDirectory: "/notes",
-      obsidianVault: "vault",
-      timezone: "UTC",
-      views: [
-        {
-          component: "NotesList",
-          filters: [
-            {
-              "frontmatter.type": "book",
-              folder: "downtime",
-            },
-          ],
-          id: "books",
-          name: "books",
-        },
-      ],
-    }))
+    resolveNotesConfigMock.mockResolvedValue(
+      createMockNotesConfig({
+        attachmentsDirectory: "images",
+        createdDateProperty: "created",
+        dateFormats: [],
+        notesDirectory: "/notes",
+        obsidianVault: "vault",
+        timezone: "UTC",
+        views: [
+          {
+            component: "NotesList",
+            filters: [
+              {
+                "frontmatter.type": "book",
+                folder: "downtime",
+              },
+            ],
+            id: "books",
+            name: "books",
+          },
+        ],
+      }),
+    )
     collectMarkdownFilesMock.mockResolvedValue(["/notes/a.md"])
     scanMarkdownFileMock.mockResolvedValue(scannedNote)
     applyViewFilterMock.mockResolvedValue([scannedNote])
@@ -213,11 +217,13 @@ describe("notes handler interface", () => {
       title: "a",
     })
 
-    resolveNotesConfigMock.mockResolvedValue(createMockNotesConfig({
-      attachmentsDirectory: "images",
-      notesDirectory: "/notes",
-      obsidianVault: "vault",
-    }))
+    resolveNotesConfigMock.mockResolvedValue(
+      createMockNotesConfig({
+        attachmentsDirectory: "images",
+        notesDirectory: "/notes",
+        obsidianVault: "vault",
+      }),
+    )
     collectMarkdownFilesMock.mockResolvedValue(["/notes/a.md"])
     scanMarkdownFileMock.mockResolvedValue(scannedNote)
     applyViewFilterMock.mockResolvedValue([scannedNote])
@@ -239,12 +245,14 @@ describe("notes handler interface", () => {
   })
 
   test("returns an error when util loading fails", async () => {
-    resolveNotesConfigMock.mockResolvedValue(createMockNotesConfig({
-      attachmentsDirectory: "images",
-      createdDateProperty: "created",
-      notesDirectory: "/notes",
-      obsidianVault: "vault",
-    }))
+    resolveNotesConfigMock.mockResolvedValue(
+      createMockNotesConfig({
+        attachmentsDirectory: "images",
+        createdDateProperty: "created",
+        notesDirectory: "/notes",
+        obsidianVault: "vault",
+      }),
+    )
     collectMarkdownFilesMock.mockRejectedValue(new Error("boom"))
     toLoggableErrorMock.mockReturnValue({ message: "boom", stack: "stack" })
     const app = express()
@@ -276,12 +284,14 @@ describe("notes handler interface", () => {
     ]
 
     expect(loggedContext.error.message).toBe("boom")
-    expect(loggedContext.notesConfig).toEqual(createMockNotesConfig({
-      attachmentsDirectory: "images",
-      createdDateProperty: "created",
-      notesDirectory: "/notes",
-      obsidianVault: "vault",
-    }))
+    expect(loggedContext.notesConfig).toEqual(
+      createMockNotesConfig({
+        attachmentsDirectory: "images",
+        createdDateProperty: "created",
+        notesDirectory: "/notes",
+        obsidianVault: "vault",
+      }),
+    )
   })
 })
 

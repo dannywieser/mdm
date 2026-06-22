@@ -1,5 +1,5 @@
 import type { ResolvedNotesConfig } from "app-config"
-import type { RequestHandler } from "express"
+import type { RequestHandler, Request } from "express"
 
 import { resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
@@ -10,31 +10,52 @@ import { applyViewFilter } from "./filters/notes.filters"
 import { EMPTY_MARKDOWN_NODE, parseMarkdownFile } from "./notes.parse"
 import { scanMarkdownFile } from "./notes.scan"
 
+const getQueryView = (request: Request): string | undefined => {
+  const view = request.query.view
+  if (typeof view === "string") {
+    return view
+  }
+  return undefined
+}
+
+const getQueryIncludeContent = (request: Request): boolean => {
+  const includeContent = request.query.includeContent
+  if (typeof includeContent === "string") {
+    return includeContent !== "false"
+  }
+  return true
+}
+
 export const notesHandler: RequestHandler = async (request, response) => {
   let notesConfig: ResolvedNotesConfig | undefined
+  const requestedView = getQueryView(request)
+  const includeContent = getQueryIncludeContent(request)
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { notesDirectory, obsidianVault } = notesConfig
+    const { notesDirectory } = notesConfig
 
-    logger.debug({ notesDirectory, obsidianVault }, "[notes] config resolved")
-
-    const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted((a, b) => a.localeCompare(b))
-    logger.debug({ count: markdownFiles.length, notesDirectory }, "[notes] collectMarkdownFiles found files")
+    const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted(
+      (a, b) => a.localeCompare(b),
+    )
+    logger.debug(
+      { count: markdownFiles.length, notesDirectory },
+      "[notes] collectMarkdownFiles found files",
+    )
 
     const scannedNotes = await Promise.all(
       markdownFiles.map((filePath) => scanMarkdownFile(filePath)),
     )
-    const requestedView =
-      typeof request.query.view === "string"
-        ? request.query.view
-        : undefined
 
-    logger.debug({ total: scannedNotes.length, view: requestedView ?? "none" }, "[notes] applying view filter")
+    logger.debug(
+      { total: scannedNotes.length, view: requestedView ?? "none" },
+      "[notes] applying view filter",
+    )
     const filteredNotes = await applyViewFilter(scannedNotes, requestedView)
-    logger.debug({ passed: filteredNotes.length, total: scannedNotes.length }, "[notes] view filter applied")
-
-    const includeContent = request.query.includeContent !== "false"
+    logger.debug(
+      { passed: filteredNotes.length, total: scannedNotes.length },
+      "[notes] view filter applied",
+    )
 
     const parsedNotes = includeContent
       ? await Promise.all(
@@ -42,9 +63,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
         )
       : filteredNotes.map((note) => ({ ...note, content: EMPTY_MARKDOWN_NODE }))
 
-    response
-      .status(200)
-      .json({ notes: parsedNotes, notesDirectory, obsidianVault })
+    response.status(200).json({ notes: parsedNotes })
   } catch (error) {
     logger.error(
       { error: toLoggableError(error), notesConfig: notesConfig ?? null },
