@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 
 import { defaultColorPaletteSystem } from "../../theme/system"
 
-import { PaletteSelector } from "./PaletteSelector"
+import { HeaderPaletteSelector } from "./HeaderPaletteSelector"
 
 const useColorPaletteMock = vi.fn()
 
@@ -21,12 +21,12 @@ const renderComponent = () =>
   render(
     <ChakraProvider value={defaultColorPaletteSystem}>
       <MemoryRouter>
-        <PaletteSelector />
+        <HeaderPaletteSelector />
       </MemoryRouter>
     </ChakraProvider>,
   )
 
-describe("PaletteSelector", () => {
+describe("HeaderPaletteSelector", () => {
   afterEach(() => { cleanup(); })
 
   beforeEach(() => {

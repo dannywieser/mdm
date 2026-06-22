@@ -77,6 +77,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "review.close": "close",
     "review.forReview": "for review ({count})",
     "header.stats": "stats",
+    "header.colors": "colors",
     "header.colorPalette": "colors",
     "header.searchNotes": "search notes",
     "palette.ocean": "ocean",
