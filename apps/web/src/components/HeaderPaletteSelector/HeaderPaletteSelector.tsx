@@ -9,7 +9,7 @@ import { useColorPalette } from "../../context/ColorPalette/useColorPalette"
 import { useI18n } from "../../i18n"
 import { colorPaletteDefinitions } from "../../theme/palettes"
 
-export const PaletteSelector = () => {
+export const HeaderPaletteSelector = () => {
   const { palette } = useColorPalette()
   const { t } = useI18n()
 
