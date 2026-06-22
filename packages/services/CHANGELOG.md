@@ -1,5 +1,14 @@
 # services
 
+## 1.8.2
+
+### Patch Changes
+
+- Updated dependencies [4d8fc0e]
+- Updated dependencies [93a0463]
+  - app-config@1.10.0
+  - markdown@1.10.0
+
 ## 1.8.1
 
 ### Patch Changes

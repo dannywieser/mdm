@@ -1,5 +1,18 @@
 # habit-tracker
 
+## 1.3.1
+
+### Patch Changes
+
+- 271252d: Refactor config threading: helper functions now retrieve cached config internally instead of receiving values as parameters.
+- Updated dependencies [4d8fc0e]
+- Updated dependencies [93a0463]
+- Updated dependencies [aad607c]
+  - app-config@1.10.0
+  - mdm-util@1.10.0
+  - services@1.8.2
+  - markdown@1.10.0
+
 ## 1.3.0
 
 ### Minor Changes

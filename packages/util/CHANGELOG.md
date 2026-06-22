@@ -1,5 +1,11 @@
 # mdm-util
 
+## 1.10.0
+
+### Minor Changes
+
+- aad607c: Add `countFilesRecursive` to the util package for counting files in a directory tree.
+
 ## 1.9.0
 
 ## 1.8.0
