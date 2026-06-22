@@ -1,5 +1,19 @@
 # notes-api
 
+## 1.10.0
+
+### Patch Changes
+
+- 93a0463: Read `attachmentsDirectory` from `app.config.json` (relative to notes root) instead of the `IMAGES_ROOT` env var. Bare-filename images (no path separator) in note bodies and frontmatter now resolve to `<attachmentsDirectory>/<noteDir>/<noteStem>/<filename>` when `attachmentsDirectory` is configured.
+- 271252d: Refactor config threading: helper functions now retrieve cached config internally instead of receiving values as parameters.
+- Updated dependencies [4d8fc0e]
+- Updated dependencies [93a0463]
+- Updated dependencies [aad607c]
+  - app-config@1.10.0
+  - mdm-util@1.10.0
+  - services@1.8.2
+  - markdown@1.10.0
+
 ## 1.9.0
 
 ### Minor Changes

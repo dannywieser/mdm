@@ -1,5 +1,14 @@
 # web
 
+## 1.10.0
+
+### Patch Changes
+
+- cc9bc64: HeatDots now splits into rows of 5 when more than 5 dots are rendered.
+- Updated dependencies [aad607c]
+  - mdm-util@1.10.0
+  - services@1.8.2
+
 ## 1.9.0
 
 ### Minor Changes
