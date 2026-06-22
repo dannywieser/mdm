@@ -3,7 +3,8 @@ import type { RequestHandler } from "express"
 
 import { resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
-import { countFilesRecursive, toLoggableError } from "mdm-util"
+import { toLoggableError } from "mdm-util"
+import { countFilesRecursive } from "mdm-util/node"
 import path from "node:path"
 
 import { logger } from "../../logger"
