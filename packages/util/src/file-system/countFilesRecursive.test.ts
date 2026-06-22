@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs"
 
-import { countFilesRecursive } from "./stats.files"
+import { countFilesRecursive } from "./countFilesRecursive"
 
 vi.mock("node:fs", () => ({
   promises: {
