@@ -1,6 +1,7 @@
+import type { ScannedNote } from "markdown"
+
 import { getDateComponents } from "mdm-util"
 
-import type { ScannedNote } from "markdown"
 import type {
   FolderCount,
   NotePerDay,

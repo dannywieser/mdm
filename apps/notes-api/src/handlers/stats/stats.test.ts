@@ -2,11 +2,11 @@ import { resolveNotesConfig } from "app-config"
 import { createMockNotesConfig } from "app-config/testing"
 import express from "express"
 import { collectMarkdownFiles } from "markdown"
+import { scanFile } from "markdown"
 import { toLoggableError } from "mdm-util"
 import { countFilesRecursive } from "mdm-util/node"
 import request from "supertest"
 
-import { scanFile } from "markdown"
 import { statsHandler } from "./stats"
 import {
   buildFolderBreakdown,

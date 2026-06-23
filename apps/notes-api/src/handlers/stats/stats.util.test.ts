@@ -1,6 +1,6 @@
-import { getDateComponents } from "mdm-util"
-
 import type { ScannedNote } from "markdown"
+
+import { getDateComponents } from "mdm-util"
 
 import {
   buildFolderBreakdown,
@@ -63,9 +63,18 @@ describe("stats util", () => {
   describe("countFolders", () => {
     test("counts unique folders across notes", () => {
       const notes = [
-        createNote({ folder: "projects", modifiedDate: "2026-06-01T00:00:00.000Z" }),
-        createNote({ folder: "archive", modifiedDate: "2026-06-01T00:00:00.000Z" }),
-        createNote({ folder: "projects", modifiedDate: "2026-06-01T00:00:00.000Z" }),
+        createNote({
+          folder: "projects",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
+        createNote({
+          folder: "archive",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
+        createNote({
+          folder: "projects",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
       ]
 
       expect(countFolders(notes)).toBe(2)
@@ -79,12 +88,30 @@ describe("stats util", () => {
   describe("buildFolderBreakdown", () => {
     test("returns folder counts sorted by count descending then name ascending", () => {
       const notes = [
-        createNote({ folder: "projects", modifiedDate: "2026-06-01T00:00:00.000Z" }),
-        createNote({ folder: "archive", modifiedDate: "2026-06-01T00:00:00.000Z" }),
-        createNote({ folder: "projects", modifiedDate: "2026-06-01T00:00:00.000Z" }),
-        createNote({ folder: "archive", modifiedDate: "2026-06-01T00:00:00.000Z" }),
-        createNote({ folder: "journal", modifiedDate: "2026-06-01T00:00:00.000Z" }),
-        createNote({ folder: "archive", modifiedDate: "2026-06-01T00:00:00.000Z" }),
+        createNote({
+          folder: "projects",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
+        createNote({
+          folder: "archive",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
+        createNote({
+          folder: "projects",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
+        createNote({
+          folder: "archive",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
+        createNote({
+          folder: "journal",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
+        createNote({
+          folder: "archive",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
       ]
 
       expect(buildFolderBreakdown(notes)).toEqual([
@@ -104,10 +131,22 @@ describe("stats util", () => {
 
     test("counts notes created within each time window", () => {
       const notes = [
-        createNote({ createdDate: "2026-06-01T00:00:00.000Z", modifiedDate: "2026-06-01T00:00:00.000Z" }),
-        createNote({ createdDate: "2026-05-01T00:00:00.000Z", modifiedDate: "2026-05-01T00:00:00.000Z" }),
-        createNote({ createdDate: "2026-01-01T00:00:00.000Z", modifiedDate: "2026-01-01T00:00:00.000Z" }),
-        createNote({ createdDate: "2024-01-01T00:00:00.000Z", modifiedDate: "2024-01-01T00:00:00.000Z" }),
+        createNote({
+          createdDate: "2026-06-01T00:00:00.000Z",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
+        createNote({
+          createdDate: "2026-05-01T00:00:00.000Z",
+          modifiedDate: "2026-05-01T00:00:00.000Z",
+        }),
+        createNote({
+          createdDate: "2026-01-01T00:00:00.000Z",
+          modifiedDate: "2026-01-01T00:00:00.000Z",
+        }),
+        createNote({
+          createdDate: "2024-01-01T00:00:00.000Z",
+          modifiedDate: "2024-01-01T00:00:00.000Z",
+        }),
       ]
 
       const result = buildNotesCreated(notes, now)
@@ -131,9 +170,18 @@ describe("stats util", () => {
 
     test("calculates positive trend when current period exceeds previous", () => {
       const notes = [
-        createNote({ createdDate: "2026-06-01T00:00:00.000Z", modifiedDate: "2026-06-01T00:00:00.000Z" }),
-        createNote({ createdDate: "2026-05-20T00:00:00.000Z", modifiedDate: "2026-05-20T00:00:00.000Z" }),
-        createNote({ createdDate: "2026-04-20T00:00:00.000Z", modifiedDate: "2026-04-20T00:00:00.000Z" }),
+        createNote({
+          createdDate: "2026-06-01T00:00:00.000Z",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
+        createNote({
+          createdDate: "2026-05-20T00:00:00.000Z",
+          modifiedDate: "2026-05-20T00:00:00.000Z",
+        }),
+        createNote({
+          createdDate: "2026-04-20T00:00:00.000Z",
+          modifiedDate: "2026-04-20T00:00:00.000Z",
+        }),
       ]
 
       const result = buildTrends(notes, now)
@@ -145,7 +193,10 @@ describe("stats util", () => {
 
     test("returns 100% change when previous period had no notes and current has some", () => {
       const notes = [
-        createNote({ createdDate: "2026-06-01T00:00:00.000Z", modifiedDate: "2026-06-01T00:00:00.000Z" }),
+        createNote({
+          createdDate: "2026-06-01T00:00:00.000Z",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
       ]
 
       const result = buildTrends(notes, now)
@@ -164,7 +215,11 @@ describe("stats util", () => {
     test("returns 365 entries", () => {
       getDateComponentsMock.mockImplementation((date) => {
         const d = new Date(date)
-        return { day: d.getUTCDate(), month: d.getUTCMonth() + 1, year: d.getUTCFullYear() }
+        return {
+          day: d.getUTCDate(),
+          month: d.getUTCMonth() + 1,
+          year: d.getUTCFullYear(),
+        }
       })
 
       const result = buildNotesPerDay([], "UTC", now)
@@ -175,13 +230,26 @@ describe("stats util", () => {
     test("counts notes on their creation date", () => {
       getDateComponentsMock.mockImplementation((date) => {
         const d = new Date(date)
-        return { day: d.getUTCDate(), month: d.getUTCMonth() + 1, year: d.getUTCFullYear() }
+        return {
+          day: d.getUTCDate(),
+          month: d.getUTCMonth() + 1,
+          year: d.getUTCFullYear(),
+        }
       })
 
       const notes = [
-        createNote({ createdDate: "2026-06-01T00:00:00.000Z", modifiedDate: "2026-06-01T00:00:00.000Z" }),
-        createNote({ createdDate: "2026-06-01T12:00:00.000Z", modifiedDate: "2026-06-01T12:00:00.000Z" }),
-        createNote({ createdDate: "2026-06-03T00:00:00.000Z", modifiedDate: "2026-06-03T00:00:00.000Z" }),
+        createNote({
+          createdDate: "2026-06-01T00:00:00.000Z",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
+        createNote({
+          createdDate: "2026-06-01T12:00:00.000Z",
+          modifiedDate: "2026-06-01T12:00:00.000Z",
+        }),
+        createNote({
+          createdDate: "2026-06-03T00:00:00.000Z",
+          modifiedDate: "2026-06-03T00:00:00.000Z",
+        }),
       ]
 
       const result = buildNotesPerDay(notes, "UTC", now)
@@ -195,11 +263,18 @@ describe("stats util", () => {
     test("ignores notes created outside the 365-day window", () => {
       getDateComponentsMock.mockImplementation((date) => {
         const d = new Date(date)
-        return { day: d.getUTCDate(), month: d.getUTCMonth() + 1, year: d.getUTCFullYear() }
+        return {
+          day: d.getUTCDate(),
+          month: d.getUTCMonth() + 1,
+          year: d.getUTCFullYear(),
+        }
       })
 
       const notes = [
-        createNote({ createdDate: "2020-01-01T00:00:00.000Z", modifiedDate: "2020-01-01T00:00:00.000Z" }),
+        createNote({
+          createdDate: "2020-01-01T00:00:00.000Z",
+          modifiedDate: "2020-01-01T00:00:00.000Z",
+        }),
       ]
 
       const result = buildNotesPerDay(notes, "UTC", now)
@@ -210,12 +285,22 @@ describe("stats util", () => {
     test("skips notes with null createdDate", () => {
       getDateComponentsMock.mockImplementation((date) => {
         const d = new Date(date)
-        return { day: d.getUTCDate(), month: d.getUTCMonth() + 1, year: d.getUTCFullYear() }
+        return {
+          day: d.getUTCDate(),
+          month: d.getUTCMonth() + 1,
+          year: d.getUTCFullYear(),
+        }
       })
 
       const notes = [
-        createNote({ createdDate: "2026-06-01T00:00:00.000Z", modifiedDate: "2026-06-01T00:00:00.000Z" }),
-        createNote({ createdDate: null, modifiedDate: "2026-06-01T00:00:00.000Z" }),
+        createNote({
+          createdDate: "2026-06-01T00:00:00.000Z",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
+        createNote({
+          createdDate: null,
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
       ]
 
       const result = buildNotesPerDay(notes, "UTC", now)
@@ -228,9 +313,18 @@ describe("stats util", () => {
   describe("countNotesWithoutCreatedDate", () => {
     test("returns count of notes where createdDate is null", () => {
       const notes = [
-        createNote({ createdDate: "2026-06-01T00:00:00.000Z", modifiedDate: "2026-06-01T00:00:00.000Z" }),
-        createNote({ createdDate: null, modifiedDate: "2026-06-01T00:00:00.000Z" }),
-        createNote({ createdDate: null, modifiedDate: "2026-06-01T00:00:00.000Z" }),
+        createNote({
+          createdDate: "2026-06-01T00:00:00.000Z",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
+        createNote({
+          createdDate: null,
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
+        createNote({
+          createdDate: null,
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
       ]
 
       expect(countNotesWithoutCreatedDate(notes)).toBe(2)
@@ -238,7 +332,10 @@ describe("stats util", () => {
 
     test("returns 0 when all notes have a createdDate", () => {
       const notes = [
-        createNote({ createdDate: "2026-06-01T00:00:00.000Z", modifiedDate: "2026-06-01T00:00:00.000Z" }),
+        createNote({
+          createdDate: "2026-06-01T00:00:00.000Z",
+          modifiedDate: "2026-06-01T00:00:00.000Z",
+        }),
       ]
 
       expect(countNotesWithoutCreatedDate(notes)).toBe(0)
