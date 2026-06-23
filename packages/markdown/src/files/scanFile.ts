@@ -1,11 +1,5 @@
 import { resolveNotesConfig } from "app-config"
 import {
-  buildObsidianUrl,
-  getTitleFromFilePath,
-  parseFrontMatter,
-  parseMarkdownBodyDates,
-} from "markdown"
-import {
   createFileID,
   getFolderFromFilePath,
   getBasename,
@@ -15,6 +9,11 @@ import { readFile } from "mdm-util/node"
 import path from "node:path"
 
 import type { ScannedNote } from "../types"
+
+import { parseFrontMatter } from "../parsers/parseFrontMatter"
+import { parseMarkdownBodyDates } from "../parsers/parseMarkdownBodyDates"
+import { buildObsidianUrl } from "./buildObsidianUrl"
+import { getTitleFromFilePath } from "./getTitleFromFilePath"
 
 export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 
