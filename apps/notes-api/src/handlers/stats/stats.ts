@@ -8,7 +8,7 @@ import { countFilesRecursive } from "mdm-util/node"
 import path from "node:path"
 
 import { logger } from "../../logger"
-import { scanMarkdownFile } from "../notes/scanFile"
+import { scanFile } from "../notes/scanFile"
 import {
   buildFolderBreakdown,
   buildNotesCreated,
@@ -26,11 +26,11 @@ export const statsHandler: RequestHandler = async (_request, response) => {
     notesConfig = await resolveNotesConfig()
     const { attachmentsDirectory, notesDirectory, timezone } = notesConfig
 
-    const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted(
+    const files = (await collectMarkdownFiles(notesDirectory)).toSorted(
       (a, b) => a.localeCompare(b),
     )
-    const scannedNotes = await Promise.all(
-      markdownFiles.map((filePath) => scanMarkdownFile(filePath)),
+    const scanned = await Promise.all(
+      files.map((filePath) => scanFile(filePath)),
     )
 
     const now = new Date()
@@ -40,15 +40,15 @@ export const statsHandler: RequestHandler = async (_request, response) => {
     const totalAttachments = await countFilesRecursive(absoluteAttachmentsDir)
 
     response.status(200).json({
-      folderBreakdown: buildFolderBreakdown(scannedNotes),
-      modifiedToday: countModifiedToday(scannedNotes, timezone),
-      notesCreated: buildNotesCreated(scannedNotes, now),
-      notesPerDay: buildNotesPerDay(scannedNotes, timezone, now),
-      notesWithoutCreatedDate: countNotesWithoutCreatedDate(scannedNotes),
+      folderBreakdown: buildFolderBreakdown(scanned),
+      modifiedToday: countModifiedToday(scanned, timezone),
+      notesCreated: buildNotesCreated(scanned, now),
+      notesPerDay: buildNotesPerDay(scanned, timezone, now),
+      notesWithoutCreatedDate: countNotesWithoutCreatedDate(scanned),
       totalAttachments,
-      totalFolders: countFolders(scannedNotes),
-      totalNotes: scannedNotes.length,
-      trends: buildTrends(scannedNotes, now),
+      totalFolders: countFolders(scanned),
+      totalNotes: scanned.length,
+      trends: buildTrends(scanned, now),
     })
   } catch (error) {
     logger.error(

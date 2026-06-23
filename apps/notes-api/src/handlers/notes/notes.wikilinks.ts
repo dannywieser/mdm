@@ -1,10 +1,9 @@
 import type { ScannedNote, WikilinkReplacement } from "./notes.types"
 
-export const WIKILINK_PLACEHOLDER_PATTERN = /WLPH(\d+)ENDWL/g
+import { WIKILINK_PLACEHOLDER_PATTERN } from "markdown"
 
 // eslint-disable-next-line sonarjs/slow-regex -- pattern is bounded by wikilink delimiters; not user-controlled input
 const WIKILINK_PATTERN = /(?<!!)\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g
-export const OBSIDIAN_WIKILINK_EMBED_PATTERN = /!\[\[([^\]|]+)(?:\|[^\]]*)?]]/g
 
 const HTML_ESCAPE_MAP: Record<string, string> = {
   "&": "&amp;",
@@ -16,9 +15,6 @@ const HTML_ESCAPE_MAP: Record<string, string> = {
 
 export const escapeHtml = (text: string): string =>
   text.replace(/[&<>"']/g, (char) => HTML_ESCAPE_MAP[char] ?? char)
-
-export const normalizeObsidianWikiEmbeds = (markdownBody: string): string =>
-  markdownBody.replace(OBSIDIAN_WIKILINK_EMBED_PATTERN, "![]($1)")
 
 export const resolveWikilinks = (
   body: string,

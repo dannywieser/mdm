@@ -1,15 +1,14 @@
-import type { MarkdownNode } from "markdown"
+import type { MarkdownNode } from "../types"
+import type { WikilinkReplacement } from "./buildMarkdownTree.types"
 
 import path from "node:path"
 import remark from "remark"
 import remarkGfm from "remark-gfm"
 
-import type { WikilinkReplacement } from "./notes.types"
-
 import {
   normalizeObsidianWikiEmbeds,
   WIKILINK_PLACEHOLDER_PATTERN,
-} from "./notes.wikilinks"
+} from "../wikilinks/obsidian"
 
 const IMAGE_SERVER_PATH = "/images"
 const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/

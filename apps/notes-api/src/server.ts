@@ -25,7 +25,7 @@ export const createApp = () => {
 export const logStartupConfig = async (): Promise<void> => {
   try {
     const notesConfig = await resolveNotesConfig()
-    //  logger.info({ notesConfig }, "Resolved notes config")
+    logger.info({ notesConfig }, "Resolved notes config")
   } catch (error) {
     logger.error(
       { error: toLoggableError(error) },

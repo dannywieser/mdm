@@ -17,6 +17,8 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "mdm-util": "1.10.0"
+    "mdm-util": "1.10.0",
+    "remark": "13.0.0",
+    "remark-gfm": "1.0.0"
   }
 }
