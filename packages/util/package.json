@@ -25,6 +25,7 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
+    "date-fns": "4.4.0",
     "redis": "5.10.0",
     "uuid": "11.1.0"
   }
