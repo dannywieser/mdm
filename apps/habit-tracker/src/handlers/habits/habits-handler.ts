@@ -5,8 +5,8 @@ import { toLoggableError } from "mdm-util"
 import { HabitSummary } from "services"
 
 import { logger } from "../../logger"
-import { calculateHabitScore } from "../habit-detail/habit-detail.util"
-import { loadHabitEntries } from "./loadHabitEntries"
+import { loadHabitEntries } from "./habits.load.util"
+import { calculateHabitScore } from "./habits.scoring.util"
 
 export const habitsHandler: RequestHandler = async (_request, response) => {
   try {

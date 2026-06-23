@@ -3,12 +3,12 @@ import type { RequestHandler } from "express"
 
 import { resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
+import { scanFile } from "markdown"
 import { toLoggableError } from "mdm-util"
 import { countFilesRecursive } from "mdm-util/node"
 import path from "node:path"
 
 import { logger } from "../../logger"
-import { scanFile } from "../../../../../packages/markdown/src/files/scanFile"
 import {
   buildFolderBreakdown,
   buildNotesCreated,

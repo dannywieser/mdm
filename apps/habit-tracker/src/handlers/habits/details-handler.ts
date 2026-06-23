@@ -1,26 +1,24 @@
-import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler } from "express"
 
 import { resolveNotesConfig } from "app-config"
 import { toLoggableError } from "mdm-util"
+import { HabitResult } from "services"
 
+import { logger } from "../../logger"
+import { buildHistory, calculateLowestDaysTrackedPerPeriod } from "./habits.history.util"
+import { loadHabitEntries } from "./habits.load.util"
 import {
-  buildHistory,
   buildScoreBreakdown,
   buildScoreEntries,
-  buildStreaks,
   calculateHabitScore,
-  calculateLowestDaysTrackedPerPeriod,
   getWindowEntries,
-} from "../habit-detail/habit-detail.util"
-import { loadHabitEntries } from "./loadHabitEntries"
+} from "./habits.scoring.util"
+import { buildStreaks } from "./habits.streak.util"
 
 export const habitDetailHandler: RequestHandler = async (request, response) => {
-  let notesConfig: ResolvedNotesConfig | undefined
-
   try {
-    notesConfig = await resolveNotesConfig()
-    const { habits, notesDirectory, timezone } = notesConfig
+    const notesConfig = await resolveNotesConfig()
+    const { habits, notesDirectory, timezone, dateFormats } = notesConfig
 
     const habitId = String(request.params.id)
     const habitConfig = habits.find((h) => h.id === habitId)
@@ -39,7 +37,11 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
       frontmatterProperty,
     } = habitConfig
 
-    const entries = await loadHabitEntries(notesDirectory, frontmatterProperty)
+    const entries = await loadHabitEntries(
+      notesDirectory,
+      frontmatterProperty,
+      dateFormats,
+    )
 
     const today = new Date().toLocaleDateString("en-CA", { timeZone: timezone })
     const {
@@ -116,10 +118,7 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
 
     response.status(200).json(result)
   } catch (error) {
-    logger.error(
-      { error: toLoggableError(error), notesConfig: notesConfig ?? null },
-      "Unable to load habit",
-    )
+    logger.error({ error: toLoggableError(error) }, "Unable to load habit")
     response.status(500).json({ error: "Unable to load habit" })
   }
 }
