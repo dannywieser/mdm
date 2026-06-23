@@ -5,11 +5,10 @@ import { getColumnLabel, resolveBadgeValues } from "./NotesSummaryTable.util"
 
 const createNote = (frontmatter: Note["frontmatter"]): Note => ({
   basename: "book",
-  titleOrBodyDates: [],
+  dates: [],
   createdDate: "2024-01-01",
   frontmatter,
   folder: "books",
-  fullPath: "/notes/books/book.md",
   fullText: "",
   content: { type: "root" },
   id: "1",
@@ -28,7 +27,10 @@ describe("resolveBadgeValues", () => {
   test("returns string array values and filters invalid entries", () => {
     const note = createNote({ genre: ["fiction", "", "mystery"] })
 
-    expect(resolveBadgeValues(note, "frontmatter.genre")).toEqual(["fiction", "mystery"])
+    expect(resolveBadgeValues(note, "frontmatter.genre")).toEqual([
+      "fiction",
+      "mystery",
+    ])
   })
 
   test("returns empty array for non-string values", () => {

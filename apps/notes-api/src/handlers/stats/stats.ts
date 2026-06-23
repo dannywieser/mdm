@@ -8,7 +8,7 @@ import { countFilesRecursive } from "mdm-util/node"
 import path from "node:path"
 
 import { logger } from "../../logger"
-import { scanFile } from "../notes/scanFile"
+import { scanFile } from "../../../../../packages/markdown/src/files/scanFile"
 import {
   buildFolderBreakdown,
   buildNotesCreated,

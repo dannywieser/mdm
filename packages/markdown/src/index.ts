@@ -1,6 +1,6 @@
-export { resolveDateFromFrontmatterOrTitle } from "./dates/resolveDateFromFrontmatterOrTitle"
 export { buildObsidianUrl } from "./files/buildObsidianUrl"
 export { collectMarkdownFiles } from "./files/collectMarkdownFiles"
+export { scanFile } from "./files/scanFile"
 export { getTitleFromFilePath } from "./files/getTitleFromFilePath"
 export { parseDateString } from "./parsers/parseDateString"
 export { parseFrontMatter } from "./parsers/parseFrontMatter"

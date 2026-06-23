@@ -7,7 +7,7 @@ import { NoteBadges } from "./NoteBadges"
 
 const noteFixture: Note = {
   basename: "My Note",
-  titleOrBodyDates: [],
+  dates: [],
   content: { children: [], type: "root" },
   createdDate: "2026-01-01",
   folder: "daily",
@@ -15,7 +15,6 @@ const noteFixture: Note = {
     genre: ["thriller", "classic"],
     type: "book",
   },
-  fullPath: "/daily/my-note.md",
   fullText: "",
   id: "my-note",
   linkedNotes: [],

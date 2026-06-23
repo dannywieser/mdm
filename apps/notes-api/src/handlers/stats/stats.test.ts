@@ -6,7 +6,7 @@ import { toLoggableError } from "mdm-util"
 import { countFilesRecursive } from "mdm-util/node"
 import request from "supertest"
 
-import { scanFile } from "../notes/scanFile"
+import { scanFile } from "../../../../../packages/markdown/src/files/scanFile"
 import { statsHandler } from "./stats"
 import {
   buildFolderBreakdown,

@@ -22,7 +22,7 @@ vi.mock("services", async (importOriginal) => {
 
 const noteFixture: Note = {
   basename: "My Note",
-  titleOrBodyDates: [],
+  dates: [],
   content: {
     children: [
       {
@@ -35,7 +35,6 @@ const noteFixture: Note = {
   createdDate: "2026-01-01",
   folder: "daily",
   frontmatter: null,
-  fullPath: "/daily/my-note.md",
   fullText: "",
   id: "my-note",
   linkedNotes: [],
@@ -46,7 +45,7 @@ const noteFixture: Note = {
 
 const linkedNoteFixture: Note = {
   basename: "Linked Note",
-  titleOrBodyDates: [],
+  dates: [],
   content: {
     children: [
       {
@@ -59,7 +58,6 @@ const linkedNoteFixture: Note = {
   createdDate: "2026-01-01",
   folder: "daily",
   frontmatter: null,
-  fullPath: "/daily/linked-note.md",
   fullText: "",
   id: "linked-note",
   linkedNotes: [],

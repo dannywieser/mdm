@@ -6,7 +6,7 @@ import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 
 import { logger } from "../../logger"
-import { scanFile } from "../notes/scanFile"
+import { scanFile } from "../../../../../packages/markdown/src/files/scanFile"
 import { buildViews } from "./views.util"
 
 export const viewsHandler: RequestHandler = async (_request, response) => {

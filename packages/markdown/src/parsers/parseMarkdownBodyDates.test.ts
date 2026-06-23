@@ -5,7 +5,7 @@ describe("parseMarkdownBodyDates", () => {
     expect(
       parseMarkdownBodyDates(
         "Met on 2026.05.26 and again on 26/05/27.\nIgnored 2026-05-26.",
-        ["YYYY.MM.DD", "YY/MM/DD"]
+        ["yyyy.MM.dd", "yy/MM/dd"]
       )
     ).toEqual(["2026.05.26", "26/05/27"])
   })
@@ -14,14 +14,14 @@ describe("parseMarkdownBodyDates", () => {
     expect(
       parseMarkdownBodyDates(
         "26/05/28, 2026.05.26, and 2026.05.27.",
-        ["YYYY.MM.DD", "YY/MM/DD"]
+        ["yyyy.MM.dd", "yy/MM/dd"]
       )
     ).toEqual(["2026.05.26", "2026.05.27", "26/05/28"])
   })
 
   test("ignores matches embedded inside longer numbers", () => {
     expect(
-      parseMarkdownBodyDates("12026.05.260 and 2026.05.26", ["YYYY.MM.DD"])
+      parseMarkdownBodyDates("12026.05.260 and 2026.05.26", ["yyyy.MM.dd"])
     ).toEqual(["2026.05.26"])
   })
 

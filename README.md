@@ -28,7 +28,7 @@ This repository is a Turborepo monorepo with this structure:
             "modifiedDate": "2026-05-26T00:00:00.000Z",
             "fullPath": "/absolute/path/to/notes/welcome.md",
             "basename": "welcome.md",
-            "titleOrBodyDates": ["2026.05.26"],
+            "dates": ["2026.05.26"],
             "id": "welcome",
             "folder": "notes",
             "obsidianUrl": "obsidian://open?vault=vault-name&file=welcome",
@@ -231,8 +231,17 @@ This repository is a Turborepo monorepo with this structure:
           { "start": "2026-01-01", "end": "2026-01-05", "length": 5 }
         ],
         "scoreEntries": [
-          { "date": "2026-03-12", "value": 10, "recentMultiplier": 10, "obsidianUrl": "obsidian://open?vault=notes&file=2026.03.12" },
-          { "date": "2026-03-08", "value": 10, "obsidianUrl": "obsidian://open?vault=notes&file=2026.03.08" }
+          {
+            "date": "2026-03-12",
+            "value": 10,
+            "recentMultiplier": 10,
+            "obsidianUrl": "obsidian://open?vault=notes&file=2026.03.12"
+          },
+          {
+            "date": "2026-03-08",
+            "value": 10,
+            "obsidianUrl": "obsidian://open?vault=notes&file=2026.03.08"
+          }
         ],
         "allTimeHighScore": 525,
         "allTimeHighStreak": 5,

@@ -5,7 +5,7 @@ import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
-import { scanFile } from "../notes/scanFile"
+import { scanFile } from "../../../../../packages/markdown/src/files/scanFile"
 import { viewsHandler } from "./views"
 import { buildViews } from "./views.util"
 

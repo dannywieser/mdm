@@ -14,7 +14,7 @@ import {
 import { readFile } from "mdm-util/node"
 import path from "node:path"
 
-import type { ScannedNote } from "./notes.types"
+import type { ScannedNote } from "../types"
 
 export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 

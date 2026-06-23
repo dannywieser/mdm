@@ -348,7 +348,7 @@ describe("notes filter helpers", () => {
 
       resolveNotesConfigMock.mockResolvedValue({
         ...defaultConfig,
-        dateFormats: ["YYYY.MM.DD"],
+        dateFormats: ["yyyy.MM.dd"],
         views: [
           {
             component: "NotesList",
@@ -368,7 +368,7 @@ describe("notes filter helpers", () => {
 
       expect(filtered).toEqual([notes[0]])
       expect(parseDateFromFormatsMock).toHaveBeenCalledWith("2024.05.27", [
-        "YYYY.MM.DD",
+        "yyyy.MM.dd",
       ])
     })
 
@@ -450,7 +450,7 @@ describe("notes filter helpers", () => {
 
       resolveNotesConfigMock.mockResolvedValue({
         ...defaultConfig,
-        dateFormats: ["YYYY.MM.DD"],
+        dateFormats: ["yyyy.MM.dd"],
         views: [
           {
             component: "NotesReview",
@@ -486,7 +486,7 @@ describe("notes filter helpers", () => {
 
       resolveNotesConfigMock.mockResolvedValue({
         ...defaultConfig,
-        dateFormats: ["YYYY.MM.DD"],
+        dateFormats: ["yyyy.MM.dd"],
         views: [
           {
             component: "NotesReview",

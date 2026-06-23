@@ -5,12 +5,11 @@ import { buildSearchIndex, filterSearchIndex } from "./NotesGallery.util"
 
 const buildNote = (overrides: Partial<Note> = {}): Note => ({
   basename: "note.md",
-  titleOrBodyDates: [],
+  dates: [],
   createdDate: null,
   frontmatter: null,
   fullText: "",
   folder: "",
-  fullPath: "/notes/note.md",
   content: { type: "root" },
   id: "note",
   modifiedDate: "2026-06-01T00:00:00.000Z",
@@ -24,13 +23,19 @@ const filterNotes = (notes: Note[], query: string): Note[] =>
 
 describe("filterSearchIndex", () => {
   test("returns all notes when the query is empty", () => {
-    const notes = [buildNote({ title: "first" }), buildNote({ title: "second" })]
+    const notes = [
+      buildNote({ title: "first" }),
+      buildNote({ title: "second" }),
+    ]
 
     expect(filterNotes(notes, "")).toEqual(notes)
   })
 
   test("matches notes by title", () => {
-    const notes = [buildNote({ title: "Trip to Japan" }), buildNote({ title: "Grocery list" })]
+    const notes = [
+      buildNote({ title: "Trip to Japan" }),
+      buildNote({ title: "Grocery list" }),
+    ]
 
     expect(filterNotes(notes, "japan")).toEqual([notes[0]])
   })
@@ -46,7 +51,10 @@ describe("filterSearchIndex", () => {
 
   test("matches notes by full text content", () => {
     const notes = [
-      buildNote({ title: "Note A", fullText: "discussing a roguelike game design" }),
+      buildNote({
+        title: "Note A",
+        fullText: "discussing a roguelike game design",
+      }),
       buildNote({ title: "Note B", fullText: "weekly meal plan" }),
     ]
 

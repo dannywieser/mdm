@@ -1,15 +1,18 @@
 import type { RequestHandler } from "express"
 
 import { resolveNotesConfig } from "app-config"
-import { collectMarkdownFiles, MarkdownNode } from "markdown"
+import {
+  collectMarkdownFiles,
+  MarkdownNode,
+  scanFile,
+  ScannedNote,
+} from "markdown"
 import { toLoggableError } from "mdm-util"
 
 import { logger } from "../../logger"
 import { applyViewFilter } from "./filters/notes.filters"
 import { getQueryIncludeContent, getQueryView } from "./handler.util"
-import { ScannedNote } from "./notes.types"
 import { parseNote } from "./parseNote"
-import { scanFile } from "./scanFile"
 
 export const EMPTY_MARKDOWN_NODE: MarkdownNode = { type: "root", children: [] }
 
