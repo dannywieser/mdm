@@ -1,7 +1,7 @@
+import type { ScannedNote } from "markdown"
+
 import { resolveNotesConfig } from "app-config"
 import { createMockNotesConfig } from "app-config/testing"
-
-import type { ScannedNote } from "../notes/notes.types"
 
 import { applyViewFilter } from "../notes/filters/notes.filters"
 import { buildViews } from "./views.util"

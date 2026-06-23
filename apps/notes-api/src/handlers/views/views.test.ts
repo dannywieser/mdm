@@ -1,11 +1,10 @@
 import { resolveNotesConfig } from "app-config"
 import { createMockNotesConfig } from "app-config/testing"
 import express from "express"
-import { collectMarkdownFiles } from "markdown"
+import { collectMarkdownFiles, scanFile } from "markdown"
 import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
-import { scanFile } from "../../../../../packages/markdown/src/files/scanFile"
 import { viewsHandler } from "./views"
 import { buildViews } from "./views.util"
 

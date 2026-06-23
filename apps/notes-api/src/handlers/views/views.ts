@@ -2,11 +2,10 @@ import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler } from "express"
 
 import { resolveNotesConfig } from "app-config"
-import { collectMarkdownFiles } from "markdown"
+import { collectMarkdownFiles, scanFile } from "markdown"
 import { toLoggableError } from "mdm-util"
 
 import { logger } from "../../logger"
-import { scanFile } from "../../../../../packages/markdown/src/files/scanFile"
 import { buildViews } from "./views.util"
 
 export const viewsHandler: RequestHandler = async (_request, response) => {

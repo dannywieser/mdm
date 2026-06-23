@@ -1,6 +1,6 @@
 import { getDateComponents } from "mdm-util"
 
-import type { ScannedNote } from "../notes/notes.types"
+import type { ScannedNote } from "markdown"
 
 import {
   buildFolderBreakdown,
