@@ -4,7 +4,7 @@ import type { RequestHandler } from "express"
 import { resolveNotesConfig } from "app-config"
 import { toLoggableError } from "mdm-util"
 
-import { loadHabitEntries } from "../habits.util"
+import { loadHabitEntries } from "../habits/loadHabitEntries"
 import {
   buildHistory,
   buildScoreBreakdown,

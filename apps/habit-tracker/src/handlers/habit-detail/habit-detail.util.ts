@@ -192,6 +192,7 @@ export const calculateHabitScore = (
   mode: HabitMode,
 ): HabitScoreResult => {
   const windowStart = getDateWindowStart(referenceDate, windowDays - 1)
+  console.log(windowStart, referenceDate, windowDays)
   const windowEntries = getWindowEntries(entries, referenceDate, windowDays)
   const rawScore = calculateRawScore(windowEntries)
   const recentEntryAdditions = calculateRecentEntryAdditions(
