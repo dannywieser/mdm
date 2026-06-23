@@ -1,14 +1,17 @@
 import type { RequestHandler } from "express"
 
 import { resolveNotesConfig } from "app-config"
-import { collectMarkdownFiles } from "markdown"
+import { collectMarkdownFiles, MarkdownNode } from "markdown"
 import { toLoggableError } from "mdm-util"
 
 import { logger } from "../../logger"
 import { applyViewFilter } from "./filters/notes.filters"
-import { getQueryView } from "./handler.util"
+import { getQueryIncludeContent, getQueryView } from "./handler.util"
 import { ScannedNote } from "./notes.types"
+import { parseNote } from "./parseNote"
 import { scanFile } from "./scanFile"
+
+export const EMPTY_MARKDOWN_NODE: MarkdownNode = { type: "root", children: [] }
 
 const loadNotes = async (notesDirectory: string): Promise<ScannedNote[]> => {
   // 1. load all markdown files from the notes directory
@@ -19,12 +22,17 @@ const loadNotes = async (notesDirectory: string): Promise<ScannedNote[]> => {
 
 export const notesHandler: RequestHandler = async (request, response) => {
   const view = getQueryView(request)
+  const includeContent = getQueryIncludeContent(request)
   try {
     const { notesDirectory } = await resolveNotesConfig()
     const rawNotes = await loadNotes(notesDirectory)
     const filteredNotes = await applyViewFilter(rawNotes, view)
-
-    response.status(200).json({ notes: filteredNotes })
+    const parsedNotes = includeContent
+      ? await Promise.all(
+          filteredNotes.map((note) => parseNote(note, rawNotes)),
+        )
+      : filteredNotes.map((note) => ({ ...note, content: EMPTY_MARKDOWN_NODE }))
+    response.status(200).json({ notes: parsedNotes })
   } catch (error) {
     logger.error({ error: toLoggableError(error) }, "Unable to load notes")
     response.status(500).json({ error: "Unable to load notes" })

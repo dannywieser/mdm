@@ -18,7 +18,6 @@ export { isNonEmptyString } from "./strings/isNonEmptyString"
 export { isStringArray } from "./strings/isStringArray"
 export { isStringRecord } from "./strings/isStringRecord"
 export { getFolderFromFilePath } from "./file-system/getFolderFromFilePath"
-export { readFile } from "./file-system/readFile"
 export { getBasename } from "./file-system/basename"
 
 export type { DateComponents } from "./date/getDateComponents.types"

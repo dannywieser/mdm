@@ -29,6 +29,7 @@ export interface Note {
   linkedNotes?: Note[]
   modifiedDate: string
   obsidianUrl: string
+  relativePath?: string
   title: string
 }
 

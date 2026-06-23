@@ -7,14 +7,9 @@ import {
   parseDateFromFormats,
 } from "mdm-util"
 
-import type { ViewFilterContext } from "./notes.filters.types"
+import type { FilterableNote, ViewFilterContext } from "./notes.filters.types"
 
-import { logger } from "../../../logger"
 import { MISSING, ON_THIS_DAY, TODAY } from "./constants"
-
-interface FilterableNote {
-  basename: string
-}
 
 const matchesOnThisDay = (
   noteValue: unknown,
@@ -133,9 +128,6 @@ const matchesViewFilters = (
   Object.entries(filters).every(([filterPath, expectedValue]) => {
     const noteValue = getValueByPath(note, filterPath)
     const matches = isMatchingFilterValue(noteValue, expectedValue, context)
-    console.log(
-      `Filter path: ${filterPath}, Expected value: ${expectedValue}, Note value: ${noteValue}, Matches: ${matches}`,
-    ) // Debugging output
     return matches
   })
 

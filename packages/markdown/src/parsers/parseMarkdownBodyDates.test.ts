@@ -10,13 +10,13 @@ describe("parseMarkdownBodyDates", () => {
     ).toEqual(["2026.05.26", "26/05/27"])
   })
 
-  test("returns dates in body order across configured formats", () => {
+  test("returns dates in chronological order across configured formats", () => {
     expect(
       parseMarkdownBodyDates(
         "26/05/28, 2026.05.26, and 2026.05.27.",
         ["YYYY.MM.DD", "YY/MM/DD"]
       )
-    ).toEqual(["26/05/28", "2026.05.26", "2026.05.27"])
+    ).toEqual(["2026.05.26", "2026.05.27", "26/05/28"])
   })
 
   test("ignores matches embedded inside longer numbers", () => {

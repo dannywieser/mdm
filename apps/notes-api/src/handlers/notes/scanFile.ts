@@ -8,10 +8,11 @@ import {
 import {
   createFileID,
   getFolderFromFilePath,
-  readFile,
   getBasename,
   formatDate,
 } from "mdm-util"
+import { readFile } from "mdm-util/node"
+import path from "node:path"
 
 import type { ScannedNote } from "./notes.types"
 
@@ -33,6 +34,10 @@ export async function scanFile(filePath: string): Promise<ScannedNote> {
   const { body: fullText, frontmatter } = parseFrontMatter(source)
   const createdDate = (frontmatter?.created as string | undefined) ?? dates[0]
   const obsidianUrl = buildObsidianUrl(obsidianVault, notesDirectory, filePath)
+  const relativePath = path
+    .relative(notesDirectory, filePath)
+    .split(path.sep)
+    .join("/")
 
   return {
     basename,
@@ -44,6 +49,7 @@ export async function scanFile(filePath: string): Promise<ScannedNote> {
     modifiedDate,
     title,
     obsidianUrl,
+    relativePath,
     dates,
   }
 }

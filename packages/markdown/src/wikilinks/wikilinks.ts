@@ -1,7 +1,7 @@
-import type { ScannedNote } from "../types"
-import type { WikilinkReplacement } from "../tree/buildMarkdownTree.types"
-
 import { escapeHtml } from "mdm-util"
+
+import type { WikilinkReplacement } from "../tree/buildMarkdownTree.types"
+import type { ScannedNote } from "../types"
 
 import { WIKILINK_PLACEHOLDER_PATTERN } from "./obsidian"
 
@@ -11,7 +11,11 @@ const WIKILINK_PATTERN = /(?<!!)\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g
 export const resolveWikilinks = (
   body: string,
   allNotes: ScannedNote[],
-): { processedBody: string; linkedNoteRefs: ScannedNote[]; replacements: WikilinkReplacement[] } => {
+): {
+  processedBody: string
+  linkedNoteRefs: ScannedNote[]
+  replacements: WikilinkReplacement[]
+} => {
   const linkedNoteRefs: ScannedNote[] = []
   const replacements: WikilinkReplacement[] = []
 
@@ -21,7 +25,9 @@ export const resolveWikilinks = (
       const noteName = noteRef.trim()
       const displayText = (alias?.trim() ?? "") || noteName
       const matchedNote =
-        allNotes.find((n) => n.title.toLowerCase() === noteName.toLowerCase()) ?? null
+        allNotes.find(
+          (n) => n.title.toLowerCase() === noteName.toLowerCase(),
+        ) ?? null
 
       if (matchedNote && !linkedNoteRefs.some((n) => n.id === matchedNote.id)) {
         linkedNoteRefs.push(matchedNote)

@@ -5,7 +5,7 @@ import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
-import { scanMarkdownFile } from "../notes/scanFile"
+import { scanFile } from "../notes/scanFile"
 import { viewsHandler } from "./views"
 import { buildViews } from "./views.util"
 
@@ -29,8 +29,8 @@ vi.mock("markdown", async (importOriginal) => {
   }
 })
 
-vi.mock("../notes/notes.scan", () => ({
-  scanMarkdownFile: vi.fn(),
+vi.mock("../notes/scanFile", () => ({
+  scanFile: vi.fn(),
 }))
 
 vi.mock("./views.util", () => ({
@@ -40,7 +40,7 @@ vi.mock("./views.util", () => ({
 const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
 const toLoggableErrorMock = vi.mocked(toLoggableError)
 const collectMarkdownFilesMock = vi.mocked(collectMarkdownFiles)
-const scanMarkdownFileMock = vi.mocked(scanMarkdownFile)
+const scanMarkdownFileMock = vi.mocked(scanFile)
 const buildViewsMock = vi.mocked(buildViews)
 
 const mockConfig = createMockNotesConfig({
@@ -60,15 +60,14 @@ const mockConfig = createMockNotesConfig({
 const mockNote = {
   basename: "a.md",
   createdDate: "2026-06-01T00:00:00.000Z",
+  dates: [],
   folder: "notes",
   frontmatter: null,
-  fullPath: "/notes/a.md",
   fullText: "",
   id: "a",
   modifiedDate: "2026-06-01T00:00:00.000Z",
   obsidianUrl: "obsidian://open?vault=vault&file=a",
   title: "a",
-  titleOrBodyDates: [],
 }
 
 describe("views handler interface", () => {

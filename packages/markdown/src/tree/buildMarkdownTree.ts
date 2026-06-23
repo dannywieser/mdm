@@ -1,9 +1,9 @@
-import type { MarkdownNode } from "../types"
-import type { WikilinkReplacement } from "./buildMarkdownTree.types"
-
 import path from "node:path"
 import remark from "remark"
 import remarkGfm from "remark-gfm"
+
+import type { MarkdownNode } from "../types"
+import type { WikilinkReplacement } from "./buildMarkdownTree.types"
 
 import {
   normalizeObsidianWikiEmbeds,

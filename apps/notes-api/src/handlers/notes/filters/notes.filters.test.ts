@@ -337,13 +337,13 @@ describe("notes filter helpers", () => {
       expect(filtered).toEqual([notes[0]])
     })
 
-    test("matches notes where any titleOrBodyDate falls on the same month and day in a previous year", async () => {
+    test("matches notes where any date falls on the same month and day in a previous year", async () => {
       const notes = [
         createMockNote("has-match.md", {
-          titleOrBodyDates: ["2024.05.27", "2024.06.01"],
+          dates: ["2024.05.27", "2024.06.01"],
         }),
-        createMockNote("no-match.md", { titleOrBodyDates: ["2024.05.26"] }),
-        createMockNote("this-year.md", { titleOrBodyDates: ["2026.05.27"] }),
+        createMockNote("no-match.md", { dates: ["2024.05.26"] }),
+        createMockNote("this-year.md", { dates: ["2026.05.27"] }),
       ]
 
       resolveNotesConfigMock.mockResolvedValue({
@@ -352,7 +352,7 @@ describe("notes filter helpers", () => {
         views: [
           {
             component: "NotesList",
-            filters: [{ titleOrBodyDates: "$onThisDay" }],
+            filters: [{ dates: "$onThisDay" }],
             id: "memories",
             name: "memories",
           },
@@ -441,11 +441,11 @@ describe("notes filter helpers", () => {
   })
 
   describe("$today keyword", () => {
-    test("matches notes where any titleOrBodyDate is today", async () => {
+    test("matches notes where any date is today", async () => {
       const notes = [
-        createMockNote("today.md", { titleOrBodyDates: ["2026.06.01"] }),
-        createMockNote("yesterday.md", { titleOrBodyDates: ["2026.05.31"] }),
-        createMockNote("no-dates.md", { titleOrBodyDates: [] }),
+        createMockNote("today.md", { dates: ["2026.06.01"] }),
+        createMockNote("yesterday.md", { dates: ["2026.05.31"] }),
+        createMockNote("no-dates.md", { dates: [] }),
       ]
 
       resolveNotesConfigMock.mockResolvedValue({
@@ -454,7 +454,7 @@ describe("notes filter helpers", () => {
         views: [
           {
             component: "NotesReview",
-            filters: [{ titleOrBodyDates: "$today" }],
+            filters: [{ dates: "$today" }],
             id: "today",
             name: "Today",
           },
@@ -480,8 +480,8 @@ describe("notes filter helpers", () => {
 
     test("does not match notes from a previous year on the same date", async () => {
       const notes = [
-        createMockNote("this-year.md", { titleOrBodyDates: ["2026.06.01"] }),
-        createMockNote("last-year.md", { titleOrBodyDates: ["2025.06.01"] }),
+        createMockNote("this-year.md", { dates: ["2026.06.01"] }),
+        createMockNote("last-year.md", { dates: ["2025.06.01"] }),
       ]
 
       resolveNotesConfigMock.mockResolvedValue({
@@ -490,7 +490,7 @@ describe("notes filter helpers", () => {
         views: [
           {
             component: "NotesReview",
-            filters: [{ titleOrBodyDates: "$today" }],
+            filters: [{ dates: "$today" }],
             id: "today",
             name: "Today",
           },
@@ -526,11 +526,10 @@ const createMockNote = (
 
 const defaultMockNote = (basename: string): Note => ({
   basename,
-  titleOrBodyDates: [],
+  dates: [],
   createdDate: "2026-05-26T00:00:00.000Z",
   folder: "notes",
   frontmatter: null,
-  fullPath: `/notes/${basename}`,
   fullText: "",
   content: {
     children: [{ type: "text", value: "Note" }],

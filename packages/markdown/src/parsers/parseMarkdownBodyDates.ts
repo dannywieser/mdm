@@ -1,3 +1,5 @@
+import { parseDateFromFormats } from "mdm-util"
+
 const TOKEN_PATTERNS: Record<string, string> = {
   yyyy: "\\d{4}",
   yy: "\\d{2}",
@@ -75,4 +77,12 @@ export const parseMarkdownBodyDates = (
         match.value !== values[index - 1]?.value,
     )
     .map(({ value }) => value)
+    .toSorted((a, b) => {
+      const parsedA = parseDateFromFormats(a, dateFormats)
+      const parsedB = parseDateFromFormats(b, dateFormats)
+      if (!parsedA || !parsedB) return 0
+      if (parsedA.year !== parsedB.year) return parsedA.year - parsedB.year
+      if (parsedA.month !== parsedB.month) return parsedA.month - parsedB.month
+      return parsedA.day - parsedB.day
+    })
 }

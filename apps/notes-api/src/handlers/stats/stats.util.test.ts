@@ -21,14 +21,13 @@ const createNote = (
 ): ScannedNote => ({
   basename: "note.md",
   createdDate: "2026-06-01T00:00:00.000Z",
+  dates: [],
   folder: "notes",
   frontmatter: null,
-  fullPath: "/notes/note.md",
   fullText: "",
   id: "note",
   obsidianUrl: "obsidian://open?vault=vault&file=note",
   title: "note",
-  titleOrBodyDates: [],
   ...overrides,
 })
 
