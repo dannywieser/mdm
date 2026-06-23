@@ -2,7 +2,7 @@ import type { RequestHandler } from "express"
 
 import request from "supertest"
 
-import { habitDetailHandler } from "./handlers/habit-detail/habit-detail"
+import { habitDetailHandler } from "./handlers/habits/details-handler"
 import { habitsHandler } from "./handlers/habits/habits-handler"
 import { healthHandler } from "./handlers/health/health"
 import { createApp } from "./server"

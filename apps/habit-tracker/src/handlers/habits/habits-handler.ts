@@ -1,4 +1,3 @@
-import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler } from "express"
 
 import { resolveNotesConfig } from "app-config"
@@ -10,18 +9,16 @@ import { calculateHabitScore } from "../habit-detail/habit-detail.util"
 import { loadHabitEntries } from "./loadHabitEntries"
 
 export const habitsHandler: RequestHandler = async (_request, response) => {
-  let notesConfig: ResolvedNotesConfig | undefined
-
   try {
-    notesConfig = await resolveNotesConfig()
+    const notesConfig = await resolveNotesConfig()
     const { habits, notesDirectory, timezone, dateFormats } = notesConfig
     const today = new Date().toLocaleDateString("en-CA", { timeZone: timezone })
 
     const summaries: HabitSummary[] = await Promise.all(
       habits.map(
         async ({
-          id,
-          name,
+          id: habitId,
+          name: habitName,
           mode,
           frontmatterProperty,
           targetScore,
@@ -33,32 +30,27 @@ export const habitsHandler: RequestHandler = async (_request, response) => {
             dateFormats,
           )
 
-          const { habitScore, streak, uniqueWindowDays } = calculateHabitScore(
-            entries,
-            today,
-            trackingWindowDays,
-            mode,
-          )
+          const {
+            habitScore,
+            streak,
+            uniqueWindowDays: windowEntries,
+          } = calculateHabitScore(entries, today, trackingWindowDays, mode)
 
           return {
-            habitId: id,
-            habitName: name,
+            habitId,
+            habitName,
             habitScore,
             mode,
             streak,
             targetScore,
-            windowEntries: uniqueWindowDays,
+            windowEntries,
           }
         },
       ),
     )
-
     response.status(200).json(summaries)
   } catch (error) {
-    logger.error(
-      { error: toLoggableError(error), notesConfig: notesConfig ?? null },
-      "Unable to load habits",
-    )
+    logger.error({ error: toLoggableError(error) }, "Unable to load habits")
     response.status(500).json({ error: "Unable to load habits" })
   }
 }

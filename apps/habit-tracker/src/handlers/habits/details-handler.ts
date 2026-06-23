@@ -4,7 +4,6 @@ import type { RequestHandler } from "express"
 import { resolveNotesConfig } from "app-config"
 import { toLoggableError } from "mdm-util"
 
-import { loadHabitEntries } from "../habits/loadHabitEntries"
 import {
   buildHistory,
   buildScoreBreakdown,
@@ -13,7 +12,8 @@ import {
   calculateHabitScore,
   calculateLowestDaysTrackedPerPeriod,
   getWindowEntries,
-} from "./habit-detail.util"
+} from "../habit-detail/habit-detail.util"
+import { loadHabitEntries } from "./loadHabitEntries"
 
 export const habitDetailHandler: RequestHandler = async (request, response) => {
   let notesConfig: ResolvedNotesConfig | undefined
@@ -40,8 +40,6 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
     } = habitConfig
 
     const entries = await loadHabitEntries(notesDirectory, frontmatterProperty)
-
-    console.log(entries)
 
     const today = new Date().toLocaleDateString("en-CA", { timeZone: timezone })
     const {
