@@ -1,5 +1,3 @@
-import type { Note, WikilinkReplacement } from "markdown"
+import type { ScannedNote, WikilinkReplacement } from "markdown"
 
-export type ScannedNote = Omit<Note, "content">
-
-export type { WikilinkReplacement }
+export type { ScannedNote, WikilinkReplacement }

@@ -6,7 +6,7 @@ import { toLoggableError } from "mdm-util"
 import { countFilesRecursive } from "mdm-util/node"
 import request from "supertest"
 
-import { scanMarkdownFile } from "../notes/scanFile"
+import { scanFile } from "../notes/scanFile"
 import { statsHandler } from "./stats"
 import {
   buildFolderBreakdown,
@@ -56,7 +56,7 @@ vi.mock("./stats.util", () => ({
 const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
 const toLoggableErrorMock = vi.mocked(toLoggableError)
 const collectMarkdownFilesMock = vi.mocked(collectMarkdownFiles)
-const scanMarkdownFileMock = vi.mocked(scanMarkdownFile)
+const scanMarkdownFileMock = vi.mocked(scanFile)
 const countFilesRecursiveMock = vi.mocked(countFilesRecursive)
 const buildFolderBreakdownMock = vi.mocked(buildFolderBreakdown)
 const buildNotesCreatedMock = vi.mocked(buildNotesCreated)

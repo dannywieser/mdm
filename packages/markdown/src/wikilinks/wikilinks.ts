@@ -1,20 +1,12 @@
-import type { ScannedNote, WikilinkReplacement } from "./notes.types"
+import type { ScannedNote } from "../types"
+import type { WikilinkReplacement } from "../tree/buildMarkdownTree.types"
 
-import { WIKILINK_PLACEHOLDER_PATTERN } from "markdown"
+import { escapeHtml } from "mdm-util"
+
+import { WIKILINK_PLACEHOLDER_PATTERN } from "./obsidian"
 
 // eslint-disable-next-line sonarjs/slow-regex -- pattern is bounded by wikilink delimiters; not user-controlled input
 const WIKILINK_PATTERN = /(?<!!)\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g
-
-const HTML_ESCAPE_MAP: Record<string, string> = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#39;",
-}
-
-export const escapeHtml = (text: string): string =>
-  text.replace(/[&<>"']/g, (char) => HTML_ESCAPE_MAP[char] ?? char)
 
 export const resolveWikilinks = (
   body: string,

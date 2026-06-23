@@ -1,6 +1,6 @@
-import type { ScannedNote } from "./notes.types"
+import type { ScannedNote } from "../types"
 
-import { applyWikilinkReplacements, escapeHtml, resolveWikilinks } from "./notes.wikilinks"
+import { applyWikilinkReplacements, resolveWikilinks } from "./wikilinks"
 
 describe("resolveWikilinks", () => {
   test("returns body unchanged when there are no wikilinks", () => {
@@ -146,38 +146,15 @@ describe("applyWikilinkReplacements", () => {
   })
 })
 
-describe("escapeHtml", () => {
-  test("escapes ampersand", () => {
-    expect(escapeHtml("A & B")).toBe("A &amp; B")
-  })
-
-  test("escapes less-than and greater-than", () => {
-    expect(escapeHtml("<tag>")).toBe("&lt;tag&gt;")
-  })
-
-  test("escapes double quote", () => {
-    expect(escapeHtml('"quoted"')).toBe("&quot;quoted&quot;")
-  })
-
-  test("escapes single quote", () => {
-    expect(escapeHtml("it's")).toBe("it&#39;s")
-  })
-
-  test("leaves plain text unchanged", () => {
-    expect(escapeHtml("hello world")).toBe("hello world")
-  })
-})
-
 const createScannedNote = (overrides: Partial<ScannedNote> = {}): ScannedNote => ({
   basename: "note.md",
-  titleOrBodyDates: [],
-  createdDate: "2026-05-26T00:00:00.000Z",
+  dates: [],
+  createdDate: null,
   folder: "topic",
   frontmatter: null,
-  fullPath: "/notes/topic/note.md",
   fullText: "",
   id: "note",
-  modifiedDate: "2026-05-26T01:00:00.000Z",
+  modifiedDate: "2026-05-26",
   obsidianUrl: "obsidian://open?vault=vault&file=topic%2Fnote",
   title: "note",
   ...overrides,

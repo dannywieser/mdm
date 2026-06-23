@@ -14,8 +14,7 @@ const loadNotes = async (notesDirectory: string): Promise<ScannedNote[]> => {
   // 1. load all markdown files from the notes directory
   const allNotes = await collectMarkdownFiles(notesDirectory)
   // 2. scan all markdown files to extract metadata and frontmatter
-  const scannedNotes = await Promise.all(allNotes.map((file) => scanFile(file)))
-  return scannedNotes
+  return Promise.all(allNotes.map((file) => scanFile(file)))
 }
 
 export const notesHandler: RequestHandler = async (request, response) => {
@@ -24,6 +23,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
     const { notesDirectory } = await resolveNotesConfig()
     const rawNotes = await loadNotes(notesDirectory)
     const filteredNotes = await applyViewFilter(rawNotes, view)
+
     response.status(200).json({ notes: filteredNotes })
   } catch (error) {
     logger.error({ error: toLoggableError(error) }, "Unable to load notes")

@@ -14,6 +14,10 @@ export {
   OBSIDIAN_WIKILINK_EMBED_PATTERN,
   WIKILINK_PLACEHOLDER_PATTERN,
 } from "./wikilinks/obsidian"
+export {
+  applyWikilinkReplacements,
+  resolveWikilinks,
+} from "./wikilinks/wikilinks"
 
 export type { WikilinkReplacement } from "./tree/buildMarkdownTree.types"
 export type {
@@ -23,4 +27,5 @@ export type {
   NoteFrontmatter,
   ParsedDate,
   ParsedFrontMatter,
+  ScannedNote,
 } from "./types"

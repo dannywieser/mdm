@@ -37,6 +37,8 @@ export interface ParsedFrontMatter {
   frontmatter: NoteFrontmatter | null
 }
 
+export type ScannedNote = Omit<Note, "content">
+
 export interface ParsedDate {
   day: number
   month: number
