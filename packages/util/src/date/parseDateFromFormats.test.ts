@@ -1,16 +1,16 @@
 import { parseDateFromFormats } from "./parseDateFromFormats"
 
 describe("parseDateFromFormats", () => {
-  test("parses a YYYY.MM.DD date string", () => {
-    expect(parseDateFromFormats("2024.05.27", ["YYYY.MM.DD"])).toEqual({
+  test("parses a yyyy.MM.dd date string", () => {
+    expect(parseDateFromFormats("2024.05.27", ["yyyy.MM.dd"])).toEqual({
       day: 27,
       month: 5,
       year: 2024,
     })
   })
 
-  test("parses a YY/MM/DD date string, interpreting YY as 2000 + YY", () => {
-    expect(parseDateFromFormats("24/05/27", ["YY/MM/DD"])).toEqual({
+  test("parses a yy/MM/dd date string, interpreting yy as 2000 + yy", () => {
+    expect(parseDateFromFormats("24/05/27", ["yy/MM/dd"])).toEqual({
       day: 27,
       month: 5,
       year: 2024,
@@ -18,7 +18,7 @@ describe("parseDateFromFormats", () => {
   })
 
   test("tries each format in order and returns the first match", () => {
-    expect(parseDateFromFormats("2024.05.27", ["YY/MM/DD", "YYYY.MM.DD"])).toEqual({
+    expect(parseDateFromFormats("2024.05.27", ["yy/MM/dd", "yyyy.MM.dd"])).toEqual({
       day: 27,
       month: 5,
       year: 2024,
@@ -26,7 +26,7 @@ describe("parseDateFromFormats", () => {
   })
 
   test("returns null when no format matches", () => {
-    expect(parseDateFromFormats("not-a-date", ["YYYY.MM.DD"])).toBeNull()
+    expect(parseDateFromFormats("not-a-date", ["yyyy.MM.dd"])).toBeNull()
   })
 
   test("returns null when formats list is empty", () => {
@@ -34,7 +34,7 @@ describe("parseDateFromFormats", () => {
   })
 
   test("requires an exact full-string match", () => {
-    expect(parseDateFromFormats("prefix-2024.05.27", ["YYYY.MM.DD"])).toBeNull()
-    expect(parseDateFromFormats("2024.05.27-suffix", ["YYYY.MM.DD"])).toBeNull()
+    expect(parseDateFromFormats("prefix-2024.05.27", ["yyyy.MM.dd"])).toBeNull()
+    expect(parseDateFromFormats("2024.05.27-suffix", ["yyyy.MM.dd"])).toBeNull()
   })
 })

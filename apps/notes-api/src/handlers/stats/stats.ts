@@ -8,7 +8,7 @@ import { countFilesRecursive } from "mdm-util/node"
 import path from "node:path"
 
 import { logger } from "../../logger"
-import { scanMarkdownFile } from "../notes/notes.scan"
+import { scanMarkdownFile } from "../notes/scanFile"
 import {
   buildFolderBreakdown,
   buildNotesCreated,
@@ -26,7 +26,9 @@ export const statsHandler: RequestHandler = async (_request, response) => {
     notesConfig = await resolveNotesConfig()
     const { attachmentsDirectory, notesDirectory, timezone } = notesConfig
 
-    const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted((a, b) => a.localeCompare(b))
+    const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted(
+      (a, b) => a.localeCompare(b),
+    )
     const scannedNotes = await Promise.all(
       markdownFiles.map((filePath) => scanMarkdownFile(filePath)),
     )

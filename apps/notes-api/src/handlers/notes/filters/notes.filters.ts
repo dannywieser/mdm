@@ -9,6 +9,7 @@ import {
 
 import type { ViewFilterContext } from "./notes.filters.types"
 
+import { logger } from "../../../logger"
 import { MISSING, ON_THIS_DAY, TODAY } from "./constants"
 
 interface FilterableNote {
@@ -40,7 +41,6 @@ const matchesOnThisDay = (
       }
 
       const parsed = parseDateFromFormats(entry, context.dateFormats)
-
       if (!parsed) {
         return false
       }
@@ -133,6 +133,9 @@ const matchesViewFilters = (
   Object.entries(filters).every(([filterPath, expectedValue]) => {
     const noteValue = getValueByPath(note, filterPath)
     const matches = isMatchingFilterValue(noteValue, expectedValue, context)
+    console.log(
+      `Filter path: ${filterPath}, Expected value: ${expectedValue}, Note value: ${noteValue}, Matches: ${matches}`,
+    ) // Debugging output
     return matches
   })
 
@@ -143,7 +146,10 @@ const isExcludeViewFilter = (filter: ViewFilter): filter is ExcludeViewFilter =>
 
 const splitViewFilters = (
   viewFilters: readonly ViewFilter[],
-): { excludeFilters: Record<string, string>[]; includeFilters: Record<string, string>[] } =>
+): {
+  excludeFilters: Record<string, string>[]
+  includeFilters: Record<string, string>[]
+} =>
   viewFilters.reduce<{
     excludeFilters: Record<string, string>[]
     includeFilters: Record<string, string>[]
@@ -164,7 +170,11 @@ export const applyViewFilter = async <T extends FilterableNote>(
   notes: readonly T[],
   requestedViewId: string | undefined,
 ): Promise<T[]> => {
-  const { dateFormats, timezone, views: configuredViews } = await resolveNotesConfig()
+  const {
+    dateFormats,
+    timezone,
+    views: configuredViews,
+  } = await resolveNotesConfig()
   const context: ViewFilterContext = { dateFormats, timezone }
 
   if (!requestedViewId) {
@@ -177,7 +187,9 @@ export const applyViewFilter = async <T extends FilterableNote>(
     return [...notes]
   }
 
-  const { excludeFilters, includeFilters } = splitViewFilters(selectedView.filters)
+  const { excludeFilters, includeFilters } = splitViewFilters(
+    selectedView.filters,
+  )
 
   return notes.filter((note) => {
     const matchesIncludeFilter =

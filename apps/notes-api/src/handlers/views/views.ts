@@ -6,7 +6,7 @@ import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 
 import { logger } from "../../logger"
-import { scanMarkdownFile } from "../notes/notes.scan"
+import { scanMarkdownFile } from "../notes/scanFile"
 import { buildViews } from "./views.util"
 
 export const viewsHandler: RequestHandler = async (_request, response) => {
@@ -16,7 +16,9 @@ export const viewsHandler: RequestHandler = async (_request, response) => {
     notesConfig = await resolveNotesConfig()
     const { notesDirectory } = notesConfig
 
-    const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted((a, b) => a.localeCompare(b))
+    const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted(
+      (a, b) => a.localeCompare(b),
+    )
     const scannedNotes = await Promise.all(
       markdownFiles.map((filePath) => scanMarkdownFile(filePath)),
     )

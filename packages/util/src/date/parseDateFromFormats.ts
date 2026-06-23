@@ -28,13 +28,13 @@ export const parseDateFromFormats = (
     tokens.forEach((token, tokenIndex) => {
       const value = parseInt(match[tokenIndex + 1], 10)
 
-      if (token === "YYYY") {
+      if (token === "yyyy") {
         year = value
-      } else if (token === "YY") {
+      } else if (token === "yy") {
         year = 2000 + value
       } else if (token === "MM") {
         month = value
-      } else if (token === "DD") {
+      } else if (token === "dd") {
         day = value
       }
     })

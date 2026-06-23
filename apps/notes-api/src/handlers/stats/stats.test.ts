@@ -6,7 +6,7 @@ import { toLoggableError } from "mdm-util"
 import { countFilesRecursive } from "mdm-util/node"
 import request from "supertest"
 
-import { scanMarkdownFile } from "../notes/notes.scan"
+import { scanMarkdownFile } from "../notes/scanFile"
 import { statsHandler } from "./stats"
 import {
   buildFolderBreakdown,
@@ -97,9 +97,7 @@ describe("stats handler interface", () => {
     countFilesRecursiveMock.mockResolvedValue(12)
     countModifiedTodayMock.mockReturnValue(1)
     countFoldersMock.mockReturnValue(3)
-    buildFolderBreakdownMock.mockReturnValue([
-      { count: 5, folder: "notes" },
-    ])
+    buildFolderBreakdownMock.mockReturnValue([{ count: 5, folder: "notes" }])
     buildNotesCreatedMock.mockReturnValue({
       last30Days: 3,
       last365Days: 40,

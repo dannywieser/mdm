@@ -1,17 +1,13 @@
-import type { MarkdownNode, Note, NoteFrontmatter } from "markdown"
+import type { MarkdownNode } from "markdown"
 
-import { resolveNotesConfig } from "app-config"
-import { parseFrontMatter } from "markdown"
-import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
 import remarkGfm from "remark-gfm"
 
-import type { ScannedNote, WikilinkReplacement } from "./notes.types"
+import type { WikilinkReplacement } from "./notes.types"
 
 import {
   normalizeObsidianWikiEmbeds,
-  resolveWikilinks,
   WIKILINK_PLACEHOLDER_PATTERN,
 } from "./notes.wikilinks"
 
@@ -20,34 +16,7 @@ const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
 
 export const EMPTY_MARKDOWN_NODE: MarkdownNode = { type: "root", children: [] }
 
-export const parseMarkdownFile = async (
-  note: ScannedNote,
-  allNotes: ScannedNote[] = [],
-): Promise<Note> => {
-  return allNotes
-  // const { attachmentsDirectory, notesDirectory } = await resolveNotesConfig()
-  // const relativePath = path.relative(notesDirectory, note.fullPath)
-  // const normalizedRelativePath = relativePath.split(path.sep).join("/")
-
-  // const content = buildMarkdownTree(
-  //   processedBody,
-  //   normalizedRelativePath,
-  //   replacements,
-  //   attachmentsDirectory,
-  // )
-
-  // const linkedNotes = await Promise.all(
-  //   linkedNoteRefs.map((linkedNote) => parseMarkdownFile(linkedNote, [])),
-  // )
-
-  // return {
-  //   ...note,
-  //   content,
-  //   linkedNotes,
-  // }
-}
-
-const buildMarkdownTree = (
+export const buildMarkdownTree = (
   markdownBody: string,
   noteRelativePath: string,
   replacements: WikilinkReplacement[],

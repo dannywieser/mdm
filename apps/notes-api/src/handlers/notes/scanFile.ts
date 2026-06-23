@@ -17,7 +17,7 @@ import type { ScannedNote } from "./notes.types"
 
 export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 
-export async function scanMarkdownFile(filePath: string): Promise<ScannedNote> {
+export async function scanFile(filePath: string): Promise<ScannedNote> {
   const { notesDirectory, dateFormats, obsidianVault } =
     await resolveNotesConfig()
 

@@ -1,10 +1,10 @@
 import type { CapturingPattern } from "./buildCapturingPattern.types"
 
 const DATE_TOKEN_PATTERNS: Record<string, string> = {
-  YYYY: "(\\d{4})",
-  YY: "(\\d{2})",
+  yyyy: "(\\d{4})",
+  yy: "(\\d{2})",
   MM: "(0[1-9]|1[0-2])",
-  DD: "(0[1-9]|[12]\\d|3[01])",
+  dd: "(0[1-9]|[12]\\d|3[01])",
 }
 
 const escapeRegex = (value: string): string =>
