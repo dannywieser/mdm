@@ -7,7 +7,6 @@ import {
 } from "markdown"
 import {
   createFileID,
-  format,
   getFolderFromFilePath,
   readFile,
   getBasename,
@@ -16,17 +15,7 @@ import {
 
 import type { ScannedNote } from "./notes.types"
 
-// import { resolveFrontmatterImages } from "./notes.parse"
-
 export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
-
-// const extractFrontmatterDates = (
-//   frontmatter: NoteFrontmatter,
-//   dateFormats: readonly string[],
-// ): string[] =>
-//   Object.values(frontmatter)
-//     .flat()
-//     .flatMap((value) => parseMarkdownBodyDates(value, dateFormats))
 
 export async function scanMarkdownFile(filePath: string): Promise<ScannedNote> {
   const { notesDirectory, dateFormats, obsidianVault } =
@@ -40,12 +29,14 @@ export async function scanMarkdownFile(filePath: string): Promise<ScannedNote> {
   const { source, stats } = await readFile(filePath)
   const modifiedDate = formatDate(stats.mtime, dateFormats[0]) // Use the first date format for modifiedDate
 
-  const dates = parseMarkdownBodyDates(source, dateFormats)
+  const dates = parseMarkdownBodyDates(`${title} ${source}`, dateFormats)
   const { body: fullText, frontmatter } = parseFrontMatter(source)
+  const createdDate = (frontmatter?.created as string | undefined) ?? dates[0]
   const obsidianUrl = buildObsidianUrl(obsidianVault, notesDirectory, filePath)
 
   return {
     basename,
+    createdDate,
     folder,
     frontmatter,
     fullText,
@@ -54,5 +45,5 @@ export async function scanMarkdownFile(filePath: string): Promise<ScannedNote> {
     title,
     obsidianUrl,
     dates,
-  } as unknown as ScannedNote
+  }
 }

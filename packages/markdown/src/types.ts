@@ -15,16 +15,15 @@ export interface MarkdownNode {
   wikilinkType?: "matched" | "unmatched"
 }
 
-export type NoteFrontmatter = Record<string, FrontmatterValue>;
+export type NoteFrontmatter = Record<string, FrontmatterValue>
 
 export interface Note {
   basename: string
-  titleOrBodyDates: string[]
-  createdDate: string | null
+  dates: string[]
+  createdDate?: string | null
   frontmatter: NoteFrontmatter | null
   fullText: string
   folder: string
-  fullPath: string
   content: MarkdownNode
   id: string
   linkedNotes?: Note[]

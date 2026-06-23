@@ -24,51 +24,27 @@ export const parseMarkdownFile = async (
   note: ScannedNote,
   allNotes: ScannedNote[] = [],
 ): Promise<Note> => {
-  const { attachmentsDirectory, notesDirectory } = await resolveNotesConfig()
-  const source = await fs.readFile(note.fullPath, "utf8")
-  const { body } = parseFrontMatter(source)
-  const relativePath = path.relative(notesDirectory, note.fullPath)
-  const normalizedRelativePath = relativePath.split(path.sep).join("/")
+  return allNotes
+  // const { attachmentsDirectory, notesDirectory } = await resolveNotesConfig()
+  // const relativePath = path.relative(notesDirectory, note.fullPath)
+  // const normalizedRelativePath = relativePath.split(path.sep).join("/")
 
-  const { processedBody, linkedNoteRefs, replacements } = resolveWikilinks(body, allNotes)
+  // const content = buildMarkdownTree(
+  //   processedBody,
+  //   normalizedRelativePath,
+  //   replacements,
+  //   attachmentsDirectory,
+  // )
 
-  const content = buildMarkdownTree(
-    processedBody,
-    normalizedRelativePath,
-    replacements,
-    attachmentsDirectory,
-  )
+  // const linkedNotes = await Promise.all(
+  //   linkedNoteRefs.map((linkedNote) => parseMarkdownFile(linkedNote, [])),
+  // )
 
-  const linkedNotes = await Promise.all(
-    linkedNoteRefs.map((linkedNote) =>
-      parseMarkdownFile(linkedNote, []),
-    ),
-  )
-
-  return {
-    ...note,
-    content,
-    linkedNotes,
-  }
-}
-
-export const resolveFrontmatterImages = (
-  frontmatter: NoteFrontmatter | null,
-  noteRelativePath: string,
-  attachmentsDirectory = "",
-): NoteFrontmatter | null => {
-  if (!frontmatter) return null
-
-  const cover = frontmatter.cover
-  if (!cover) return frontmatter
-
-  const rawPath = Array.isArray(cover) ? cover[0] : cover
-  if (!rawPath) return frontmatter
-
-  const resolvedPath = resolveLocalImagePath(rawPath, noteRelativePath, attachmentsDirectory)
-  if (!resolvedPath) return frontmatter
-
-  return { ...frontmatter, cover: resolvedPath }
+  // return {
+  //   ...note,
+  //   content,
+  //   linkedNotes,
+  // }
 }
 
 const buildMarkdownTree = (
@@ -91,7 +67,11 @@ const buildMarkdownTree = (
       return
     }
 
-    const imagePath = resolveLocalImagePath(node.url, noteRelativePath, attachmentsDirectory)
+    const imagePath = resolveLocalImagePath(
+      node.url,
+      noteRelativePath,
+      attachmentsDirectory,
+    )
 
     if (!imagePath) {
       return
@@ -182,12 +162,18 @@ const replaceWikilinkPlaceholdersInNode = (
   return parts
 }
 
-const resolveMultiComponentImagePath = (decodedImagePath: string, noteRelativePath: string): string => {
+const resolveMultiComponentImagePath = (
+  decodedImagePath: string,
+  noteRelativePath: string,
+): string => {
   if (decodedImagePath.startsWith("/")) {
     return decodedImagePath.replace(/^\/+/, "")
   }
   if (decodedImagePath.startsWith("./") || decodedImagePath.startsWith("../")) {
-    return path.posix.join(path.posix.dirname(noteRelativePath), decodedImagePath)
+    return path.posix.join(
+      path.posix.dirname(noteRelativePath),
+      decodedImagePath,
+    )
   }
   return decodedImagePath
 }
@@ -199,7 +185,10 @@ const resolveLocalImagePath = (
 ): string | null => {
   const sanitizedImagePath = rawImagePath.trim()
 
-  if (!sanitizedImagePath || EXTERNAL_IMAGE_URL_PATTERN.test(sanitizedImagePath)) {
+  if (
+    !sanitizedImagePath ||
+    EXTERNAL_IMAGE_URL_PATTERN.test(sanitizedImagePath)
+  ) {
     return null
   }
 
@@ -213,7 +202,9 @@ const resolveLocalImagePath = (
 
   if (!decodedImagePath.includes("/")) {
     const noteDir = path.posix.dirname(noteRelativePath)
-    const noteStem = path.posix.basename(noteRelativePath).replace(/\.[^.]+$/, "")
+    const noteStem = path.posix
+      .basename(noteRelativePath)
+      .replace(/\.[^.]+$/, "")
     const parts: string[] = []
     if (attachmentsDirectory) parts.push(attachmentsDirectory)
     if (noteDir !== ".") parts.push(noteDir)
@@ -221,7 +212,10 @@ const resolveLocalImagePath = (
     return path.posix.join(...parts)
   }
 
-  const resolvedImagePath = resolveMultiComponentImagePath(decodedImagePath, noteRelativePath)
+  const resolvedImagePath = resolveMultiComponentImagePath(
+    decodedImagePath,
+    noteRelativePath,
+  )
   const normalizedImagePath = path.posix.normalize(resolvedImagePath)
 
   if (
@@ -250,7 +244,9 @@ const visitMarkdownTree = (
     return
   }
 
-  node.children.forEach((childNode) => { visitMarkdownTree(childNode, visitor); })
+  node.children.forEach((childNode) => {
+    visitMarkdownTree(childNode, visitor)
+  })
 }
 
 const safeDecodeURIComponent = (value: string): string => {
