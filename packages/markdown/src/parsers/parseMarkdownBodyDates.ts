@@ -1,12 +1,14 @@
 const TOKEN_PATTERNS: Record<string, string> = {
-  YYYY: "\\d{4}",
-  YY: "\\d{2}",
+  yyyy: "\\d{4}",
+  yy: "\\d{2}",
   MM: "(?:0[1-9]|1[0-2])",
-  DD: "(?:0[1-9]|[12]\\d|3[01])"
+  M: "(?:1[0-2]|[1-9])",
+  dd: "(?:0[1-9]|[12]\\d|3[01])",
+  d: "(?:3[01]|[12]\\d|[1-9])",
 }
 
 const DATE_TOKENS = Object.keys(TOKEN_PATTERNS).sort(
-  (tokenA, tokenB) => tokenB.length - tokenA.length
+  (tokenA, tokenB) => tokenB.length - tokenA.length,
 )
 
 const escapeRegex = (value: string): string =>
@@ -18,7 +20,7 @@ const formatToRegexSource = (format: string): string => {
 
   while (index < format.length) {
     const token = DATE_TOKENS.find((candidate) =>
-      format.startsWith(candidate, index)
+      format.startsWith(candidate, index),
     )
 
     if (token) {
@@ -36,7 +38,7 @@ const formatToRegexSource = (format: string): string => {
 
 export const parseMarkdownBodyDates = (
   body: string,
-  dateFormats: readonly string[]
+  dateFormats: readonly string[],
 ): string[] => {
   if (!body || dateFormats.length === 0) {
     return []
@@ -51,7 +53,7 @@ export const parseMarkdownBodyDates = (
 
     const expression = new RegExp(
       `(?:^|[^0-9])(${formatToRegexSource(dateFormat)})(?=$|[^0-9])`,
-      "g"
+      "g",
     )
 
     for (const match of body.matchAll(expression)) {
@@ -70,7 +72,7 @@ export const parseMarkdownBodyDates = (
       (match, index, values) =>
         index === 0 ||
         match.index !== values[index - 1]?.index ||
-        match.value !== values[index - 1]?.value
+        match.value !== values[index - 1]?.value,
     )
     .map(({ value }) => value)
 }
