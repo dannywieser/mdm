@@ -1,11 +1,17 @@
 import { resolveNotesConfig } from "app-config"
-import { getTitleFromFilePath } from "markdown"
+import {
+  buildObsidianUrl,
+  getTitleFromFilePath,
+  parseFrontMatter,
+  parseMarkdownBodyDates,
+} from "markdown"
 import {
   createFileID,
   format,
   getFolderFromFilePath,
   readFile,
   getBasename,
+  formatDate,
 } from "mdm-util"
 
 import type { ScannedNote } from "./notes.types"
@@ -23,7 +29,8 @@ export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 //     .flatMap((value) => parseMarkdownBodyDates(value, dateFormats))
 
 export async function scanMarkdownFile(filePath: string): Promise<ScannedNote> {
-  const { notesDirectory, dateFormats } = await resolveNotesConfig()
+  const { notesDirectory, dateFormats, obsidianVault } =
+    await resolveNotesConfig()
 
   const basename = getBasename(filePath)
   const id = createFileID(filePath, FILE_ID_NAMESPACE)
@@ -31,17 +38,22 @@ export async function scanMarkdownFile(filePath: string): Promise<ScannedNote> {
   const title = getTitleFromFilePath(filePath)
 
   const { source, stats } = await readFile(filePath)
-  const modifiedDate = format(stats.mtime, dateFormats[0]) // Use the first date format for modifiedDate
+  const modifiedDate = formatDate(stats.mtime, dateFormats[0]) // Use the first date format for modifiedDate
+
+  const dates = parseMarkdownBodyDates(source, ["YYYY.MM.DD"])
+  const { body, frontmatter } = parseFrontMatter(source)
+  const obsidianUrl = buildObsidianUrl(obsidianVault, notesDirectory, filePath)
 
   return {
     basename,
     folder,
+    frontmatter,
     id,
     modifiedDate,
     title,
+    obsidianUrl,
+    dates,
   } as unknown as ScannedNote
-
-  // const { body, frontmatter } = parseFrontMatter(source)
 
   // const titleOrBodyDates = Array.from(
   //   new Set([
@@ -51,7 +63,6 @@ export async function scanMarkdownFile(filePath: string): Promise<ScannedNote> {
   //   ]),
   // )
 
-  // const obsidianUrl = buildObsidianUrl(obsidianVault, notesDirectory, filePath)
   // const relativePath = path
   //   .relative(notesDirectory, filePath)
   //   .split(path.sep)

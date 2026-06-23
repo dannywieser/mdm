@@ -4,7 +4,7 @@ import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
 import { healthHandler } from "./handlers/health/health"
-import { notesHandler } from "./handlers/notes/notes"
+import { notesHandler } from "./handlers/notes/handler"
 import { statsHandler } from "./handlers/stats/stats"
 import { logger } from "./logger"
 import { createApp, logStartupConfig } from "./server"
@@ -18,7 +18,9 @@ vi.mock("mdm-util", () => ({
 }))
 
 vi.mock("pino-http", () => ({
-  default: () => (_req: unknown, _res: unknown, next: () => void) => { next() },
+  default: () => (_req: unknown, _res: unknown, next: () => void) => {
+    next()
+  },
 }))
 
 vi.mock("./logger", () => ({
@@ -81,7 +83,11 @@ describe("notes-api server interface", () => {
     const response = await request(app).get("/stats")
 
     expect(response.status).toBe(200)
-    expect(response.body).toEqual({ modifiedToday: 0, totalNotes: 0, views: [] })
+    expect(response.body).toEqual({
+      modifiedToday: 0,
+      totalNotes: 0,
+      views: [],
+    })
     expect(statsHandlerMock).toHaveBeenCalledTimes(1)
   })
 

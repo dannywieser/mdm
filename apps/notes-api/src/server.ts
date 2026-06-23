@@ -4,7 +4,7 @@ import { toLoggableError } from "mdm-util"
 import pinoHttp from "pino-http"
 
 import { healthHandler } from "./handlers/health/health"
-import { notesHandler } from "./handlers/notes/notes"
+import { notesHandler } from "./handlers/notes/handler"
 import { statsHandler } from "./handlers/stats/stats"
 import { viewsHandler } from "./handlers/views/views"
 import { logger } from "./logger"
@@ -25,7 +25,7 @@ export const createApp = () => {
 export const logStartupConfig = async (): Promise<void> => {
   try {
     const notesConfig = await resolveNotesConfig()
-    // logger.info({ notesConfig }, "Resolved notes config")
+    logger.info({ notesConfig }, "Resolved notes config")
   } catch (error) {
     logger.error(
       { error: toLoggableError(error) },

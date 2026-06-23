@@ -11,22 +11,6 @@ import { logger } from "../../logger"
 import { scanMarkdownFile } from "./notes.scan"
 import { ScannedNote } from "./notes.types"
 
-// const getQueryView = (request: Request): string | undefined => {
-//   const view = request.query.view
-//   if (typeof view === "string") {
-//     return view
-//   }
-//   return undefined
-// }
-
-// const getQueryIncludeContent = (request: Request): boolean => {
-//   const includeContent = request.query.includeContent
-//   if (typeof includeContent === "string") {
-//     return includeContent !== "false"
-//   }
-//   return true
-// }
-
 const loadNotes = async (notesDirectory: string): Promise<ScannedNote[]> => {
   // 1. load all markdown files from the notes directory
   const allNotes = await collectMarkdownFiles(notesDirectory)

@@ -34,7 +34,9 @@ export function Header() {
   const isStatsPage = useMatch("/stats")
   const isColorsPage = useMatch("/colors")
   const { data } = useViewsQuery({})
-  const currentView = view ? data.views.find(({ id }) => id === view) : undefined
+  const currentView = view
+    ? data.views.find(({ id }) => id === view)
+    : undefined
   const showNotesSearch = currentView?.component === "NotesGallery"
   const isSecondaryPage = !!(isStatsPage ?? isColorsPage)
 
@@ -67,7 +69,7 @@ export function Header() {
         ) : (
           <Flex alignItems="center" gap="1">
             <Text fontSize="sm" color="app.text" fontWeight="bold">
-              {formatDate(new Date())}
+              {formatDate(new Date(), "yyyy.MM.dd (EEE)")}
             </Text>
             <HeaderStatsLink />
             <HeaderPaletteSelector />

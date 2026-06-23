@@ -19,7 +19,6 @@ export { isStringRecord } from "./strings/isStringRecord"
 export { getFolderFromFilePath } from "./file-system/getFolderFromFilePath"
 export { readFile } from "./file-system/readFile"
 export { getBasename } from "./file-system/basename"
-export { format } from "./date/format"
 
 export type { DateComponents } from "./date/getDateComponents.types"
 export type { ParsedDate } from "./date/parseDateFromFormats.types"
