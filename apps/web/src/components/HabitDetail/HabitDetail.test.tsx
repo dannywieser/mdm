@@ -246,7 +246,7 @@ describe("HabitDetail", () => {
     expect(screen.getByText("habit.scoreInfoDoMore")).toBeTruthy()
   })
 
-  test("shows the target score and overage for do-less habits scoring above their target", () => {
+  test("shows the score and overage for do-less habits scoring above their target", () => {
     renderDetail({
       ...HABIT,
       mode: "do-less",
@@ -254,7 +254,7 @@ describe("HabitDetail", () => {
       targetScore: 100,
     })
 
-    expect(screen.getByText("100", { selector: "dd" })).toBeTruthy()
+    expect(screen.getByText("125", { selector: "dd" })).toBeTruthy()
     expect(screen.getByText("(+25)")).toBeTruthy()
   })
 
