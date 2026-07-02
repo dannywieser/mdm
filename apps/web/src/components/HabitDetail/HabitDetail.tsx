@@ -31,8 +31,6 @@ import { useI18n } from "../../i18n"
 
 import { HabitScoreProgress } from "../HabitScoreProgress"
 import { HabitScoreValue } from "../HabitScoreValue"
-import { HeatDots } from "../HeatDots"
-import { calculateHeatDotCount } from "../HeatDots/HeatDots.util"
 import { HabitScoreBreakdown } from "../HabitScoreBreakdown/HabitScoreBreakdown"
 import type { HabitDetailRouteParamKey } from "./HabitDetail.types"
 import {
@@ -54,11 +52,6 @@ export function HabitDetail() {
   const { habitId } = useParams<HabitDetailRouteParamKey>()
   const { t } = useI18n()
   const { data: habit } = useHabitQuery({ habitId: habitId ?? "" })
-  const heatDotCount = calculateHeatDotCount(
-    habit.mode,
-    habit.habitScore,
-    habit.targetScore,
-  )
   const windowFillPercentage = calculateWindowFillPercentage(
     habit.windowEntries,
     habit.trackingWindowDays,
@@ -146,7 +139,6 @@ export function HabitDetail() {
                     score={habit.habitScore}
                     targetScore={habit.targetScore}
                   />
-                  <HeatDots count={heatDotCount} />
                 </Flex>
                 <Box mt={2} px={6}>
                   <HabitScoreProgress

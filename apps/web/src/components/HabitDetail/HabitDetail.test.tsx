@@ -246,7 +246,7 @@ describe("HabitDetail", () => {
     expect(screen.getByText("habit.scoreInfoDoMore")).toBeTruthy()
   })
 
-  test("renders heat dots for do-less habits scoring well above their target", () => {
+  test("shows the target score and overage for do-less habits scoring above their target", () => {
     renderDetail({
       ...HABIT,
       mode: "do-less",
@@ -254,10 +254,11 @@ describe("HabitDetail", () => {
       targetScore: 100,
     })
 
-    expect(screen.getByLabelText("habit.heatLevel")).toBeTruthy()
+    expect(screen.getByText("100", { selector: "dd" })).toBeTruthy()
+    expect(screen.getByText("(+25)")).toBeTruthy()
   })
 
-  test("omits heat dots when the score is at or below the target", () => {
+  test("omits the overage when the score is at or below the target", () => {
     renderDetail({
       ...HABIT,
       mode: "do-less",
@@ -265,10 +266,11 @@ describe("HabitDetail", () => {
       targetScore: 100,
     })
 
-    expect(screen.queryByLabelText("habit.heatLevel")).toBeNull()
+    expect(screen.getByText("100", { selector: "dd" })).toBeTruthy()
+    expect(screen.queryByText(/^\(\+/)).toBeNull()
   })
 
-  test("omits heat dots for do-more habits", () => {
+  test("omits the overage for do-more habits", () => {
     renderDetail({
       ...HABIT,
       mode: "do-more",
@@ -276,7 +278,8 @@ describe("HabitDetail", () => {
       targetScore: 100,
     })
 
-    expect(screen.queryByLabelText("habit.heatLevel")).toBeNull()
+    expect(screen.getByText("200", { selector: "dd" })).toBeTruthy()
+    expect(screen.queryByText(/^\(\+/)).toBeNull()
   })
 
   test("shows the score breakdown section when entries are expanded", () => {

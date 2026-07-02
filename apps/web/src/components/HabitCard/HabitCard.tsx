@@ -1,6 +1,5 @@
 import {
   Box,
-  Flex,
   SimpleGrid,
   StatLabel,
   StatRoot,
@@ -12,17 +11,10 @@ import { Link } from "react-router-dom"
 import { useI18n } from "../../i18n"
 
 import { HabitScoreValue } from "../HabitScoreValue"
-import { HeatDots } from "../HeatDots"
-import { calculateHeatDotCount } from "../HeatDots/HeatDots.util"
 import type { HabitCardProps } from "./HabitCard.types"
 
 export function HabitCard({ habit }: Readonly<HabitCardProps>) {
   const { t } = useI18n()
-  const heatDotCount = calculateHeatDotCount(
-    habit.mode,
-    habit.habitScore,
-    habit.targetScore,
-  )
 
   return (
     <Box
@@ -59,14 +51,11 @@ export function HabitCard({ habit }: Readonly<HabitCardProps>) {
           <SimpleGrid columns={3} gap={3}>
             <StatRoot size="sm">
               <StatLabel color="app.textMuted">{t("habit.score")}</StatLabel>
-              <Flex align="center" gap={1.5}>
-                <HabitScoreValue
-                  mode={habit.mode}
-                  score={habit.habitScore}
-                  targetScore={habit.targetScore}
-                />
-                <HeatDots count={heatDotCount} />
-              </Flex>
+              <HabitScoreValue
+                mode={habit.mode}
+                score={habit.habitScore}
+                targetScore={habit.targetScore}
+              />
             </StatRoot>
             <StatRoot size="sm">
               <StatLabel color="app.textMuted">

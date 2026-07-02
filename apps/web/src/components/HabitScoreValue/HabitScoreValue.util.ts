@@ -12,6 +12,13 @@ export const getDoLessScoreStatus = (score: number, targetScore?: number): Habit
   return "red"
 }
 
+// How far a do-less score sits above its target. Returns undefined when
+// there's nothing to report (wrong mode, no target, or at/under target).
+export const getHabitScoreOverage = (mode: HabitMode, score: number, targetScore?: number): number | undefined => {
+  if (mode !== "do-less" || targetScore === undefined || score <= targetScore) return undefined
+  return score - targetScore
+}
+
 export const getHabitScoreColor = (mode: HabitMode, score: number, targetScore?: number): string => {
   if (mode === "do-more") return "app.accent"
 

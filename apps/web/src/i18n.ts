@@ -11,7 +11,6 @@ const translations: Record<Locale, Record<string, string>> = {
     "habit.daysLogged": "days logged",
     "habit.entryDate": "date",
     "habit.entryValue": "value",
-    "habit.heatLevel": "{count} heat",
     "habit.highestScore": "highest score",
     "habit.do-less": "do less: {name}",
     "habit.do-more": "do more: {name}",
