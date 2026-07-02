@@ -34,13 +34,13 @@ describe("HabitScoreValue", () => {
     expect(screen.queryByText(/^\(\+/)).toBeNull()
   })
 
-  test("renders the target score with the overage in brackets", () => {
+  test("renders the score with the overage in brackets", () => {
     getHabitScoreColorMock.mockReturnValue("red.500")
     getHabitScoreOverageMock.mockReturnValue(150)
 
     renderValue({ mode: "do-less", score: 250, targetScore: 100 })
 
-    expect(screen.getByText("100")).toBeTruthy()
+    expect(screen.getByText("250")).toBeTruthy()
     expect(screen.getByText("(+150)")).toBeTruthy()
   })
 })
