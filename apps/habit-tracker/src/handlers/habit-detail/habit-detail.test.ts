@@ -206,13 +206,18 @@ describe("calculateConsecutiveEntryStreak (do-more streak)", () => {
     expect(calculateConsecutiveEntryStreak(entries, "2025-01-10")).toBe(3)
   })
 
-  test("returns 1 for single entry on reference date", () => {
+  test("returns 0 for a single entry on reference date (below minimum streak length)", () => {
     expect(
       calculateConsecutiveEntryStreak(
         [makeEntry("2025-01-10", 5)],
         "2025-01-10",
       ),
-    ).toBe(1)
+    ).toBe(0)
+  })
+
+  test("returns 2 once a second consecutive day is logged", () => {
+    const entries = [makeEntry("2025-01-09", 5), makeEntry("2025-01-10", 5)]
+    expect(calculateConsecutiveEntryStreak(entries, "2025-01-10")).toBe(2)
   })
 
   test("ignores future entries when calculating streak", () => {
@@ -542,11 +547,11 @@ describe("calculateHabitScore", () => {
     // recentCutoff = addDays("2025-01-31", -14) = "2025-01-17"
     // 2025-01-15 < recentCutoff → 5 * 1 = 5
     // 2025-01-31 > recentCutoff → 8 * 10 = 80
-    // baseScore = 85, streak = 1 (Jan 30 missing), uniqueWindowDays = 2
-    // streakMultiplier = 0.005, dayMultiplier = 0.01
-    // habitScore = 85 * (1 + 0.01) * (1 + 0.005) = 85 * 1.01505 = 86.27925, floored to 86
+    // baseScore = 85, streak = 0 (only a single day logged, below the minimum streak length), uniqueWindowDays = 2
+    // streakMultiplier = 0, dayMultiplier = 0.01
+    // habitScore = 85 * (1 + 0.01) * (1 + 0) = 85 * 1.01 = 85.85, floored to 85
     expect(uniqueWindowDays).toBe(2)
-    expect(habitScore).toBe(Math.floor(85 * (1 + 0.01) * (1 + 0.005)))
+    expect(habitScore).toBe(Math.floor(85 * (1 + 0.01) * (1 + 0)))
   })
 
   test("10-day do-more streak applies tiered bonus (0.5% for days 1–5, 0.6% for days 6–10)", () => {
@@ -640,11 +645,18 @@ describe("buildHistory", () => {
   })
 
   test("do-more streak resets to 0 on days with no entry and counts consecutive logged days", () => {
-    const entries = [makeEntry("2025-01-01", 5), makeEntry("2025-01-03", 7)]
+    const entries = [
+      makeEntry("2025-01-01", 5),
+      makeEntry("2025-01-02", 7),
+      makeEntry("2025-01-04", 3),
+    ]
     const history = buildHistory(entries, 30, "do-more", "2025-01-05")
-    // 01-01: entry → streak 1; 01-02: no entry → 0; 01-03: entry → streak 1 (01-02 broke the chain)
-    // 01-04, 01-05: no entry → 0
-    expect(history.map((h) => h.streak)).toEqual([1, 0, 1, 0, 0])
+    // 01-01: single day so far → below minimum streak length → 0
+    // 01-02: two consecutive days → streak 2
+    // 01-03: no entry → 0
+    // 01-04: entry, but 01-03 broke the chain → single day again → 0
+    // 01-05: no entry → 0
+    expect(history.map((h) => h.streak)).toEqual([0, 2, 0, 0, 0])
   })
 
   test("do-less streak counts days since the last entry and resets to 0 on logged days", () => {
@@ -803,14 +815,15 @@ describe("calculateLowestDaysTrackedPerPeriod", () => {
     expect(calculateLowestDaysTrackedPerPeriod([], "2025-06-01", 90)).toBe(0)
   })
 
-  test("returns the count for a single incomplete period", () => {
-    // Only 10 days of tracking, window is 90 → one partial period with 3 entries
+  test("returns undefined when only an incomplete period exists", () => {
+    // Only 10 days of tracking, window is 90 → the only period is partial and
+    // is discarded, leaving no complete period to report.
     const entries = [
       makeEntry("2025-05-23", 1),
       makeEntry("2025-05-25", 1),
       makeEntry("2025-06-01", 1),
     ]
-    expect(calculateLowestDaysTrackedPerPeriod(entries, "2025-06-01", 90)).toBe(3)
+    expect(calculateLowestDaysTrackedPerPeriod(entries, "2025-06-01", 90)).toBeUndefined()
   })
 
   test("returns the minimum across multiple exactly-aligned periods", () => {
@@ -857,18 +870,36 @@ describe("calculateLowestDaysTrackedPerPeriod", () => {
     expect(calculateLowestDaysTrackedPerPeriod(entries, "2025-01-10", 10)).toBe(2)
   })
 
-  test("oldest partial period (tracking started mid-window) is included as-is", () => {
-    // windowDays = 10, tracking started on 2025-01-06 (mid-period)
-    // Period 1 (2025-01-11..2025-01-20): 2 entries
-    // Partial period (2025-01-01..2025-01-10): only 2 entries (before 2025-01-06, zero)
+  test("discards an oldest period that starts before tracking began", () => {
+    // windowDays = 10, tracking started 2025-01-06 (mid-period) → the oldest
+    // period (2025-01-01..2025-01-10) is discarded rather than counted as-is,
+    // even though it has fewer tracked days than the complete period.
     const entries = [
-      makeEntry("2025-01-06", 1), // mid-window start
-      makeEntry("2025-01-09", 1),
+      makeEntry("2025-01-06", 1), // partial period, discarded
       makeEntry("2025-01-11", 1),
       makeEntry("2025-01-19", 1),
     ]
-    // Both periods have 2 entries
     expect(calculateLowestDaysTrackedPerPeriod(entries, "2025-01-20", 10)).toBe(2)
+  })
+
+  test("discards an incomplete oldest period rather than counting it as-is", () => {
+    // windowDays = 10, tracking started 2025-01-08 (partway through the oldest window)
+    // Partial period (2025-01-01..2025-01-10): only 2025-01-08 tracked → would
+    // wrongly report a "fewest" of 1 if counted, but it's discarded since
+    // tracking hadn't started at the beginning of that window.
+    // Period 2 (2025-01-11..2025-01-20): 4 tracked days
+    // Period 1 (2025-01-21..2025-01-30): 3 tracked days
+    const entries = [
+      makeEntry("2025-01-08", 1), // partial period, discarded
+      makeEntry("2025-01-11", 1),
+      makeEntry("2025-01-13", 1),
+      makeEntry("2025-01-15", 1),
+      makeEntry("2025-01-17", 1),
+      makeEntry("2025-01-21", 1),
+      makeEntry("2025-01-23", 1),
+      makeEntry("2025-01-25", 1),
+    ]
+    expect(calculateLowestDaysTrackedPerPeriod(entries, "2025-01-30", 10)).toBe(3)
   })
 })
 
@@ -1283,12 +1314,24 @@ describe("habitDetailHandler", () => {
     expect(result.allTimeHighWindowEntries).toBeGreaterThanOrEqual(1)
   })
 
-  test("lowestDaysTrackedPerPeriod is present for do-less habits", async () => {
+  test("lowestDaysTrackedPerPeriod is present for do-less habits once a full period is tracked", async () => {
+    // trackingWindowDays = 30, today = 2025-01-03 → a complete period needs to
+    // start on or before 2024-12-05.
+    vi.mocked(scanHabitEntries).mockResolvedValue([
+      makeEntry("2024-12-05", 5),
+      makeEntry("2025-01-03", 5),
+    ])
     const { response, json } = makeResponse()
     await habitDetailHandler(makeRequest("stress"), response, vi.fn())
     const result = getJsonResult(json)
     expect(result.lowestDaysTrackedPerPeriod).toBeDefined()
     expect(typeof result.lowestDaysTrackedPerPeriod).toBe("number")
+  })
+
+  test("lowestDaysTrackedPerPeriod is absent for do-less habits with no complete period yet", async () => {
+    const { response, json } = makeResponse()
+    await habitDetailHandler(makeRequest("stress"), response, vi.fn())
+    expect(getJsonResult(json).lowestDaysTrackedPerPeriod).toBeUndefined()
   })
 
   test("lowestDaysTrackedPerPeriod is absent for do-more habits", async () => {

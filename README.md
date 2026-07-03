@@ -169,12 +169,13 @@ This repository is a Turborepo monorepo with this structure:
     - `mode` and `targetScore` are passed through from the habit's configuration. `targetScore` is only meaningful for `do-less` habits — it defines the score thresholds a UI can use to render a green/yellow/red status (for example a `targetScore` of `100` implies green for scores up to `50`, yellow up to `75`, and red from `75` upward) — and is omitted from the response (rather than appearing as `null`) when not configured, since `JSON.stringify` drops `undefined` properties
     - Scoring: sums frontmatter values from notes within the rolling `trackingWindowDays` window (entries from the last 14 days count at a 10x multiplier) to get a base total, then multiplies it by `(1 + dayMultiplier) * (1 + streakMultiplier)` — a 0.5%-per-day-with-an-entry adjustment and either a 0.5%-per-streak-day bonus (`do-more` mode) or penalty (`do-less` mode). Final scores are floored to whole numbers.
     - The top-level `streak` reflects the current streak as of the reference date. Its definition depends on mode:
-      - `do-more` habits: the number of consecutive days (ending on the reference date) with an entry.
+      - `do-more` habits: the number of consecutive days (ending on the reference date) with an entry — reported as `0` until at least 2 consecutive days have been logged, since a single logged day hasn't yet spanned a full day-to-day gap and shouldn't read as an established streak.
       - `do-less` habits: the number of days since the most recent entry (an entry on today's date resets it to `0`).
     - `streaks` is a dedicated breakdown of historical streak periods, each with `start`, `end`, and `length` (in days):
       - `do-more` habits: periods of consecutive days with a logged entry.
       - `do-less` habits: gaps of consecutive days without a logged entry that fall strictly between two logged entries (the time before the first entry and the ongoing gap since the most recent entry are excluded).
     - `allTimeHighStreak` is the longest `length` across all entries in `streaks`.
+    - `lowestDaysTrackedPerPeriod` (`do-less` habits only) is the fewest unique tracked days seen across any complete `trackingWindowDays`-length period, walking backwards from the reference date. A trailing period that starts before the first tracked entry is only partial and is discarded rather than counted as-is; the field is omitted entirely if no complete period has elapsed yet.
     - The current `habitScore` and each `history` entry's `habitScore` also include a score breakdown:
       - `rawScore`: the sum of entry values in the tracking window with no recency multiplier applied
       - `recentEntryAdditions`: the extra amount contributed by entries within the last 14 days (each counts at 10x, so this is `entry.value * 9` summed across those entries)
@@ -203,14 +204,14 @@ This repository is a Turborepo monorepo with this structure:
           {
             "date": "2026-01-01",
             "habitScore": 100,
-            "streak": 1,
+            "streak": 0,
             "windowEntries": 1,
             "windowStart": "2025-10-03",
             "value": 10,
             "rawScore": 10,
             "recentEntryAdditions": 90,
             "scoreBeforeMultipliers": 100,
-            "streakMultiplier": 0.005,
+            "streakMultiplier": 0,
             "dayMultiplier": 0.005
           },
           {
