@@ -34,6 +34,7 @@ import { HabitScoreValue } from "../HabitScoreValue"
 import { HabitScoreBreakdown } from "../HabitScoreBreakdown/HabitScoreBreakdown"
 import type { HabitDetailRouteParamKey } from "./HabitDetail.types"
 import {
+  calculateStreakAxisMax,
   calculateWindowFillPercentage,
   formatChartDate,
   formatEntryValue,
@@ -56,6 +57,8 @@ export function HabitDetail() {
     habit.windowEntries,
     habit.trackingWindowDays,
   )
+  const streakMax = Math.max(0, ...habit.history.map((entry) => entry.streak))
+  const streakAxisMax = calculateStreakAxisMax(streakMax, habit.targetScore)
 
   return (
     <VStack align="center" gap={6} pt={16} px={4} pb={16}>
@@ -265,6 +268,7 @@ export function HabitDetail() {
                   <YAxis
                     yAxisId="streak"
                     orientation="right"
+                    domain={streakAxisMax === undefined ? undefined : [0, streakAxisMax]}
                     tick={AXIS_TICK_STYLE}
                     axisLine={false}
                     tickLine={false}
