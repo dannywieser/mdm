@@ -10,6 +10,7 @@ const RECENT_MULTIPLIER = 10
 const BONUS_TIER_SIZE = 5
 const BASE_BONUS_RATE = 0.005
 const BONUS_RATE_INCREMENT = 0.001
+const MIN_STREAK_DAYS = 2
 
 // Tiered multiplier: each group of BONUS_TIER_SIZE days earns a higher per-day
 // rate (0.5% for days 1–5, 0.6% for days 6–10, etc.).
@@ -33,6 +34,9 @@ export const getWindowEntries = (
   return entries.filter((e) => e.date >= windowStart && e.date <= referenceDate)
 }
 
+// Requires at least MIN_STREAK_DAYS consecutive entries before it's reported
+// as a streak, since a single logged day hasn't yet spanned a full day-over-day
+// gap and shouldn't read as an established streak.
 export const calculateConsecutiveEntryStreak = (entries: HabitEntry[], referenceDate: string): number => {
   const entryDates = new Set(
     entries.filter((e) => e.date <= referenceDate).map((e) => e.date),
@@ -44,7 +48,7 @@ export const calculateConsecutiveEntryStreak = (entries: HabitEntry[], reference
     streak++
     currentDate = addDays(currentDate, -1)
   }
-  return streak
+  return streak < MIN_STREAK_DAYS ? 0 : streak
 }
 
 const mostRecentDateOnOrBefore = (dates: string[], referenceDate: string): string | null => {
@@ -271,14 +275,15 @@ export const buildStreaks = (entries: HabitEntry[], mode: HabitMode): HabitStrea
 }
 
 // For do-less habits: the minimum number of tracked days seen across any
-// `windowDays`-length period, working backwards from `referenceDate`. The
-// oldest period may be partial (if tracking started mid-window), and its
-// raw entry count is used as-is.
+// complete `windowDays`-length period, working backwards from `referenceDate`.
+// A trailing period that starts before tracking began is only partial (there
+// weren't enough days for a fair count) and is discarded rather than counted
+// as-is. Returns `undefined` if no complete period exists yet.
 export const calculateLowestDaysTrackedPerPeriod = (
   entries: HabitEntry[],
   referenceDate: string,
   windowDays: number,
-): number => {
+): number | undefined => {
   if (entries.length === 0) return 0
 
   const uniqueDates = [...new Set(entries.map((e) => e.date))].toSorted((a, b) => a.localeCompare(b))
@@ -289,10 +294,12 @@ export const calculateLowestDaysTrackedPerPeriod = (
 
   while (periodEnd >= firstEntryDate) {
     const periodStart = getDateWindowStart(periodEnd, windowDays - 1)
+    if (periodStart < firstEntryDate) break
+
     const count = uniqueDates.filter((d) => d >= periodStart && d <= periodEnd).length
     counts.push(count)
     periodEnd = addDays(periodStart, -1)
   }
 
-  return Math.min(...counts)
+  return counts.length === 0 ? undefined : Math.min(...counts)
 }
