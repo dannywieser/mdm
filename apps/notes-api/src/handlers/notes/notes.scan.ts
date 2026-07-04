@@ -1,7 +1,5 @@
-import type { NoteFrontmatter } from "markdown"
-
 import { resolveNotesConfig } from "app-config"
-import { buildObsidianUrl, parseFrontMatter, parseMarkdownBodyDates, resolveOldestDate } from "markdown"
+import { buildObsidianUrl, extractNoteDates, parseFrontMatter, resolveOldestDate } from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
 import path from "node:path"
@@ -20,14 +18,6 @@ export const resolveCreatedDate = (
   return date ? date.toISOString() : null
 }
 
-const extractFrontmatterDates = (
-  frontmatter: NoteFrontmatter,
-  dateFormats: readonly string[],
-): string[] =>
-  Object.values(frontmatter)
-    .flat()
-    .flatMap((value) => parseMarkdownBodyDates(value, dateFormats))
-
 export const scanMarkdownFile = async (
   filePath: string,
 ): Promise<ScannedNote> => {
@@ -41,12 +31,7 @@ export const scanMarkdownFile = async (
   const title = basename.endsWith(".md") ? basename.slice(0, -3) : basename
   const modifiedDate = stats.mtime.toISOString()
   const dates = Array.from(
-    new Set([
-      ...parseMarkdownBodyDates(title, dateFormats),
-      ...parseMarkdownBodyDates(body, dateFormats),
-      ...(frontmatter ? extractFrontmatterDates(frontmatter, dateFormats) : []),
-      modifiedDate,
-    ]),
+    new Set([...extractNoteDates(title, body, frontmatter, dateFormats), modifiedDate]),
   )
 
   const obsidianUrl = buildObsidianUrl(obsidianVault, notesDirectory, filePath)

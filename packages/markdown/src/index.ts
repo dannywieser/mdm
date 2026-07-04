@@ -1,3 +1,4 @@
+export { extractNoteDates } from "./dates/extractNoteDates"
 export { resolveDateFromFrontmatterOrTitle } from "./dates/resolveDateFromFrontmatterOrTitle"
 export { resolveOldestDate } from "./dates/resolveOldestDate"
 export { buildObsidianUrl } from "./files/buildObsidianUrl"
