@@ -2,7 +2,7 @@ import type { Mock } from "vitest"
 
 import { resolveNotesConfig } from "app-config"
 import { createMockNotesConfig } from "app-config/testing"
-import { parseFrontMatter, parseMarkdownBodyDates, resolveDateFromFrontmatterOrTitle } from "markdown"
+import { parseFrontMatter, parseMarkdownBodyDates, resolveOldestDate } from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
 
@@ -25,7 +25,7 @@ vi.mock("markdown", async (importOriginal) => {
     ...actual,
     parseFrontMatter: vi.fn(),
     parseMarkdownBodyDates: vi.fn(),
-    resolveDateFromFrontmatterOrTitle: vi.fn(),
+    resolveOldestDate: vi.fn(),
   }
 })
 
@@ -39,27 +39,22 @@ const readFileMock = fs.readFile as Mock
 const statMock = fs.stat as Mock
 const parseFrontMatterMock = vi.mocked(parseFrontMatter)
 const parseMarkdownBodyDatesMock = vi.mocked(parseMarkdownBodyDates)
-const resolveDateFromFrontmatterOrTitleMock = vi.mocked(resolveDateFromFrontmatterOrTitle)
+const resolveOldestDateMock = vi.mocked(resolveOldestDate)
 
 const defaultConfig = createMockNotesConfig()
 
 describe("resolveCreatedDate", () => {
   test("returns the resolved date as an ISO string", () => {
-    resolveDateFromFrontmatterOrTitleMock.mockReturnValueOnce(new Date("2025-06-15T00:00:00.000Z"))
+    resolveOldestDateMock.mockReturnValueOnce(new Date("2025-06-15T00:00:00.000Z"))
     expect(
-      resolveCreatedDate({ created: "2025.06.15" }, "", "created", ["YYYY.MM.DD"]),
+      resolveCreatedDate(["2025.06.15"], ["YYYY.MM.DD"]),
     ).toBe("2025-06-15T00:00:00.000Z")
-    expect(resolveDateFromFrontmatterOrTitleMock).toHaveBeenCalledWith(
-      { created: "2025.06.15" },
-      "",
-      "created",
-      ["YYYY.MM.DD"],
-    )
+    expect(resolveOldestDateMock).toHaveBeenCalledWith(["2025.06.15"], ["YYYY.MM.DD"])
   })
 
   test("returns null when no date can be resolved", () => {
-    resolveDateFromFrontmatterOrTitleMock.mockReturnValueOnce(null)
-    expect(resolveCreatedDate(null, "", "created", [])).toBeNull()
+    resolveOldestDateMock.mockReturnValueOnce(null)
+    expect(resolveCreatedDate([], [])).toBeNull()
   })
 })
 
@@ -96,7 +91,7 @@ describe("notes scan helpers", () => {
 
     expect(note).toEqual({
       basename: "welcome.md",
-      titleOrBodyDates: ["2026.05.26"],
+      dates: ["2026.05.26", "2026-05-26T01:00:00.000Z"],
       createdDate: null,
       folder: "topic",
       frontmatter: null,
@@ -114,6 +109,10 @@ describe("notes scan helpers", () => {
     expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith("welcome", ["YYYY.MM.DD"])
     expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith(
       "# Welcome\n\nThis is a note.",
+      ["YYYY.MM.DD"],
+    )
+    expect(resolveOldestDateMock).toHaveBeenCalledWith(
+      ["2026.05.26", "2026-05-26T01:00:00.000Z"],
       ["YYYY.MM.DD"],
     )
     expect(createFileIDMock).toHaveBeenCalledWith(
@@ -138,7 +137,7 @@ describe("notes scan helpers", () => {
     expect(note.folder).toBe("daily/briefing")
   })
 
-  test("scanMarkdownFile includes date-like frontmatter values in titleOrBodyDates", async () => {
+  test("scanMarkdownFile includes date-like frontmatter values in dates", async () => {
     resolveNotesConfigMock.mockResolvedValue({
       ...defaultConfig,
       dateFormats: ["YYYY.MM.DD"],
@@ -166,7 +165,7 @@ describe("notes scan helpers", () => {
 
     const note = await scanMarkdownFile("/notes/note.md")
 
-    expect(note.titleOrBodyDates).toEqual(["2026.06.01", "2025.12.31"])
+    expect(note.dates).toEqual(["2026.06.01", "2025.12.31", "2026-06-01T01:00:00.000Z"])
     expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith("2026.06.01", ["YYYY.MM.DD"])
     expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith("reading", ["YYYY.MM.DD"])
     expect(parseMarkdownBodyDatesMock).toHaveBeenCalledWith("2025.12.31", ["YYYY.MM.DD"])
@@ -209,7 +208,7 @@ This is a note.`)
 
     const note = await scanMarkdownFile("/notes/daily/2026.05.27 (Wed) á.md")
 
-    expect(note.titleOrBodyDates).toEqual(["2026.05.26", "26/05/27"])
+    expect(note.dates).toEqual(["2026.05.26", "26/05/27", "2026-05-26T01:00:00.000Z"])
     expect(note.frontmatter).toEqual({
       created: "2026.05.26",
       topic: ["AI", "Notes"],

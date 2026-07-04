@@ -73,7 +73,7 @@ describe("notes handler interface", () => {
         id: "a",
         obsidianUrl: "obsidian://open?vault=vault&file=a",
         title: "a",
-        titleOrBodyDates: ["2026.05.26"],
+        dates: ["2026.05.26"],
       }),
       createScannedNote({
         basename: "b.md",
@@ -136,7 +136,7 @@ describe("notes handler interface", () => {
           children: [{ type: "text", value: "Note" }],
           type: "root",
         },
-        titleOrBodyDates: ["2026.05.26"],
+        dates: ["2026.05.26"],
       }),
     ])
     expect(resolveNotesConfigMock).toHaveBeenCalled()
@@ -299,7 +299,7 @@ const createScannedNote = (
   overrides: Partial<ScannedNote> = {},
 ): ScannedNote => ({
   basename: "note.md",
-  titleOrBodyDates: [],
+  dates: [],
   createdDate: "2026-05-26T00:00:00.000Z",
   folder: "notes",
   frontmatter: null,

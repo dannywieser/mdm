@@ -5,7 +5,7 @@ import { buildSearchIndex, filterSearchIndex } from "./NotesGallery.util"
 
 const buildNote = (overrides: Partial<Note> = {}): Note => ({
   basename: "note.md",
-  titleOrBodyDates: [],
+  dates: [],
   createdDate: null,
   frontmatter: null,
   fullText: "",

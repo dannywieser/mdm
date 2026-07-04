@@ -5,7 +5,7 @@ import { getColumnLabel, resolveBadgeValues } from "./NotesSummaryTable.util"
 
 const createNote = (frontmatter: Note["frontmatter"]): Note => ({
   basename: "book",
-  titleOrBodyDates: [],
+  dates: [],
   createdDate: "2024-01-01",
   frontmatter,
   folder: "books",

@@ -459,7 +459,7 @@ const createScannedNote = (
   overrides: Partial<ScannedNote> = {},
 ): ScannedNote => ({
   basename: "note.md",
-  titleOrBodyDates: [],
+  dates: [],
   createdDate: "2026-05-26T00:00:00.000Z",
   folder: "topic",
   frontmatter: null,
