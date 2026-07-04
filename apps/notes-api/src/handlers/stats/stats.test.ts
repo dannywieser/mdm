@@ -86,7 +86,7 @@ const mockNote = {
   modifiedDate: "2026-06-01T00:00:00.000Z",
   obsidianUrl: "obsidian://open?vault=vault&file=a",
   title: "a",
-  titleOrBodyDates: [],
+  dates: [],
 }
 
 describe("stats handler interface", () => {

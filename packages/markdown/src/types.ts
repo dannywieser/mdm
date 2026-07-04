@@ -19,7 +19,7 @@ export type NoteFrontmatter = Record<string, FrontmatterValue>;
 
 export interface Note {
   basename: string
-  titleOrBodyDates: string[]
+  dates: string[]
   createdDate: string | null
   frontmatter: NoteFrontmatter | null
   fullText: string

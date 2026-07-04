@@ -24,7 +24,7 @@ describe("config", () => {
 
   beforeEach(async () => {
     vi.resetModules()
-    ;({ resolveNotesConfig } = await import("./index"))
+    ;({ resolveNotesConfig } = await import("./index.js"))
     process.env.NOTES_ROOT = "/notes-root"
 
     mockIsNonEmptyString.mockImplementation(

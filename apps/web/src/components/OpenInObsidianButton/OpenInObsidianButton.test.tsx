@@ -7,7 +7,7 @@ import { OpenInObsidianButton } from './OpenInObsidianButton'
 
 const noteFixture: Note = {
   basename: 'my-note.md',
-  titleOrBodyDates: [],
+  dates: [],
   createdDate: '2026-01-01',
   content: {
     children: [{ children: [{ type: 'text', value: 'Hello' }], type: 'paragraph' }],

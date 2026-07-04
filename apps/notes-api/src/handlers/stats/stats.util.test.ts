@@ -28,7 +28,7 @@ const createNote = (
   id: "note",
   obsidianUrl: "obsidian://open?vault=vault&file=note",
   title: "note",
-  titleOrBodyDates: [],
+  dates: [],
   ...overrides,
 })
 

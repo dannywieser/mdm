@@ -30,7 +30,7 @@
 - after every change made, review the README file for the application or package and update it if necessary to reflect the changes made or remove any outdated information.
 - When adding dependencies to `package.json`, always prefer pinning a specific version over fuzzy version matching.
 - For user-visible changes, include a Changesets entry by running `npm run changeset` from the repository root and committing the generated `.changeset/*.md` file.
-- Always run linting **and** type checking after every single change made, and fix any errors before committing. Run `npm run lint` for ESLint errors and `npm run typecheck` (or the package-level `npm run typecheck` from within the app/package directory) for TypeScript type errors. Note that ESLint does not catch all TypeScript type errors — type checking must be run separately. The `build` script uses `tsconfig.build.json` which excludes test files, so `npm run typecheck` (which uses `tsconfig.json`) is the only way to catch type errors in test files.
+- Before every commit, run `npm run verify` from the repository root (runs lint, typecheck, build, and test via Turbo across all packages) and fix any errors it reports. Do not commit if it fails. Note that ESLint does not catch all TypeScript type errors, and the `build` script uses `tsconfig.build.json` which excludes test files — `verify` runs `typecheck` (which uses `tsconfig.json`) separately so type errors in test files are still caught.
 
 ## apps/web structure guidelines
 
