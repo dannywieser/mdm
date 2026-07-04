@@ -25,6 +25,12 @@ describe("resolveOldestDate", () => {
     ).toEqual(new Date(Date.UTC(2026, 5, 1)))
   })
 
+  test("ignores non-ISO-8601 values that Date would otherwise parse loosely", () => {
+    expect(
+      resolveOldestDate(["June 15, 2025", "2026.06.01"], ["YYYY.MM.DD"]),
+    ).toEqual(new Date(Date.UTC(2026, 5, 1)))
+  })
+
   test("returns null when no values are parseable", () => {
     expect(resolveOldestDate(["not-a-date"], ["YYYY.MM.DD"])).toBeNull()
   })
