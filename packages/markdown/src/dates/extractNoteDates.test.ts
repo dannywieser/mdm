@@ -2,58 +2,52 @@ import { extractNoteDates } from "./extractNoteDates"
 
 describe("extractNoteDates", () => {
   test("extracts a date found in the title", () => {
-    expect(extractNoteDates("2026.05.27 Weekly Review", "", null, ["YYYY.MM.DD"])).toEqual([
+    expect(extractNoteDates("2026.05.27 Weekly Review", "", ["YYYY.MM.DD"])).toEqual([
       "2026.05.27",
     ])
   })
 
   test("extracts a date found in the body", () => {
-    expect(extractNoteDates("", "Seen on 2026.06.01.", null, ["YYYY.MM.DD"])).toEqual([
+    expect(extractNoteDates("", "Seen on 2026.06.01.", ["YYYY.MM.DD"])).toEqual(["2026.06.01"])
+  })
+
+  test("extracts dates found in a raw frontmatter block, including list items", () => {
+    const source = `---
+created: 2026.06.01
+tags:
+  - reading
+  - 2025.12.31
+---
+Body text.`
+    expect(extractNoteDates("", source, ["YYYY.MM.DD"])).toEqual(["2026.06.01", "2025.12.31"])
+  })
+
+  test("returns dates in the order found: title, then frontmatter, then body", () => {
+    const source = `---
+created: 2025.12.31
+---
+Body mentions 2026.06.01 only.`
+    expect(extractNoteDates("2026.05.27", source, ["YYYY.MM.DD"])).toEqual([
+      "2026.05.27",
+      "2025.12.31",
       "2026.06.01",
     ])
   })
 
-  test("extracts dates found in frontmatter values, including arrays", () => {
-    expect(
-      extractNoteDates(
-        "",
-        "",
-        { created: "2026.06.01", tags: ["reading", "2025.12.31"] },
-        ["YYYY.MM.DD"],
-      ),
-    ).toEqual(["2026.06.01", "2025.12.31"])
-  })
-
-  test("returns dates in title, then body, then frontmatter order", () => {
-    expect(
-      extractNoteDates(
-        "2026.05.27",
-        "Body mentions 2026.06.01.",
-        { created: "2025.12.31" },
-        ["YYYY.MM.DD"],
-      ),
-    ).toEqual(["2026.05.27", "2026.06.01", "2025.12.31"])
-  })
-
-  test("does not bleed a date match across the title/body boundary", () => {
-    expect(extractNoteDates("2026.05.27", "2026.05.28 more text", null, ["YYYY.MM.DD"])).toEqual([
+  test("does not bleed a date match across the title/source boundary", () => {
+    expect(extractNoteDates("2026.05.27", "2026.05.28 more text", ["YYYY.MM.DD"])).toEqual([
       "2026.05.27",
       "2026.05.28",
     ])
   })
 
-  test("deduplicates identical dates found across sources", () => {
+  test("deduplicates identical dates found across the title and source", () => {
     expect(
-      extractNoteDates(
-        "",
-        "Mentioned 2026.06.01 here.",
-        { created: "2026.06.01" },
-        ["YYYY.MM.DD"],
-      ),
+      extractNoteDates("2026.06.01", "Mentioned 2026.06.01 again.", ["YYYY.MM.DD"]),
     ).toEqual(["2026.06.01"])
   })
 
-  test("returns an empty array when frontmatter is null and no dates are found", () => {
-    expect(extractNoteDates("Untitled", "No dates here.", null, ["YYYY.MM.DD"])).toEqual([])
+  test("returns an empty array when no dates are found", () => {
+    expect(extractNoteDates("Untitled", "No dates here.", ["YYYY.MM.DD"])).toEqual([])
   })
 })

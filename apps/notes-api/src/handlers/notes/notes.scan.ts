@@ -31,7 +31,7 @@ export const scanMarkdownFile = async (
   const title = basename.endsWith(".md") ? basename.slice(0, -3) : basename
   const modifiedDate = stats.mtime.toISOString()
   const dates = Array.from(
-    new Set([...extractNoteDates(title, body, frontmatter, dateFormats), modifiedDate]),
+    new Set([...extractNoteDates(title, source, dateFormats), modifiedDate]),
   )
 
   const obsidianUrl = buildObsidianUrl(obsidianVault, notesDirectory, filePath)

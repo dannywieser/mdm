@@ -108,7 +108,6 @@ describe("notes scan helpers", () => {
     expect(extractNoteDatesMock).toHaveBeenCalledWith(
       "welcome",
       "# Welcome\n\nThis is a note.",
-      null,
       ["YYYY.MM.DD"],
     )
     expect(resolveOldestDateMock).toHaveBeenCalledWith(
@@ -160,12 +159,7 @@ describe("notes scan helpers", () => {
     const note = await scanMarkdownFile("/notes/note.md")
 
     expect(note.dates).toEqual(["2026.06.01", "2025.12.31", "2026-06-01T01:00:00.000Z"])
-    expect(extractNoteDatesMock).toHaveBeenCalledWith(
-      "note",
-      "# Note",
-      { created: "2026.06.01", tags: ["reading", "2025.12.31"] },
-      ["YYYY.MM.DD"],
-    )
+    expect(extractNoteDatesMock).toHaveBeenCalledWith("note", "# Note", ["YYYY.MM.DD"])
   })
 
   test("scanMarkdownFile uses parsed frontmatter and escapes obsidian file paths", async () => {

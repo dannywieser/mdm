@@ -1,28 +1,24 @@
-import type { NoteFrontmatter } from "../types"
-
 import { parseMarkdownBodyDates } from "../parsers/parseMarkdownBodyDates"
 
 /**
- * Extracts every date found in a note's title, body, and frontmatter values.
+ * Extracts every date found in a note's title and raw source text.
  *
- * The three sources are joined into a single block of text (separated by
- * newlines, so date matches never bleed across a source boundary) and
- * scanned once against `dateFormats`, so this is equivalent to extracting
- * dates from each source separately, but without the repeated parsing.
+ * `source` is the note's full file content, including any frontmatter
+ * block, so this covers dates in the title, body, and frontmatter values
+ * with a single pass — no need to parse frontmatter into an object first.
+ * Title and source are joined with a newline (a non-digit separator, so
+ * date matches never bleed across the boundary) and scanned once.
  *
  * @param title - The note's title.
- * @param body - The note's body text.
- * @param frontmatter - Parsed note frontmatter, or `null`.
+ * @param source - The note's full raw file content (frontmatter block plus body).
  * @param dateFormats - Format strings used to find dates.
- * @returns Every matched date string, deduplicated, in the order first found (title, then body, then frontmatter).
+ * @returns Every matched date string, deduplicated, in the order first found.
  */
 export const extractNoteDates = (
   title: string,
-  body: string,
-  frontmatter: NoteFrontmatter | null,
+  source: string,
   dateFormats: readonly string[],
 ): string[] => {
-  const frontmatterValues = frontmatter ? Object.values(frontmatter).flat() : []
-  const text = [title, body, ...frontmatterValues].join("\n")
+  const text = [title, source].join("\n")
   return Array.from(new Set(parseMarkdownBodyDates(text, dateFormats)))
 }
