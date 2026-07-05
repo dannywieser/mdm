@@ -2,22 +2,29 @@
 
 ## Codebase overview
 
-**Apps**
+mdm is an npm workspaces + Turbo monorepo of Express backend services and a React frontend, all reading from a shared Obsidian markdown vault. Each app/package has its own README with full detail (endpoints, config, structure) — see the root README's "Current apps"/"Current packages" lists for links. This section is a map, not the source of truth; if it drifts from an app's own README or the code, trust those instead.
 
-- `apps/notes-api` — Express 5 API. Two endpoints: `GET /health` and `GET /notes`. The notes endpoint recursively collects all `.md`/`.markdown` files from the configured vault directory, parses each one into a `Note` object (frontmatter, HTML body, body-extracted dates, file metadata), then optionally filters the result by a named view before returning JSON.
+**Apps** (all Express services use `pino-http` for request logging; none use `morgan`)
+
+- `apps/notes-api` — `GET /health`, `GET /notes` (recursively parses every note into a `Note`: frontmatter, markdown node tree with wikilinks resolved and images rewritten to the image proxy, extracted dates, file metadata; optional `?view=` filter and `?includeContent=false`), `GET /views` (per-view note counts/IDs for the view picker, without full content).
+- `apps/flag-manager` — Redis-backed per-ID feature flags (`GET`/`POST`/`PATCH /flags/:id/:flag`), driven by the `flags` config.
+- `apps/habit-tracker` — `GET /habits` (lightweight per-habit summary) and `GET /habits/:id` (full score history/streaks/breakdown), scoring notes' `frontmatterProperty` values via a tiered day/streak multiplier, driven by the `habits` config.
+- `apps/stats-service` — `GET /stats/meta`: aggregate note/folder/word/attachment counts, in-memory cached for 5 minutes with a shared in-flight scan.
+- `apps/image-server` — `GET /images?path=` proxies/redirects local note images through imgproxy with Redis-cached redirects; configured entirely via env vars, does not read `app.config.json`.
+- `apps/web` — React + TypeScript client (Chakra UI, TanStack Query, React Router): home dashboard, `/notes/:view`, `/tracking/:habitId`, `/stats`, `/source/:noteId`, `/colors` (theme picker); can run against the live services or a static demo snapshot (`VITE_DEMO_MODE`).
+- `apps/demo-data` — generates a deterministic demo vault and snapshots the other services' responses into static JSON for the GitHub Pages demo.
 
 **Packages**
 
-- `packages/app-config` — reads and validates `app.config.json` (searched upward from `cwd()`). Exposes `resolveNotesConfig()` which returns a cached `ResolvedNotesConfig` with `notesDirectory`, `obsidianVault`, `dateFormats`, and `views`. Config errors surface as `AppConfigError`.
-- `packages/markdown` — low-level markdown utilities: `parseFrontMatter` (YAML front matter → `NoteFrontmatter`) and `parseMarkdownBodyDates` (extracts dates from note body text given configured format strings). Also owns the `Note` type used across the codebase.
+- `packages/app-config` — reads and validates `app.config.json`, merges in the `NOTES_ROOT` env var, and caches the result. Exposes `resolveNotesConfig()` returning a `ResolvedNotesConfig` (`notesDirectory`, `obsidianVault`, `dateFormats`, `attachmentsDirectory`, `createdDateProperty`, `timezone`, `habits`, `views`). Config errors are thrown as plain `Error`s with a message describing what's wrong.
+- `packages/markdown` — low-level markdown utilities: `parseFrontMatter`, `parseMarkdownBodyDates`/`extractNoteDates`, `resolveDateFromFrontmatterOrTitle`/`resolveOldestDate`, `collectMarkdownFiles`, `buildObsidianUrl`. Owns the `Note` type used across the codebase.
+- `packages/services` — shared response types and React Query hooks consumed by `apps/web`, plus the demo-mode config/URL helpers.
+- `packages/util` (`mdm-util`) — dependency-free pure-function helpers (dates, strings, objects, promises, regex, IDs), plus `./node` and `./redis` subpath exports.
+- `packages/logger` (`mdm-logger`) — shared `pino`-based logger factory used by every backend service.
 
-**Config shape** (`app.config.json`):
+**Config shape** (`app.config.json` + `NOTES_ROOT` env var — see root README for the full field list): the vault path comes exclusively from the required `NOTES_ROOT` env var, not from `app.config.json`. `obsidianVault` only builds `obsidianUrl` deep links. `dateFormats` finds dates in note bodies. `views` are named filters (`filters` groups of dot-path → expected value, ANDed within a group/ORed across groups, with `$exclude`/`$missing`/`$today`/`$onThisDay` support); callers pass `?view=<id>` to filter.
 
-- `noteRootDirectory` + `obsidianVault` → combined into `notesDirectory` (the vault root passed to the file walker)
-- `dateFormats` — array of format strings used to find dates in note bodies
-- `views` — named filters; each view has a `name` and a `filters` map of dot-path → expected value (e.g. `"frontmatter.type": "book"`). Callers pass `?view=<name>` to filter the response.
-
-**Key data flow**: `GET /notes` → `resolveNotesConfig()` → `collectMarkdownFiles(notesDirectory)` → `parseMarkdownFile()` per file → `applyViewFilter()` → JSON response.
+**Key data flow**: `GET /notes` → `resolveNotesConfig()` → `collectMarkdownFiles(notesDirectory)` → scan/parse each file into a `Note` → `applyViewFilter()` → JSON response.
 
 ## On every change
 
