@@ -2,13 +2,14 @@ export * from "./config"
 
 export * from "./notes/notes.types"
 export * from "./notes/views.types"
-export * from "./notes/stats.types"
 export * from "./notes/hooks/useNotesQuery/useNotesQuery"
 export * from "./notes/hooks/useNotesQuery/useNotesQuery.types"
 export * from "./notes/hooks/useViewsQuery/useViewsQuery"
 export * from "./notes/hooks/useViewsQuery/useViewsQuery.types"
-export * from "./notes/hooks/useStatsQuery/useStatsQuery"
-export * from "./notes/hooks/useStatsQuery/useStatsQuery.types"
+
+export * from "./stats/stats.types"
+export * from "./stats/hooks/useStatsQuery/useStatsQuery"
+export * from "./stats/hooks/useStatsQuery/useStatsQuery.types"
 
 export * from "./habits/habits.types"
 export * from "./habits/hooks/useHabitsQuery/useHabitsQuery"
