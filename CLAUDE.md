@@ -2,7 +2,7 @@
 
 ## Codebase overview
 
-mdm is an npm workspaces + Turbo monorepo of Express backend services and a React frontend, all reading from a shared Obsidian markdown vault. Each app/package has its own README with full detail (endpoints, config, structure) — see the root README's "Current apps"/"Current packages" lists for links. This section is a map, not the source of truth; if it drifts from an app's own README or the code, trust those instead.
+mdm is an npm workspaces + Turbo monorepo of Express backend services and a React frontend, all reading from a shared Obsidian markdown vault. Each app/package has its own README with full detail (endpoints, config, structure) — see [`CONTRIBUTING.md`](CONTRIBUTING.md)'s "Project structure" section for links. This section is a map, not the source of truth; if it drifts from an app's own README or the code, trust those instead.
 
 **Apps** (all Express services use `pino-http` for request logging; none use `morgan`)
 
@@ -22,7 +22,7 @@ mdm is an npm workspaces + Turbo monorepo of Express backend services and a Reac
 - `packages/util` (`mdm-util`) — dependency-free pure-function helpers (dates, strings, objects, promises, regex, IDs), plus `./node` and `./redis` subpath exports.
 - `packages/logger` (`mdm-logger`) — shared `pino`-based logger factory used by every backend service.
 
-**Config shape** (`app.config.json` + `NOTES_ROOT` env var — see root README for the full field list): the vault path comes exclusively from the required `NOTES_ROOT` env var, not from `app.config.json`. `obsidianVault` only builds `obsidianUrl` deep links. `dateFormats` finds dates in note bodies. `views` are named filters (`filters` groups of dot-path → expected value, ANDed within a group/ORed across groups, with `$exclude`/`$missing`/`$today`/`$onThisDay` support); callers pass `?view=<id>` to filter.
+**Config shape** (`app.config.json` + `NOTES_ROOT` env var — see `CONTRIBUTING.md` for the full field list): the vault path comes exclusively from the required `NOTES_ROOT` env var, not from `app.config.json`. `obsidianVault` only builds `obsidianUrl` deep links. `dateFormats` finds dates in note bodies. `views` are named filters (`filters` groups of dot-path → expected value, ANDed within a group/ORed across groups, with `$exclude`/`$missing`/`$today`/`$onThisDay` support); callers pass `?view=<id>` to filter.
 
 **Key data flow**: `GET /notes` → `resolveNotesConfig()` → `collectMarkdownFiles(notesDirectory)` → scan/parse each file into a `Note` → `applyViewFilter()` → JSON response.
 

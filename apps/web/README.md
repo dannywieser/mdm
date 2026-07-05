@@ -13,7 +13,7 @@ React + TypeScript client using Chakra UI, TanStack Query, and React Router.
 
 ## Configuration
 
-- Backend base URLs, each defaulting to same-origin relative paths proxied by nginx (see root README's Docker section):
+- Backend base URLs, each defaulting to same-origin relative paths proxied by nginx (see `CONTRIBUTING.md`'s Docker Compose section):
   - `VITE_API_BASE_URL` (defaults to `/api`) — `notes-api`
   - `VITE_HABIT_API_BASE_URL` (defaults to `""`) — `habit-tracker`
   - `VITE_FLAGS_BASE_URL` (defaults to `/flags`) — `flag-manager`

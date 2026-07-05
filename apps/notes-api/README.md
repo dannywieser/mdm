@@ -85,7 +85,7 @@ Express-based Node service with request logging via `pino-http`.
 
 ## Configuration
 
-Configured via `app.config.json` at the repository root plus the `NOTES_ROOT` environment variable (see root README for the full config shape). Fields used by this service:
+Configured via `app.config.json` at the repository root plus the `NOTES_ROOT` environment variable (see `CONTRIBUTING.md` for the full config shape). Fields used by this service:
 
 - `NOTES_ROOT` (environment variable, required): absolute path to your notes root directory. Resolution fails with `"NOTES_ROOT environment variable is required"` if unset.
 - `dateFormats`: array of expected date patterns to extract from note bodies, such as `["YYYY.MM.DD", "YY/MM/DD"]`.
