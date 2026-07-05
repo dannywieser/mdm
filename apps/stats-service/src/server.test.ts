@@ -4,13 +4,19 @@ import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
 import { healthHandler } from "./handlers/health/health"
-import { notesHandler } from "./handlers/notes/notes"
+import { metaHandler } from "./handlers/meta/meta"
 import { logger } from "./logger"
 import { createApp, logStartupConfig } from "./server"
 
-vi.mock("app-config", () => ({
-  resolveNotesConfig: vi.fn(),
-}))
+vi.mock("app-config", async () => {
+  const actualConfig =
+    await vi.importActual<typeof import("app-config")>("app-config")
+
+  return {
+    ...actualConfig,
+    resolveNotesConfig: vi.fn(),
+  }
+})
 
 vi.mock("mdm-util", () => ({
   toLoggableError: vi.fn(),
@@ -31,16 +37,16 @@ vi.mock("./logger", () => ({
 vi.mock("./handlers/health/health", () => ({
   healthHandler: vi.fn(),
 }))
-vi.mock("./handlers/notes/notes", () => ({
-  notesHandler: vi.fn(),
+vi.mock("./handlers/meta/meta", () => ({
+  metaHandler: vi.fn(),
 }))
 
 const healthHandlerMock = vi.mocked(healthHandler)
-const notesHandlerMock = vi.mocked(notesHandler)
+const metaHandlerMock = vi.mocked(metaHandler)
 const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
 const toLoggableErrorMock = vi.mocked(toLoggableError)
 
-describe("notes-api server interface", () => {
+describe("stats-service server interface", () => {
   test("wires GET /health to the health handler", async () => {
     healthHandlerMock.mockImplementation((_request, response) => {
       response.status(200).json({ status: "ok" })
@@ -54,17 +60,17 @@ describe("notes-api server interface", () => {
     expect(healthHandlerMock).toHaveBeenCalledTimes(1)
   })
 
-  test("wires GET /notes to the notes handler", async () => {
-    notesHandlerMock.mockImplementation((_request, response) => {
-      response.status(200).json({ notes: [] })
+  test("wires GET /stats/meta to the meta handler", async () => {
+    metaHandlerMock.mockImplementation((_request, response) => {
+      response.status(200).json({ totalNotes: 0 })
     })
     const app = createApp()
 
-    const response = await request(app).get("/notes")
+    const response = await request(app).get("/stats/meta")
 
     expect(response.status).toBe(200)
-    expect(response.body).toEqual({ notes: [] })
-    expect(notesHandlerMock).toHaveBeenCalledTimes(1)
+    expect(response.body).toEqual({ totalNotes: 0 })
+    expect(metaHandlerMock).toHaveBeenCalledTimes(1)
   })
 
   test("logs the resolved notes config on startup", async () => {

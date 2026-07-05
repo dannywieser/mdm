@@ -130,6 +130,33 @@ This repository is a Turborepo monorepo with this structure:
       { "error": "A valid local image path is required" }
       ```
 
+- `apps/stats-service`: Express-based API for aggregate vault statistics.
+  - `GET /health`
+    - Purpose: basic service health check
+    - Success response: `200`
+      ```json
+      { "status": "ok" }
+      ```
+  - `GET /stats/meta`
+    - Purpose: return top-level vault totals — note count, distinct folder count, word count (counted from note bodies, excluding frontmatter), and attachment count grouped by file extension
+    - Success response: `200`
+      ```json
+      {
+        "totalNotes": 128,
+        "totalFolders": 12,
+        "totalWords": 45213,
+        "totalAttachments": { "png": 34, "pdf": 2 }
+      }
+      ```
+    - Error response: `500`
+      ```json
+      { "error": "Unable to load stats" }
+      ```
+    - Sample curl command:
+      ```bash
+      curl http://localhost/stats/meta
+      ```
+
 - `apps/habit-tracker`: Express-based API for tracking configurable habits scored from note frontmatter.
   - `GET /health`
     - Purpose: basic service health check
@@ -281,6 +308,7 @@ This repository is a Turborepo monorepo with this structure:
   - `flag-manager` as an internal service on port `3001`
   - `habit-tracker` as an internal service on port `3003`
   - `image-server` as an internal service on port `3002`
+  - `stats-service` as an internal service on port `3004`
   - `imgproxy` as internal image optimizer used by `image-server`
   - `redis` as internal data storage for `flag-manager`
 - nginx routes:
@@ -289,8 +317,9 @@ This repository is a Turborepo monorepo with this structure:
   - `/habit/*` → `habit-tracker:3003/habit/*`
   - `/habits` → `habit-tracker:3003/habits`
   - `/images*` → `image-server:3002/images*`
+  - `/stats/*` → `stats-service:3004/stats/*`
   - `/imgproxy/*` → `imgproxy:8080/*` (used by `image-server` redirects)
-- `app.config.json` is mounted into the `notes-api` and `habit-tracker` containers as `/app/app.config.json` (read-only).
+- `app.config.json` is mounted into the `notes-api`, `habit-tracker`, and `stats-service` containers as `/app/app.config.json` (read-only).
 - Configure `noteRootDirectory` in `app.config.json` using a path valid inside the container (for example `/data/notes`).
 - Host notes (and attachments) are mounted into all services with `NOTES_ROOT`:
   - default: `./notes` on the host maps to `/data/notes`
@@ -298,7 +327,7 @@ This repository is a Turborepo monorepo with this structure:
 - Set `attachmentsDirectory` in `app.config.json` to the folder name (relative to `NOTES_ROOT`) where Obsidian stores attachments (e.g. `"attachments"`). Bare-filename images in notes resolve to `<attachmentsDirectory>/<noteDir>/<noteStem>/<filename>`.
 - Notes markdown image paths now resolve through `/images?path=<encoded-relative-path>` for imgproxy optimization.
 - If local and container config values differ, create a separate Docker-specific config file and mount it to `/app/app.config.json`.
-- `notes-api`, `flag-manager`, `habit-tracker`, and `image-server` each define a Docker healthcheck that polls their `/health` endpoint; `web` waits for all of them to report healthy before starting.
+- `notes-api`, `flag-manager`, `habit-tracker`, `image-server`, and `stats-service` each define a Docker healthcheck that polls their `/health` endpoint; `web` waits for all of them to report healthy before starting.
 
 Start services:
 
