@@ -7,6 +7,8 @@ import { countFilesByExtension } from "mdm-util/node"
 import { promises as fs } from "node:fs"
 import request from "supertest"
 
+import type { StatsMetaResponse } from "./meta.types"
+
 import { metaHandler } from "./meta"
 
 vi.mock("app-config", async () => {
@@ -38,6 +40,12 @@ vi.mock("node:fs", () => ({
   promises: {
     readFile: vi.fn(),
   },
+}))
+
+vi.mock("./meta.cache", () => ({
+  createStatsMetaCache: vi.fn(() => ({
+    get: (compute: () => Promise<StatsMetaResponse>) => compute(),
+  })),
 }))
 
 const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
