@@ -15,6 +15,14 @@ This repository is a Turborepo monorepo with this structure:
 - `apps/stats-service`: Express-based API for aggregate vault statistics. See [`apps/stats-service/README.md`](apps/stats-service/README.md).
 - `apps/habit-tracker`: Express-based API for tracking configurable habits scored from note frontmatter. See [`apps/habit-tracker/README.md`](apps/habit-tracker/README.md).
 
+## Current packages
+
+- `packages/app-config`: reads, validates, and caches `app.config.json` + `NOTES_ROOT` into the resolved config every backend service consumes. See [`packages/app-config/README.md`](packages/app-config/README.md).
+- `packages/markdown`: frontmatter parsing, date extraction, and vault file collection; owns the `Note` type. See [`packages/markdown/README.md`](packages/markdown/README.md).
+- `packages/util` (`mdm-util`): dependency-free pure-function helpers (dates, strings, objects, promises, regex, IDs) shared across the repo, plus `./node` and `./redis` subpath exports. See [`packages/util/README.md`](packages/util/README.md).
+- `packages/logger` (`mdm-logger`): shared `pino`-based structured logger factory used by every backend service. See [`packages/logger/README.md`](packages/logger/README.md).
+- `packages/services`: shared TypeScript types and React Query hooks for the backend services, consumed by `apps/web`. See [`packages/services/README.md`](packages/services/README.md).
+
 ## Configuration
 
 - Copy `app.config.example.json` to `app.config.json` at repository root.
