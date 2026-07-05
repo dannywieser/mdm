@@ -10,6 +10,16 @@ export interface SnapshotHabitSummary {
   habitId: string
 }
 
+export interface SnapshotNote {
+  /** Absolute path of the note's markdown file inside the demo vault. */
+  fullPath: string
+  id: string
+}
+
+export interface SnapshotNotesPayload {
+  notes: SnapshotNote[]
+}
+
 export interface BuildSnapshotOptions {
   /** Absolute path to the vault's attachments directory (copied for covers). */
   attachmentsSourceDirectory: string
@@ -23,6 +33,7 @@ export interface BuildSnapshotOptions {
 
 export interface SnapshotSummary {
   habitCount: number
+  noteCount: number
   viewCount: number
 }
 

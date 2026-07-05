@@ -47,7 +47,7 @@ const main = async (): Promise<void> => {
       outputDirectory: OUTPUT_DIRECTORY,
     })
     console.info(
-      `[demo-data] snapshot complete: ${String(summary.viewCount)} views, ${String(summary.habitCount)} habits -> ${OUTPUT_DIRECTORY}`,
+      `[demo-data] snapshot complete: ${String(summary.viewCount)} views, ${String(summary.habitCount)} habits, ${String(summary.noteCount)} note sources -> ${OUTPUT_DIRECTORY}`,
     )
   } finally {
     notesApi.stop()

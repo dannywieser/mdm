@@ -5,6 +5,7 @@ import {
   buildDemoHabitsUrl,
   buildDemoHabitUrl,
   buildDemoImageUrl,
+  buildDemoNoteSourceUrl,
   buildDemoNotesUrl,
   buildDemoStatsUrl,
   buildDemoViewsUrl,
@@ -38,6 +39,12 @@ describe("simple demo endpoints", () => {
     expect(buildDemoStatsUrl()).toBe("/demo-data/stats.json")
     expect(buildDemoHabitsUrl()).toBe("/demo-data/habits.json")
     expect(buildDemoHabitUrl("screen-time")).toBe("/demo-data/habit.screen-time.json")
+  })
+})
+
+describe("buildDemoNoteSourceUrl", () => {
+  test("points at the note's captured markdown source", () => {
+    expect(buildDemoNoteSourceUrl("note-1")).toBe("/demo-data/source/note-1.md")
   })
 })
 

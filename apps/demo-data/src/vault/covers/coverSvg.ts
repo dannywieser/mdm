@@ -1,6 +1,15 @@
-import type { CoverKind, CoverSvgOptions } from "./coverSvg.types"
+import type {
+  CoverDecoration,
+  CoverDimensions,
+  CoverKind,
+  CoverSvgOptions,
+} from "./coverSvg.types"
 
 import { createRandom, pickOne, randomInt } from "../random/random"
+import { BOOK_DECORATIONS } from "./decorations/bookDecorations"
+import { MOVIE_DECORATIONS } from "./decorations/movieDecorations"
+import { PHOTO_DECORATIONS } from "./decorations/photoDecorations"
+import { RECIPE_DECORATIONS } from "./decorations/recipeDecorations"
 
 const PALETTES: readonly (readonly [string, string, string])[] = [
   ["#1d3557", "#457b9d", "#f1faee"],
@@ -13,11 +22,31 @@ const PALETTES: readonly (readonly [string, string, string])[] = [
   ["#4a044e", "#a21caf", "#fae8ff"],
 ]
 
-const COVER_SIZES: Record<CoverKind, { height: number; width: number }> = {
-  book: { height: 600, width: 400 },
-  movie: { height: 600, width: 400 },
-  photo: { height: 600, width: 600 },
-  recipe: { height: 600, width: 600 },
+// Books and movies stay portrait like real covers; photos and recipes mix
+// square, letterbox, portrait, and panoramic frames so masonry galleries
+// show varied cell heights.
+const COVER_DIMENSIONS: Record<CoverKind, readonly CoverDimensions[]> = {
+  book: [{ height: 600, width: 400 }],
+  movie: [{ height: 600, width: 400 }],
+  photo: [
+    { height: 600, width: 600 },
+    { height: 450, width: 800 },
+    { height: 750, width: 600 },
+    { height: 400, width: 900 },
+    { height: 600, width: 800 },
+  ],
+  recipe: [
+    { height: 600, width: 600 },
+    { height: 500, width: 800 },
+    { height: 700, width: 560 },
+  ],
+}
+
+const DECORATIONS: Record<CoverKind, readonly CoverDecoration[]> = {
+  book: BOOK_DECORATIONS,
+  movie: MOVIE_DECORATIONS,
+  photo: PHOTO_DECORATIONS,
+  recipe: RECIPE_DECORATIONS,
 }
 
 const escapeXml = (value: string): string =>
@@ -60,45 +89,16 @@ const buildTitleText = (
   return `<text x="${width / 2}" y="${startY}" fill="${color}" font-family="Georgia, serif" font-size="${fontSize}" font-weight="bold" text-anchor="middle">${spans}</text>`
 }
 
-const buildDecoration = (
-  kind: CoverKind,
-  random: () => number,
-  width: number,
-  height: number,
-  accent: string,
-): string => {
-  if (kind === "photo") {
-    const sunX = randomInt(random, 100, width - 100)
-    const peak = randomInt(random, 200, 320)
-    return (
-      `<circle cx="${sunX}" cy="150" r="${randomInt(random, 40, 70)}" fill="${accent}" opacity="0.9"/>` +
-      `<polygon points="0,${height} 0,${peak + 140} ${width * 0.35},${peak} ${width * 0.7},${peak + 180} ${width},${peak + 60} ${width},${height}" fill="#00000055"/>`
-    )
-  }
-  if (kind === "recipe") {
-    return (
-      `<circle cx="${width / 2}" cy="${height / 2 - 40}" r="130" fill="${accent}" opacity="0.35"/>` +
-      `<circle cx="${width / 2}" cy="${height / 2 - 40}" r="90" fill="${accent}" opacity="0.6"/>`
-    )
-  }
-  if (kind === "movie") {
-    const bars = Array.from({ length: 6 }, (_, index) => {
-      const x = 20 + index * ((width - 40) / 6)
-      return `<rect x="${x}" y="20" width="24" height="24" rx="4" fill="${accent}" opacity="0.7"/>`
-    })
-    return bars.join("")
-  }
-  return `<rect x="0" y="0" width="26" height="${height}" fill="${accent}" opacity="0.65"/>`
-}
-
 /**
  * Renders a small deterministic SVG cover so demo galleries have images
- * without any external image service.
+ * without any external image service. Palette, decoration motif, and (for
+ * photos/recipes) intrinsic aspect ratio all vary with the seed.
  */
 export const generateCoverSvg = ({ kind, seed, title }: CoverSvgOptions): string => {
   const random = createRandom(seed)
-  const { height, width } = COVER_SIZES[kind]
+  const { height, width } = pickOne(random, COVER_DIMENSIONS[kind])
   const [dark, mid, light] = pickOne(random, PALETTES)
+  const decoration = DECORATIONS[kind][randomInt(random, 0, DECORATIONS[kind].length - 1)]
   const titleColor = kind === "photo" ? "#ffffff" : light
   const titleY = kind === "book" || kind === "movie" ? 180 : height - 110
   const fontSize = kind === "photo" ? 34 : 38
@@ -109,7 +109,7 @@ export const generateCoverSvg = ({ kind, seed, title }: CoverSvgOptions): string
     `<stop offset="0" stop-color="${mid}"/><stop offset="1" stop-color="${dark}"/>` +
     `</linearGradient></defs>` +
     `<rect width="${width}" height="${height}" fill="url(#bg)"/>` +
-    buildDecoration(kind, random, width, height, light) +
+    decoration({ accent: light, dark, height, mid, random, width }) +
     buildTitleText(title, width, titleY, titleColor, fontSize) +
     `</svg>`
   )

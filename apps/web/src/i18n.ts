@@ -71,6 +71,9 @@ const translations: Record<Locale, Record<string, string>> = {
     "stats.notesPerDay": "notes per day — past year",
     "stats.totalNotes": "total notes",
     "stats.trend": "trend vs previous 30 days",
+    "source.demoNotice":
+      "in the full app this opens the note in Obsidian — this page shows the note's markdown source for demo purposes",
+    "errors.unableToLoadNoteSource": "unable to load note source",
     "review.backToHome": "back to home",
     "review.complete": "review complete",
     "review.close": "close",

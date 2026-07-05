@@ -8,6 +8,7 @@ import { Header, HeaderSkeleton } from "./components/Header"
 import { Home } from "./components/Home"
 import { HomeStats } from "./components/HomeStats"
 import { LoadingScreen } from "./components/LoadingScreen"
+import { NoteSource } from "./components/NoteSource"
 import { NotesView } from "./components/NotesView"
 import { PaletteView } from "./components/PaletteView"
 
@@ -57,6 +58,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/tracking/:habitId" element={<HabitDetail />} />
         <Route path="/notes/:view" element={<NotesView />} />
+        <Route path="/source/:noteId" element={<NoteSource />} />
         <Route path="/stats" element={<HomeStats />} />
         <Route path="/colors" element={<PaletteView />} />
       </Route>

@@ -7,6 +7,7 @@ vi.mock("node:fs", () => ({
   promises: {
     cp: vi.fn().mockResolvedValue(undefined),
     mkdir: vi.fn().mockResolvedValue(undefined),
+    readFile: vi.fn().mockResolvedValue("---\ncreated: 2024-01-01\n---\n\nBody.\n"),
     rm: vi.fn().mockResolvedValue(undefined),
     writeFile: vi.fn().mockResolvedValue(undefined),
   },
@@ -16,6 +17,9 @@ const RESPONSES: Record<string, unknown> = {
   "https://notes/views": { views: [{ id: "books" }] },
   "https://notes/notes?view=books": { notes: [{ id: "1", content: {} }] },
   "https://notes/notes?view=books&includeContent=false": { notes: [{ id: "1" }] },
+  "https://notes/notes?includeContent=false": {
+    notes: [{ fullPath: "/vault/library/books/dune.md", id: "note-1" }],
+  },
   "https://habits/habits": [{ habitId: "exercise" }],
   "https://habits/habits/exercise": { habitId: "exercise", history: [] },
 }
@@ -46,7 +50,7 @@ describe("buildSnapshot", () => {
 
     const summary = await runBuildSnapshot()
 
-    expect(summary).toEqual({ habitCount: 1, viewCount: 1 })
+    expect(summary).toEqual({ habitCount: 1, noteCount: 1, viewCount: 1 })
     const writtenFiles = vi
       .mocked(fsMock.writeFile)
       .mock.calls.map(([filePath]) => filePath)
@@ -56,6 +60,7 @@ describe("buildSnapshot", () => {
       "/out/notes.books.slim.json",
       "/out/habits.json",
       "/out/habit.exercise.json",
+      "/out/source/note-1.md",
     ])
   })
 
@@ -69,6 +74,19 @@ describe("buildSnapshot", () => {
       "/vault/attachments",
       "/out/images/attachments",
       { recursive: true },
+    )
+  })
+
+  test("copies each note's raw markdown into the source directory", async () => {
+    stubFetch()
+
+    await runBuildSnapshot()
+
+    expect(fsMock.readFile).toHaveBeenCalledWith("/vault/library/books/dune.md", "utf8")
+    expect(fsMock.writeFile).toHaveBeenCalledWith(
+      "/out/source/note-1.md",
+      "---\ncreated: 2024-01-01\n---\n\nBody.\n",
+      "utf8",
     )
   })
 

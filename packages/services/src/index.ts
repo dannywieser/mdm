@@ -2,6 +2,8 @@ export * from "./config"
 
 export * from "./demo/demoMode"
 export * from "./demo/demoMode.types"
+export * from "./demo/hooks/useNoteSourceQuery/useNoteSourceQuery"
+export * from "./demo/hooks/useNoteSourceQuery/useNoteSourceQuery.types"
 
 export * from "./notes/notes.types"
 export * from "./notes/views.types"

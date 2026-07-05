@@ -16,6 +16,10 @@ export const buildDemoHabitsUrl = (): string => `${getDemoDataBasePath()}/habits
 export const buildDemoHabitUrl = (habitId: string): string =>
   `${getDemoDataBasePath()}/habit.${encodeURIComponent(habitId)}.json`
 
+/** Raw markdown source captured per note id by the demo snapshot. */
+export const buildDemoNoteSourceUrl = (noteId: string): string =>
+  `${getDemoDataBasePath()}/source/${encodeURIComponent(noteId)}.md`
+
 /** Vault-relative image paths are copied under `<base>/images/` at build time. */
 export const buildDemoImageUrl = (path: string): string => {
   const encodedPath = path

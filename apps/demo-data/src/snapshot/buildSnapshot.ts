@@ -4,6 +4,7 @@ import path from "node:path"
 import type {
   BuildSnapshotOptions,
   SnapshotHabitSummary,
+  SnapshotNotesPayload,
   SnapshotSummary,
   SnapshotViewsPayload,
 } from "./snapshot.types"
@@ -54,6 +55,31 @@ const snapshotView = async (
 }
 
 /**
+ * Copies every note's raw markdown file to `source/<note.id>.md` so the demo
+ * can show note source in the browser where the Obsidian deep link would
+ * normally open the vault.
+ */
+const copyNoteSources = async (
+  notesBaseUrl: string,
+  outputDirectory: string,
+): Promise<number> => {
+  const sourceDirectory = path.join(outputDirectory, "source")
+  await fs.mkdir(sourceDirectory, { recursive: true })
+
+  const { notes } = await fetchJson<SnapshotNotesPayload>(
+    `${notesBaseUrl}/notes?includeContent=false`,
+  )
+
+  for (const note of notes) {
+    const safeNoteId = assertFileSafeId("Note", note.id)
+    const contents = await fs.readFile(note.fullPath, "utf8")
+    await fs.writeFile(path.join(sourceDirectory, `${safeNoteId}.md`), contents, "utf8")
+  }
+
+  return notes.length
+}
+
+/**
  * Captures the responses of the running notes-api and habit-tracker services
  * as static JSON files, plus the vault attachments (cover images), producing
  * everything the web app needs to run without servers.
@@ -83,11 +109,13 @@ export const buildSnapshot = async ({
     await writeJson(outputDirectory, `habit.${safeHabitId}.json`, detail)
   }
 
+  const noteCount = await copyNoteSources(notesBaseUrl, outputDirectory)
+
   await fs.cp(
     attachmentsSourceDirectory,
     path.join(outputDirectory, "images", "attachments"),
     { recursive: true },
   )
 
-  return { habitCount: habits.length, viewCount: viewsPayload.views.length }
+  return { habitCount: habits.length, noteCount, viewCount: viewsPayload.views.length }
 }
