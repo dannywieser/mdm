@@ -4,9 +4,12 @@ import type { StatsMetaResponse } from "../../stats.types"
 import type { UseStatsMetaParams } from "./useStatsMeta.types"
 
 import { getStatsBaseUrl } from "../../../config"
+import { isDemoMode } from "../../../demo/demoMode"
+import { buildDemoStatsMetaUrl } from "../../../demo/demoUrls"
 
 const fetchStats = async (): Promise<StatsMetaResponse> => {
-  const response = await fetch(`${getStatsBaseUrl()}/meta`)
+  const url = isDemoMode() ? buildDemoStatsMetaUrl() : `${getStatsBaseUrl()}/meta`
+  const response = await fetch(url)
 
   if (!response.ok) {
     throw new Error("errors.unableToLoadStats")

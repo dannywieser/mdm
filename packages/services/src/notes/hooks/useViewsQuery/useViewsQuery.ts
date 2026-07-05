@@ -4,9 +4,12 @@ import type { ViewsResponse } from "../../views.types"
 import type { UseViewsQueryParams } from "./useViewsQuery.types"
 
 import { getBaseUrl } from "../../../config"
+import { isDemoMode } from "../../../demo/demoMode"
+import { buildDemoViewsUrl } from "../../../demo/demoUrls"
 
 const fetchViews = async (): Promise<ViewsResponse> => {
-  const response = await fetch(`${getBaseUrl()}/views`)
+  const url = isDemoMode() ? buildDemoViewsUrl() : `${getBaseUrl()}/views`
+  const response = await fetch(url)
 
   if (!response.ok) {
     throw new Error("errors.unableToLoadViews")

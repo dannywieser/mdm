@@ -4,9 +4,15 @@ import type { ToggleFlagResult } from "../../flags.types"
 import type { UseIsReadParams } from "./useIsRead.types"
 
 import { getFlagsBaseUrl } from "../../../config"
+import { readDemoFlag } from "../../../demo/demoFlags"
+import { isDemoMode } from "../../../demo/demoMode"
 import { READ_FLAG_NAME } from "../../flags.constants"
 
 export const fetchIsRead = async (noteId: string): Promise<boolean> => {
+  if (isDemoMode()) {
+    return readDemoFlag(noteId, READ_FLAG_NAME)
+  }
+
   const response = await fetch(
     `${getFlagsBaseUrl()}/${encodeURIComponent(noteId)}/${READ_FLAG_NAME}`,
   )

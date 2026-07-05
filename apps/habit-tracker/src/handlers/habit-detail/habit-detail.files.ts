@@ -1,11 +1,14 @@
 import { resolveNotesConfig } from "app-config"
 import { buildObsidianUrl, parseFrontMatter, resolveDateFromFrontmatterOrTitle } from "markdown"
+import { mapWithConcurrency } from "mdm-util"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 
 import type { HabitEntry } from "./habit-detail.types"
 
 import { logger } from "../../logger"
+
+const FILE_READ_CONCURRENCY = 64
 
 const resolveNoteDate = (
   frontmatter: Record<string, string | string[]> | null,
@@ -23,8 +26,12 @@ export const scanHabitEntries = async (
   frontmatterProperty: string,
 ): Promise<HabitEntry[]> => {
   const { createdDateProperty, dateFormats, notesDirectory, obsidianVault } = await resolveNotesConfig()
-  const results = await Promise.all(
-    filePaths.map(async (filePath) => {
+  // Bounded concurrency: several habits can scan a large vault at the same
+  // time, and unbounded reads exhaust the process file-descriptor limit.
+  const results = await mapWithConcurrency(
+    filePaths,
+    FILE_READ_CONCURRENCY,
+    async (filePath) => {
       const basename = path.basename(filePath)
       const source = await fs.readFile(filePath, "utf8")
       const { frontmatter } = parseFrontMatter(source)
@@ -65,7 +72,7 @@ export const scanHabitEntries = async (
 
       logger.debug({ basename, date, value: numValue }, "[habit] matched entry")
       return { date, value: numValue, obsidianUrl: buildObsidianUrl(obsidianVault, notesDirectory, filePath) }
-    }),
+    },
   )
   return results.filter((entry): entry is HabitEntry => entry !== null)
 }

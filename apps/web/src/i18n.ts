@@ -62,6 +62,9 @@ const translations: Record<Locale, Record<string, string>> = {
     "stats.folders": "folders",
     "stats.totalNotes": "total notes",
     "stats.totalWords": "total words",
+    "source.demoNotice":
+      "in the full app this opens the note in Obsidian — this page shows the note's markdown source for demo purposes",
+    "errors.unableToLoadNoteSource": "unable to load note source",
     "review.backToHome": "back to home",
     "review.complete": "review complete",
     "review.close": "close",

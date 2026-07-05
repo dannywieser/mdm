@@ -3,6 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react"
 import { type ReactNode } from "react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
+import { configureDemoMode, resetDemoMode } from "../../../demo/demoMode"
 import { useIsRead } from "./useIsRead"
 
 const createWrapper = () => {
@@ -25,6 +26,8 @@ const createWrapper = () => {
 
 afterEach(() => {
   vi.restoreAllMocks()
+  resetDemoMode()
+  window.sessionStorage.clear()
 })
 
 describe("useIsRead", () => {
@@ -46,6 +49,24 @@ describe("useIsRead", () => {
 
     expect(fetchMock).toHaveBeenCalledWith("/flags/note-1/read")
     expect(result.current.data).toBe(true)
+  })
+
+  test("reads the flag from session storage in demo mode without fetching", async () => {
+    configureDemoMode({ dataBasePath: "/demo-data" })
+    window.sessionStorage.setItem("mdm-demo-flag:read:note-1", "true")
+    const fetchMock = vi.fn()
+    vi.stubGlobal("fetch", fetchMock)
+
+    const { result } = renderHook(() => useIsRead({ noteId: "note-1" }), {
+      wrapper: createWrapper(),
+    })
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+
+    expect(result.current.data).toBe(true)
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 
   test("returns an error when the read state request fails", async () => {

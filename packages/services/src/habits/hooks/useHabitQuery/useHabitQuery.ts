@@ -4,9 +4,14 @@ import type { HabitResult } from "../../habits.types"
 import type { UseHabitQueryParams } from "./useHabitQuery.types"
 
 import { getHabitsBaseUrl } from "../../../config"
+import { isDemoMode } from "../../../demo/demoMode"
+import { buildDemoHabitUrl } from "../../../demo/demoUrls"
 
 const fetchHabit = async (habitId: string): Promise<HabitResult> => {
-  const response = await fetch(`${getHabitsBaseUrl()}/habits/${encodeURIComponent(habitId)}`)
+  const url = isDemoMode()
+    ? buildDemoHabitUrl(habitId)
+    : `${getHabitsBaseUrl()}/habits/${encodeURIComponent(habitId)}`
+  const response = await fetch(url)
 
   if (!response.ok) {
     throw new Error("errors.unableToLoadHabit")

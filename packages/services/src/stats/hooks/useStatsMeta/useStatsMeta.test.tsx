@@ -4,6 +4,7 @@ import { renderHook, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
 import { setStatsBaseUrl } from "../../../config"
+import { configureDemoMode, resetDemoMode } from "../../../demo/demoMode"
 import { useStatsMeta } from "./useStatsMeta"
 
 class ErrorBoundary extends Component<
@@ -42,6 +43,7 @@ const createWrapper = () => {
 
 afterEach(() => {
   vi.restoreAllMocks()
+  resetDemoMode()
   setStatsBaseUrl("/stats")
 })
 
@@ -86,6 +88,27 @@ describe("useStatsMeta", () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith("https://stats.example.com/meta")
     })
+  })
+
+  test("fetches the static stats meta file in demo mode", async () => {
+    configureDemoMode({ dataBasePath: "/demo-data" })
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({
+        totalAttachments: {},
+        totalFolders: 1,
+        totalNotes: 1,
+        totalWords: 10,
+      }),
+    }))
+
+    const { result } = renderHook(() => useStatsMeta(), {
+      wrapper: createWrapper(),
+    })
+
+    await waitFor(() => { expect(result.current.isSuccess).toBe(true); })
+
+    expect(global.fetch).toHaveBeenCalledWith("/demo-data/stats.meta.json")
   })
 
   test("throws to error boundary when the stats response is not ok", async () => {

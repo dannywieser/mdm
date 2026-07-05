@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { renderHook, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
+import { configureDemoMode, resetDemoMode } from "../../../demo/demoMode"
 import { useNotesQuery } from "./useNotesQuery"
 
 class ErrorBoundary extends Component<
@@ -41,6 +42,7 @@ const createWrapper = () => {
 
 afterEach(() => {
   vi.restoreAllMocks()
+  resetDemoMode()
 })
 
 describe("useNotesQuery", () => {
@@ -108,6 +110,40 @@ describe("useNotesQuery", () => {
     await waitFor(() => { expect(result.current.isSuccess).toBe(true); })
 
     expect(global.fetch).toHaveBeenCalledWith("/api/notes?view=on-this-day&includeContent=false")
+  })
+
+  test("fetches the static per-view file in demo mode", async () => {
+    configureDemoMode({ dataBasePath: "/demo-data" })
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ notes: [] }),
+    }))
+
+    const { result } = renderHook(
+      () => useNotesQuery({ view: "books" }),
+      { wrapper: createWrapper() },
+    )
+
+    await waitFor(() => { expect(result.current.isSuccess).toBe(true); })
+
+    expect(global.fetch).toHaveBeenCalledWith("/demo-data/notes.books.json")
+  })
+
+  test("fetches the slim static file in demo mode when content is not requested", async () => {
+    configureDemoMode({ dataBasePath: "/demo-data" })
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ notes: [] }),
+    }))
+
+    const { result } = renderHook(
+      () => useNotesQuery({ includeContent: false, view: "books" }),
+      { wrapper: createWrapper() },
+    )
+
+    await waitFor(() => { expect(result.current.isSuccess).toBe(true); })
+
+    expect(global.fetch).toHaveBeenCalledWith("/demo-data/notes.books.slim.json")
   })
 
   test("throws to error boundary when the response is not ok", async () => {

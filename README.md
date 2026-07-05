@@ -114,6 +114,9 @@ This repository is a Turborepo monorepo with this structure:
   - Routes: `/` and `/notes/:view`
   - `/notes/:view` resolves the view config by ID and renders the configured component (for example `NotesList` or `NotesReview`)
   - Configure the API base URL with `VITE_API_BASE_URL` (defaults to `http://localhost:3000`)
+  - Demo mode: set `VITE_DEMO_MODE=true` to serve all data from the static JSON snapshot in `public/demo-data` (no backend services needed); `VITE_BASE_PATH` sets the Vite base for sub-path hosting (e.g. `/mdm/` on GitHub Pages)
+
+- `apps/demo-data`: generator for the static demo dataset (see `apps/demo-data/README.md`). Builds a deterministic 1500+ note demo vault, then snapshots the real `notes-api` and `habit-tracker` responses into `apps/web/public/demo-data` for the GitHub Pages demo.
 
 - `apps/image-server`: Express-based image proxy for note image assets backed by imgproxy.
   - `GET /health`
@@ -338,6 +341,23 @@ docker compose up --build
 
 Optional future placeholder services are defined as `svc-x` and `svc-y` under the `future-services` profile.
 
+## Demo deployment (GitHub Pages)
+
+`.github/workflows/deploy-pages.yml` deploys a fully static demo of `apps/web` to GitHub Pages on pushes to `main`, on a daily schedule (so date-relative views like `$today`/`$onThisDay` and habit streaks stay fresh), and on manual dispatch. The workflow:
+
+1. Runs `npm run demo:data` to generate the demo vault and snapshot the `notes-api`/`habit-tracker` responses into `apps/web/public/demo-data` (see `apps/demo-data/README.md`).
+2. Builds `apps/web` with `VITE_DEMO_MODE=true` and `VITE_BASE_PATH=/<repo-name>/`.
+3. Copies `index.html` to `404.html` as a SPA fallback for client-side routes and publishes the `dist` folder to Pages.
+
+In demo mode the web app reads all data from the static snapshot, and the redis-backed read flags are replaced with per-session browser storage (see `packages/services/README.md`). Enable Pages in the repository settings with "GitHub Actions" as the source.
+
+Run the demo locally:
+
+```bash
+npm run demo:data   # generate vault + static snapshot
+npm run demo:dev    # start the web app with VITE_DEMO_MODE=true
+```
+
 ## Scripts
 
 Run from repository root:
@@ -346,6 +366,8 @@ Run from repository root:
 - `turbo run lint -- --fix` - run ESLint with auto-fixes where possible
 - `turbo run build` - build workspace packages/apps
 - `turbo run test` - run workspace tests
+- `npm run demo:data` - generate the demo vault and static demo data snapshot
+- `npm run demo:dev` - run the web app in demo mode against the static snapshot
 - `npm run docker:start` - start/update Docker services in detached mode with build
 - `npm run docker:update` - pull images and rebuild/restart Docker services
 - `npm run docker:stop` - stop Docker services

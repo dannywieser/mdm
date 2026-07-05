@@ -1,0 +1,148 @@
+{
+  "attachmentsDirectory": "attachments",
+  "dateFormats": ["YYYY-MM-DD"],
+  "obsidianVault": "mdm-demo",
+  "timezone": "UTC",
+  "views": [
+    {
+      "id": "on-this-day",
+      "name": "On This Day",
+      "group": "journal",
+      "component": "NotesReview",
+      "filters": [{ "folder": "journal", "frontmatter.created": "$onThisDay" }],
+      "badges": ["frontmatter.mood", "frontmatter.tags"]
+    },
+    {
+      "id": "today",
+      "name": "Today's Entry",
+      "group": "journal",
+      "component": "NotesList",
+      "filters": [{ "folder": "journal", "frontmatter.created": "$today" }],
+      "badges": ["frontmatter.mood", "frontmatter.tags"]
+    },
+    {
+      "id": "photo-wall",
+      "name": "Photo Wall",
+      "group": "photos",
+      "component": "NotesGallery",
+      "aspectRatio": "1/1",
+      "filters": [{ "folder": "photos" }],
+      "badges": ["frontmatter.location", "frontmatter.tags"]
+    },
+    {
+      "id": "photos-by-month",
+      "name": "Photos by Month",
+      "group": "photos",
+      "component": "NotesGalleryByMonth",
+      "aspectRatio": "1/1",
+      "filters": [{ "folder": "photos" }],
+      "badges": ["frontmatter.location"]
+    },
+    {
+      "id": "photos-by-year",
+      "name": "Photos by Year",
+      "group": "photos",
+      "component": "NotesGalleryByYear",
+      "aspectRatio": "1/1",
+      "filters": [{ "folder": "photos" }],
+      "badges": ["frontmatter.location"]
+    },
+    {
+      "id": "books",
+      "name": "Books",
+      "group": "library",
+      "component": "NotesGallery",
+      "aspectRatio": "2/3",
+      "filters": [{ "folder": "library/books" }],
+      "badges": ["frontmatter.author", "frontmatter.genre"]
+    },
+    {
+      "id": "reading-list",
+      "name": "Reading List",
+      "group": "library",
+      "component": "NotesSummaryTable",
+      "filters": [
+        { "folder": "library/books", "frontmatter.status": "to-read" },
+        { "folder": "library/books", "frontmatter.status": "reading" }
+      ],
+      "badges": ["frontmatter.author", "frontmatter.genre", "frontmatter.status"]
+    },
+    {
+      "id": "movies",
+      "name": "Movies",
+      "group": "library",
+      "component": "NotesGallery",
+      "aspectRatio": "2/3",
+      "filters": [
+        { "folder": "library/movies" },
+        { "$exclude": { "frontmatter.status": "watchlist" } }
+      ],
+      "badges": ["frontmatter.director", "frontmatter.genre", "frontmatter.rating"]
+    },
+    {
+      "id": "quote-review",
+      "name": "Quote Review",
+      "group": "library",
+      "component": "NotesReview",
+      "filters": [{ "folder": "quotes" }],
+      "badges": ["frontmatter.author", "frontmatter.tags"]
+    },
+    {
+      "id": "ideas",
+      "name": "Ideas",
+      "group": "knowledge",
+      "component": "NotesList",
+      "filters": [{ "folder": "ideas", "frontmatter.archived": "$missing" }],
+      "badges": ["frontmatter.tags"]
+    },
+    {
+      "id": "projects",
+      "name": "Active Projects",
+      "group": "knowledge",
+      "component": "NotesSummaryTable",
+      "filters": [
+        { "folder": "projects" },
+        { "$exclude": { "frontmatter.status": "done" } }
+      ],
+      "badges": ["frontmatter.status", "frontmatter.tags"]
+    },
+    {
+      "id": "recipes",
+      "name": "Recipes",
+      "group": "knowledge",
+      "component": "NotesGallery",
+      "aspectRatio": "1/1",
+      "filters": [{ "folder": "recipes" }],
+      "badges": ["frontmatter.cuisine", "frontmatter.difficulty"]
+    }
+  ],
+  "habits": [
+    {
+      "id": "exercise",
+      "name": "Daily Exercise",
+      "mode": "do-more",
+      "frontmatterProperty": "exercise",
+      "trackingWindowDays": 90
+    },
+    {
+      "id": "reading",
+      "name": "Reading",
+      "mode": "do-more",
+      "frontmatterProperty": "reading",
+      "trackingWindowDays": 30
+    },
+    {
+      "id": "screen-time",
+      "name": "Screen Time",
+      "mode": "do-less",
+      "frontmatterProperty": "screentime",
+      "trackingWindowDays": 30,
+      "targetScore": 100
+    }
+  ],
+  "flags": {
+    "read": {
+      "expiresInDays": 30
+    }
+  }
+}

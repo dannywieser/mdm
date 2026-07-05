@@ -4,6 +4,8 @@ import { defineConfig } from "vite"
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Deployments under a sub-path (e.g. GitHub Pages) set VITE_BASE_PATH.
+  base: process.env.VITE_BASE_PATH ?? "/",
   resolve: {
     alias: {
       "mdm-util": path.resolve(__dirname, "../../packages/util/src/index.ts"),
