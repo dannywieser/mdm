@@ -4,8 +4,7 @@ import { toLoggableError } from "mdm-util"
 import pinoHttp from "pino-http"
 
 import { healthHandler } from "./handlers/health/health"
-import { notesHandler } from "./handlers/notes/notes"
-import { viewsHandler } from "./handlers/views/views"
+import { metaHandler } from "./handlers/meta/meta"
 import { logger } from "./logger"
 
 export const createApp = () => {
@@ -14,8 +13,7 @@ export const createApp = () => {
   app.use(pinoHttp({ logger }))
 
   app.get("/health", healthHandler)
-  app.get("/notes", notesHandler)
-  app.get("/views", viewsHandler)
+  app.get("/stats/meta", metaHandler)
 
   return app
 }
@@ -34,10 +32,10 @@ export const logStartupConfig = async (): Promise<void> => {
 
 if (require.main === module) {
   const app = createApp()
-  const port = Number(process.env.PORT ?? 3000)
+  const port = Number(process.env.PORT ?? 3004)
 
   app.listen(port, () => {
-    logger.info({ port }, "notes-api listening")
+    logger.info({ port }, "stats-service listening")
     void logStartupConfig()
   })
 }
