@@ -1,5 +1,27 @@
 # notes-api
 
+## 2.0.0
+
+### Major Changes
+
+- fb9cd71: Extract vault statistics into a new dedicated `stats-service` app. `GET /stats` has been removed from `notes-api` (a breaking change); the new `stats-service` exposes `GET /stats/meta`, returning total notes, total folders, total words (counted from note bodies, excluding frontmatter), and total attachments grouped by file extension. `mdm-util` gains `countWords` and `countFilesByExtension` (replacing `countFilesRecursive`) to support the new endpoint.
+
+### Minor Changes
+
+- 492658e: Renamed the `titleOrBodyDates` note property to `dates`, and expanded it to include every date found in a note's title, body, and frontmatter, plus the file's modified date. `createdDate` is now derived as the oldest date in this list instead of preferring a configured frontmatter property.
+
+### Patch Changes
+
+- Updated dependencies [707d12d]
+- Updated dependencies [fb9cd71]
+- Updated dependencies [492658e]
+- Updated dependencies [498a480]
+- Updated dependencies [572b5ff]
+  - services@2.0.0
+  - mdm-util@2.0.0
+  - markdown@2.0.0
+  - app-config@2.0.0
+
 ## 1.10.0
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # markdown
 
+## 2.0.0
+
+### Minor Changes
+
+- 492658e: Renamed the `titleOrBodyDates` note property to `dates`, and expanded it to include every date found in a note's title, body, and frontmatter, plus the file's modified date. `createdDate` is now derived as the oldest date in this list instead of preferring a configured frontmatter property.
+
+### Patch Changes
+
+- Updated dependencies [fb9cd71]
+- Updated dependencies [498a480]
+  - mdm-util@2.0.0
+
 ## 1.10.0
 
 ### Patch Changes

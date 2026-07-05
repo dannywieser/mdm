@@ -1,5 +1,13 @@
 # app-config
 
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies [fb9cd71]
+- Updated dependencies [498a480]
+  - mdm-util@2.0.0
+
 ## 1.10.0
 
 ### Minor Changes
