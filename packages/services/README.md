@@ -16,14 +16,14 @@ setImagesBaseUrl(import.meta.env.VITE_IMAGES_BASE_URL ?? "")
 setStatsBaseUrl(import.meta.env.VITE_STATS_BASE_URL ?? "/stats")
 ```
 
-Then use the hooks and types as normal, e.g. `useNotesQuery`, `useViewsQuery`, `useStatsQuery`, `useHabitsQuery`, `useHabitQuery`, `useIsRead`, `useToggleNoteRead`, `buildImageUrl`.
+Then use the hooks and types as normal, e.g. `useNotesQuery`, `useViewsQuery`, `useStatsMeta`, `useHabitsQuery`, `useHabitQuery`, `useIsRead`, `useToggleNoteRead`, `buildImageUrl`.
 
 Hooks throw `Error` objects whose `message` is an i18n key (e.g. `"errors.unableToLoadViews"`) rather than localized text, so consuming apps can translate the message themselves.
 
 ## Structure
 
 - `notes/` — `Note`/`NotesResponse`, `ViewSummary`/`ViewsResponse` and the hooks that fetch them from `apps/notes-api`, plus the note "read" flag hooks (`useIsRead`, `useToggleNoteRead`).
-- `stats/` — `StatsMetaResponse` and the `useStatsQuery` hook that fetches it from `apps/stats-service`.
+- `stats/` — `StatsMetaResponse` and the `useStatsMeta` hook that fetches it from `apps/stats-service`.
 - `habits/` — `HabitSummary`/`HabitResult` and the hooks that fetch them from `apps/habit-tracker`.
 - `flags/` — `ToggleFlagInput`/`ToggleFlagResult` shared with `apps/flag-manager`.
 - `images/` — `buildImageUrl` helper for the `apps/image-server` image proxy.

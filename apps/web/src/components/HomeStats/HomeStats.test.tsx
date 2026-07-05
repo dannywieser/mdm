@@ -8,14 +8,14 @@ import type { StatsMetaResponse } from "services"
 
 import { HomeStats } from "./HomeStats"
 
-const useStatsQueryMock = vi.fn()
+const useStatsMetaMock = vi.fn()
 
 vi.mock("services", async (importOriginal) => {
   const actual = await importOriginal<typeof import("services")>()
 
   return {
     ...actual,
-    useStatsQuery: () => useStatsQueryMock(),
+    useStatsMeta: () => useStatsMetaMock(),
   }
 })
 
@@ -31,7 +31,7 @@ const defaultData: StatsMetaResponse = {
 }
 
 const renderComponent = (data = defaultData) => {
-  useStatsQueryMock.mockReturnValue({ data })
+  useStatsMetaMock.mockReturnValue({ data })
   render(
     <ChakraProvider value={defaultSystem}>
       <HomeStats />

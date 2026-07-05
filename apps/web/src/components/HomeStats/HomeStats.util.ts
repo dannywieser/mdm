@@ -1,7 +1,4 @@
-export interface AttachmentBreakdownEntry {
-  count: number
-  extension: string
-}
+import type { AttachmentBreakdownEntry } from "./HomeStats.types"
 
 export const buildAttachmentBreakdown = (
   totalAttachments: Record<string, number>,

@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 
 import type { StatsMetaResponse } from "../../stats.types"
-import type { UseStatsQueryParams } from "./useStatsQuery.types"
+import type { UseStatsMetaParams } from "./useStatsMeta.types"
 
 import { getStatsBaseUrl } from "../../../config"
 
@@ -15,7 +15,7 @@ const fetchStats = async (): Promise<StatsMetaResponse> => {
   return (await response.json()) as StatsMetaResponse
 }
 
-export const useStatsQuery = ({ staleTime }: UseStatsQueryParams = {}) =>
+export const useStatsMeta = ({ staleTime }: UseStatsMetaParams = {}) =>
   useSuspenseQuery({
     queryKey: ["stats"],
     queryFn: fetchStats,

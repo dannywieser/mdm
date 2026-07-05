@@ -8,7 +8,7 @@ import {
   VStack,
 } from "@chakra-ui/react"
 
-import { useStatsQuery } from "services"
+import { useStatsMeta } from "services"
 import { useI18n } from "../../i18n"
 
 import type { HomeStatsProps } from "./HomeStats.types"
@@ -17,7 +17,7 @@ import { buildAttachmentBreakdown } from "./HomeStats.util"
 
 export function HomeStats({ staleTime }: Readonly<HomeStatsProps>) {
   const { t } = useI18n()
-  const { data } = useStatsQuery({ staleTime })
+  const { data } = useStatsMeta({ staleTime })
   const attachmentBreakdown = buildAttachmentBreakdown(data.totalAttachments)
 
   return (
