@@ -30,3 +30,8 @@ Express-based API for aggregate vault statistics.
     ```bash
     curl http://localhost/stats/meta
     ```
+
+## Configuration
+
+- `NOTES_ROOT` (environment variable, required): absolute path to the notes vault, same as `notes-api`.
+- `attachmentsDirectory` (optional, `app.config.json`): folder name (relative to `NOTES_ROOT`) scanned to compute `totalAttachments`; omitted or unset means `totalAttachments` is always `{}`.

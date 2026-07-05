@@ -10,7 +10,7 @@ Generates the static demo dataset used by the GitHub Pages deployment of `apps/w
 2. **Snapshots the real APIs** — spawns the actual `notes-api`, `habit-tracker`, and `stats-service` builds against the demo vault (via `NOTES_ROOT` + `APP_CONFIG_PATH`) and captures their responses as static JSON files in `apps/web/public/demo-data` (gitignored):
    - `views.json`, `stats.meta.json`, `habits.json`, `habit.<id>.json`
    - `notes.<view>.json` and `notes.<view>.slim.json` (without parsed content) per configured view
-   - `images/` — the vault's attachments (cover SVGs), so `buildImageUrl` works without the image server
+   - `images/attachments/` — the vault's attachments (cover SVGs), so `buildImageUrl` works without the image server
    - `source/<note.id>.md` — each note's raw markdown, shown by the web app's demo-only note source page (which replaces the Obsidian deep link in demo mode)
 
 The timeline always ends on the generation date, so date-relative features (`$today`, `$onThisDay`, habit streaks) have data; the Pages workflow regenerates the snapshot daily.

@@ -1,6 +1,6 @@
 # notes-api
 
-Express-based Node service with request logging via `morgan`.
+Express-based Node service with request logging via `pino-http`.
 
 ## Endpoints
 
@@ -11,13 +11,12 @@ Express-based Node service with request logging via `morgan`.
     { "status": "ok" }
     ```
 - `GET /notes`
-  - Purpose: recursively load `*.md` and `*.markdown` files from the directory resolved by `noteRootDirectory` + `obsidianVault` in `app.config.json`, extract optional frontmatter metadata, collect all dates found in the title, body, and frontmatter (plus the file's modified date) using configured `dateFormats`, parse markdown into a node tree, and return note metadata
+  - Purpose: recursively load `*.md` and `*.markdown` files from the vault directory (`NOTES_ROOT` env var), extract optional frontmatter metadata, collect all dates found in the title, body, and frontmatter (plus the file's modified date) using configured `dateFormats`, parse markdown into a node tree (resolving Obsidian wikilinks and rewriting local image paths to the image-server), and return note metadata
   - Optional query: `view=<id>` to apply a configured notes view filter by view ID
+  - Optional query: `includeContent=false` to skip markdown parsing and return an empty `content` tree — useful for lightweight listing requests that only need frontmatter/metadata
   - Success response: `200`
     ```json
     {
-      "notesDirectory": "/absolute/path/to/notes/vault-name",
-      "obsidianVault": "vault-name",
       "notes": [
         {
           "createdDate": "2026-05-26T00:00:00.000Z",
@@ -27,6 +26,8 @@ Express-based Node service with request logging via `morgan`.
           "dates": ["2026.05.26", "2026-05-26T00:00:00.000Z"],
           "id": "welcome",
           "folder": "notes",
+          "title": "Welcome",
+          "fullText": "# Welcome\n\nHello world.",
           "obsidianUrl": "obsidian://open?vault=vault-name&file=welcome",
           "frontmatter": {
             "topic": ["AI"],
@@ -41,12 +42,13 @@ Express-based Node service with request logging via `morgan`.
                 "children": [{ "type": "text", "value": "Welcome" }]
               }
             ]
-          }
+          },
+          "linkedNotes": []
         }
       ]
     }
     ```
-  - Notes without frontmatter return `"frontmatter": null`
+  - Notes without frontmatter return `"frontmatter": null`. `linkedNotes` (parsed notes referenced via `[[wikilink]]` syntax in the body) is only present on notes that link to others; unmatched wikilinks are left in the body as plain text
   - Error responses: `500`
     ```json
     {
@@ -56,19 +58,48 @@ Express-based Node service with request logging via `morgan`.
     ```json
     { "error": "Unable to load notes" }
     ```
+- `GET /views`
+  - Purpose: list every configured view with its resolved note count and the IDs of the notes that currently match it, without the cost of parsing/returning full note content — used by the web app to render a view picker with live counts
+  - Success response: `200`
+    ```json
+    {
+      "views": [
+        {
+          "id": "books",
+          "name": "Books",
+          "component": "NotesGallery",
+          "count": 42,
+          "noteIds": ["book-1", "book-2"],
+          "badges": ["frontmatter.type"],
+          "aspectRatio": "2/3",
+          "group": "Library",
+          "layout": "grid"
+        }
+      ]
+    }
+    ```
+  - Error response: `500`
+    ```json
+    { "error": "Unable to load views" }
+    ```
 
 ## Configuration
 
-Configured via `app.config.json` at the repository root (see root README for the full config shape). Fields used by this service:
+Configured via `app.config.json` at the repository root plus the `NOTES_ROOT` environment variable (see root README for the full config shape). Fields used by this service:
 
+- `NOTES_ROOT` (environment variable, required): absolute path to your notes root directory. Resolution fails with `"NOTES_ROOT environment variable is required"` if unset.
 - `dateFormats`: array of expected date patterns to extract from note bodies, such as `["YYYY.MM.DD", "YY/MM/DD"]`.
-- `noteRootDirectory`: absolute path to your notes root directory.
-- `obsidianVault`: vault folder name under `noteRootDirectory`.
+- `obsidianVault`: vault folder name, used to build each note's `obsidianUrl` deep link.
+- `attachmentsDirectory` (optional): folder name (relative to `NOTES_ROOT`) where Obsidian stores attachments; used to resolve bare-filename images in note bodies to the `/images?path=...` proxy.
+- `createdDateProperty` (optional, defaults to `"created"`): frontmatter key treated as the note's created-date source.
+- `timezone` (optional, defaults to `"UTC"`): IANA timezone used to evaluate the `$today`/`$onThisDay` filter values against "now".
 - `views` (optional): array of view configs. Each view has:
   - `id`: route key used by `GET /notes?view=<id>`
   - `name`: human-readable label
   - `component`: component name that the web app renders for that view (for example `NotesList` or `NotesReview`)
   - `filters`: array of filter groups. Within each standard group, conditions are ANDed; across standard groups, matches are ORed.
-    - Use `{"$exclude": { ... }}` to define exclusion groups; exclusion groups are ANDed against all other filters.
+    - Use `{"$exclude": { ... }}` to define exclusion groups; a note is excluded if it fully matches any one exclusion group.
     - Use `$missing` as a filter value to match notes where a property path is absent (for example `{"frontmatter.type": "$missing"}`).
+    - Use `$today` or `$onThisDay` as a filter value to match a date property against today's date, or against today's month/day in a past year, respectively (both evaluated in the configured `timezone`).
   - `badges` (optional): array of note property paths to render as badges in the UI, such as `folder` or `frontmatter.type`
+  - `aspectRatio`, `group`, `layout` (optional): presentation hints passed through to the web app for gallery-style views

@@ -7,7 +7,7 @@ This repository is a Turborepo monorepo with this structure:
 
 ## Current apps
 
-- `apps/notes-api`: Express-based Node service with request logging via `morgan`. See [`apps/notes-api/README.md`](apps/notes-api/README.md).
+- `apps/notes-api`: Express-based Node service with request logging via `pino-http`. See [`apps/notes-api/README.md`](apps/notes-api/README.md).
 - `apps/flag-manager`: Express-based Redis-backed API for per-ID feature flags. See [`apps/flag-manager/README.md`](apps/flag-manager/README.md).
 - `apps/web`: React + TypeScript client using Chakra UI, TanStack Query, and React Router. See [`apps/web/README.md`](apps/web/README.md).
 - `apps/demo-data`: generator for the static demo dataset. See [`apps/demo-data/README.md`](apps/demo-data/README.md). Builds a deterministic 1500+ note demo vault, then snapshots the real `notes-api` and `habit-tracker` responses into `apps/web/public/demo-data` for the GitHub Pages demo.
@@ -18,10 +18,13 @@ This repository is a Turborepo monorepo with this structure:
 ## Configuration
 
 - Copy `app.config.example.json` to `app.config.json` at repository root.
-- Set:
+- Set the `NOTES_ROOT` environment variable to an absolute path to your notes root directory — this replaces the vault path, it is not read from `app.config.json`.
+- In `app.config.json`, set:
   - `dateFormats`: array of expected date patterns to extract from note bodies, such as `["YYYY.MM.DD", "YY/MM/DD"]`.
-  - `noteRootDirectory`: absolute path to your notes root directory.
-  - `obsidianVault`: vault folder name under `noteRootDirectory`.
+  - `obsidianVault`: vault folder name, used to build each note's `obsidianUrl` deep link.
+  - `attachmentsDirectory` (optional): folder name (relative to `NOTES_ROOT`) where Obsidian stores attachments.
+  - `createdDateProperty` (optional, defaults to `"created"`): frontmatter key treated as a note's created-date source.
+  - `timezone` (optional, defaults to `"UTC"`): IANA timezone used for date-relative filters (`$today`/`$onThisDay`) and habit scoring.
 - See each app's README for app-specific config fields (`views`, `flags`, `habits`, etc.).
 
 ## Docker Compose deployment
@@ -34,22 +37,22 @@ This repository is a Turborepo monorepo with this structure:
   - `image-server` as an internal service on port `3002`
   - `stats-service` as an internal service on port `3004`
   - `imgproxy` as internal image optimizer used by `image-server`
-  - `redis` as internal data storage for `flag-manager`
+  - `redis` as internal data storage shared by `flag-manager` and `image-server` (redirect cache)
 - nginx routes:
-  - `/api/*` → `notes-api:3000/*`
+  - `/api/*` → `notes-api:3000/*` (includes `/api/notes` and `/api/views`)
   - `/flags/*` → `flag-manager:3001/flags/*`
-  - `/habit/*` → `habit-tracker:3003/habit/*`
-  - `/habits` → `habit-tracker:3003/habits`
+  - `/habits*` → `habit-tracker:3003/habits*` (covers both `GET /habits` and `GET /habits/:id`)
   - `/images*` → `image-server:3002/images*`
   - `/stats/*` → `stats-service:3004/stats/*`
   - `/imgproxy/*` → `imgproxy:8080/*` (used by `image-server` redirects)
-- `app.config.json` is mounted into the `notes-api`, `habit-tracker`, and `stats-service` containers as `/app/app.config.json` (read-only).
-- Configure `noteRootDirectory` in `app.config.json` using a path valid inside the container (for example `/data/notes`).
-- Host notes (and attachments) are mounted into all services with `NOTES_ROOT`:
+  - nginx config also defines an `/habit/*` route to `habit-tracker:3003/habit/*`, but no endpoint at that singular path exists anymore (the API is `/habits/:id`) — this route is currently dead and unused by the web app
+- `app.config.json` is mounted (read-only) into all 5 backend containers as `/app/app.config.json`: `notes-api`, `flag-manager`, `habit-tracker`, `stats-service`, and `image-server`. `image-server` doesn't currently read this file (it's configured entirely by environment variables — see `apps/image-server/README.md`), so the mount is a no-op for it today.
+- The vault is mounted with `NOTES_ROOT` into the services that read notes directly: `notes-api`, `habit-tracker`, `stats-service`, `image-server`, and `imgproxy`. `flag-manager` (no vault access needed) and `web`/`redis` don't get this mount.
   - default: `./notes` on the host maps to `/data/notes`
   - override: `NOTES_ROOT=/absolute/path/on/host docker compose up --build`
+- Each of those services also gets `NOTES_ROOT=/data/notes` set as an environment variable — that's how the container-side path is resolved (there's no `noteRootDirectory` field in `app.config.json` anymore).
 - Set `attachmentsDirectory` in `app.config.json` to the folder name (relative to `NOTES_ROOT`) where Obsidian stores attachments (e.g. `"attachments"`). Bare-filename images in notes resolve to `<attachmentsDirectory>/<noteDir>/<noteStem>/<filename>`.
-- Notes markdown image paths now resolve through `/images?path=<encoded-relative-path>` for imgproxy optimization.
+- Notes markdown image paths resolve through `/images?path=<encoded-relative-path>`, proxied by `image-server` to imgproxy for optimization.
 - If local and container config values differ, create a separate Docker-specific config file and mount it to `/app/app.config.json`.
 - `notes-api`, `flag-manager`, `habit-tracker`, `image-server`, and `stats-service` each define a Docker healthcheck that polls their `/health` endpoint; `web` waits for all of them to report healthy before starting.
 
@@ -58,8 +61,6 @@ Start services:
 ```bash
 docker compose up --build
 ```
-
-Optional future placeholder services are defined as `svc-x` and `svc-y` under the `future-services` profile.
 
 ## Demo deployment (GitHub Pages)
 
@@ -84,8 +85,11 @@ Run from repository root:
 
 - `turbo run lint` - run ESLint across workspaces
 - `turbo run lint -- --fix` - run ESLint with auto-fixes where possible
+- `turbo run typecheck` - run the TypeScript compiler (no emit) across workspaces
 - `turbo run build` - build workspace packages/apps
 - `turbo run test` - run workspace tests
+- `turbo run dev` - run workspace apps in dev/watch mode
+- `npm run verify` - run lint, typecheck, build, and test across all workspaces; required before every commit
 - `npm run demo:data` - generate the demo vault and static demo data snapshot
 - `npm run demo:dev` - run the web app in demo mode against the static snapshot
 - `npm run docker:start` - start/update Docker services in detached mode with build
@@ -94,11 +98,11 @@ Run from repository root:
 - `npm run changeset` - create a new changeset entry for user-visible changes
 - `npm run changeset:version` - apply pending changesets (versions + changelog updates)
 
-Equivalent npm script aliases are available: `npm run lint`, `npm run lint:fix`, `npm run build`, and `npm test`.
+Equivalent npm script aliases are available: `npm run lint`, `npm run lint:fix`, `npm run typecheck`, `npm run build`, `npm run test`, and `npm run dev`.
 
 ## Changesets workflow
 
-- This repo uses [Changesets](https://github.com/changesets/changesets) for a single monorepo release track.
-- All workspaces are configured in one fixed release group, so versioning stays aligned across the repo instead of separate package tracks.
+- This repo uses [Changesets](https://github.com/changesets/changesets) for versioning and changelog generation.
+- A fixed release group in `.changeset/config.json` keeps `app-config`, `markdown`, `mdm-util`, `notes-api`, and `web` versioned together. The remaining workspaces (`flag-manager`, `habit-tracker`, `image-server`, `stats-service`, `demo-data`, `services`, `mdm-logger`) are not in that group and version independently.
 - For user-visible changes, add a changeset in your PR (`npm run changeset`) and write a short summary of what changed.
 - Run `npm run changeset:version` when preparing a release/changelog update to consume pending entries.

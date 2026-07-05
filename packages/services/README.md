@@ -44,4 +44,5 @@ In demo mode:
 - `habits/` — `HabitSummary`/`HabitResult` and the hooks that fetch them from `apps/habit-tracker`.
 - `flags/` — `ToggleFlagInput`/`ToggleFlagResult` shared with `apps/flag-manager`.
 - `images/` — `buildImageUrl` helper for the `apps/image-server` image proxy.
+- `demo/` — `configureDemoMode`/`isDemoMode`, the `mdm-demo-flag:*` sessionStorage-backed read flags, and the `buildDemo*Url` helpers that point the query hooks at the static snapshot instead of live services.
 - `config.ts` — module-level base URL configuration for each backend service.

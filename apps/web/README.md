@@ -4,11 +4,21 @@ React + TypeScript client using Chakra UI, TanStack Query, and React Router.
 
 ## Routes
 
-- `/` and `/notes/:view`
-- `/notes/:view` resolves the view config by ID and renders the configured component (for example `NotesList` or `NotesReview`)
+- `/` — home dashboard (view group overview, stats summary, notes review card)
+- `/notes/:view` — resolves the view config by ID and renders the configured component (for example `NotesList` or `NotesReview`)
+- `/tracking/:habitId` — habit detail page (score history, streaks, breakdown) for one configured habit
+- `/stats` — aggregate vault statistics from `stats-service`
+- `/source/:noteId` — raw markdown source view for a note (used in demo mode in place of the Obsidian deep link)
+- `/colors` — lets the user pick and preview one of the app's color palettes (see Configuration below)
 
 ## Configuration
 
-- Configure the API base URL with `VITE_API_BASE_URL` (defaults to `http://localhost:3000`)
-- Demo mode: set `VITE_DEMO_MODE=true` to serve all data from the static JSON snapshot in `public/demo-data` (no backend services needed); see `apps/demo-data/README.md`
+- Backend base URLs, each defaulting to same-origin relative paths proxied by nginx (see root README's Docker section):
+  - `VITE_API_BASE_URL` (defaults to `/api`) — `notes-api`
+  - `VITE_HABIT_API_BASE_URL` (defaults to `""`) — `habit-tracker`
+  - `VITE_FLAGS_BASE_URL` (defaults to `/flags`) — `flag-manager`
+  - `VITE_IMAGES_BASE_URL` (defaults to `""`) — `image-server`
+  - `VITE_STATS_BASE_URL` (defaults to `/stats`) — `stats-service`
+- Demo mode: set `VITE_DEMO_MODE=true` to serve all data from the static JSON snapshot in `public/demo-data` (no backend services needed, and the base URL vars above are ignored); see `apps/demo-data/README.md`
 - `VITE_BASE_PATH` sets the Vite base for sub-path hosting (e.g. `/mdm/` on GitHub Pages)
+- Color palette: the app ships 8 selectable themes (dracula, gruvbox, nord, catppuccin, solarized, gotham, highContrast, ocean), each with its own light/dark variant, chosen via the header's palette selector or the `/colors` page and persisted across sessions
