@@ -9,7 +9,8 @@ export const buildDemoNotesUrl = (view?: string, includeContent = true): string 
 
 export const buildDemoViewsUrl = (): string => `${getDemoDataBasePath()}/views.json`
 
-export const buildDemoStatsUrl = (): string => `${getDemoDataBasePath()}/stats.json`
+export const buildDemoStatsMetaUrl = (): string =>
+  `${getDemoDataBasePath()}/stats.meta.json`
 
 export const buildDemoHabitsUrl = (): string => `${getDemoDataBasePath()}/habits.json`
 

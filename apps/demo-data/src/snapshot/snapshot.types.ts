@@ -29,6 +29,8 @@ export interface BuildSnapshotOptions {
   notesBaseUrl: string
   /** Directory the static JSON snapshot is written into. */
   outputDirectory: string
+  /** Base URL of a running stats-service instance. */
+  statsBaseUrl: string
 }
 
 export interface SnapshotSummary {

@@ -89,6 +89,7 @@ export const buildSnapshot = async ({
   habitsBaseUrl,
   notesBaseUrl,
   outputDirectory,
+  statsBaseUrl,
 }: BuildSnapshotOptions): Promise<SnapshotSummary> => {
   await fs.rm(outputDirectory, { force: true, recursive: true })
   await fs.mkdir(outputDirectory, { recursive: true })
@@ -99,6 +100,9 @@ export const buildSnapshot = async ({
   for (const view of viewsPayload.views) {
     await snapshotView(notesBaseUrl, outputDirectory, view.id)
   }
+
+  const statsMeta = await fetchJson<unknown>(`${statsBaseUrl}/stats/meta`)
+  await writeJson(outputDirectory, "stats.meta.json", statsMeta)
 
   const habits = await fetchJson<SnapshotHabitSummary[]>(`${habitsBaseUrl}/habits`)
   await writeJson(outputDirectory, "habits.json", habits)

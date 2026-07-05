@@ -8,6 +8,7 @@ import { writeVault } from "./vault/writeVault"
 const DEMO_SEED = 1337
 const NOTES_API_PORT = 4310
 const HABIT_TRACKER_PORT = 4311
+const STATS_SERVICE_PORT = 4312
 
 const PACKAGE_ROOT = path.resolve(__dirname, "..")
 const VAULT_DIRECTORY = path.join(PACKAGE_ROOT, ".vault")
@@ -38,6 +39,11 @@ const main = async (): Promise<void> => {
     port: HABIT_TRACKER_PORT,
     serverPath: require.resolve("habit-tracker"),
   })
+  const statsService = await startService({
+    env: serviceEnv,
+    port: STATS_SERVICE_PORT,
+    serverPath: require.resolve("stats-service"),
+  })
 
   try {
     const summary = await buildSnapshot({
@@ -45,6 +51,7 @@ const main = async (): Promise<void> => {
       habitsBaseUrl: habitTracker.baseUrl,
       notesBaseUrl: notesApi.baseUrl,
       outputDirectory: OUTPUT_DIRECTORY,
+      statsBaseUrl: statsService.baseUrl,
     })
     console.info(
       `[demo-data] snapshot complete: ${String(summary.viewCount)} views, ${String(summary.habitCount)} habits, ${String(summary.noteCount)} note sources -> ${OUTPUT_DIRECTORY}`,
@@ -52,6 +59,7 @@ const main = async (): Promise<void> => {
   } finally {
     notesApi.stop()
     habitTracker.stop()
+    statsService.stop()
   }
 }
 

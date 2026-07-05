@@ -20,6 +20,7 @@ const RESPONSES: Record<string, unknown> = {
   "https://notes/notes?includeContent=false": {
     notes: [{ fullPath: "/vault/library/books/dune.md", id: "note-1" }],
   },
+  "https://stats/stats/meta": { totalNotes: 1, totalWords: 10 },
   "https://habits/habits": [{ habitId: "exercise" }],
   "https://habits/habits/exercise": { habitId: "exercise", history: [] },
 }
@@ -42,6 +43,7 @@ const runBuildSnapshot = () =>
     habitsBaseUrl: "https://habits",
     notesBaseUrl: "https://notes",
     outputDirectory: "/out",
+    statsBaseUrl: "https://stats",
   })
 
 describe("buildSnapshot", () => {
@@ -58,6 +60,7 @@ describe("buildSnapshot", () => {
       "/out/views.json",
       "/out/notes.books.json",
       "/out/notes.books.slim.json",
+      "/out/stats.meta.json",
       "/out/habits.json",
       "/out/habit.exercise.json",
       "/out/source/note-1.md",

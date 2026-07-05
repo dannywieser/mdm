@@ -8,6 +8,7 @@ import {
   setFlagsBaseUrl,
   setHabitsBaseUrl,
   setImagesBaseUrl,
+  setStatsBaseUrl,
 } from 'services'
 
 import './index.css'
@@ -25,6 +26,7 @@ if (import.meta.env.VITE_DEMO_MODE === 'true') {
   setHabitsBaseUrl(import.meta.env.VITE_HABIT_API_BASE_URL ?? '')
   setFlagsBaseUrl(import.meta.env.VITE_FLAGS_BASE_URL ?? '/flags')
   setImagesBaseUrl(import.meta.env.VITE_IMAGES_BASE_URL ?? '')
+  setStatsBaseUrl(import.meta.env.VITE_STATS_BASE_URL ?? '/stats')
 }
 
 const queryClient = new QueryClient()

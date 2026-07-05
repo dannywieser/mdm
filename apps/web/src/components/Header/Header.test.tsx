@@ -3,8 +3,6 @@ import { cleanup, render, screen } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
-import { configureDemoMode, resetDemoMode } from "services"
-
 import { defaultColorPaletteSystem } from "../../theme/system"
 import { Header } from "./Header"
 
@@ -46,7 +44,6 @@ vi.mock("services", async (importOriginal) => {
 
 afterEach(() => {
   cleanup()
-  resetDemoMode()
 })
 
 const renderAt = (path: string) =>
@@ -71,15 +68,6 @@ describe("Header", () => {
     expect(screen.getByTestId("header-breadcrumb")).toBeTruthy()
     expect(screen.getByText("2026-06-01")).toBeTruthy()
     expect(screen.getByTestId("header-stats-link")).toBeTruthy()
-    expect(screen.getByTestId("palette-selector")).toBeTruthy()
-  })
-
-  test("hides the stats link in demo mode", () => {
-    configureDemoMode({ dataBasePath: "/demo-data" })
-
-    renderAt("/")
-
-    expect(screen.queryByTestId("header-stats-link")).toBeNull()
     expect(screen.getByTestId("palette-selector")).toBeTruthy()
   })
 

@@ -2,6 +2,7 @@ let baseUrl = "/api"
 let habitsBaseUrl = ""
 let flagsBaseUrl = "/flags"
 let imagesBaseUrl = ""
+let statsBaseUrl = "/stats"
 
 export const setBaseUrl = (url: string): void => {
   baseUrl = url
@@ -26,3 +27,9 @@ export const setImagesBaseUrl = (url: string): void => {
 }
 
 export const getImagesBaseUrl = (): string => imagesBaseUrl
+
+export const setStatsBaseUrl = (url: string): void => {
+  statsBaseUrl = url
+}
+
+export const getStatsBaseUrl = (): string => statsBaseUrl

@@ -7,7 +7,7 @@ import {
   buildDemoImageUrl,
   buildDemoNoteSourceUrl,
   buildDemoNotesUrl,
-  buildDemoStatsUrl,
+  buildDemoStatsMetaUrl,
   buildDemoViewsUrl,
 } from "./demoUrls"
 
@@ -36,7 +36,7 @@ describe("buildDemoNotesUrl", () => {
 describe("simple demo endpoints", () => {
   test("views, stats, and habits point at their static files", () => {
     expect(buildDemoViewsUrl()).toBe("/demo-data/views.json")
-    expect(buildDemoStatsUrl()).toBe("/demo-data/stats.json")
+    expect(buildDemoStatsMetaUrl()).toBe("/demo-data/stats.meta.json")
     expect(buildDemoHabitsUrl()).toBe("/demo-data/habits.json")
     expect(buildDemoHabitUrl("screen-time")).toBe("/demo-data/habit.screen-time.json")
   })
