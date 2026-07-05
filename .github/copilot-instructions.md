@@ -26,6 +26,7 @@
 - Favor the creation of small (<150 lines) files that are focused on a single purpose.
 - Organize files into subdirectories based on related functions or domains.
 - Never include types or interfaces in the same file as the implementation. Types should either live in a colocated file with a `.types.ts` suffix, or in a top level "types" folder if they are shared across multiple files.
+- Never colocate a test file next to the module it tests. Instead, place it in a `__tests__` folder inside the same directory (e.g. `src/handlers/health/__tests__/health.test.ts` tests `src/handlers/health/health.ts`), and import the module under test with a relative path (e.g. `../health`).
 - Split apart complex logic into small, pure functions with descriptive names. Avoid large functions that do many things; instead, break them down into smaller helper functions that can be easily tested and reused.
 - after every change made, review the README file for the application or package and update it if necessary to reflect the changes made or remove any outdated information.
 - When adding dependencies to `package.json`, always prefer pinning a specific version over fuzzy version matching.
@@ -34,9 +35,9 @@
 
 ## apps/web structure guidelines
 
-- Keep each React component in `apps/web/src/components/<ComponentName>/` with colocated `<ComponentName>.tsx`, `<ComponentName>.types.ts`, and `<ComponentName>.test.tsx` files.
-- Keep each hook in `apps/web/src/hooks/<hookName>/` with colocated `<hookName>.ts`, `<hookName>.types.ts`, and `<hookName>.test.tsx` files.
-- Add a colocated `<name>.util.ts` file only when helper logic is needed by that component or hook. Every `.util.ts` must have a colocated `<name>.util.test.ts` that tests its functions directly.
+- Keep each React component in `apps/web/src/components/<ComponentName>/` with colocated `<ComponentName>.tsx` and `<ComponentName>.types.ts` files, and its test at `apps/web/src/components/<ComponentName>/__tests__/<ComponentName>.test.tsx`.
+- Keep each hook in `apps/web/src/hooks/<hookName>/` with colocated `<hookName>.ts` and `<hookName>.types.ts` files, and its test at `apps/web/src/hooks/<hookName>/__tests__/<hookName>.test.tsx`.
+- Add a colocated `<name>.util.ts` file only when helper logic is needed by that component or hook. Every `.util.ts` must have a corresponding `<name>.util.test.ts` in the same directory's `__tests__` folder that tests its functions directly.
 - For shared page chrome (like the app header), define it in a parent route layout so sibling routes (for example `/` and `/notes/:view`) render the same shell.
 
 ## changesets guidelines
@@ -71,7 +72,7 @@ Changesets are **not** required for:
 ## express api guidelines
 
 - The main service file should be focused on setting up the server, middleware, and routes, and should not contain any business logic. All handler logic should be contained in separate files under the `handlers` directory.
-- When adding endpoints to services written in Express, place each handler in its own folder under `handlers/<handler-name>`, with the handler in `<handler-name>.ts`, tests in `<handler-name>.test.ts`, and helper functions in `<handler-name>.util.ts`.
+- When adding endpoints to services written in Express, place each handler in its own folder under `handlers/<handler-name>`, with the handler in `<handler-name>.ts`, helper functions in `<handler-name>.util.ts`, and tests in `handlers/<handler-name>/__tests__/<handler-name>.test.ts`.
 - When a PR adds or changes an API endpoint, its description must include, for each affected endpoint: the method + path (e.g. `GET /stats/meta`), and a success response example. Include error responses too when the endpoint has non-trivial failure modes.
 
 ## unit testing guidelines
@@ -79,7 +80,7 @@ Changesets are **not** required for:
 - Use `test` (not `it`) in tests, and write descriptions that read naturally without implying an `it` prefix.
 - All changes and additions to the codebase should be accompanied by appropriate unit tests that cover the new functionality and ensure that existing functionality is not broken. Tests should be written using Vitest and should follow best practices for test organization and structure.
 - Use global Vitest config (`clearMocks: true`) for mock cleanup; never call manual global mock cleanup helpers in individual tests.
-- Prefer mocking for all dependencies external to the file/unit being tested. In particular, a component's `.test.tsx` must mock its colocated `.util.ts` module (via `vi.mock`) and assert on how the component uses the util's return values — the util's own logic is covered in `<name>.util.test.ts`, not in the component test.
+- Prefer mocking for all dependencies external to the file/unit being tested. In particular, a component's `.test.tsx` must mock its `.util.ts` module (via `vi.mock`) and assert on how the component uses the util's return values — the util's own logic is covered in `<name>.util.test.ts`, not in the component test.
 - In particular always mock platform libraries like `fs` and `path` when testing file handling logic, to avoid unintended side effects and ensure test reliability.
 - In `apps/web` tests, mock the i18n module so `t(...)`/`translate(...)` returns translation keys, and assert on keys instead of translated copy.
 
