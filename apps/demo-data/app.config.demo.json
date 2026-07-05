@@ -8,7 +8,7 @@
       "id": "on-this-day",
       "name": "On This Day",
       "group": "journal",
-      "component": "NotesList",
+      "component": "NotesReview",
       "filters": [{ "folder": "journal", "frontmatter.created": "$onThisDay" }],
       "badges": ["frontmatter.mood", "frontmatter.tags"]
     },

@@ -19,7 +19,7 @@ The timeline always ends on the generation date, so date-relative features (`$to
 
 ## Demo configuration
 
-`app.config.demo.json` is the `app.config.json` used for the demo. It defines 12 grouped views covering every view component (`NotesList`, `NotesGallery`, `NotesGalleryByMonth`, `NotesGalleryByYear`, `NotesReview`, `NotesSummaryTable`) and every filter capability (folder and frontmatter equality, OR groups, `$exclude`, `$missing`, `$today`, `$onThisDay`), plus three habits (`do-more` and `do-less` modes).
+`app.config.demo.json` is the `app.config.json` used for the demo. It defines 12 grouped views covering every view component (`NotesList`, `NotesGallery`, `NotesGalleryByMonth`, `NotesGalleryByYear`, `NotesReview`, `NotesSummaryTable`) and every filter capability (folder and frontmatter equality, OR groups, `$exclude`, `$missing`, `$today`, `$onThisDay`), plus three habits (`do-more` and `do-less` modes). "On This Day" pairs `$onThisDay` with the `NotesReview` component — the vault generator guarantees a journal entry exists on that calendar day in every earlier year, so the review flow always has entries to step through.
 
 ## Structure
 

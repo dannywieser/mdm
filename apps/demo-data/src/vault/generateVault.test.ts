@@ -35,6 +35,16 @@ describe("generateVault", () => {
     ])
   })
 
+  test("writes a journal entry on the end date's month/day in every year so $onThisDay is never empty", () => {
+    const journalTitles = new Set(
+      vault.notes.filter((note) => note.folder === "journal").map((note) => note.title),
+    )
+
+    for (const anniversary of ["2023-07-01", "2024-07-01", "2025-07-01", "2026-07-01"]) {
+      expect(journalTitles.has(anniversary)).toBe(true)
+    }
+  })
+
   test("always writes a journal entry for the end date so $today matches", () => {
     const todayNote = vault.notes.find(
       (note) => note.folder === "journal" && note.title === END_DATE,

@@ -98,14 +98,19 @@ const buildJournalNote = (
 
 /**
  * Builds one journal note for most days of the timeline. The final day is
- * always present so the `$today` view has content on freshly generated data.
+ * always present so the `$today` view has content on freshly generated data,
+ * and the end date's month/day is always present in every earlier year so
+ * the `$onThisDay` review view is never empty.
  */
 export const buildJournalNotes = ({ endDate, random }: VaultBuilderOptions): VaultNote[] => {
   const dates = buildDateRange(addDays(endDate, -(TIMELINE_DAYS - 1)), endDate)
+  const anniversaryMonthDay = endDate.slice(5)
 
   return dates.flatMap((date, dayIndex) => {
     const daysFromEnd = dates.length - 1 - dayIndex
-    const skipDay = daysFromEnd >= STREAK_TAIL_DAYS && !chance(random, 0.8)
+    const isAnniversary = date.slice(5) === anniversaryMonthDay
+    const skipDay =
+      !isAnniversary && daysFromEnd >= STREAK_TAIL_DAYS && !chance(random, 0.8)
     if (skipDay) return []
     return [buildJournalNote(date, dayIndex, daysFromEnd, random)]
   })
