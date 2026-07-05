@@ -72,6 +72,7 @@ Changesets are **not** required for:
 
 - The main service file should be focused on setting up the server, middleware, and routes, and should not contain any business logic. All handler logic should be contained in separate files under the `handlers` directory.
 - When adding endpoints to services written in Express, place each handler in its own folder under `handlers/<handler-name>`, with the handler in `<handler-name>.ts`, tests in `<handler-name>.test.ts`, and helper functions in `<handler-name>.util.ts`.
+- When a PR adds or changes an API endpoint, its description must include, for each affected endpoint: the method + path (e.g. `GET /stats/meta`), and a success response example. Include error responses too when the endpoint has non-trivial failure modes.
 
 ## unit testing guidelines
 

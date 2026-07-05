@@ -1,0 +1,24 @@
+{
+  "name": "stats-service",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist/server.js",
+  "scripts": {
+    "prebuild": "turbo run build --filter=stats-service^...",
+    "predev": "turbo run build --filter=stats-service^...",
+    "pretest": "turbo run build --filter=stats-service^...",
+    "dev": "tsx watch --env-file=../../.env src/server.ts | pino-pretty",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "app-config": "1.10.0",
+    "express": "5.2.1",
+    "markdown": "1.10.0",
+    "mdm-logger": "1.0.0",
+    "mdm-util": "1.10.0",
+    "pino-http": "11.0.0"
+  }
+}

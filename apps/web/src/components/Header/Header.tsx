@@ -3,7 +3,7 @@ import { formatDate } from "mdm-util"
 import { X } from "lucide-react"
 import { useLocation, useMatch, useNavigate, useParams } from "react-router-dom"
 
-import { useViewsQuery } from "services"
+import { isDemoMode, useViewsQuery } from "services"
 import { useI18n } from "../../i18n"
 import { focusRing } from "../../theme/focusRing"
 import { HeaderBreadcrumb } from "../HeaderBreadcrumb"
@@ -69,7 +69,8 @@ export function Header() {
             <Text fontSize="sm" color="app.text" fontWeight="bold">
               {formatDate(new Date())}
             </Text>
-            <HeaderStatsLink />
+            {/* The static demo deployment has no stats backend, so hide the stats page there. */}
+            {!isDemoMode() && <HeaderStatsLink />}
             <HeaderPaletteSelector />
           </Flex>
         )

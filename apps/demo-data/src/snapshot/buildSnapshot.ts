@@ -74,9 +74,6 @@ export const buildSnapshot = async ({
     await snapshotView(notesBaseUrl, outputDirectory, view.id)
   }
 
-  const stats = await fetchJson<unknown>(`${notesBaseUrl}/stats`)
-  await writeJson(outputDirectory, "stats.json", stats)
-
   const habits = await fetchJson<SnapshotHabitSummary[]>(`${habitsBaseUrl}/habits`)
   await writeJson(outputDirectory, "habits.json", habits)
 

@@ -1,1 +1,1 @@
-export { countFilesRecursive } from "./file-system/countFilesRecursive"
+export { countFilesByExtension } from "./file-system/countFilesByExtension"

@@ -16,7 +16,6 @@ const RESPONSES: Record<string, unknown> = {
   "https://notes/views": { views: [{ id: "books" }] },
   "https://notes/notes?view=books": { notes: [{ id: "1", content: {} }] },
   "https://notes/notes?view=books&includeContent=false": { notes: [{ id: "1" }] },
-  "https://notes/stats": { totalNotes: 1 },
   "https://habits/habits": [{ habitId: "exercise" }],
   "https://habits/habits/exercise": { habitId: "exercise", history: [] },
 }
@@ -55,7 +54,6 @@ describe("buildSnapshot", () => {
       "/out/views.json",
       "/out/notes.books.json",
       "/out/notes.books.slim.json",
-      "/out/stats.json",
       "/out/habits.json",
       "/out/habit.exercise.json",
     ])
