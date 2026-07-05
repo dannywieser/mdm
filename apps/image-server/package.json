@@ -1,6 +1,6 @@
 {
   "name": "image-server",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "private": true,
   "main": "dist/server.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "dependencies": {
     "express": "5.2.1",
     "mdm-logger": "1.0.0",
-    "mdm-util": "1.10.0",
+    "mdm-util": "2.0.0",
     "pino-http": "11.0.0",
     "redis": "5.10.0"
   }

@@ -1,5 +1,21 @@
 # habit-tracker
 
+## 1.3.2
+
+### Patch Changes
+
+- 707d12d: Fix `EMFILE: too many open files` errors when scanning large vaults: habit entry scanning now reads note files with bounded concurrency (via `mapWithConcurrency` from `mdm-util`) instead of opening every note at once per habit.
+- 781fcee: Fix two habit-tracking calculations: a "do-more" streak now requires at least 2 consecutive logged days before it's reported (a single logged day no longer shows as a streak of 1), and "fewest days tracked per period" now discards the oldest tracking period when it started partway through a window instead of counting it as-is, so an incomplete leading window no longer produces an artificially low score.
+- Updated dependencies [707d12d]
+- Updated dependencies [fb9cd71]
+- Updated dependencies [492658e]
+- Updated dependencies [498a480]
+- Updated dependencies [572b5ff]
+  - services@2.0.0
+  - mdm-util@2.0.0
+  - markdown@2.0.0
+  - app-config@2.0.0
+
 ## 1.3.1
 
 ### Patch Changes

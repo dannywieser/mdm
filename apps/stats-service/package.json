@@ -1,6 +1,6 @@
 {
   "name": "stats-service",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "main": "dist/server.js",
   "scripts": {
@@ -14,11 +14,11 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "app-config": "1.10.0",
+    "app-config": "2.0.0",
     "express": "5.2.1",
-    "markdown": "1.10.0",
+    "markdown": "2.0.0",
     "mdm-logger": "1.0.0",
-    "mdm-util": "1.10.0",
+    "mdm-util": "2.0.0",
     "pino-http": "11.0.0"
   }
 }
