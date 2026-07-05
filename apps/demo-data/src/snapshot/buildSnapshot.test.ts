@@ -80,4 +80,29 @@ describe("buildSnapshot", () => {
 
     await expect(runBuildSnapshot()).rejects.toThrow("Request failed with status 500")
   })
+
+  test("rejects view ids that are not filename-safe", async () => {
+    const fetchMock = stubFetch()
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ views: [{ id: "books/archived" }] }),
+    })
+
+    await expect(runBuildSnapshot()).rejects.toThrow(
+      'View id "books/archived" cannot be used in a demo snapshot filename',
+    )
+  })
+
+  test("rejects habit ids that are not filename-safe", async () => {
+    stubFetch()
+    RESPONSES["https://habits/habits"] = [{ habitId: "screen time" }]
+
+    try {
+      await expect(runBuildSnapshot()).rejects.toThrow(
+        'Habit id "screen time" cannot be used in a demo snapshot filename',
+      )
+    } finally {
+      RESPONSES["https://habits/habits"] = [{ habitId: "exercise" }]
+    }
+  })
 })

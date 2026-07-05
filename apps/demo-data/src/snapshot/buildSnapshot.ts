@@ -22,19 +22,35 @@ const writeJson = async (
   )
 }
 
+const FILE_SAFE_ID_PATTERN = /^[A-Za-z0-9_-]+$/
+
+/**
+ * Snapshot filenames embed view/habit ids verbatim, and static hosts decode
+ * request URLs before resolving files — so ids must be URL-safe as-is or the
+ * files written here would never match the URLs the demo hooks request.
+ */
+const assertFileSafeId = (kind: string, id: string): string => {
+  if (!FILE_SAFE_ID_PATTERN.test(id)) {
+    throw new Error(
+      `${kind} id "${id}" cannot be used in a demo snapshot filename; use only letters, numbers, hyphens, and underscores`,
+    )
+  }
+  return id
+}
+
 const snapshotView = async (
   notesBaseUrl: string,
   outputDirectory: string,
   viewId: string,
 ): Promise<void> => {
-  const encodedView = encodeURIComponent(viewId)
-  const full = await fetchJson<unknown>(`${notesBaseUrl}/notes?view=${encodedView}`)
+  const safeViewId = assertFileSafeId("View", viewId)
+  const full = await fetchJson<unknown>(`${notesBaseUrl}/notes?view=${safeViewId}`)
   const slim = await fetchJson<unknown>(
-    `${notesBaseUrl}/notes?view=${encodedView}&includeContent=false`,
+    `${notesBaseUrl}/notes?view=${safeViewId}&includeContent=false`,
   )
 
-  await writeJson(outputDirectory, `notes.${viewId}.json`, full)
-  await writeJson(outputDirectory, `notes.${viewId}.slim.json`, slim)
+  await writeJson(outputDirectory, `notes.${safeViewId}.json`, full)
+  await writeJson(outputDirectory, `notes.${safeViewId}.slim.json`, slim)
 }
 
 /**
@@ -65,10 +81,9 @@ export const buildSnapshot = async ({
   await writeJson(outputDirectory, "habits.json", habits)
 
   for (const habit of habits) {
-    const detail = await fetchJson<unknown>(
-      `${habitsBaseUrl}/habits/${encodeURIComponent(habit.habitId)}`,
-    )
-    await writeJson(outputDirectory, `habit.${habit.habitId}.json`, detail)
+    const safeHabitId = assertFileSafeId("Habit", habit.habitId)
+    const detail = await fetchJson<unknown>(`${habitsBaseUrl}/habits/${safeHabitId}`)
+    await writeJson(outputDirectory, `habit.${safeHabitId}.json`, detail)
   }
 
   await fs.cp(
