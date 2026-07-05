@@ -1,0 +1,277 @@
+import type { Mock } from "vitest"
+
+import { resolveNotesConfig } from "app-config"
+import { createMockNotesConfig } from "app-config/testing"
+import { extractNoteDates, parseFrontMatter, resolveOldestDate } from "markdown"
+import { createFileID } from "mdm-util"
+import { promises as fs } from "node:fs"
+
+import { FILE_ID_NAMESPACE, resolveCreatedDate, scanMarkdownFile } from "../notes.scan"
+
+vi.mock("app-config", () => ({
+  resolveNotesConfig: vi.fn(),
+}))
+
+vi.mock("node:fs", () => ({
+  promises: {
+    readFile: vi.fn(),
+    stat: vi.fn(),
+  },
+}))
+
+vi.mock("markdown", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("markdown")>()
+  return {
+    ...actual,
+    extractNoteDates: vi.fn(),
+    parseFrontMatter: vi.fn(),
+    resolveOldestDate: vi.fn(),
+  }
+})
+
+vi.mock("mdm-util", () => ({
+  createFileID: vi.fn(),
+}))
+
+const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
+const createFileIDMock = vi.mocked(createFileID)
+const readFileMock = fs.readFile as Mock
+const statMock = fs.stat as Mock
+const parseFrontMatterMock = vi.mocked(parseFrontMatter)
+const extractNoteDatesMock = vi.mocked(extractNoteDates)
+const resolveOldestDateMock = vi.mocked(resolveOldestDate)
+
+const defaultConfig = createMockNotesConfig()
+
+describe("resolveCreatedDate", () => {
+  test("returns the resolved date as an ISO string", () => {
+    resolveOldestDateMock.mockReturnValueOnce(new Date("2025-06-15T00:00:00.000Z"))
+    expect(
+      resolveCreatedDate(["2025.06.15"], ["YYYY.MM.DD"]),
+    ).toBe("2025-06-15T00:00:00.000Z")
+    expect(resolveOldestDateMock).toHaveBeenCalledWith(["2025.06.15"], ["YYYY.MM.DD"])
+  })
+
+  test("returns null when no date can be resolved", () => {
+    resolveOldestDateMock.mockReturnValueOnce(null)
+    expect(resolveCreatedDate([], [])).toBeNull()
+  })
+})
+
+describe("notes scan helpers", () => {
+  beforeEach(() => {
+    resolveNotesConfigMock.mockResolvedValue(defaultConfig)
+    extractNoteDatesMock.mockReturnValue([])
+  })
+
+  test("scanMarkdownFile returns filterable metadata without parsed markdown content", async () => {
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      dateFormats: ["YYYY.MM.DD"],
+      obsidianVault: "dgw",
+    })
+
+    const createdDate = new Date("2026-05-26T00:00:00.000Z")
+    const modifiedDate = new Date("2026-05-26T01:00:00.000Z")
+
+    readFileMock.mockResolvedValue("# Welcome\n\nThis is a note.")
+    parseFrontMatterMock.mockReturnValue({
+      body: "# Welcome\n\nThis is a note.",
+      frontmatter: null,
+    })
+    extractNoteDatesMock.mockReturnValue(["2026.05.26"])
+    createFileIDMock.mockReturnValue("17e3771f-2773-5c87-8f66-6a455a878763")
+    statMock.mockResolvedValue({
+      birthtime: createdDate,
+      mtime: modifiedDate,
+    })
+
+    const note = await scanMarkdownFile("/notes/topic/welcome.md")
+
+    expect(note).toEqual({
+      basename: "welcome.md",
+      dates: ["2026.05.26", "2026-05-26T01:00:00.000Z"],
+      createdDate: null,
+      folder: "topic",
+      frontmatter: null,
+      fullPath: "/notes/topic/welcome.md",
+      fullText: "# Welcome\n\nThis is a note.",
+      id: "17e3771f-2773-5c87-8f66-6a455a878763",
+      modifiedDate: "2026-05-26T01:00:00.000Z",
+      obsidianUrl: "obsidian://open?vault=dgw&file=topic%2Fwelcome",
+      title: "welcome",
+    })
+    expect(note).not.toHaveProperty("content")
+    expect(FILE_ID_NAMESPACE).toBe("6ba7b811-9dad-11d1-80b4-00c04fd430c8")
+    expect(readFileMock).toHaveBeenCalledWith("/notes/topic/welcome.md", "utf8")
+    expect(parseFrontMatterMock).toHaveBeenCalledWith("# Welcome\n\nThis is a note.")
+    expect(extractNoteDatesMock).toHaveBeenCalledWith(
+      "welcome",
+      "# Welcome\n\nThis is a note.",
+      ["YYYY.MM.DD"],
+    )
+    expect(resolveOldestDateMock).toHaveBeenCalledWith(
+      ["2026.05.26", "2026-05-26T01:00:00.000Z"],
+      ["YYYY.MM.DD"],
+    )
+    expect(createFileIDMock).toHaveBeenCalledWith(
+      "/notes/topic/welcome.md",
+      FILE_ID_NAMESPACE,
+    )
+    expect(statMock).toHaveBeenCalledWith("/notes/topic/welcome.md")
+  })
+
+  test("scanMarkdownFile sets folder to the full relative path from the notes directory", async () => {
+    readFileMock.mockResolvedValue("# Note")
+    parseFrontMatterMock.mockReturnValue({ body: "# Note", frontmatter: null })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await scanMarkdownFile("/notes/daily/briefing/2026-06-01.md")
+
+    expect(note.folder).toBe("daily/briefing")
+  })
+
+  test("scanMarkdownFile includes date-like frontmatter values in dates", async () => {
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      dateFormats: ["YYYY.MM.DD"],
+    })
+
+    readFileMock.mockResolvedValue("# Note")
+    parseFrontMatterMock.mockReturnValue({
+      body: "# Note",
+      frontmatter: {
+        created: "2026.06.01",
+        tags: ["reading", "2025.12.31"],
+      },
+    })
+    extractNoteDatesMock.mockReturnValue(["2026.06.01", "2025.12.31"])
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-06-01T00:00:00.000Z"),
+      mtime: new Date("2026-06-01T01:00:00.000Z"),
+    })
+
+    const note = await scanMarkdownFile("/notes/note.md")
+
+    expect(note.dates).toEqual(["2026.06.01", "2025.12.31", "2026-06-01T01:00:00.000Z"])
+    expect(extractNoteDatesMock).toHaveBeenCalledWith("note", "# Note", ["YYYY.MM.DD"])
+  })
+
+  test("scanMarkdownFile uses parsed frontmatter and escapes obsidian file paths", async () => {
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
+      obsidianVault: "vault name",
+    })
+
+    readFileMock.mockResolvedValue(`---
+topic:
+  - AI
+  - Notes
+created: 2026.05.26
+---
+# Welcome
+
+This is a note.`)
+    parseFrontMatterMock.mockReturnValue({
+      body: "# Welcome\n\nThis is a note.",
+      frontmatter: {
+        created: "2026.05.26",
+        topic: ["AI", "Notes"],
+      },
+    })
+    extractNoteDatesMock.mockReturnValue(["2026.05.26", "26/05/27"])
+    createFileIDMock.mockReturnValue("frontmatter-id")
+    statMock.mockResolvedValue({
+      birthtime: new Date("2026-05-26T00:00:00.000Z"),
+      mtime: new Date("2026-05-26T01:00:00.000Z"),
+    })
+
+    const note = await scanMarkdownFile("/notes/daily/2026.05.27 (Wed) á.md")
+
+    expect(note.dates).toEqual(["2026.05.26", "26/05/27", "2026-05-26T01:00:00.000Z"])
+    expect(note.frontmatter).toEqual({
+      created: "2026.05.26",
+      topic: ["AI", "Notes"],
+    })
+    expect(note.id).toBe("frontmatter-id")
+    expect(note.obsidianUrl).toBe(
+      "obsidian://open?vault=vault%20name&file=daily%2F2026.05.27%20(Wed)%20%C3%A1",
+    )
+    expect(note.title).toBe("2026.05.27 (Wed) á")
+  })
+
+  test("scanMarkdownFile resolves bare cover filename to attachment path", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "",
+      frontmatter: { cover: "attach-20260616070917164.png" },
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/citizen-sleeper-2.md")
+
+    expect(note.frontmatter?.cover).toBe(
+      "games/citizen-sleeper-2/attach-20260616070917164.png",
+    )
+  })
+
+  test("scanMarkdownFile prepends attachmentsDirectory to bare cover filename", async () => {
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      attachmentsDirectory: "attachments",
+    })
+
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "",
+      frontmatter: { cover: "attach-20260616070917164.png" },
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/citizen-sleeper-2.md")
+
+    expect(note.frontmatter?.cover).toBe(
+      "attachments/games/citizen-sleeper-2/attach-20260616070917164.png",
+    )
+  })
+
+  test("scanMarkdownFile passes through cover path that already has directory components", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "",
+      frontmatter: {
+        cover: "attachments/downtime/The Rogue Prince of Persia/attach-20260503144843356.jpg",
+      },
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/downtime/the-rogue-prince-of-persia.md")
+
+    expect(note.frontmatter?.cover).toBe(
+      "attachments/downtime/The Rogue Prince of Persia/attach-20260503144843356.jpg",
+    )
+  })
+
+  test("scanMarkdownFile leaves external url in cover frontmatter unchanged", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "",
+      frontmatter: { cover: "https://example.com/cover.png" },
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/note.md")
+
+    expect(note.frontmatter?.cover).toBe("https://example.com/cover.png")
+  })
+})
