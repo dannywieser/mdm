@@ -1,6 +1,10 @@
 import type { ImageProxyParams } from "./images.types"
 
 import { getImagesBaseUrl } from "../config"
+import { isDemoMode } from "../demo/demoMode"
+import { buildDemoImageUrl } from "../demo/demoUrls"
 
 export const buildImageUrl = ({ path }: ImageProxyParams): string =>
-  `${getImagesBaseUrl()}/images?path=${encodeURIComponent(path)}`
+  isDemoMode()
+    ? buildDemoImageUrl(path)
+    : `${getImagesBaseUrl()}/images?path=${encodeURIComponent(path)}`

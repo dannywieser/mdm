@@ -1,0 +1,26 @@
+import { getDemoDataBasePath } from "./demoMode"
+
+/** Static file for a notes query; slim files omit parsed note content. */
+export const buildDemoNotesUrl = (view?: string, includeContent = true): string => {
+  const viewSegment = view ? `.${encodeURIComponent(view)}` : ""
+  const contentSegment = includeContent ? "" : ".slim"
+  return `${getDemoDataBasePath()}/notes${viewSegment}${contentSegment}.json`
+}
+
+export const buildDemoViewsUrl = (): string => `${getDemoDataBasePath()}/views.json`
+
+export const buildDemoStatsUrl = (): string => `${getDemoDataBasePath()}/stats.json`
+
+export const buildDemoHabitsUrl = (): string => `${getDemoDataBasePath()}/habits.json`
+
+export const buildDemoHabitUrl = (habitId: string): string =>
+  `${getDemoDataBasePath()}/habit.${encodeURIComponent(habitId)}.json`
+
+/** Vault-relative image paths are copied under `<base>/images/` at build time. */
+export const buildDemoImageUrl = (path: string): string => {
+  const encodedPath = path
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/")
+  return `${getDemoDataBasePath()}/images/${encodedPath}`
+}

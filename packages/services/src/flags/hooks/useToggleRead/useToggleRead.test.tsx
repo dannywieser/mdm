@@ -3,6 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react"
 import { type ReactNode } from "react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
+import { configureDemoMode, resetDemoMode } from "../../../demo/demoMode"
 import { useToggleRead } from "./useToggleRead"
 
 const createWrapper = () => {
@@ -28,6 +29,8 @@ const createWrapper = () => {
 
 afterEach(() => {
   vi.restoreAllMocks()
+  resetDemoMode()
+  window.sessionStorage.clear()
 })
 
 describe("useToggleRead", () => {
@@ -56,6 +59,30 @@ describe("useToggleRead", () => {
     expect(fetchMock).toHaveBeenCalledWith("/flags/note-1/read", {
       method: "POST",
     })
+    expect(queryClient.getQueryData(["read", "note-1"])).toBe(true)
+  })
+
+  test("toggles the flag in session storage in demo mode without fetching", async () => {
+    configureDemoMode({ dataBasePath: "/demo-data" })
+    const fetchMock = vi.fn()
+    vi.stubGlobal("fetch", fetchMock)
+
+    const { QueryWrapper, queryClient } = createWrapper()
+    const { result } = renderHook(
+      () => useToggleRead({ noteId: "note-1" }),
+      {
+        wrapper: QueryWrapper,
+      },
+    )
+
+    result.current.mutate()
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(window.sessionStorage.getItem("mdm-demo-flag:read:note-1")).toBe("true")
     expect(queryClient.getQueryData(["read", "note-1"])).toBe(true)
   })
 

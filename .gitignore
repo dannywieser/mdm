@@ -5,3 +5,5 @@ coverage
 **/dist
 .env
 app.config.json
+.vault
+apps/web/public/demo-data

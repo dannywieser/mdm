@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { renderHook, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
+import { configureDemoMode, resetDemoMode } from "../../../demo/demoMode"
 import { useHabitQuery } from "./useHabitQuery"
 
 class ErrorBoundary extends Component<
@@ -41,6 +42,7 @@ const createWrapper = () => {
 
 afterEach(() => {
   vi.restoreAllMocks()
+  resetDemoMode()
 })
 
 describe("useHabitQuery", () => {
@@ -66,6 +68,22 @@ describe("useHabitQuery", () => {
 
     expect(global.fetch).toHaveBeenCalledWith("/habits/exercise")
     expect(result.current.data).toEqual(responseBody)
+  })
+
+  test("fetches the static habit detail file in demo mode", async () => {
+    configureDemoMode({ dataBasePath: "/demo-data" })
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ habitId: "screen-time" }),
+    }))
+
+    const { result } = renderHook(() => useHabitQuery({ habitId: "screen-time" }), {
+      wrapper: createWrapper(),
+    })
+
+    await waitFor(() => { expect(result.current.isSuccess).toBe(true); })
+
+    expect(global.fetch).toHaveBeenCalledWith("/demo-data/habit.screen-time.json")
   })
 
   test("throws to error boundary when the habit response is not ok", async () => {

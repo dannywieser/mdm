@@ -1,5 +1,8 @@
 export * from "./config"
 
+export * from "./demo/demoMode"
+export * from "./demo/demoMode.types"
+
 export * from "./notes/notes.types"
 export * from "./notes/views.types"
 export * from "./notes/stats.types"

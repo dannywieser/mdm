@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { renderHook, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
+import { configureDemoMode, resetDemoMode } from "../../../demo/demoMode"
 import { useStatsQuery } from "./useStatsQuery"
 
 class ErrorBoundary extends Component<
@@ -41,6 +42,7 @@ const createWrapper = () => {
 
 afterEach(() => {
   vi.restoreAllMocks()
+  resetDemoMode()
 })
 
 describe("useStatsQuery", () => {
@@ -63,6 +65,22 @@ describe("useStatsQuery", () => {
 
     expect(global.fetch).toHaveBeenCalledWith("/api/stats")
     expect(result.current.data).toEqual(responseBody)
+  })
+
+  test("fetches the static stats file in demo mode", async () => {
+    configureDemoMode({ dataBasePath: "/demo-data" })
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ totalNotes: 1 }),
+    }))
+
+    const { result } = renderHook(() => useStatsQuery(), {
+      wrapper: createWrapper(),
+    })
+
+    await waitFor(() => { expect(result.current.isSuccess).toBe(true); })
+
+    expect(global.fetch).toHaveBeenCalledWith("/demo-data/stats.json")
   })
 
   test("throws to error boundary when the stats response is not ok", async () => {

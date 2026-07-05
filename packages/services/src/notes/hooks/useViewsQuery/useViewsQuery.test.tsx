@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { renderHook, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
+import { configureDemoMode, resetDemoMode } from "../../../demo/demoMode"
 import { useViewsQuery } from "./useViewsQuery"
 
 class ErrorBoundary extends Component<
@@ -41,6 +42,7 @@ const createWrapper = () => {
 
 afterEach(() => {
   vi.restoreAllMocks()
+  resetDemoMode()
 })
 
 describe("useViewsQuery", () => {
@@ -64,6 +66,22 @@ describe("useViewsQuery", () => {
 
     expect(global.fetch).toHaveBeenCalledWith("/api/views")
     expect(result.current.data).toEqual(responseBody)
+  })
+
+  test("fetches the static views file in demo mode", async () => {
+    configureDemoMode({ dataBasePath: "/demo-data" })
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ views: [] }),
+    }))
+
+    const { result } = renderHook(() => useViewsQuery(), {
+      wrapper: createWrapper(),
+    })
+
+    await waitFor(() => { expect(result.current.isSuccess).toBe(true); })
+
+    expect(global.fetch).toHaveBeenCalledWith("/demo-data/views.json")
   })
 
   test("throws to error boundary when the views response is not ok", async () => {

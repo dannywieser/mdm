@@ -1,3 +1,4 @@
+export { mapWithConcurrency } from "./async/mapWithConcurrency"
 export { addDays } from "./date/addDays"
 export { buildDateRange } from "./date/buildDateRange"
 export { daysBetween } from "./date/daysBetween"

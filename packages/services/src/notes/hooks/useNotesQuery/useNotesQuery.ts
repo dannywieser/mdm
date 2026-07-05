@@ -4,15 +4,23 @@ import type { NotesResponse } from "../../notes.types"
 import type { UseNotesQueryParams } from "./useNotesQuery.types"
 
 import { getBaseUrl } from "../../../config"
+import { isDemoMode } from "../../../demo/demoMode"
+import { buildDemoNotesUrl } from "../../../demo/demoUrls"
 
-const fetchNotes = async (view?: string, includeContent = true): Promise<NotesResponse> => {
+const buildNotesUrl = (view?: string, includeContent = true): string => {
   const params = new URLSearchParams()
   if (view) params.set("view", view)
   if (!includeContent) params.set("includeContent", "false")
 
   const queryString = params.toString()
   const baseUrl = getBaseUrl()
-  const url = queryString ? `${baseUrl}/notes?${queryString}` : `${baseUrl}/notes`
+  return queryString ? `${baseUrl}/notes?${queryString}` : `${baseUrl}/notes`
+}
+
+const fetchNotes = async (view?: string, includeContent = true): Promise<NotesResponse> => {
+  const url = isDemoMode()
+    ? buildDemoNotesUrl(view, includeContent)
+    : buildNotesUrl(view, includeContent)
   const response = await fetch(url)
 
   if (!response.ok) {

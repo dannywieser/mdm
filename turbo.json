@@ -9,6 +9,10 @@
       "dependsOn": [
         "^build"
       ],
+      "env": [
+        "VITE_BASE_PATH",
+        "VITE_DEMO_MODE"
+      ],
       "outputs": [
         "dist/**"
       ]

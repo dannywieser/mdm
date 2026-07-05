@@ -2,7 +2,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { setBaseUrl, setFlagsBaseUrl, setHabitsBaseUrl, setImagesBaseUrl } from 'services'
+import {
+  configureDemoMode,
+  setBaseUrl,
+  setFlagsBaseUrl,
+  setHabitsBaseUrl,
+  setImagesBaseUrl,
+} from 'services'
 
 import './index.css'
 
@@ -10,10 +16,16 @@ import App from './App'
 import { ColorPaletteProvider } from './context/ColorPalette/ColorPalette'
 import { I18nProvider } from './i18n'
 
-setBaseUrl(import.meta.env.VITE_API_BASE_URL ?? '/api')
-setHabitsBaseUrl(import.meta.env.VITE_HABIT_API_BASE_URL ?? '')
-setFlagsBaseUrl(import.meta.env.VITE_FLAGS_BASE_URL ?? '/flags')
-setImagesBaseUrl(import.meta.env.VITE_IMAGES_BASE_URL ?? '')
+if (import.meta.env.VITE_DEMO_MODE === 'true') {
+  // Static demo deployment (e.g. GitHub Pages): all data comes from the
+  // pre-built JSON snapshot under public/demo-data and no services run.
+  configureDemoMode({ dataBasePath: `${import.meta.env.BASE_URL}demo-data` })
+} else {
+  setBaseUrl(import.meta.env.VITE_API_BASE_URL ?? '/api')
+  setHabitsBaseUrl(import.meta.env.VITE_HABIT_API_BASE_URL ?? '')
+  setFlagsBaseUrl(import.meta.env.VITE_FLAGS_BASE_URL ?? '/flags')
+  setImagesBaseUrl(import.meta.env.VITE_IMAGES_BASE_URL ?? '')
+}
 
 const queryClient = new QueryClient()
 
@@ -23,7 +35,7 @@ createRoot(rootElement).render(
   <StrictMode>
     <ColorPaletteProvider>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <I18nProvider>
             <App />
           </I18nProvider>

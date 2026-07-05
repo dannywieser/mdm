@@ -19,6 +19,22 @@ Then use the hooks and types as normal, e.g. `useNotesQuery`, `useViewsQuery`, `
 
 Hooks throw `Error` objects whose `message` is an i18n key (e.g. `"errors.unableToLoadViews"`) rather than localized text, so consuming apps can translate the message themselves.
 
+## Demo mode
+
+For fully static deployments (e.g. the GitHub Pages demo) call `configureDemoMode` instead of the `set*BaseUrl` functions:
+
+```ts
+import { configureDemoMode } from "services"
+
+configureDemoMode({ dataBasePath: `${import.meta.env.BASE_URL}demo-data` })
+```
+
+In demo mode:
+
+- The query hooks fetch pre-built static JSON files from `dataBasePath` (`views.json`, `stats.json`, `habits.json`, `habit.<id>.json`, `notes.<view>.json` / `notes.<view>.slim.json`) instead of calling the live services. The files are produced by `apps/demo-data`.
+- `useIsRead` / `useToggleRead` swap the redis-backed flag-manager HTTP calls for browser `sessionStorage` (key format `mdm-demo-flag:<flag>:<noteId>`), so read-state is temporary and per-session.
+- `buildImageUrl` maps vault-relative image paths to static files under `<dataBasePath>/images/` instead of the image-server proxy.
+
 ## Structure
 
 - `notes/` — `Note`/`NotesResponse`, `ViewSummary`/`ViewsResponse`, `StatsResponse` and the hooks that fetch them from `apps/notes-api`, plus the note "read" flag hooks (`useIsRead`, `useToggleNoteRead`).
