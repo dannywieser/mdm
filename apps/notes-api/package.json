@@ -1,6 +1,6 @@
 {
   "name": "notes-api",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "license": "MIT",
   "main": "dist/server.js",
@@ -15,14 +15,14 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "app-config": "2.0.0",
+    "app-config": "2.0.1",
     "express": "5.2.1",
-    "markdown": "2.0.0",
+    "markdown": "2.0.1",
     "mdm-logger": "1.0.0",
-    "mdm-util": "2.0.0",
+    "mdm-util": "2.0.1",
     "pino-http": "11.0.0",
     "remark": "13.0.0",
-    "services": "2.0.0",
+    "services": "2.0.1",
     "remark-gfm": "1.0.0"
   }
 }
