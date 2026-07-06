@@ -18,24 +18,24 @@ export const createApp = () => {
   return app
 }
 
-export const logStartupConfig = async (): Promise<void> => {
-  try {
-    const notesConfig = await resolveNotesConfig()
-    logger.info({ notesConfig }, "Resolved notes config")
-  } catch (error) {
-    logger.error(
-      { error: toLoggableError(error) },
-      "Unable to resolve notes config on startup",
-    )
-  }
-}
+const startServer = async (): Promise<void> => {
+  const notesConfig = await resolveNotesConfig()
+  logger.info({ notesConfig }, "Resolved notes config")
 
-if (require.main === module) {
   const app = createApp()
   const port = Number(process.env.PORT ?? 3004)
 
   app.listen(port, () => {
     logger.info({ port }, "stats-service listening")
-    void logStartupConfig()
+  })
+}
+
+if (require.main === module) {
+  startServer().catch((error: unknown) => {
+    logger.error(
+      { error: toLoggableError(error) },
+      "Unable to start stats-service due to configuration error",
+    )
+    throw error
   })
 }

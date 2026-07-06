@@ -3,36 +3,41 @@ import type { RequestHandler } from "express"
 import request from "supertest"
 
 import { createFlagsHandler } from "../handlers/flags/flags"
-import { healthHandler } from "../handlers/health/health"
+import { createHealthHandler } from "../handlers/health/health"
 import { createApp } from "../server"
 
 vi.mock("../handlers/health/health", () => ({
-  healthHandler: vi.fn(),
+  createHealthHandler: vi.fn(),
 }))
 
 vi.mock("../handlers/flags/flags", () => ({
   createFlagsHandler: vi.fn(),
 }))
 
-const healthHandlerMock = vi.mocked(healthHandler)
+const createHealthHandlerMock = vi.mocked(createHealthHandler)
 const createFlagsHandlerMock = vi.mocked(createFlagsHandler)
 
 describe("flag-manager server interface", () => {
   const flagDefinitions = { read: {}, archived: { expiresInDays: 1 } }
+  const redisClient = { get: vi.fn(), ping: vi.fn(), set: vi.fn() }
+
+  beforeEach(() => {
+    createHealthHandlerMock.mockReturnValue(vi.fn())
+  })
 
   test("wires GET /health to the health handler", async () => {
-    healthHandlerMock.mockImplementation((_request, response) => {
+    createHealthHandlerMock.mockReturnValue((_request, response) => {
       response.status(200).json({ status: "ok" })
     })
     createFlagsHandlerMock.mockReturnValue(vi.fn())
 
-    const app = createApp({ get: vi.fn(), set: vi.fn() }, flagDefinitions)
+    const app = createApp(redisClient, flagDefinitions)
 
     const response = await request(app).get("/health")
 
     expect(response.status).toBe(200)
     expect(response.body).toEqual({ status: "ok" })
-    expect(healthHandlerMock).toHaveBeenCalledTimes(1)
+    expect(createHealthHandlerMock).toHaveBeenCalledWith(redisClient)
   })
 
   test("wires POST /flags/:id/:flag to the flags handler", async () => {
@@ -41,7 +46,7 @@ describe("flag-manager server interface", () => {
     }
     createFlagsHandlerMock.mockReturnValue(flagsHandler)
 
-    const app = createApp({ get: vi.fn(), set: vi.fn() }, flagDefinitions)
+    const app = createApp(redisClient, flagDefinitions)
 
     const response = await request(app).post("/flags/note-1/read")
 
@@ -60,7 +65,7 @@ describe("flag-manager server interface", () => {
     }
     createFlagsHandlerMock.mockReturnValue(flagsHandler)
 
-    const app = createApp({ get: vi.fn(), set: vi.fn() }, flagDefinitions)
+    const app = createApp(redisClient, flagDefinitions)
 
     const response = await request(app).get("/flags/note-1/read")
 
@@ -75,7 +80,7 @@ describe("flag-manager server interface", () => {
     }
     createFlagsHandlerMock.mockReturnValue(flagsHandler)
 
-    const app = createApp({ get: vi.fn(), set: vi.fn() }, flagDefinitions)
+    const app = createApp(redisClient, flagDefinitions)
 
     const response = await request(app).patch("/flags/note-1/read")
 

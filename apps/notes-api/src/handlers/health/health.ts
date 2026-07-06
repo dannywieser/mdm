@@ -1,4 +1,19 @@
 import type { RequestHandler } from "express"
 
-export const healthHandler: RequestHandler = (_request, response) =>
-  response.status(200).json({ status: "ok" })
+import { resolveNotesConfig } from "app-config"
+import { access, constants } from "node:fs/promises"
+
+export const healthHandler: RequestHandler = async (_request, response) => {
+  try {
+    const { notesDirectory } = await resolveNotesConfig()
+
+    await access(notesDirectory, constants.R_OK)
+
+    response.status(200).json({ status: "ok" })
+  } catch (error) {
+    response.status(503).json({
+      error: error instanceof Error ? error.message : "Unknown error",
+      status: "error",
+    })
+  }
+}
