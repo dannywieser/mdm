@@ -1,5 +1,14 @@
 # stats-service
 
+## 1.0.1
+
+### Patch Changes
+
+- 5e73d92: Rebuild all Docker images as minimal multi-stage builds using `turbo prune` (only ship each app's own dependency subgraph, run as non-root, `NODE_ENV=production`), add a `HEALTHCHECK` to every image so health status works standalone, and publish images to `ghcr.io/dannywieser/mdm-<app>` on every push to `main`. `docker-compose.yml` now references the published images alongside local `build:` config, and `npm run docker:update` pulls and restarts without rebuilding from source.
+  - app-config@2.0.1
+  - markdown@2.0.1
+  - mdm-util@2.0.1
+
 ## 1.0.0
 
 ### Major Changes
