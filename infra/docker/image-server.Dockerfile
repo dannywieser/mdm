@@ -16,6 +16,7 @@ COPY --from=pruner /app/out/package-lock.json ./package-lock.json
 RUN npm ci
 
 COPY --from=pruner /app/out/full/ .
+COPY tsconfig.base.json ./tsconfig.base.json
 RUN npm run build --workspace image-server
 RUN npm prune --omit=dev
 
