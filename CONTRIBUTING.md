@@ -74,7 +74,9 @@ This repository is a Turborepo monorepo with:
 - Set `attachmentsDirectory` in `app.config.json` to the folder name (relative to `NOTES_ROOT`) where Obsidian stores attachments (e.g. `"attachments"`). Bare-filename images in notes resolve to `<attachmentsDirectory>/<noteDir>/<noteStem>/<filename>`.
 - Notes markdown image paths resolve through `/images?path=<encoded-relative-path>`, proxied by `image-server` to imgproxy for optimization.
 - If local and container config values differ, create a separate Docker-specific config file and mount it to `/app/app.config.json`.
-- `notes-api`, `flag-manager`, `habit-tracker`, `image-server`, and `stats-service` each define a Docker healthcheck that polls their `/health` endpoint; `web` waits for all of them to report healthy before starting.
+- Every image defines its own `HEALTHCHECK` (`notes-api`, `flag-manager`, `habit-tracker`, `image-server`, and `stats-service` poll their `/health` endpoint; `web` polls a static `/health` route added to the nginx config) so health status works the same whether the container is started via this compose file or run standalone. `web` waits for the 5 backend services to report healthy before starting.
+- Each backend Dockerfile (`infra/docker/*.Dockerfile`) uses a multi-stage build with `turbo prune <app> --docker` so the image only contains that app's own workspace dependency subgraph, not the whole monorepo, and runs as the non-root `node` user.
+- Images are published to `ghcr.io/dannywieser/mdm-<app>` on every push to `main` (see `.github/workflows/docker-publish.yml`), tagged `latest`, `sha-<short-sha>`, and the app's `package.json` version. `docker-compose.yml` references these images directly (`image: ghcr.io/dannywieser/mdm-<app>:${MDM_IMAGE_TAG:-latest}`) alongside the local `build:` config, so `docker compose up --build` still builds from source, while `docker compose pull && docker compose up -d` runs the published images without needing the source checked out at all.
 
 Start services:
 
@@ -112,8 +114,8 @@ Run from repository root:
 - `npm run verify` - run lint, typecheck, build, and test across all workspaces; required before every commit
 - `npm run demo:data` - generate the demo vault and static demo data snapshot
 - `npm run demo:dev` - run the web app in demo mode against the static snapshot
-- `npm run docker:start` - start/update Docker services in detached mode with build
-- `npm run docker:update` - pull images and rebuild/restart Docker services
+- `npm run docker:start` - build from source and start/update Docker services in detached mode
+- `npm run docker:update` - pull the published GHCR images and restart Docker services, without building from source
 - `npm run docker:stop` - stop Docker services
 - `npm run changeset` - create a new changeset entry for user-visible changes
 - `npm run changeset:version` - apply pending changesets (versions + changelog updates)
