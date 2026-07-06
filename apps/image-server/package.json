@@ -2,6 +2,7 @@
   "name": "image-server",
   "version": "1.2.2",
   "private": true,
+  "license": "MIT",
   "main": "dist/server.js",
   "scripts": {
     "prebuild": "turbo run build --filter=image-server^...",

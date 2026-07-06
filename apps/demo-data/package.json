@@ -2,6 +2,7 @@
   "name": "demo-data",
   "version": "1.1.0",
   "private": true,
+  "license": "MIT",
   "main": "dist/cli.js",
   "scripts": {
     "prebuild": "turbo run build --filter=demo-data^...",

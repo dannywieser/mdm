@@ -2,6 +2,7 @@
   "name": "notes-api",
   "version": "2.0.0",
   "private": true,
+  "license": "MIT",
   "main": "dist/server.js",
   "scripts": {
     "prebuild": "turbo run build --filter=notes-api^...",
@@ -22,7 +23,6 @@
     "pino-http": "11.0.0",
     "remark": "13.0.0",
     "services": "2.0.0",
-    "remark-gfm": "1.0.0",
-    "remark-html": "13.0.2"
+    "remark-gfm": "1.0.0"
   }
 }
