@@ -19,7 +19,7 @@
     "demo:data": "npm run generate --workspace=demo-data",
     "demo:dev": "npm run dev:demo --workspace=web",
     "docker:start": "docker compose up --build -d",
-    "docker:update": "docker compose pull && docker compose up --build -d",
+    "docker:update": "docker compose pull && docker compose up -d",
     "docker:stop": "docker compose down",
     "changeset": "changeset",
     "changeset:version": "changeset version"
