@@ -2,6 +2,7 @@
   "name": "mdm",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
   "packageManager": "npm@10.9.4",
   "workspaces": [
     "apps/*",

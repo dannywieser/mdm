@@ -2,6 +2,7 @@
   "name": "stats-service",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
   "main": "dist/server.js",
   "scripts": {
     "prebuild": "turbo run build --filter=stats-service^...",
