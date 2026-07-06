@@ -1,5 +1,5 @@
 import express from "express"
-import { access } from "node:fs/promises"
+import { assertDirectoryReadable } from "mdm-util/node"
 import request from "supertest"
 
 import { resolveImageProxyConfig } from "../../images/images"
@@ -9,13 +9,12 @@ vi.mock("../../images/images", () => ({
   resolveImageProxyConfig: vi.fn(),
 }))
 
-vi.mock("node:fs/promises", () => ({
-  access: vi.fn(),
-  constants: { R_OK: 4 },
+vi.mock("mdm-util/node", () => ({
+  assertDirectoryReadable: vi.fn(),
 }))
 
 const resolveImageProxyConfigMock = vi.mocked(resolveImageProxyConfig)
-const accessMock = vi.mocked(access)
+const assertDirectoryReadableMock = vi.mocked(assertDirectoryReadable)
 
 describe("health handler", () => {
   test("returns 200 when the images root is readable", async () => {
@@ -27,13 +26,13 @@ describe("health handler", () => {
       maxHeight: 1080,
       maxWidth: 1920,
     })
-    accessMock.mockResolvedValue(undefined)
+    assertDirectoryReadableMock.mockResolvedValue(undefined)
     const app = express()
     app.get("/health", healthHandler)
 
     const response = await request(app).get("/health")
 
-    expect(accessMock).toHaveBeenCalledWith("/data/notes", expect.any(Number))
+    expect(assertDirectoryReadableMock).toHaveBeenCalledWith("/data/notes")
     expect(response.status).toBe(200)
     expect(response.body).toEqual({ status: "ok" })
   })
@@ -47,7 +46,9 @@ describe("health handler", () => {
       maxHeight: 1080,
       maxWidth: 1920,
     })
-    accessMock.mockRejectedValue(new Error("ENOENT: no such file or directory"))
+    assertDirectoryReadableMock.mockRejectedValue(
+      new Error("ENOENT: no such file or directory"),
+    )
     const app = express()
     app.get("/health", healthHandler)
 
