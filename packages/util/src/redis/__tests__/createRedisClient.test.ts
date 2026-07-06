@@ -11,6 +11,7 @@ describe("createRedisClient", () => {
     connect: vi.fn(),
     get: vi.fn(),
     on: vi.fn(),
+    ping: vi.fn(),
     set: vi.fn(),
   }
 
@@ -57,5 +58,20 @@ describe("createRedisClient", () => {
     client.on("error", listener)
 
     expect(mockClient.on).toHaveBeenCalledWith("error", listener)
+  })
+
+  test("ping delegates to the underlying client", async () => {
+    const client = createRedisClient("redis://localhost:6379")
+
+    await client.ping()
+
+    expect(mockClient.ping).toHaveBeenCalled()
+  })
+
+  test("ping rejects when the underlying client rejects", async () => {
+    mockClient.ping.mockRejectedValue(new Error("connection closed"))
+    const client = createRedisClient("redis://localhost:6379")
+
+    await expect(client.ping()).rejects.toThrow("connection closed")
   })
 })

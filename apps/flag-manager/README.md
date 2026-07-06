@@ -5,10 +5,14 @@ Express-based Redis-backed API for per-ID feature flags.
 ## Endpoints
 
 - `GET /health`
-  - Purpose: basic service health check
+  - Purpose: verifies Redis is reachable
   - Success response: `200`
     ```json
     { "status": "ok" }
+    ```
+  - Error response: `503` when Redis doesn't respond to a ping
+    ```json
+    { "status": "error", "error": "connection closed" }
     ```
 - `GET /flags/:id/:flag`
   - Purpose: retrieve the current value of the named flag for the given ID

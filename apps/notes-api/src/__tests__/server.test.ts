@@ -1,20 +1,8 @@
-import { resolveNotesConfig } from "app-config"
-import { createMockNotesConfig } from "app-config/testing"
-import { toLoggableError } from "mdm-util"
 import request from "supertest"
 
 import { healthHandler } from "../handlers/health/health"
 import { notesHandler } from "../handlers/notes/notes"
-import { logger } from "../logger"
-import { createApp, logStartupConfig } from "../server"
-
-vi.mock("app-config", () => ({
-  resolveNotesConfig: vi.fn(),
-}))
-
-vi.mock("mdm-util", () => ({
-  toLoggableError: vi.fn(),
-}))
+import { createApp } from "../server"
 
 vi.mock("pino-http", () => ({
   default: () => (_req: unknown, _res: unknown, next: () => void) => { next() },
@@ -37,8 +25,6 @@ vi.mock("../handlers/notes/notes", () => ({
 
 const healthHandlerMock = vi.mocked(healthHandler)
 const notesHandlerMock = vi.mocked(notesHandler)
-const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
-const toLoggableErrorMock = vi.mocked(toLoggableError)
 
 describe("notes-api server interface", () => {
   test("wires GET /health to the health handler", async () => {
@@ -65,36 +51,5 @@ describe("notes-api server interface", () => {
     expect(response.status).toBe(200)
     expect(response.body).toEqual({ notes: [] })
     expect(notesHandlerMock).toHaveBeenCalledTimes(1)
-  })
-
-  test("logs the resolved notes config on startup", async () => {
-    const config = createMockNotesConfig({
-      attachmentsDirectory: "images",
-      dateFormats: ["YYYY.MM.DD"],
-      notesDirectory: "/notes",
-      obsidianVault: "vault",
-    })
-    resolveNotesConfigMock.mockResolvedValue(config)
-
-    await logStartupConfig()
-
-    expect(logger.info).toHaveBeenCalledWith(
-      { notesConfig: config },
-      "Resolved notes config",
-    )
-  })
-
-  test("logs startup config resolution failures", async () => {
-    resolveNotesConfigMock.mockRejectedValue(new Error("boom"))
-    toLoggableErrorMock.mockReturnValue({ message: "boom", stack: "stack" })
-
-    await logStartupConfig()
-
-    expect(resolveNotesConfigMock).toHaveBeenCalled()
-    expect(toLoggableErrorMock).toHaveBeenCalledWith(expect.any(Error))
-    expect(logger.error).toHaveBeenCalledWith(
-      { error: { message: "boom", stack: "stack" } },
-      "Unable to resolve notes config on startup",
-    )
   })
 })

@@ -5,10 +5,14 @@ Express-based API for aggregate vault statistics.
 ## Endpoints
 
 - `GET /health`
-  - Purpose: basic service health check
+  - Purpose: verifies the vault directory (`NOTES_ROOT`) is readable
   - Success response: `200`
     ```json
     { "status": "ok" }
+    ```
+  - Error response: `503` when config can't be resolved or the vault directory isn't readable
+    ```json
+    { "status": "error", "error": "ENOENT: no such file or directory, access '/data/notes'" }
     ```
 - `GET /stats/meta`
   - Purpose: return top-level vault totals — note count, distinct folder count, word count (counted from note bodies, excluding frontmatter), and attachment count grouped by file extension

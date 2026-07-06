@@ -5,10 +5,14 @@ Express-based image proxy for note image assets backed by imgproxy.
 ## Endpoints
 
 - `GET /health`
-  - Purpose: basic service health check
+  - Purpose: verifies the images root directory (`NOTES_ROOT`) is readable
   - Success response: `200`
     ```json
     { "status": "ok" }
+    ```
+  - Error response: `503` when the images root directory isn't readable
+    ```json
+    { "status": "error", "error": "ENOENT: no such file or directory, access '/data/notes'" }
     ```
 - `GET /images?path=<relative-note-image-path>`
   - Purpose: validate a local note image path (rejecting external URLs and path traversal), then either redirect to an imgproxy-resized version or, when the proxy is disabled, serve the file directly

@@ -7,14 +7,15 @@ import type {
   FlagDefinition,
   FlagRedisClient,
 } from "./handlers/flags/flags.types"
+import type { HealthRedisClient } from "./handlers/health/health"
 
 import { resolveFlagDefinitions } from "./config"
 import { createFlagsHandler } from "./handlers/flags/flags"
-import { healthHandler } from "./handlers/health/health"
+import { createHealthHandler } from "./handlers/health/health"
 import { logger } from "./logger"
 
 export const createApp = (
-  redisClient: FlagRedisClient,
+  redisClient: FlagRedisClient & HealthRedisClient,
   flagDefinitions: Record<string, FlagDefinition>,
 ) => {
   const app = express()
@@ -23,7 +24,7 @@ export const createApp = (
 
   const flagsHandler = createFlagsHandler(redisClient, flagDefinitions)
 
-  app.get("/health", healthHandler)
+  app.get("/health", createHealthHandler(redisClient))
   app.get("/flags/:id/:flag", flagsHandler)
   app.post("/flags/:id/:flag", flagsHandler)
   app.patch("/flags/:id/:flag", flagsHandler)

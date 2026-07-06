@@ -5,10 +5,14 @@ Express-based API for tracking configurable habits scored from note frontmatter.
 ## Endpoints
 
 - `GET /health`
-  - Purpose: basic service health check
+  - Purpose: verifies the vault directory (`NOTES_ROOT`) is readable
   - Success response: `200`
     ```json
     { "status": "ok" }
+    ```
+  - Error response: `503` when config can't be resolved or the vault directory isn't readable
+    ```json
+    { "status": "error", "error": "ENOENT: no such file or directory, access '/data/notes'" }
     ```
 - `GET /habits`
   - Purpose: list every habit configured under `habits` in `app.config.json`, each with its current score, streak, mode, tracking-window entry count, and `targetScore` — intended for rendering a lightweight overview (for example a grid of habit cards) without the per-habit cost of computing full history

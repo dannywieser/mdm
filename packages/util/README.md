@@ -11,7 +11,7 @@ import { addDays, buildDateRange, daysBetween, getDateWindowStart, formatDate, g
 Two additional subpath exports isolate dependencies that don't belong in every consumer's bundle:
 
 - `mdm-util/node` — Node-only file-system helpers (currently `countFilesByExtension`), kept out of the default entry point so it's safe to import `mdm-util` from browser code (`apps/web`).
-- `mdm-util/redis` — `createRedisClient`, a thin wrapper around the `redis` client exposing the `connect`/`get`/`set`/`on` surface shared by `apps/flag-manager` and `apps/image-server`'s caches.
+- `mdm-util/redis` — `createRedisClient`, a thin wrapper around the `redis` client exposing the `connect`/`get`/`set`/`on`/`ping` surface shared by `apps/flag-manager` and `apps/image-server`'s caches. `ping` is used by `flag-manager`'s `/health` endpoint to verify Redis is actually reachable.
 
 ## Structure
 
