@@ -13,6 +13,12 @@ import { notesHandler } from "../notes"
 import { parseMarkdownFile } from "../notes.parse"
 import { scanMarkdownFile } from "../notes.scan"
 
+vi.mock("../notes.cache", () => ({
+  createNotesScanCache: vi.fn(() => ({
+    get: (scan: () => Promise<ScannedNote[]>) => scan(),
+  })),
+}))
+
 vi.mock("../../../logger", () => ({
   logger: {
     debug: vi.fn(),

@@ -7,8 +7,13 @@ import { toLoggableError } from "mdm-util"
 
 import { logger } from "../../logger"
 import { applyViewFilter } from "./filters/notes.filters"
+import { createNotesScanCache } from "./notes.cache"
 import { EMPTY_MARKDOWN_NODE, parseMarkdownFile } from "./notes.parse"
 import { scanMarkdownFile } from "./notes.scan"
+
+const CACHE_TTL_MS = 5 * 60 * 1000
+
+const notesScanCache = createNotesScanCache(CACHE_TTL_MS)
 
 const getQueryView = (request: Request): string | undefined => {
   const view = request.query.view
@@ -32,20 +37,22 @@ export const notesHandler: RequestHandler = async (request, response) => {
   const includeContent = getQueryIncludeContent(request)
 
   try {
-    notesConfig = await resolveNotesConfig()
-    const { notesDirectory } = notesConfig
+    const scannedNotes = await notesScanCache.get(async () => {
+      notesConfig = await resolveNotesConfig()
+      const { notesDirectory } = notesConfig
 
-    const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted(
-      (a, b) => a.localeCompare(b),
-    )
-    logger.debug(
-      { count: markdownFiles.length, notesDirectory },
-      "[notes] collectMarkdownFiles found files",
-    )
+      const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted(
+        (a, b) => a.localeCompare(b),
+      )
+      logger.debug(
+        { count: markdownFiles.length, notesDirectory },
+        "[notes] collectMarkdownFiles found files",
+      )
 
-    const scannedNotes = await Promise.all(
-      markdownFiles.map((filePath) => scanMarkdownFile(filePath)),
-    )
+      return Promise.all(
+        markdownFiles.map((filePath) => scanMarkdownFile(filePath)),
+      )
+    })
 
     logger.debug(
       { total: scannedNotes.length, view: requestedView ?? "none" },
