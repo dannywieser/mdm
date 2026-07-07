@@ -11,6 +11,8 @@ RUN npm run build --workspace web
 
 FROM nginx:1.29.3-alpine3.22
 
+RUN apk update && apk upgrade --no-cache
+
 COPY infra/nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/apps/web/dist /usr/share/nginx/html
 

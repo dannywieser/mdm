@@ -25,6 +25,10 @@ FROM node:24.12.0-alpine3.22 AS runner
 ENV NODE_ENV=production
 ENV PORT=3000
 
+RUN apk update && apk upgrade --no-cache \
+  && rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+    /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
+
 WORKDIR /app
 COPY --from=installer /app .
 
