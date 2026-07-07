@@ -59,6 +59,26 @@ jobs:
         id: sha
         run: echo "value=${GITHUB_SHA:0:7}" >> "$GITHUB_OUTPUT"
 
+      - name: Build image for scanning
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: false
+          load: true
+          tags: mdm-${{ matrix.name }}:scan
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+
+      - name: Scan image for vulnerabilities
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: mdm-${{ matrix.name }}:scan
+          format: table
+          exit-code: "1"
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:

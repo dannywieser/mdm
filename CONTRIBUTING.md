@@ -31,7 +31,7 @@ This repository is a Turborepo monorepo with:
 
 1. Install dependencies: `npm install`
 2. Copy `.env.example` to `.env` at the repository root, and set `NOTES_ROOT` to an absolute path to a local notes vault (any folder of `.md`/`.markdown` files works for testing).
-3. Copy `app.config.example.json` to `app.config.json` at the repository root and set `obsidianVault` (see Configuration below for the full field list).
+3. Copy `app.config.example.json` to `app.config.json` at the repository root and set `obsidianVault` (see Configuration below for the full field list). Set `APP_CONFIG_PATH` in `.env` to this file's absolute path — each app runs from its own workspace directory, so it won't find this file by its own default relative lookup otherwise.
 4. Run an app in dev/watch mode, e.g. `npm run dev --workspace=notes-api` or `npm run dev --workspace=web`, or `turbo run dev` to run every app at once.
 5. Before committing, run `npm run verify` (lint, typecheck, build, and test across all workspaces) and fix anything it reports.
 
@@ -77,6 +77,7 @@ This repository is a Turborepo monorepo with:
 - Every image defines its own `HEALTHCHECK` (`notes-api`, `flag-manager`, `habit-tracker`, `image-server`, and `stats-service` poll their `/health` endpoint; `web` polls a static `/health` route added to the nginx config) so health status works the same whether the container is started via this compose file or run standalone. `web` waits for the 5 backend services to report healthy before starting.
 - Each backend Dockerfile (`infra/docker/*.Dockerfile`) uses a multi-stage build with `turbo prune <app> --docker` so the image only contains that app's own workspace dependency subgraph, not the whole monorepo, and runs as the non-root `node` user.
 - Images are published to `ghcr.io/dannywieser/mdm-<app>` on every push to `main` (see `.github/workflows/docker-publish.yml`), tagged `latest`, `sha-<short-sha>`, and the app's `package.json` version. `docker-compose.yml` references these images directly (`image: ghcr.io/dannywieser/mdm-<app>:${MDM_IMAGE_TAG:-latest}`) alongside the local `build:` config, so `docker compose up --build` still builds from source, while `docker compose pull && docker compose up -d` runs the published images without needing the source checked out at all.
+- Before publishing, each image is scanned with Trivy and the workflow fails (no push) if it finds a HIGH or CRITICAL vulnerability with a known fix.
 
 Start services:
 
