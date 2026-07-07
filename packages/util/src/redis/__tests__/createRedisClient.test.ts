@@ -8,6 +8,7 @@ vi.mock("redis", () => ({
 
 describe("createRedisClient", () => {
   const mockClient = {
+    close: vi.fn(),
     connect: vi.fn(),
     get: vi.fn(),
     on: vi.fn(),
@@ -73,5 +74,13 @@ describe("createRedisClient", () => {
     const client = createRedisClient("redis://localhost:6379")
 
     await expect(client.ping()).rejects.toThrow("connection closed")
+  })
+
+  test("disconnect delegates to the underlying client's close", async () => {
+    const client = createRedisClient("redis://localhost:6379")
+
+    await client.disconnect()
+
+    expect(mockClient.close).toHaveBeenCalled()
   })
 })

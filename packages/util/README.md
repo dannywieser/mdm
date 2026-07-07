@@ -10,8 +10,8 @@ import { addDays, buildDateRange, daysBetween, getDateWindowStart, formatDate, g
 
 Two additional subpath exports isolate dependencies that don't belong in every consumer's bundle:
 
-- `mdm-util/node` — Node-only file-system helpers (currently `countFilesByExtension`), kept out of the default entry point so it's safe to import `mdm-util` from browser code (`apps/web`).
-- `mdm-util/redis` — `createRedisClient`, a thin wrapper around the `redis` client exposing the `connect`/`get`/`set`/`on`/`ping` surface shared by `apps/flag-manager` and `apps/image-server`'s caches. `ping` is used by `flag-manager`'s `/health` endpoint to verify Redis is actually reachable.
+- `mdm-util/node` — Node-only helpers (`countFilesByExtension`, `assertDirectoryReadable`, `startServer`), kept out of the default entry point so it's safe to import `mdm-util` from browser code (`apps/web`). `startServer` wraps `app.listen(...)` with SIGTERM/SIGINT graceful shutdown (drain in-flight requests, run an optional cleanup callback, force-exit after a timeout) shared by all 5 backend services.
+- `mdm-util/redis` — `createRedisClient`, a thin wrapper around the `redis` client exposing the `connect`/`disconnect`/`get`/`set`/`on`/`ping` surface shared by `apps/flag-manager` and `apps/image-server`'s caches. `ping` is used by `flag-manager`'s `/health` endpoint to verify Redis is actually reachable; `disconnect` is called during graceful shutdown.
 
 ## Structure
 
@@ -21,6 +21,7 @@ Two additional subpath exports isolate dependencies that don't belong in every c
 - `promises/` — `mapWithConcurrency`, a bounded-concurrency async map that preserves input order regardless of completion order.
 - `regex/` — `buildCapturingPattern`, builds a full-string regex + token list from a tokenized format string (backs date format parsing).
 - `ids/` — `createFileID`, a deterministic UUIDv5 for a file path within a namespace.
-- `file-system/` — `normalizeFilePathForId` (used by `createFileID`) and `countFilesByExtension` (exposed via the `./node` subpath).
+- `file-system/` — `normalizeFilePathForId` (used by `createFileID`), `countFilesByExtension`, and `assertDirectoryReadable` (the latter two exposed via the `./node` subpath).
 - `logging/` — `toLoggableError`, normalizes thrown values into a loggable shape for pino-backed loggers.
 - `redis/` — `createRedisClient` (exposed via the `./redis` subpath).
+- `server/` — `startServer` (exposed via the `./node` subpath).

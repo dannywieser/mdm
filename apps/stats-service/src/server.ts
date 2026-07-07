@@ -1,6 +1,7 @@
 import { resolveNotesConfig } from "app-config"
 import express from "express"
 import { toLoggableError } from "mdm-util"
+import { startServer } from "mdm-util/node"
 import pinoHttp from "pino-http"
 
 import { healthHandler } from "./handlers/health/health"
@@ -18,20 +19,21 @@ export const createApp = () => {
   return app
 }
 
-const startServer = async (): Promise<void> => {
+const bootstrap = async (): Promise<void> => {
   const notesConfig = await resolveNotesConfig()
   logger.info({ notesConfig }, "Resolved notes config")
 
   const app = createApp()
-  const port = Number(process.env.PORT ?? 3004)
 
-  app.listen(port, () => {
-    logger.info({ port }, "stats-service listening")
+  startServer(app, {
+    logger,
+    port: Number(process.env.PORT ?? 3004),
+    serviceName: "stats-service",
   })
 }
 
 if (require.main === module) {
-  startServer().catch((error: unknown) => {
+  bootstrap().catch((error: unknown) => {
     logger.error(
       { error: toLoggableError(error) },
       "Unable to start stats-service due to configuration error",
