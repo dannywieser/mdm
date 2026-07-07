@@ -1,5 +1,6 @@
 import express from "express"
 import { toLoggableError } from "mdm-util"
+import { startServer } from "mdm-util/node"
 import { createRedisClient } from "mdm-util/redis"
 import pinoHttp from "pino-http"
 
@@ -32,11 +33,12 @@ export const createApp = (
   return app
 }
 
-const startServer = async (): Promise<void> => {
+const bootstrap = async (): Promise<void> => {
   const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379"
-  const port = Number(process.env.PORT ?? 3001)
   const redisClient = createRedisClient(redisUrl)
   const flagDefinitions = await resolveFlagDefinitions()
+
+  logger.info({ flagDefinitions }, "Resolved flag definitions")
 
   redisClient.on("error", (error) => {
     logger.error({ error }, "Redis client error")
@@ -46,13 +48,16 @@ const startServer = async (): Promise<void> => {
 
   const app = createApp(redisClient, flagDefinitions)
 
-  app.listen(port, () => {
-    logger.info({ flagDefinitions, port }, "flag-manager listening")
+  startServer(app, {
+    logger,
+    onShutdown: () => redisClient.disconnect(),
+    port: Number(process.env.PORT ?? 3001),
+    serviceName: "flag-manager",
   })
 }
 
 if (require.main === module) {
-  startServer().catch((error: unknown) => {
+  bootstrap().catch((error: unknown) => {
     logger.error(
       { error: toLoggableError(error) },
       "Unable to start flag-manager due to configuration error",

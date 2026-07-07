@@ -1,4 +1,5 @@
 import express from "express"
+import { startServer } from "mdm-util/node"
 import pinoHttp from "pino-http"
 
 import { habitDetailHandler } from "./handlers/habit-detail/habit-detail"
@@ -20,9 +21,10 @@ export const createApp = () => {
 
 if (require.main === module) {
   const app = createApp()
-  const port = Number(process.env.PORT ?? 3003)
 
-  app.listen(port, () => {
-    logger.info({ port }, "habit-tracker listening")
+  startServer(app, {
+    logger,
+    port: Number(process.env.PORT ?? 3003),
+    serviceName: "habit-tracker",
   })
 }

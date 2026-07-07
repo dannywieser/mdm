@@ -1,5 +1,6 @@
 import express from "express"
 import { toLoggableError } from "mdm-util"
+import { startServer } from "mdm-util/node"
 import { createRedisClient } from "mdm-util/redis"
 import pinoHttp from "pino-http"
 
@@ -29,9 +30,8 @@ export const createApp = (redisClient: ImageRedisClient = noopRedisClient) => {
 }
 
 if (require.main === module) {
-  const start = async (): Promise<void> => {
+  const bootstrap = async (): Promise<void> => {
     const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379"
-    const port = Number(process.env.PORT ?? 3002)
     const redisClient = createRedisClient(redisUrl)
 
     redisClient.on("error", (error) => {
@@ -39,9 +39,12 @@ if (require.main === module) {
     })
 
     let cacheClient: ImageRedisClient = noopRedisClient
+    let redisConnected = false
+
     try {
       await redisClient.connect()
       cacheClient = redisClient
+      redisConnected = true
     } catch (error) {
       logger.error(
         { error: toLoggableError(error) },
@@ -50,15 +53,19 @@ if (require.main === module) {
     }
 
     const app = createApp(cacheClient)
-
     const { imagesRoot } = resolveImageProxyConfig()
 
-    app.listen(port, () => {
-      logger.info({ imagesRoot, port }, "image-server listening")
+    logger.info({ imagesRoot }, "Resolved image-server config")
+
+    startServer(app, {
+      logger,
+      onShutdown: redisConnected ? () => redisClient.disconnect() : undefined,
+      port: Number(process.env.PORT ?? 3002),
+      serviceName: "image-server",
     })
   }
 
-  start().catch((error: unknown) => {
+  bootstrap().catch((error: unknown) => {
     logger.error(
       { error: toLoggableError(error) },
       "Unable to start image-server due to configuration error",
