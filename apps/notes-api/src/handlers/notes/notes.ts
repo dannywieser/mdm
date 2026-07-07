@@ -11,7 +11,7 @@ import { createNotesScanCache } from "./notes.cache"
 import { EMPTY_MARKDOWN_NODE, parseMarkdownFile } from "./notes.parse"
 import { scanMarkdownFile } from "./notes.scan"
 
-const CACHE_TTL_MS = 5 * 60 * 1000
+const CACHE_TTL_MS = 30 * 1000
 
 const notesScanCache = createNotesScanCache(CACHE_TTL_MS)
 
