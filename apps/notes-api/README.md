@@ -18,6 +18,7 @@ Express-based Node service with request logging via `pino-http`.
   - Purpose: recursively load `*.md` and `*.markdown` files from the vault directory (`NOTES_ROOT` env var), extract optional frontmatter metadata, collect all dates found in the title, body, and frontmatter (plus the file's modified date) using configured `dateFormats`, parse markdown into a node tree (resolving Obsidian wikilinks and rewriting local image paths to the image-server), and return note metadata
   - Optional query: `view=<id>` to apply a configured notes view filter by view ID
   - Optional query: `includeContent=false` to skip markdown parsing and return an empty `content` tree — useful for lightweight listing requests that only need frontmatter/metadata
+  - The vault scan (walking the directory and reading each file's frontmatter/dates) is cached in memory for 5 minutes and shared across all requests regardless of `view`/`includeContent`; concurrent requests during a cache miss share a single in-flight scan instead of each triggering their own. View filtering and markdown body parsing still run fresh per request against the cached scan, since both depend on the request's query params.
   - Success response: `200`
     ```json
     {
