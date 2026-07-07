@@ -16,7 +16,7 @@ export function Home() {
   const groupedViews = groupViewsByGroup(data.views)
 
   return (
-    <VStack align="center" gap={6} pt={16} px={{ base: 4, md: "100px" }}>
+    <VStack align="center" gap={6} pt={16} pb={16} px={{ base: 4, md: "100px" }}>
       <Box color="app.iconMuted">
         <NotebookIcon size={80} />
       </Box>
