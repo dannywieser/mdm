@@ -71,13 +71,14 @@ jobs:
           cache-to: type=gha,mode=max,scope=${{ matrix.name }}
 
       - name: Scan image for vulnerabilities
-        uses: aquasecurity/trivy-action@v0.32.0
-        with:
-          image-ref: mdm-${{ matrix.name }}:scan
-          format: table
-          exit-code: "1"
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.72.0 image \
+            --exit-code 1 \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            mdm-${{ matrix.name }}:scan
 
       - name: Build and push
         uses: docker/build-push-action@v6
