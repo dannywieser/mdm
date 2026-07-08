@@ -1,5 +1,6 @@
 import {
   Box,
+  FormatNumber,
   SimpleGrid,
   StatLabel,
   StatRoot,
@@ -40,7 +41,11 @@ export function HomeStats({ staleTime }: Readonly<HomeStatsProps>) {
                 {t("stats.totalNotes")}
               </StatLabel>
               <StatValueText>
-                {data.totalNotes.toLocaleString()}
+                <FormatNumber
+                  value={data.totalNotes}
+                  notation="compact"
+                  compactDisplay="short"
+                />
               </StatValueText>
             </StatRoot>
             <StatRoot size="sm">
@@ -48,7 +53,11 @@ export function HomeStats({ staleTime }: Readonly<HomeStatsProps>) {
                 {t("stats.folders")}
               </StatLabel>
               <StatValueText>
-                {data.totalFolders.toLocaleString()}
+                <FormatNumber
+                  value={data.totalFolders}
+                  notation="compact"
+                  compactDisplay="short"
+                />
               </StatValueText>
             </StatRoot>
             <StatRoot size="sm">
@@ -56,7 +65,11 @@ export function HomeStats({ staleTime }: Readonly<HomeStatsProps>) {
                 {t("stats.totalWords")}
               </StatLabel>
               <StatValueText>
-                {data.totalWords.toLocaleString()}
+                <FormatNumber
+                  value={data.totalWords}
+                  notation="compact"
+                  compactDisplay="short"
+                />
               </StatValueText>
             </StatRoot>
           </SimpleGrid>
@@ -70,7 +83,13 @@ export function HomeStats({ staleTime }: Readonly<HomeStatsProps>) {
                 {attachmentBreakdown.map(({ extension, count }) => (
                   <StatRoot key={extension} size="sm">
                     <StatLabel color="app.textMuted">{extension}</StatLabel>
-                    <StatValueText>{count.toLocaleString()}</StatValueText>
+                    <StatValueText>
+                      <FormatNumber
+                        value={count}
+                        notation="compact"
+                        compactDisplay="short"
+                      />
+                    </StatValueText>
                   </StatRoot>
                 ))}
               </SimpleGrid>

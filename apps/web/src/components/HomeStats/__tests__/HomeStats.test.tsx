@@ -26,7 +26,7 @@ vi.mock("../../../i18n", () => ({
 }))
 
 const defaultData: StatsMetaResponse = {
-  totalAttachments: { pdf: 2, png: 17 },
+  totalAttachments: { pdf: 2, png: 1234 },
   totalFolders: 8,
   totalNotes: 200,
   totalWords: 45213,
@@ -52,14 +52,14 @@ describe("HomeStats", () => {
 
     expect(screen.getByText("200")).toBeTruthy()
     expect(screen.getByText("8")).toBeTruthy()
-    expect(screen.getByText("45,213")).toBeTruthy()
+    expect(screen.getByText("45K")).toBeTruthy()
   })
 
   test("renders attachment breakdown by extension", () => {
     renderComponent()
 
     expect(screen.getByText("png")).toBeTruthy()
-    expect(screen.getByText("17")).toBeTruthy()
+    expect(screen.getByText("1.2K")).toBeTruthy()
     expect(screen.getByText("pdf")).toBeTruthy()
     expect(screen.getByText("2")).toBeTruthy()
   })
