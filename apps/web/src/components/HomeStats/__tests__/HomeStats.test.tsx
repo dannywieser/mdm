@@ -52,7 +52,7 @@ describe("HomeStats", () => {
 
     expect(screen.getByText("200")).toBeTruthy()
     expect(screen.getByText("8")).toBeTruthy()
-    expect(screen.getByText("45,213")).toBeTruthy()
+    expect(screen.getByText("45K")).toBeTruthy()
   })
 
   test("renders attachment breakdown by extension", () => {
