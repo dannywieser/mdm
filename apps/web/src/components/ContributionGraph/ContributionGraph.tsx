@@ -3,6 +3,8 @@ import { Box, HStack, Text, VStack } from "@chakra-ui/react"
 import { useStatsHistory } from "services"
 import { useI18n } from "../../i18n"
 
+import { focusRing } from "../../theme/focusRing"
+
 import type { ContributionDay, ContributionGraphProps } from "./ContributionGraph.types"
 import {
   buildContributionDays,
@@ -70,11 +72,16 @@ export function ContributionGraph({ staleTime }: Readonly<ContributionGraphProps
                   <Box key={day.date} className="group" position="relative">
                     <Box
                       aria-label={`${formatContributionDate(day.date)} — ${buildDetails(day)}`}
+                      as="button"
                       aspectRatio={1}
                       bg={style.bg}
+                      border="none"
                       borderRadius="2px"
+                      cursor="default"
                       opacity={style.opacity}
+                      padding={0}
                       w="full"
+                      {...focusRing}
                     />
                     <Box
                       position="absolute"
@@ -86,6 +93,7 @@ export function ContributionGraph({ staleTime }: Readonly<ContributionGraphProps
                       transform="translateX(-50%)"
                       transition="opacity 0.15s"
                       zIndex={10}
+                      _groupFocusWithin={{ opacity: 1 }}
                       _groupHover={{ opacity: 1 }}
                     >
                       <Box
