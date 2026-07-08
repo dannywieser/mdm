@@ -91,7 +91,7 @@ docker compose up --build
 `.github/workflows/deploy-pages.yml` deploys a fully static demo of `apps/web` to GitHub Pages on pushes to `main`, on a daily schedule (so date-relative views like `$today`/`$onThisDay` and habit streaks stay fresh), and on manual dispatch. The workflow:
 
 1. Runs `npm run demo:data` to generate the demo vault and snapshot the `notes-api`/`habit-tracker` responses into `apps/web/public/demo-data` (see `apps/demo-data/README.md`).
-2. Builds `apps/web` with `VITE_DEMO_MODE=true` and `VITE_BASE_PATH=/<repo-name>/`.
+2. Builds `apps/web` with `VITE_DEMO_MODE=true`, using Vite's default `/` base (the demo is served from a custom domain at the site root; see `apps/web/README.md` for the `VITE_BASE_PATH` override if it's ever hosted from a `<user>.github.io/<repo>/` sub-path instead).
 3. Copies `index.html` to `404.html` as a SPA fallback for client-side routes and publishes the `dist` folder to Pages.
 
 In demo mode the web app reads all data from the static snapshot, and the redis-backed read flags are replaced with per-session browser storage (see `packages/services/README.md`). Enable Pages in the repository settings with "GitHub Actions" as the source.
