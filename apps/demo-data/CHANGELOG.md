@@ -1,5 +1,16 @@
 # demo-data
 
+## 1.1.3
+
+### Patch Changes
+
+- 2abe52c: Add a GitHub-style activity graph to the `/stats` page — one square per day, shaded by how many notes were created and modified that day, sourced from the new `GET /stats/history` endpoint. Adds a `useStatsHistory` hook and `StatsHistoryResponse`/`StatsHistoryEntry` types to `services`.
+- Updated dependencies [2abe52c]
+  - stats-service@1.1.0
+  - mdm-util@2.1.0
+  - habit-tracker@1.3.5
+  - notes-api@2.1.0
+
 ## 1.1.2
 
 ### Patch Changes

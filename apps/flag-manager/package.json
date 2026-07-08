@@ -1,6 +1,6 @@
 {
   "name": "flag-manager",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "private": true,
   "license": "MIT",
   "main": "dist/server.js",
@@ -15,12 +15,12 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "app-config": "2.0.2",
+    "app-config": "2.1.0",
     "express": "5.2.1",
     "mdm-logger": "1.0.0",
-    "mdm-util": "2.0.2",
+    "mdm-util": "2.1.0",
     "pino-http": "11.0.0",
     "redis": "5.10.0",
-    "services": "2.0.2"
+    "services": "2.1.0"
   }
 }
