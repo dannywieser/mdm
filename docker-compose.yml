@@ -141,15 +141,21 @@ services:
 
   # Opt-in: only starts when the "watchtower" profile is active (set
   # COMPOSE_PROFILES=watchtower in .env, or pass --profile watchtower).
-  # Watches the mdm-* app images above (labeled below) and pulls +
-  # recreates them when a new image is published, so `docker compose
-  # pull && docker compose up -d` never needs to run on a schedule.
+  # Watches the 6 mdm-* app services above (each labeled
+  # com.centurylinklabs.watchtower.enable=true) and pulls + recreates
+  # them when a new image is published, so `docker compose pull &&
+  # docker compose up -d` never needs to run on a schedule.
   watchtower:
     profiles:
       - watchtower
     restart: unless-stopped
     image: containrrr/watchtower:1.7.1
     volumes:
+      # Grants watchtower root-equivalent control over the host Docker
+      # daemon (it can create/remove any container, not just the ones
+      # it's scoped to watch) - this is inherent to how Watchtower
+      # works, not something this label scoping can fully mitigate.
+      # Only enable this profile on a host you trust the image for.
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       WATCHTOWER_LABEL_ENABLE: "true"
