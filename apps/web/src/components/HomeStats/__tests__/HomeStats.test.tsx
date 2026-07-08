@@ -4,11 +4,12 @@ import { afterEach, describe, expect, test, vi } from "vitest"
 
 afterEach(cleanup)
 
-import type { StatsMetaResponse } from "services"
+import type { StatsHistoryResponse, StatsMetaResponse } from "services"
 
 import { HomeStats } from "../HomeStats"
 
 const useStatsMetaMock = vi.fn()
+const useStatsHistoryMock = vi.fn()
 
 vi.mock("services", async (importOriginal) => {
   const actual = await importOriginal<typeof import("services")>()
@@ -16,6 +17,7 @@ vi.mock("services", async (importOriginal) => {
   return {
     ...actual,
     useStatsMeta: () => useStatsMetaMock(),
+    useStatsHistory: () => useStatsHistoryMock(),
   }
 })
 
@@ -30,8 +32,13 @@ const defaultData: StatsMetaResponse = {
   totalWords: 45213,
 }
 
-const renderComponent = (data = defaultData) => {
+const defaultHistory: StatsHistoryResponse = [
+  { date: "2026-05-01", entriesCreated: 3, entriesModified: 1, foldersTouched: 2 },
+]
+
+const renderComponent = (data = defaultData, history = defaultHistory) => {
   useStatsMetaMock.mockReturnValue({ data })
+  useStatsHistoryMock.mockReturnValue({ data: history })
   render(
     <ChakraProvider value={defaultSystem}>
       <HomeStats />

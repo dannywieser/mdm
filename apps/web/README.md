@@ -7,7 +7,7 @@ React + TypeScript client using Chakra UI, TanStack Query, and React Router.
 - `/` — home dashboard (view group overview, stats summary, notes review card)
 - `/notes/:view` — resolves the view config by ID and renders the configured component (for example `NotesList` or `NotesReview`)
 - `/tracking/:habitId` — habit detail page (score history, streaks, breakdown) for one configured habit
-- `/stats` — aggregate vault statistics from `stats-service`
+- `/stats` — aggregate vault statistics from `stats-service`, plus a per-year activity graph (one square per day, shaded by notes created/modified that day, sourced from `GET /stats/history`); years stack vertically, most recent first, with a hover card showing each day's created/modified/folders-touched counts
 - `/source/:noteId` — raw markdown source view for a note (used in demo mode in place of the Obsidian deep link)
 - `/colors` — lets the user pick and preview one of the app's color palettes (see Configuration below)
 

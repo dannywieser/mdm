@@ -12,6 +12,9 @@ export const buildDemoViewsUrl = (): string => `${getDemoDataBasePath()}/views.j
 export const buildDemoStatsMetaUrl = (): string =>
   `${getDemoDataBasePath()}/stats.meta.json`
 
+export const buildDemoStatsHistoryUrl = (): string =>
+  `${getDemoDataBasePath()}/stats.history.json`
+
 export const buildDemoHabitsUrl = (): string => `${getDemoDataBasePath()}/habits.json`
 
 export const buildDemoHabitUrl = (habitId: string): string =>

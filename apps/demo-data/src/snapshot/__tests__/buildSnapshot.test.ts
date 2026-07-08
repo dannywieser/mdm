@@ -21,6 +21,7 @@ const RESPONSES: Record<string, unknown> = {
     notes: [{ fullPath: "/vault/library/books/dune.md", id: "note-1" }],
   },
   "https://stats/stats/meta": { totalNotes: 1, totalWords: 10 },
+  "https://stats/stats/history": [{ date: "2026-05-01", entriesCreated: 1, entriesModified: 0, foldersTouched: 1 }],
   "https://habits/habits": [{ habitId: "exercise" }],
   "https://habits/habits/exercise": { habitId: "exercise", history: [] },
 }
@@ -61,6 +62,7 @@ describe("buildSnapshot", () => {
       "/out/notes.books.json",
       "/out/notes.books.slim.json",
       "/out/stats.meta.json",
+      "/out/stats.history.json",
       "/out/habits.json",
       "/out/habit.exercise.json",
       "/out/source/note-1.md",

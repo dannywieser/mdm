@@ -1,0 +1,137 @@
+import { Box, HStack, Text, VStack } from "@chakra-ui/react"
+
+import { useStatsHistory } from "services"
+import { useI18n } from "../../i18n"
+
+import type { ContributionDay, ContributionGraphProps } from "./ContributionGraph.types"
+import {
+  buildContributionDays,
+  buildContributionYears,
+  formatContributionDate,
+} from "./ContributionGraph.util"
+
+const CELL_SIZE_PX = 11
+const CELL_GAP_PX = 3
+
+const LEVEL_STYLES = [
+  { bg: "app.border", opacity: 0.6 },
+  { bg: "app.successBackground", opacity: 0.35 },
+  { bg: "app.successBackground", opacity: 0.55 },
+  { bg: "app.successBackground", opacity: 0.8 },
+  { bg: "app.successBackground", opacity: 1 },
+] as const
+
+export function ContributionGraph({ staleTime }: Readonly<ContributionGraphProps>) {
+  const { t } = useI18n()
+  const { data } = useStatsHistory({ staleTime })
+  const days = buildContributionDays(data)
+
+  if (days.length === 0) {
+    return null
+  }
+
+  const years = buildContributionYears(days)
+
+  const buildDetails = (day: ContributionDay) =>
+    t("stats.activityDetails", {
+      created: day.entriesCreated,
+      folders: day.foldersTouched,
+      modified: day.entriesModified,
+    })
+
+  return (
+    <Box
+      borderColor="app.border"
+      borderRadius="lg"
+      borderWidth="1px"
+      backgroundColor="app.panelBackground"
+      p={4}
+      w="full"
+      maxW="2xl"
+    >
+      <VStack align="stretch" gap={4}>
+        <Text fontSize="xs" color="app.textMuted">
+          {t("stats.activityGraph")}
+        </Text>
+
+        {years.map(({ days: yearDays, year }) => (
+          <VStack key={year} align="stretch" gap={2}>
+            <Text fontSize="xs" color="app.textMuted" fontWeight="medium">
+              {year}
+            </Text>
+            <Box
+              display="grid"
+              gap={`${CELL_GAP_PX}px`}
+              gridTemplateColumns={`repeat(auto-fill, minmax(${CELL_SIZE_PX}px, 1fr))`}
+            >
+              {yearDays.map((day) => {
+                const style = LEVEL_STYLES[day.level]
+                return (
+                  <Box key={day.date} className="group" position="relative">
+                    <Box
+                      aria-label={`${formatContributionDate(day.date)} — ${buildDetails(day)}`}
+                      aspectRatio={1}
+                      bg={style.bg}
+                      borderRadius="2px"
+                      opacity={style.opacity}
+                      w="full"
+                    />
+                    <Box
+                      position="absolute"
+                      bottom="100%"
+                      left="50%"
+                      mb={2}
+                      opacity={0}
+                      pointerEvents="none"
+                      transform="translateX(-50%)"
+                      transition="opacity 0.15s"
+                      zIndex={10}
+                      _groupHover={{ opacity: 1 }}
+                    >
+                      <Box
+                        bg="app.panelBackground"
+                        borderColor="app.border"
+                        borderRadius="md"
+                        borderWidth="1px"
+                        boxShadow="md"
+                        px={2}
+                        py={1}
+                        whiteSpace="nowrap"
+                      >
+                        <Text fontSize="xs" fontWeight="medium">
+                          {formatContributionDate(day.date)}
+                        </Text>
+                        <Text fontSize="xs" color="app.textMuted">
+                          {buildDetails(day)}
+                        </Text>
+                      </Box>
+                    </Box>
+                  </Box>
+                )
+              })}
+            </Box>
+          </VStack>
+        ))}
+
+        <HStack gap={1} justify="flex-end">
+          <Text fontSize="xs" color="app.textMuted">
+            {t("stats.activityLess")}
+          </Text>
+          {LEVEL_STYLES.map((style, level) => (
+            <Box
+              key={level}
+              bg={style.bg}
+              opacity={style.opacity}
+              borderRadius="2px"
+              h={`${CELL_SIZE_PX}px`}
+              w={`${CELL_SIZE_PX}px`}
+            />
+          ))}
+          <Text fontSize="xs" color="app.textMuted">
+            {t("stats.activityMore")}
+          </Text>
+        </HStack>
+      </VStack>
+    </Box>
+  )
+}

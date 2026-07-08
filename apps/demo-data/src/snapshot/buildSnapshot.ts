@@ -104,6 +104,9 @@ export const buildSnapshot = async ({
   const statsMeta = await fetchJson<unknown>(`${statsBaseUrl}/stats/meta`)
   await writeJson(outputDirectory, "stats.meta.json", statsMeta)
 
+  const statsHistory = await fetchJson<unknown>(`${statsBaseUrl}/stats/history`)
+  await writeJson(outputDirectory, "stats.history.json", statsHistory)
+
   const habits = await fetchJson<SnapshotHabitSummary[]>(`${habitsBaseUrl}/habits`)
   await writeJson(outputDirectory, "habits.json", habits)
 

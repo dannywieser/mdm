@@ -1,8 +1,7 @@
-export interface StatsMetaResponse {
-  totalAttachments: Record<string, number>
-  totalFolders: number
-  totalNotes: number
-  totalWords: number
+export interface HistoryNoteDates {
+  createdDate: string | null
+  folder: string
+  modifiedDate: string
 }
 
 export interface StatsHistoryEntry {

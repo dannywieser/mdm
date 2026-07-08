@@ -5,6 +5,7 @@ import { startServer } from "mdm-util/node"
 import pinoHttp from "pino-http"
 
 import { healthHandler } from "./handlers/health/health"
+import { historyHandler } from "./handlers/history/history"
 import { metaHandler } from "./handlers/meta/meta"
 import { logger } from "./logger"
 
@@ -15,6 +16,7 @@ export const createApp = () => {
 
   app.get("/health", healthHandler)
   app.get("/stats/meta", metaHandler)
+  app.get("/stats/history", historyHandler)
 
   return app
 }
