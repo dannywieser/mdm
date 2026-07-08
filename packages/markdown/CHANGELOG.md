@@ -1,5 +1,12 @@
 # markdown
 
+## 2.1.0
+
+### Patch Changes
+
+- Updated dependencies [2abe52c]
+  - mdm-util@2.1.0
+
 ## 2.0.2
 
 ### Patch Changes

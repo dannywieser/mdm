@@ -1,5 +1,16 @@
 # services
 
+## 2.1.0
+
+### Minor Changes
+
+- 2abe52c: Add a GitHub-style activity graph to the `/stats` page — one square per day, shaded by how many notes were created and modified that day, sourced from the new `GET /stats/history` endpoint. Adds a `useStatsHistory` hook and `StatsHistoryResponse`/`StatsHistoryEntry` types to `services`.
+
+### Patch Changes
+
+- app-config@2.1.0
+- markdown@2.1.0
+
 ## 2.0.2
 
 ### Patch Changes

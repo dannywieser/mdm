@@ -1,5 +1,18 @@
 # stats-service
 
+## 1.1.0
+
+### Minor Changes
+
+- 2abe52c: Add `GET /stats/history` to stats-service, returning a per-date breakdown of notes created, notes modified, and distinct folders touched across the vault. Adds a `toISODateString` timezone-aware date formatter to `mdm-util`.
+
+### Patch Changes
+
+- Updated dependencies [2abe52c]
+  - mdm-util@2.1.0
+  - app-config@2.1.0
+  - markdown@2.1.0
+
 ## 1.0.2
 
 ### Patch Changes
