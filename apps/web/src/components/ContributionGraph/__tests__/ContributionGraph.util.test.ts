@@ -68,8 +68,75 @@ describe("buildContributionDays", () => {
         foldersTouched: 0,
         totalActivity: 0,
         level: 0,
+        isOutlier: false,
+        outlierLevel: 0,
       },
     ])
+  })
+
+  test("flags a day whose activity is a clear outlier and scales colors off the typical range instead", () => {
+    const history: StatsHistoryResponse = [
+      { date: "2026-05-01", entriesCreated: 0, entriesModified: 5, foldersTouched: 1 },
+      { date: "2026-05-02", entriesCreated: 0, entriesModified: 10, foldersTouched: 1 },
+      { date: "2026-05-03", entriesCreated: 0, entriesModified: 15, foldersTouched: 1 },
+      { date: "2026-05-04", entriesCreated: 0, entriesModified: 20, foldersTouched: 1 },
+      { date: "2026-05-05", entriesCreated: 0, entriesModified: 25, foldersTouched: 1 },
+      { date: "2026-05-06", entriesCreated: 0, entriesModified: 900, foldersTouched: 1 },
+    ]
+
+    const days = buildContributionDays(history)
+
+    expect(days.map((day) => day.isOutlier)).toEqual([false, false, false, false, false, true])
+    expect(days.map((day) => day.level)).toEqual([1, 2, 3, 4, 4, 4])
+    expect(days.map((day) => day.outlierLevel)).toEqual([0, 0, 0, 0, 0, 4])
+  })
+
+  test("gives outliers their own gradient so a mild outlier reads lighter than an extreme one", () => {
+    const history: StatsHistoryResponse = [
+      ...Array.from({ length: 10 }, (_, index) => ({
+        date: `2026-04-${String(index + 1).padStart(2, "0")}`,
+        entriesCreated: 1,
+        entriesModified: 0,
+        foldersTouched: 1,
+      })),
+      { date: "2026-04-11", entriesCreated: 50, entriesModified: 0, foldersTouched: 1 },
+      { date: "2026-04-12", entriesCreated: 900, entriesModified: 0, foldersTouched: 1 },
+    ]
+
+    const days = buildContributionDays(history)
+    const mildOutlier = days.find((day) => day.totalActivity === 50)
+    const extremeOutlier = days.find((day) => day.totalActivity === 900)
+
+    expect(mildOutlier).toMatchObject({ isOutlier: true, outlierLevel: 1 })
+    expect(extremeOutlier).toMatchObject({ isOutlier: true, outlierLevel: 4 })
+  })
+
+  test("does not flag a ramp-up day as an outlier just because the historical baseline is low", () => {
+    const history: StatsHistoryResponse = Array.from({ length: 10 }, (_, index) => ({
+      date: `2026-04-${String(index + 1).padStart(2, "0")}`,
+      entriesCreated: 1,
+      entriesModified: 0,
+      foldersTouched: 1,
+    }))
+    history.push({ date: "2026-04-11", entriesCreated: 12, entriesModified: 0, foldersTouched: 1 })
+
+    const days = buildContributionDays(history)
+
+    expect(days.map((day) => day.isOutlier)).toEqual(Array(11).fill(false))
+  })
+
+  test("does not flag a day that's only modestly busier than the rest as an outlier", () => {
+    const history: StatsHistoryResponse = [
+      { date: "2026-05-01", entriesCreated: 4, entriesModified: 0, foldersTouched: 1 },
+      { date: "2026-05-02", entriesCreated: 5, entriesModified: 0, foldersTouched: 1 },
+      { date: "2026-05-03", entriesCreated: 6, entriesModified: 0, foldersTouched: 1 },
+      { date: "2026-05-04", entriesCreated: 7, entriesModified: 0, foldersTouched: 1 },
+      { date: "2026-05-05", entriesCreated: 20, entriesModified: 0, foldersTouched: 1 },
+    ]
+
+    const days = buildContributionDays(history)
+
+    expect(days.map((day) => day.isOutlier)).toEqual([false, false, false, false, false])
   })
 })
 

@@ -9,7 +9,7 @@ import {
   VStack,
 } from "@chakra-ui/react"
 
-import { useStatsMeta } from "services"
+import { useStatsHistory, useStatsMeta } from "services"
 import { useI18n } from "../../i18n"
 
 import { ContributionGraph } from "../ContributionGraph"
@@ -21,6 +21,7 @@ import { buildAttachmentBreakdown } from "./HomeStats.util"
 export function HomeStats({ staleTime }: Readonly<HomeStatsProps>) {
   const { t } = useI18n()
   const { data } = useStatsMeta({ staleTime })
+  const { data: history } = useStatsHistory({ staleTime })
   const attachmentBreakdown = buildAttachmentBreakdown(data.totalAttachments)
 
   return (
@@ -98,7 +99,7 @@ export function HomeStats({ staleTime }: Readonly<HomeStatsProps>) {
         </VStack>
       </Box>
 
-      <ContributionGraph staleTime={staleTime} />
+      <ContributionGraph history={history} />
     </VStack>
   )
 }

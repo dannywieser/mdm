@@ -1,5 +1,7 @@
+import type { StatsHistoryResponse } from "services"
+
 export interface ContributionGraphProps {
-  staleTime?: number
+  history: StatsHistoryResponse
 }
 
 export interface ContributionDay {
@@ -9,6 +11,8 @@ export interface ContributionDay {
   foldersTouched: number
   totalActivity: number
   level: number
+  isOutlier: boolean
+  outlierLevel: number
 }
 
 export interface ContributionYear {
