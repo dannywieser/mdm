@@ -11,8 +11,9 @@ import {
   formatContributionDate,
 } from "./ContributionGraph.util"
 
-const CELL_SIZE_PX = 11
-const CELL_GAP_PX = 3
+const CELL_SIZE_PX = 9
+const CELL_COLUMN_GAP_PX = 3
+const CELL_ROW_GAP_PX = 1
 
 const LEVEL_STYLES = [
   { bg: "app.border", opacity: 0.6 },
@@ -71,7 +72,8 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
             </Text>
             <Box
               display="grid"
-              gap={`${CELL_GAP_PX}px`}
+              rowGap={`${CELL_ROW_GAP_PX}px`}
+              columnGap={`${CELL_COLUMN_GAP_PX}px`}
               gridTemplateColumns={`repeat(auto-fill, minmax(${CELL_SIZE_PX}px, 1fr))`}
             >
               {yearDays.map((day) => {
@@ -79,7 +81,7 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                   ? OUTLIER_LEVEL_STYLES[day.outlierLevel - 1]
                   : LEVEL_STYLES[day.level]
                 return (
-                  <Box key={day.date} className="group" position="relative">
+                  <Box key={day.date} className="group" position="relative" lineHeight={0}>
                     <Box
                       aria-label={`${formatContributionDate(day.date)} — ${buildDetails(day)}`}
                       as="button"

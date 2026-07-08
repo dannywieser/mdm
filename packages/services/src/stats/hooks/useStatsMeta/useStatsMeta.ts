@@ -7,7 +7,7 @@ import { getStatsBaseUrl } from "../../../config"
 import { isDemoMode } from "../../../demo/demoMode"
 import { buildDemoStatsMetaUrl } from "../../../demo/demoUrls"
 
-const fetchStats = async (): Promise<StatsMetaResponse> => {
+export const fetchStatsMeta = async (): Promise<StatsMetaResponse> => {
   const url = isDemoMode() ? buildDemoStatsMetaUrl() : `${getStatsBaseUrl()}/meta`
   const response = await fetch(url)
 
@@ -21,6 +21,6 @@ const fetchStats = async (): Promise<StatsMetaResponse> => {
 export const useStatsMeta = ({ staleTime }: UseStatsMetaParams = {}) =>
   useSuspenseQuery({
     queryKey: ["stats"],
-    queryFn: fetchStats,
+    queryFn: fetchStatsMeta,
     staleTime,
   })
