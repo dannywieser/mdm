@@ -12,8 +12,7 @@ import {
 } from "./ContributionGraph.util"
 
 const CELL_SIZE_PX = 9
-const CELL_COLUMN_GAP_PX = 3
-const CELL_ROW_GAP_PX = 1
+const CELL_GAP_PX = 1
 
 const LEVEL_STYLES = [
   { bg: "app.border", opacity: 0.6 },
@@ -72,8 +71,7 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
             </Text>
             <Box
               display="grid"
-              rowGap={`${CELL_ROW_GAP_PX}px`}
-              columnGap={`${CELL_COLUMN_GAP_PX}px`}
+              gap={`${CELL_GAP_PX}px`}
               gridTemplateColumns={`repeat(auto-fill, minmax(${CELL_SIZE_PX}px, 1fr))`}
             >
               {yearDays.map((day) => {
