@@ -34,6 +34,24 @@ Express-based API for aggregate vault statistics.
     ```bash
     curl http://localhost/stats/meta
     ```
+- `GET /stats/history`
+  - Purpose: return one entry per calendar date (in the configured `timezone`) on which any note was created or modified, with the number of notes created, notes modified, and distinct folders touched that date. A note's "created" date is the oldest date resolvable from its title, body, frontmatter, or file modified time (same resolution `notes-api` uses); its "modified" date is the file's modified time. Entries are sorted ascending by date.
+  - The response is cached in memory for 5 minutes with the same shared in-flight scan behavior as `/stats/meta`.
+  - Success response: `200`
+    ```json
+    [
+      { "date": "2026-05-01", "entriesCreated": 3, "entriesModified": 1, "foldersTouched": 2 },
+      { "date": "2026-05-02", "entriesCreated": 0, "entriesModified": 2, "foldersTouched": 1 }
+    ]
+    ```
+  - Error response: `500`
+    ```json
+    { "error": "Unable to load stats history" }
+    ```
+  - Sample curl command:
+    ```bash
+    curl http://localhost/stats/history
+    ```
 
 ## Configuration
 

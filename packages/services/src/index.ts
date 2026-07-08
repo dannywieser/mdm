@@ -15,6 +15,8 @@ export * from "./notes/hooks/useViewsQuery/useViewsQuery.types"
 export * from "./stats/stats.types"
 export * from "./stats/hooks/useStatsMeta/useStatsMeta"
 export * from "./stats/hooks/useStatsMeta/useStatsMeta.types"
+export * from "./stats/hooks/useStatsHistory/useStatsHistory"
+export * from "./stats/hooks/useStatsHistory/useStatsHistory.types"
 
 export * from "./habits/habits.types"
 export * from "./habits/hooks/useHabitsQuery/useHabitsQuery"

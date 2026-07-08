@@ -11,6 +11,8 @@ import {
 import { useStatsMeta } from "services"
 import { useI18n } from "../../i18n"
 
+import { ContributionGraph } from "../ContributionGraph"
+
 import type { HomeStatsProps } from "./HomeStats.types"
 
 import { buildAttachmentBreakdown } from "./HomeStats.util"
@@ -76,6 +78,8 @@ export function HomeStats({ staleTime }: Readonly<HomeStatsProps>) {
           )}
         </VStack>
       </Box>
+
+      <ContributionGraph staleTime={staleTime} />
     </VStack>
   )
 }

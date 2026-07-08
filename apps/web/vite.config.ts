@@ -28,6 +28,9 @@ export default defineConfig({
       "/images": {
         target: "http://localhost:3002",
       },
+      "/stats/": {
+        target: "http://localhost:3004",
+      },
       "/imgproxy": {
         target: "http://localhost:8080",
         rewrite: (path) => path.replace(/^\/imgproxy/, ""),
