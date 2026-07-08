@@ -2,6 +2,8 @@ services:
   web:
     restart: unless-stopped
     image: ghcr.io/dannywieser/mdm-web:${MDM_IMAGE_TAG:-latest}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     build:
       context: .
       dockerfile: infra/docker/web.Dockerfile
@@ -22,6 +24,8 @@ services:
   notes-api:
     restart: unless-stopped
     image: ghcr.io/dannywieser/mdm-notes-api:${MDM_IMAGE_TAG:-latest}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     build:
       context: .
       dockerfile: infra/docker/notes-api.Dockerfile
@@ -38,6 +42,8 @@ services:
   flag-manager:
     restart: unless-stopped
     image: ghcr.io/dannywieser/mdm-flag-manager:${MDM_IMAGE_TAG:-latest}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     build:
       context: .
       dockerfile: infra/docker/flag-manager.Dockerfile
@@ -55,6 +61,8 @@ services:
   habit-tracker:
     restart: unless-stopped
     image: ghcr.io/dannywieser/mdm-habit-tracker:${MDM_IMAGE_TAG:-latest}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     build:
       context: .
       dockerfile: infra/docker/habit-tracker.Dockerfile
@@ -71,6 +79,8 @@ services:
   stats-service:
     restart: unless-stopped
     image: ghcr.io/dannywieser/mdm-stats-service:${MDM_IMAGE_TAG:-latest}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     build:
       context: .
       dockerfile: infra/docker/stats-service.Dockerfile
@@ -87,6 +97,8 @@ services:
   image-server:
     restart: unless-stopped
     image: ghcr.io/dannywieser/mdm-image-server:${MDM_IMAGE_TAG:-latest}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     build:
       context: .
       dockerfile: infra/docker/image-server.Dockerfile
@@ -126,3 +138,20 @@ services:
     image: redis:8.2.1-alpine3.22
     ports:
       - "127.0.0.1:6379:6379"
+
+  # Opt-in: only starts when the "watchtower" profile is active (set
+  # COMPOSE_PROFILES=watchtower in .env, or pass --profile watchtower).
+  # Watches the mdm-* app images above (labeled below) and pulls +
+  # recreates them when a new image is published, so `docker compose
+  # pull && docker compose up -d` never needs to run on a schedule.
+  watchtower:
+    profiles:
+      - watchtower
+    restart: unless-stopped
+    image: containrrr/watchtower:1.7.1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      WATCHTOWER_LABEL_ENABLE: "true"
+      WATCHTOWER_POLL_INTERVAL: "3600"
+      WATCHTOWER_CLEANUP: "true"
