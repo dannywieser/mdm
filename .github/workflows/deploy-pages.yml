@@ -38,9 +38,7 @@ jobs:
         run: npm run demo:data
 
       - name: Build web app in demo mode
-        run: |
-          export VITE_BASE_PATH="/${GITHUB_REPOSITORY#*/}/"
-          npx turbo run build --filter=web
+        run: npx turbo run build --filter=web
         env:
           VITE_DEMO_MODE: "true"
 
