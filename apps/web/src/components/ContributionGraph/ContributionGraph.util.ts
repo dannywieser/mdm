@@ -34,7 +34,7 @@ const computeOutlierThreshold = (totals: number[]): number => {
   if (activeTotals.length === 0) return Infinity
 
   const median = computeMedian(activeTotals)
-  return median === 0 ? Infinity : Math.max(median * OUTLIER_MEDIAN_MULTIPLIER, OUTLIER_MIN_THRESHOLD)
+  return Math.max(median * OUTLIER_MEDIAN_MULTIPLIER, OUTLIER_MIN_THRESHOLD)
 }
 
 /**
