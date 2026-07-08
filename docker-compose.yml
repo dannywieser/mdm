@@ -4,6 +4,7 @@ services:
     image: ghcr.io/dannywieser/mdm-web:${MDM_IMAGE_TAG:-latest}
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.scope=mdm"
     build:
       context: .
       dockerfile: infra/docker/web.Dockerfile
@@ -26,6 +27,7 @@ services:
     image: ghcr.io/dannywieser/mdm-notes-api:${MDM_IMAGE_TAG:-latest}
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.scope=mdm"
     build:
       context: .
       dockerfile: infra/docker/notes-api.Dockerfile
@@ -44,6 +46,7 @@ services:
     image: ghcr.io/dannywieser/mdm-flag-manager:${MDM_IMAGE_TAG:-latest}
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.scope=mdm"
     build:
       context: .
       dockerfile: infra/docker/flag-manager.Dockerfile
@@ -63,6 +66,7 @@ services:
     image: ghcr.io/dannywieser/mdm-habit-tracker:${MDM_IMAGE_TAG:-latest}
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.scope=mdm"
     build:
       context: .
       dockerfile: infra/docker/habit-tracker.Dockerfile
@@ -81,6 +85,7 @@ services:
     image: ghcr.io/dannywieser/mdm-stats-service:${MDM_IMAGE_TAG:-latest}
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.scope=mdm"
     build:
       context: .
       dockerfile: infra/docker/stats-service.Dockerfile
@@ -99,6 +104,7 @@ services:
     image: ghcr.io/dannywieser/mdm-image-server:${MDM_IMAGE_TAG:-latest}
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.scope=mdm"
     build:
       context: .
       dockerfile: infra/docker/image-server.Dockerfile
@@ -142,14 +148,17 @@ services:
   # Opt-in: only starts when the "watchtower" profile is active (set
   # COMPOSE_PROFILES=watchtower in .env, or pass --profile watchtower).
   # Watches the 6 mdm-* app services above (each labeled
-  # com.centurylinklabs.watchtower.enable=true) and pulls + recreates
-  # them when a new image is published, so `docker compose pull &&
-  # docker compose up -d` never needs to run on a schedule.
+  # com.centurylinklabs.watchtower.enable=true and .scope=mdm) and pulls
+  # + recreates them when a new image is published, so `docker compose
+  # pull && docker compose up -d` never needs to run on a schedule.
   watchtower:
     profiles:
       - watchtower
     restart: unless-stopped
-    image: containrrr/watchtower:1.7.1
+    # Pinned by digest (in addition to the human-readable tag) so the
+    # container this host's Docker daemon actually pulls can't silently
+    # change out from under a service with root-equivalent socket access.
+    image: containrrr/watchtower:1.7.1@sha256:6dd50763bbd632a83cb154d5451700530d1e44200b268a4e9488fefdfcf2b038
     volumes:
       # Grants watchtower root-equivalent control over the host Docker
       # daemon (it can create/remove any container, not just the ones
@@ -159,5 +168,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       WATCHTOWER_LABEL_ENABLE: "true"
+      # Restricts this instance to only the containers labeled
+      # com.centurylinklabs.watchtower.scope=mdm (the 6 services above),
+      # so another unrelated container on the same host that happens to
+      # carry the enable label alone won't get swept up by this instance.
+      WATCHTOWER_SCOPE: "mdm"
       WATCHTOWER_POLL_INTERVAL: "3600"
       WATCHTOWER_CLEANUP: "true"
