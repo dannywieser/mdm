@@ -7,7 +7,7 @@ import { getStatsBaseUrl } from "../../../config"
 import { isDemoMode } from "../../../demo/demoMode"
 import { buildDemoStatsHistoryUrl } from "../../../demo/demoUrls"
 
-const fetchStatsHistory = async (): Promise<StatsHistoryResponse> => {
+export const fetchStatsHistory = async (): Promise<StatsHistoryResponse> => {
   const url = isDemoMode() ? buildDemoStatsHistoryUrl() : `${getStatsBaseUrl()}/history`
   const response = await fetch(url)
 

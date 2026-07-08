@@ -8,17 +8,6 @@ import type { StatsHistoryResponse } from "services"
 
 import { ContributionGraph } from "../ContributionGraph"
 
-const useStatsHistoryMock = vi.fn()
-
-vi.mock("services", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("services")>()
-
-  return {
-    ...actual,
-    useStatsHistory: () => useStatsHistoryMock(),
-  }
-})
-
 vi.mock("../../../i18n", () => ({
   useI18n: () => ({
     t: (key: string, values?: Record<string, string | number>) =>
@@ -31,11 +20,10 @@ const defaultData: StatsHistoryResponse = [
   { date: "2026-05-02", entriesCreated: 0, entriesModified: 2, foldersTouched: 1 },
 ]
 
-const renderComponent = (data: StatsHistoryResponse = defaultData) => {
-  useStatsHistoryMock.mockReturnValue({ data })
+const renderComponent = (history: StatsHistoryResponse = defaultData) => {
   render(
     <ChakraProvider value={defaultSystem}>
-      <ContributionGraph />
+      <ContributionGraph history={history} />
     </ChakraProvider>,
   )
 }
@@ -71,13 +59,61 @@ describe("ContributionGraph", () => {
   })
 
   test("renders nothing when there is no history", () => {
-    useStatsHistoryMock.mockReturnValue({ data: [] })
     const { container } = render(
       <ChakraProvider value={defaultSystem}>
-        <ContributionGraph />
+        <ContributionGraph history={[]} />
       </ChakraProvider>,
     )
 
     expect(container.firstChild).toBeNull()
+  })
+
+  test("flags an outlier day's tooltip and shows the outlier legend", () => {
+    const history: StatsHistoryResponse = [
+      { date: "2026-05-01", entriesCreated: 0, entriesModified: 5, foldersTouched: 1 },
+      { date: "2026-05-02", entriesCreated: 0, entriesModified: 10, foldersTouched: 1 },
+      { date: "2026-05-03", entriesCreated: 0, entriesModified: 15, foldersTouched: 1 },
+      { date: "2026-05-04", entriesCreated: 0, entriesModified: 20, foldersTouched: 1 },
+      { date: "2026-05-05", entriesCreated: 0, entriesModified: 25, foldersTouched: 1 },
+      { date: "2026-05-06", entriesCreated: 0, entriesModified: 900, foldersTouched: 1 },
+    ]
+    renderComponent(history)
+
+    expect(screen.getByText("stats.activityOutlier")).toBeTruthy()
+    expect(document.querySelector(
+      '[aria-label*="May 6, 2026"][aria-label*="stats.activityOutlier"]',
+    )).toBeTruthy()
+    expect(document.querySelector(
+      '[aria-label*="May 1, 2026"][aria-label*="stats.activityOutlier"]',
+    )).toBeNull()
+  })
+
+  test("does not show the outlier legend when every day is within a typical range", () => {
+    renderComponent()
+
+    expect(screen.queryByText("stats.activityOutlier")).toBeNull()
+  })
+
+  test("shades a mild outlier lighter than an extreme one instead of using one flat outlier color", () => {
+    const history: StatsHistoryResponse = [
+      ...Array.from({ length: 10 }, (_, index) => ({
+        date: `2026-04-${String(index + 1).padStart(2, "0")}`,
+        entriesCreated: 1,
+        entriesModified: 0,
+        foldersTouched: 1,
+      })),
+      { date: "2026-04-11", entriesCreated: 50, entriesModified: 0, foldersTouched: 1 },
+      { date: "2026-04-12", entriesCreated: 900, entriesModified: 0, foldersTouched: 1 },
+    ]
+    renderComponent(history)
+
+    const mildOutlier = document.querySelector<HTMLElement>('[aria-label*="Apr 11, 2026"]')!
+    const extremeOutlier = document.querySelector<HTMLElement>('[aria-label*="Apr 12, 2026"]')!
+
+    const mildOpacity = Number(getComputedStyle(mildOutlier).opacity)
+    const extremeOpacity = Number(getComputedStyle(extremeOutlier).opacity)
+
+    expect(mildOpacity).toBeLessThan(extremeOpacity)
+    expect(extremeOpacity).toBe(1)
   })
 })

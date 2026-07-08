@@ -1,6 +1,5 @@
 import { Box, HStack, Text, VStack } from "@chakra-ui/react"
 
-import { useStatsHistory } from "services"
 import { useI18n } from "../../i18n"
 
 import { focusRing } from "../../theme/focusRing"
@@ -12,8 +11,8 @@ import {
   formatContributionDate,
 } from "./ContributionGraph.util"
 
-const CELL_SIZE_PX = 11
-const CELL_GAP_PX = 3
+const CELL_SIZE_PX = 9
+const CELL_GAP_PX = 1
 
 const LEVEL_STYLES = [
   { bg: "app.border", opacity: 0.6 },
@@ -23,23 +22,32 @@ const LEVEL_STYLES = [
   { bg: "app.successBackground", opacity: 1 },
 ] as const
 
-export function ContributionGraph({ staleTime }: Readonly<ContributionGraphProps>) {
+const OUTLIER_LEVEL_STYLES = [
+  { bg: "orange.400", opacity: 0.4 },
+  { bg: "orange.400", opacity: 0.6 },
+  { bg: "orange.400", opacity: 0.8 },
+  { bg: "orange.400", opacity: 1 },
+] as const
+
+export function ContributionGraph({ history }: Readonly<ContributionGraphProps>) {
   const { t } = useI18n()
-  const { data } = useStatsHistory({ staleTime })
-  const days = buildContributionDays(data)
+  const days = buildContributionDays(history)
 
   if (days.length === 0) {
     return null
   }
 
   const years = buildContributionYears(days)
+  const hasOutliers = days.some((day) => day.isOutlier)
 
-  const buildDetails = (day: ContributionDay) =>
-    t("stats.activityDetails", {
+  const buildDetails = (day: ContributionDay) => {
+    const details = t("stats.activityDetails", {
       created: day.entriesCreated,
       folders: day.foldersTouched,
       modified: day.entriesModified,
     })
+    return day.isOutlier ? `${details} — ${t("stats.activityOutlier")}` : details
+  }
 
   return (
     <Box
@@ -67,9 +75,11 @@ export function ContributionGraph({ staleTime }: Readonly<ContributionGraphProps
               gridTemplateColumns={`repeat(auto-fill, minmax(${CELL_SIZE_PX}px, 1fr))`}
             >
               {yearDays.map((day) => {
-                const style = LEVEL_STYLES[day.level]
+                const style = day.isOutlier
+                  ? OUTLIER_LEVEL_STYLES[day.outlierLevel - 1]
+                  : LEVEL_STYLES[day.level]
                 return (
-                  <Box key={day.date} className="group" position="relative">
+                  <Box key={day.date} className="group" position="relative" lineHeight={0}>
                     <Box
                       aria-label={`${formatContributionDate(day.date)} — ${buildDetails(day)}`}
                       as="button"
@@ -139,6 +149,24 @@ export function ContributionGraph({ staleTime }: Readonly<ContributionGraphProps
             {t("stats.activityMore")}
           </Text>
         </HStack>
+
+        {hasOutliers && (
+          <HStack gap={1} justify="flex-end">
+            <Text fontSize="xs" color="app.textMuted">
+              {t("stats.activityOutlier")}
+            </Text>
+            {OUTLIER_LEVEL_STYLES.map((style, index) => (
+              <Box
+                key={index}
+                bg={style.bg}
+                opacity={style.opacity}
+                borderRadius="2px"
+                h={`${CELL_SIZE_PX}px`}
+                w={`${CELL_SIZE_PX}px`}
+              />
+            ))}
+          </HStack>
+        )}
       </VStack>
     </Box>
   )

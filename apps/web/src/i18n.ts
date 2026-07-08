@@ -62,6 +62,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "stats.activityGraph": "activity",
     "stats.activityLess": "less",
     "stats.activityMore": "more",
+    "stats.activityOutlier": "unusually high — outside the typical range",
     "stats.attachments": "attachments",
     "stats.folders": "folders",
     "stats.totalNotes": "total notes",
