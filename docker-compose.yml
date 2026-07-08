@@ -155,10 +155,16 @@ services:
     profiles:
       - watchtower
     restart: unless-stopped
+    # containrrr/watchtower was archived unmaintained in Dec 2025 and ships
+    # a Docker client stuck on API 1.25, which newer Docker Engine releases
+    # (v29+) reject outright ("client version 1.25 is too old"). This uses
+    # nicholas-fedor/watchtower, the actively maintained fork the Watchtower
+    # community has standardized on - a verified drop-in replacement with
+    # the same env vars, labels, and volumes.
     # Pinned by digest (in addition to the human-readable tag) so the
     # container this host's Docker daemon actually pulls can't silently
     # change out from under a service with root-equivalent socket access.
-    image: containrrr/watchtower:1.7.1@sha256:6dd50763bbd632a83cb154d5451700530d1e44200b268a4e9488fefdfcf2b038
+    image: nickfedor/watchtower:1.19.0@sha256:c1dfdf27fe805dcfefe1cf048cee6960a511c097a99aa355b0bc4be6e6bb3bdf
     volumes:
       # Grants watchtower root-equivalent control over the host Docker
       # daemon (it can create/remove any container, not just the ones
