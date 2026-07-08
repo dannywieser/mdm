@@ -16,7 +16,7 @@ setImagesBaseUrl(import.meta.env.VITE_IMAGES_BASE_URL ?? "")
 setStatsBaseUrl(import.meta.env.VITE_STATS_BASE_URL ?? "/stats")
 ```
 
-Then use the hooks and types as normal, e.g. `useNotesQuery`, `useViewsQuery`, `useStatsMeta`, `useStatsHistory`, `useStatsPageData`, `useHabitsQuery`, `useHabitQuery`, `useIsRead`, `useToggleNoteRead`, `buildImageUrl`.
+Then use the hooks and types as normal, e.g. `useNotesQuery`, `useViewsQuery`, `useStatsMeta`, `useStatsHistory`, `useStatsPageData`, `useHabitsQuery`, `useHabitQuery`, `useIsRead`, `useToggleRead`, `buildImageUrl`.
 
 Hooks throw `Error` objects whose `message` is an i18n key (e.g. `"errors.unableToLoadViews"`) rather than localized text, so consuming apps can translate the message themselves.
 
@@ -39,7 +39,7 @@ In demo mode:
 
 ## Structure
 
-- `notes/` — `Note`/`NotesResponse`, `ViewSummary`/`ViewsResponse` and the hooks that fetch them from `apps/notes-api`, plus the note "read" flag hooks (`useIsRead`, `useToggleNoteRead`).
+- `notes/` — `Note`/`NotesResponse`, `ViewSummary`/`ViewsResponse` and the hooks that fetch them from `apps/notes-api`, plus the note "read" flag hooks (`useIsRead`, `useToggleRead`).
 - `stats/` — `StatsMetaResponse`/`StatsHistoryResponse` and the `useStatsMeta`/`useStatsHistory` hooks that fetch them from `apps/stats-service`, plus `useStatsPageData`, which fetches both via `useSuspenseQueries` so they start in parallel under a single Suspense boundary (calling `useStatsMeta` and `useStatsHistory` as two separate `useSuspenseQuery` hooks in the same component does not parallelize them, since React aborts the render — and never reaches the second hook call — as soon as the first one suspends).
 - `habits/` — `HabitSummary`/`HabitResult` and the hooks that fetch them from `apps/habit-tracker`.
 - `flags/` — `ToggleFlagInput`/`ToggleFlagResult` shared with `apps/flag-manager`.
