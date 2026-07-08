@@ -37,7 +37,7 @@ createRoot(rootElement).render(
   <StrictMode>
     <ColorPaletteProvider>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <BrowserRouter basename={import.meta.env.BASE_URL} useTransitions={false}>
           <I18nProvider>
             <App />
           </I18nProvider>
