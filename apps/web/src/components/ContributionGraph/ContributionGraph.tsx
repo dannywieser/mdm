@@ -101,6 +101,7 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                       position="absolute"
                       bottom="100%"
                       left="50%"
+                      lineHeight="normal"
                       mb={2}
                       opacity={0}
                       pointerEvents="none"
