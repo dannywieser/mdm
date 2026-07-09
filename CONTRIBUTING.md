@@ -49,6 +49,7 @@ This repository is a Turborepo monorepo with:
 
 ## Running with Docker Compose
 
+- If you just want to run mdm against your own notes vault without cloning this repo, see the [Quick start](README.md#running-mdm-against-your-own-notes) in the README instead — it uses `infra/docker/quickstart.sh` to fetch `docker-compose.yml` and set up config in a standalone directory.
 - `docker-compose.yml` runs:
   - `web` (nginx) on `http://localhost` for static web hosting + `/api` proxy
   - `notes-api` as an internal service on port `3000`
