@@ -9,7 +9,7 @@
 # target-dir defaults to ./mdm. Set MDM_REF to pin a tag/branch/commit
 # instead of main, e.g. MDM_REF=v1.0.0. Set NOTES_ROOT to skip the
 # interactive prompt (required when there's no controlling terminal to
-# prompt against), e.g. NOTES_ROOT=/absolute/path/to/vault.
+# prompt against), e.g. NOTES_ROOT="/absolute/path/to/vault".
 set -euo pipefail
 
 REPO="dannywieser/mdm"
@@ -17,8 +17,14 @@ REF="${MDM_REF:-main}"
 RAW_BASE="https://raw.githubusercontent.com/${REPO}/${REF}"
 TARGET_DIR="${1:-mdm}"
 
-mkdir -p "$TARGET_DIR"
-cd "$TARGET_DIR"
+mkdir -p -- "$TARGET_DIR"
+# bash's cd special-cases a bare "-" as $OLDPWD even with "--" before it, so
+# a target dir literally named "-" needs a "./" prefix to read as a normal
+# relative path instead (absolute paths are unaffected by this).
+case "$TARGET_DIR" in
+  /*) cd -- "$TARGET_DIR" ;;
+  *) cd -- "./$TARGET_DIR" ;;
+esac
 TARGET_DIR="$(pwd)"
 
 echo "Downloading docker-compose.yml and example config into ${TARGET_DIR} ..."
@@ -46,7 +52,7 @@ else
     if ! ( : < /dev/tty ) 2>/dev/null; then
       echo "No terminal available to prompt for NOTES_ROOT - set it as an" >&2
       echo "environment variable instead, e.g.:" >&2
-      echo "  curl -fsSL ${RAW_BASE}/infra/docker/quickstart.sh | NOTES_ROOT=/absolute/path/to/vault bash -s -- ${TARGET_DIR}" >&2
+      echo "  curl -fsSL ${RAW_BASE}/infra/docker/quickstart.sh | NOTES_ROOT=\"/absolute/path/to/vault\" bash -s -- \"${TARGET_DIR}\"" >&2
       exit 1
     fi
     while true; do
