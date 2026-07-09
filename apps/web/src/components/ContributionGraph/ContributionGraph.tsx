@@ -1,4 +1,4 @@
-import { Box, HStack, Text, VStack } from "@chakra-ui/react"
+import { Box, HStack, Text, VStack, chakra } from "@chakra-ui/react"
 
 import { useI18n } from "../../i18n"
 
@@ -83,9 +83,8 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                 const detailLines = buildDetailLines(day)
                 return (
                   <Box key={day.date} className="group" position="relative" lineHeight={0}>
-                    <Box
+                    <chakra.button
                       aria-label={`${formatContributionDate(day.date)} — ${buildAriaDetails(day, detailLines)}`}
-                      as="button"
                       aspectRatio={1}
                       bg={style.bg}
                       border="none"
@@ -93,6 +92,7 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                       cursor="default"
                       opacity={style.opacity}
                       padding={0}
+                      type="button"
                       w="full"
                       {...focusRing}
                     />
