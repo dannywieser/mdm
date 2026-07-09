@@ -40,12 +40,14 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
   const years = buildContributionYears(days)
   const hasOutliers = days.some((day) => day.isOutlier)
 
-  const buildDetails = (day: ContributionDay) => {
-    const details = t("stats.activityDetails", {
-      created: day.entriesCreated,
-      folders: day.foldersTouched,
-      modified: day.entriesModified,
-    })
+  const buildDetailLines = (day: ContributionDay) => [
+    t("stats.activityCreated", { created: day.entriesCreated }),
+    t("stats.activityModified", { modified: day.entriesModified }),
+    t("stats.activityFoldersTouched", { folders: day.foldersTouched }),
+  ]
+
+  const buildAriaDetails = (day: ContributionDay) => {
+    const details = buildDetailLines(day).join(" · ")
     return day.isOutlier ? `${details} — ${t("stats.activityOutlier")}` : details
   }
 
@@ -81,7 +83,7 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                 return (
                   <Box key={day.date} className="group" position="relative" lineHeight={0}>
                     <Box
-                      aria-label={`${formatContributionDate(day.date)} — ${buildDetails(day)}`}
+                      aria-label={`${formatContributionDate(day.date)} — ${buildAriaDetails(day)}`}
                       as="button"
                       aspectRatio={1}
                       bg={style.bg}
@@ -112,16 +114,26 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                         borderRadius="md"
                         borderWidth="1px"
                         boxShadow="md"
-                        px={2}
-                        py={1}
+                        px={3}
+                        py={2}
+                        minW="max-content"
                         whiteSpace="nowrap"
                       >
-                        <Text fontSize="xs" fontWeight="medium">
-                          {formatContributionDate(day.date)}
-                        </Text>
-                        <Text fontSize="xs" color="app.textMuted">
-                          {buildDetails(day)}
-                        </Text>
+                        <VStack align="stretch" gap={0.5}>
+                          <Text fontSize="xs" fontWeight="medium">
+                            {formatContributionDate(day.date)}
+                          </Text>
+                          {buildDetailLines(day).map((line) => (
+                            <Text key={line} fontSize="xs" color="app.textMuted">
+                              {line}
+                            </Text>
+                          ))}
+                          {day.isOutlier && (
+                            <Text fontSize="xs" color="orange.400">
+                              {t("stats.activityOutlier")}
+                            </Text>
+                          )}
+                        </VStack>
                       </Box>
                     </Box>
                   </Box>
