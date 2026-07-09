@@ -2,52 +2,22 @@
   "attachmentsDirectory": "attachments",
   "dateFormats": ["YYYY.MM.DD", "YY/MM/DD"],
   "obsidianVault": "vault-name",
-  "timezone": "America/Edmonton",
   "views": [
     {
-      "id": "books",
-      "name": "Books",
-      "group": "library",
-      "component": "NotesGallery",
-      "layout": "flex",
+      "id": "on-this-date",
+      "name": "on this day",
+      "group": "review",
+      "component": "NotesReview",
       "filters": [
         {
-          "folder": "downtime",
-          "frontmatter.type": "book"
-        },
-        {
-          "$exclude": {
-            "folder": "archive"
-          }
-        },
-        {
-          "frontmatter.series": "$missing"
+          "dates": "$onThisDay"
         }
-      ],
-      "badges": ["folder", "frontmatter.type", "frontmatter.genre"]
-    }
-  ],
-  "habits": [
-    {
-      "id": "exercise",
-      "name": "Daily Exercise",
-      "mode": "do-more",
-      "frontmatterProperty": "exercise",
-      "trackingWindowDays": 90
-    },
-    {
-      "id": "stress",
-      "name": "Stress Level",
-      "mode": "do-less",
-      "frontmatterProperty": "stress",
-      "trackingWindowDays": 30,
-      "targetScore": 100
+      ]
     }
   ],
   "flags": {
     "read": {
       "expiresInDays": 30
-    },
-    "archived": {}
+    }
   }
 }
