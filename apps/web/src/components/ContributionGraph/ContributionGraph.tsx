@@ -1,4 +1,4 @@
-import { Box, HStack, Text, VStack } from "@chakra-ui/react"
+import { Box, HStack, Text, VStack, chakra } from "@chakra-ui/react"
 
 import { useI18n } from "../../i18n"
 
@@ -40,12 +40,14 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
   const years = buildContributionYears(days)
   const hasOutliers = days.some((day) => day.isOutlier)
 
-  const buildDetails = (day: ContributionDay) => {
-    const details = t("stats.activityDetails", {
-      created: day.entriesCreated,
-      folders: day.foldersTouched,
-      modified: day.entriesModified,
-    })
+  const buildDetailLines = (day: ContributionDay) => [
+    { id: "created", text: t("stats.activityCreated", { created: day.entriesCreated }) },
+    { id: "modified", text: t("stats.activityModified", { modified: day.entriesModified }) },
+    { id: "folders", text: t("stats.activityFoldersTouched", { folders: day.foldersTouched }) },
+  ]
+
+  const buildAriaDetails = (day: ContributionDay, detailLines: ReturnType<typeof buildDetailLines>) => {
+    const details = detailLines.map((line) => line.text).join(" · ")
     return day.isOutlier ? `${details} — ${t("stats.activityOutlier")}` : details
   }
 
@@ -78,11 +80,11 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                 const style = day.isOutlier
                   ? OUTLIER_LEVEL_STYLES[day.outlierLevel - 1]
                   : LEVEL_STYLES[day.level]
+                const detailLines = buildDetailLines(day)
                 return (
                   <Box key={day.date} className="group" position="relative" lineHeight={0}>
-                    <Box
-                      aria-label={`${formatContributionDate(day.date)} — ${buildDetails(day)}`}
-                      as="button"
+                    <chakra.button
+                      aria-label={`${formatContributionDate(day.date)} — ${buildAriaDetails(day, detailLines)}`}
                       aspectRatio={1}
                       bg={style.bg}
                       border="none"
@@ -90,10 +92,12 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                       cursor="default"
                       opacity={style.opacity}
                       padding={0}
+                      type="button"
                       w="full"
                       {...focusRing}
                     />
                     <Box
+                      aria-hidden="true"
                       position="absolute"
                       bottom="100%"
                       left="50%"
@@ -112,16 +116,26 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                         borderRadius="md"
                         borderWidth="1px"
                         boxShadow="md"
-                        px={2}
-                        py={1}
+                        px={3}
+                        py={2}
+                        minW="max-content"
                         whiteSpace="nowrap"
                       >
-                        <Text fontSize="xs" fontWeight="medium">
-                          {formatContributionDate(day.date)}
-                        </Text>
-                        <Text fontSize="xs" color="app.textMuted">
-                          {buildDetails(day)}
-                        </Text>
+                        <VStack align="stretch" gap={0.5}>
+                          <Text fontSize="xs" fontWeight="medium">
+                            {formatContributionDate(day.date)}
+                          </Text>
+                          {detailLines.map((line) => (
+                            <Text key={line.id} fontSize="xs" color="app.textMuted">
+                              {line.text}
+                            </Text>
+                          ))}
+                          {day.isOutlier && (
+                            <Text fontSize="xs" color="orange.400">
+                              {t("stats.activityOutlier")}
+                            </Text>
+                          )}
+                        </VStack>
                       </Box>
                     </Box>
                   </Box>

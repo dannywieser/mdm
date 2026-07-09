@@ -42,20 +42,24 @@ describe("ContributionGraph", () => {
     renderComponent()
 
     expect(document.querySelector(
-      '[aria-label*="stats.activityDetails"][aria-label*="\\"created\\":3"][aria-label*="\\"modified\\":1"][aria-label*="\\"folders\\":2"]',
+      '[aria-label*="stats.activityCreated"][aria-label*="\\"created\\":3"][aria-label*="stats.activityModified"][aria-label*="\\"modified\\":1"][aria-label*="stats.activityFoldersTouched"][aria-label*="\\"folders\\":2"]',
     )).toBeTruthy()
     expect(document.querySelector(
-      '[aria-label*="stats.activityDetails"][aria-label*="\\"created\\":0"][aria-label*="\\"modified\\":2"][aria-label*="\\"folders\\":1"]',
+      '[aria-label*="stats.activityCreated"][aria-label*="\\"created\\":0"][aria-label*="stats.activityModified"][aria-label*="\\"modified\\":2"][aria-label*="stats.activityFoldersTouched"][aria-label*="\\"folders\\":1"]',
     )).toBeTruthy()
   })
 
-  test("renders an on-hover card with the date and created/modified/folders details for each day", () => {
+  test("renders an on-hover card with the date and each stat on its own line", () => {
     renderComponent()
 
     expect(screen.getByText("May 1, 2026")).toBeTruthy()
-    expect(screen.getByText('stats.activityDetails {"created":3,"folders":2,"modified":1}')).toBeTruthy()
+    expect(screen.getByText('stats.activityCreated {"created":3}')).toBeTruthy()
+    expect(screen.getByText('stats.activityModified {"modified":1}')).toBeTruthy()
+    expect(screen.getByText('stats.activityFoldersTouched {"folders":2}')).toBeTruthy()
     expect(screen.getByText("May 2, 2026")).toBeTruthy()
-    expect(screen.getByText('stats.activityDetails {"created":0,"folders":1,"modified":2}')).toBeTruthy()
+    expect(screen.getByText('stats.activityCreated {"created":0}')).toBeTruthy()
+    expect(screen.getByText('stats.activityModified {"modified":2}')).toBeTruthy()
+    expect(screen.getByText('stats.activityFoldersTouched {"folders":1}')).toBeTruthy()
   })
 
   test("renders nothing when there is no history", () => {
@@ -79,7 +83,7 @@ describe("ContributionGraph", () => {
     ]
     renderComponent(history)
 
-    expect(screen.getByText("stats.activityOutlier")).toBeTruthy()
+    expect(screen.getAllByText("stats.activityOutlier")).toHaveLength(2)
     expect(document.querySelector(
       '[aria-label*="May 6, 2026"][aria-label*="stats.activityOutlier"]',
     )).toBeTruthy()
