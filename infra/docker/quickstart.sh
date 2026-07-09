@@ -77,7 +77,7 @@ cat <<EOF
 All files were created in: ${TARGET_DIR}
 
 Next steps:
-  1. cd ${TARGET_DIR}
+  1. cd "${TARGET_DIR}"
   2. Double-check .env has NOTES_ROOT set to the absolute path of your notes
      vault - it's mounted read-only into the containers, so without it
      pointed at the right place the stack starts against an empty

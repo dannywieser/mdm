@@ -3,7 +3,7 @@ Markdown Memory (mdm) is for those of us who love markdown as a way to capture o
 
 mdm is a self-hosted application which you point at an [Obsidian](https://obsidian.md/) vault, and it will provide RESTful API access and a web application for viewing your notes. Nothing leaves your machine — mdm reads the vault directly off disk, and everything it stores itself (per-note read/done flags, a short-lived cache of resolved image URLs) lives in its own Redis instance.
 
-The core part of mdm are fully configurable **views**, which are similar to Bases in Obsidian, with some power ups to improve their interaction. A view is a name plus a set of folder/frontmatter/date filters, so the same vault can be sliced as many ways as you have use cases — no re-tagging notes, no schema to migrate. Point each view at whichever UI fits the content:
+mdm's core feature is fully configurable **views**, similar to Bases in Obsidian, with some power-ups to improve their interaction. A view is a name plus a set of folder/frontmatter/date filters, so the same vault can be sliced as many ways as you have use cases — no re-tagging notes, no schema to migrate. Point each view at whichever UI fits the content:
 
 - an [inbox-style review](https://demo.markdownmemory.com/notes/on-this-day) that surfaces notes one at a time and tracks what you've read,
 - a **sortable table** with badge-annotated columns, or
