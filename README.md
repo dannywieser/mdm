@@ -25,7 +25,7 @@ mdm ships as a set of published Docker images, so you can run it against your ow
 curl -fsSL https://raw.githubusercontent.com/dannywieser/mdm/main/infra/docker/quickstart.sh | bash -s -- mdm
 ```
 
-This downloads `docker-compose.yml` and an example config into `./mdm`, prompts for the absolute path to your notes vault and saves it as `NOTES_ROOT` in `.env` — this is what gets mounted read-only into the containers, so it needs to point at your actual vault or the stack will start against an empty `./notes` folder instead — and creates `app.config.json` from the example. Then:
+This downloads `docker-compose.yml` and an example config into `./mdm`, prompts for the absolute path to your notes vault and saves it as `NOTES_ROOT` in `.env` — this is what gets mounted read-only into the containers, so it needs to point at your actual vault or the stack will start against an empty `./notes` folder instead — and creates `app.config.json` from the example. If there's no terminal to prompt against (or you'd rather skip the prompt), set `NOTES_ROOT` yourself: `curl ... | NOTES_ROOT=/absolute/path/to/vault bash -s -- mdm`. Then:
 
 1. Double-check `mdm/.env` has `NOTES_ROOT` set to the absolute path of your notes vault.
 2. Edit `mdm/app.config.json`:

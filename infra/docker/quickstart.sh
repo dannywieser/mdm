@@ -7,7 +7,9 @@
 #   curl -fsSL https://raw.githubusercontent.com/dannywieser/mdm/main/infra/docker/quickstart.sh | bash -s -- [target-dir]
 #
 # target-dir defaults to ./mdm. Set MDM_REF to pin a tag/branch/commit
-# instead of main, e.g. MDM_REF=v1.0.0.
+# instead of main, e.g. MDM_REF=v1.0.0. Set NOTES_ROOT to skip the
+# interactive prompt (required when there's no controlling terminal to
+# prompt against), e.g. NOTES_ROOT=/absolute/path/to/vault.
 set -euo pipefail
 
 REPO="dannywieser/mdm"
@@ -36,20 +38,34 @@ else
   # NOTES_ROOT is the only value docker-compose.yml requires from .env; the
   # rest (obsidianVault, dateFormats, views, flags, ...) live in
   # app.config.json and are edited directly by the user.
-  while true; do
-    read -rp "Absolute path to your notes vault (NOTES_ROOT): " notes_root
-    case "$notes_root" in
-      /*)
-        if [ ! -d "$notes_root" ]; then
-          echo "Warning: ${notes_root} doesn't exist (yet) - continuing anyway."
-        fi
-        break
-        ;;
-      *)
-        echo "NOTES_ROOT must be an absolute path (starting with /)."
-        ;;
-    esac
-  done
+  notes_root="${NOTES_ROOT:-}"
+  if [ -z "$notes_root" ]; then
+    # /dev/tty can exist as a device node with no controlling terminal
+    # attached (e.g. CI, a non-interactive `bash -c`), so actually try to
+    # open it rather than just checking for its existence.
+    if ! ( : < /dev/tty ) 2>/dev/null; then
+      echo "No terminal available to prompt for NOTES_ROOT - set it as an" >&2
+      echo "environment variable instead, e.g.:" >&2
+      echo "  NOTES_ROOT=/absolute/path/to/vault bash -s -- ${TARGET_DIR}" >&2
+      exit 1
+    fi
+    while true; do
+      # Read from the controlling terminal, not this script's own stdin -
+      # when piped via `curl | bash`, stdin is already consumed by bash
+      # reading the script itself, so a plain `read` here never sees input.
+      read -rp "Absolute path to your notes vault (NOTES_ROOT): " notes_root < /dev/tty
+      case "$notes_root" in
+        /*) break ;;
+        *) echo "NOTES_ROOT must be an absolute path (starting with /)." ;;
+      esac
+    done
+  elif [ "${notes_root#/}" = "$notes_root" ]; then
+    echo "NOTES_ROOT must be an absolute path (starting with /): ${notes_root}" >&2
+    exit 1
+  fi
+  if [ ! -d "$notes_root" ]; then
+    echo "Warning: ${notes_root} doesn't exist (yet) - continuing anyway."
+  fi
   # Quoted so paths containing spaces are preserved as a single value -
   # docker compose's .env parser strips the surrounding quotes.
   printf 'NOTES_ROOT="%s"\n' "$notes_root" > .env
