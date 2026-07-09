@@ -1,6 +1,22 @@
 # (m)ark(d)own (m)emory
 Markdown Memory (mdm) is for those of us who love markdown as a way to capture our thoughts, our journals, our experiences, our memories, photos, knowledge, and everything and anything else, but also acknowledge that the act of _reviewing_ and _reflecting_ on that markdown is very different than capturing it.
 
+mdm is a self-hosted application which you point at an [Obsidian](https://obsidian.md/) vault, and it will provide RESTful API access and a web application for viewing your notes. Nothing leaves your machine — mdm reads the vault directly off disk; the only thing it stores itself is a handful of read/done flags in its own Redis instance.
+
+The core part of mdm are fully configurable **views**, which are similar to Bases in Obsidian, with some power ups to improve their interaction. A view is a name plus a set of folder/frontmatter/date filters, so the same vault can be sliced as many ways as you have use cases — no re-tagging notes, no schema to migrate. Point each view at whichever UI fits the content:
+
+- an [inbox-style review](https://demo.markdownmemory.com/notes/on-this-day) that surfaces notes one at a time and tracks what you've read,
+- a **sortable table** with badge-annotated columns, or
+- a [gallery](https://demo.markdownmemory.com/notes/movies) — grid, or grouped by month/year — for image-heavy notes like books, journals, or photos.
+
+Wikilinks between notes resolve automatically (so a view can surface a note's linked notes too), and every note carries a deep link back into Obsidian, so you're never more than a click from editing the real thing.
+
+The other feature currently included in mdm is habit tracking. This takes a simple frontmatter property in your notes and provides an interface for allowing you to track habits more effectively through your markdown. Each habit gets a running score with streak and consistency multipliers — bonuses for `do-more` habits, penalties for `do-less` ones — plus a full day-by-day history to plot and a breakdown of exactly which days and streaks moved the score.
+
+Rounding it out, a stats page gives you aggregate counts across the vault (notes, folders, words, attachments) alongside a GitHub-style activity graph — one square per day, shaded by how much you wrote or edited, with outlier days called out.
+
+See it in action in the demo: [demo.markdownmemory.com](https://demo.markdownmemory.com)
+
 ## Running mdm against your own notes
 
 mdm ships as a set of published Docker images, so you can run it against your own notes vault (any folder of `.md`/`.markdown` files, such as an Obsidian vault) without cloning this repo or installing Node. From any directory:
