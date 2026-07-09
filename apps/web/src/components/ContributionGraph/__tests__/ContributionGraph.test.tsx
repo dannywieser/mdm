@@ -72,7 +72,7 @@ describe("ContributionGraph", () => {
     expect(container.firstChild).toBeNull()
   })
 
-  test("flags an outlier day's tooltip and shows the outlier legend", () => {
+  test("flags an outlier day's aria-label and shows the outlier legend, without repeating it in the visual tooltip", () => {
     const history: StatsHistoryResponse = [
       { date: "2026-05-01", entriesCreated: 0, entriesModified: 5, foldersTouched: 1 },
       { date: "2026-05-02", entriesCreated: 0, entriesModified: 10, foldersTouched: 1 },
@@ -83,7 +83,7 @@ describe("ContributionGraph", () => {
     ]
     renderComponent(history)
 
-    expect(screen.getAllByText("stats.activityOutlier")).toHaveLength(2)
+    expect(screen.getAllByText("stats.activityOutlier")).toHaveLength(1)
     expect(document.querySelector(
       '[aria-label*="May 6, 2026"][aria-label*="stats.activityOutlier"]',
     )).toBeTruthy()

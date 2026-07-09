@@ -101,6 +101,7 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                       position="absolute"
                       bottom="100%"
                       left="50%"
+                      lineHeight="normal"
                       mb={2}
                       opacity={0}
                       pointerEvents="none"
@@ -130,11 +131,6 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                               {line.text}
                             </Text>
                           ))}
-                          {day.isOutlier && (
-                            <Text fontSize="xs" color="orange.400">
-                              {t("stats.activityOutlier")}
-                            </Text>
-                          )}
                         </VStack>
                       </Box>
                     </Box>
