@@ -97,6 +97,7 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                       {...focusRing}
                     />
                     <Box
+                      aria-hidden="true"
                       position="absolute"
                       bottom="100%"
                       left="50%"
