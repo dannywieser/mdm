@@ -28,7 +28,10 @@ curl -fsSL https://raw.githubusercontent.com/dannywieser/mdm/main/infra/docker/q
 This downloads `docker-compose.yml` and an example config into `./mdm`, prompts for the absolute path to your notes vault and saves it as `NOTES_ROOT` in `.env` — this is what gets mounted read-only into the containers, so it has to point at your actual vault before anything will start — and creates `app.config.json` from the example. Then:
 
 1. Double-check `mdm/.env` has `NOTES_ROOT` set to the absolute path of your notes vault.
-2. Edit `mdm/app.config.json` — set at least `obsidianVault`, and review `dateFormats`, `views`, `habits`, and `flags` for your vault (see [CONTRIBUTING.md](CONTRIBUTING.md#configuration) for the full field list).
+2. Edit `mdm/app.config.json`:
+   - set `obsidianVault` — needed for links to open notes in Obsidian to work correctly.
+   - update `dateFormats` to match how dates appear in your notes — this is key to mdm's date filtering.
+   - see [CONTRIBUTING.md](CONTRIBUTING.md#configuration) for the full field list (`views`, `habits`, `flags`, etc.).
 3. `cd mdm && docker compose pull && docker compose up -d`
 4. Open http://localhost
 

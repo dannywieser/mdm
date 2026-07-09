@@ -34,7 +34,7 @@ if [ -f .env ]; then
   echo "${TARGET_DIR}/.env already exists, leaving it as-is."
 else
   # NOTES_ROOT is the only value docker-compose.yml requires from .env; the
-  # rest (obsidianVault, dateFormats, views, habits, ...) live in
+  # rest (obsidianVault, dateFormats, views, flags, ...) live in
   # app.config.json and are edited directly by the user.
   read -rp "Absolute path to your notes vault (NOTES_ROOT): " notes_root
   printf 'NOTES_ROOT=%s\n' "$notes_root" > .env
@@ -50,8 +50,11 @@ Next steps:
   2. Double-check .env has NOTES_ROOT set to the absolute path of your notes
      vault - it's mounted read-only into the containers, so nothing will
      start correctly without it pointed at the right place.
-  3. Edit app.config.json - set at least "obsidianVault", and review
-     "dateFormats", "views", "habits", and "flags" for your vault.
+  3. Edit app.config.json:
+     - set "obsidianVault" - needed for links to open notes in Obsidian
+       to work correctly.
+     - update "dateFormats" to match how dates appear in your notes -
+       this is key to mdm's date filtering.
   4. docker compose pull && docker compose up -d
   5. Open http://localhost
 
