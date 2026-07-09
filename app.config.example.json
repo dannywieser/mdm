@@ -4,7 +4,7 @@
   "obsidianVault": "vault-name",
   "views": [
     {
-      "id": "on-this-date",
+      "id": "on-this-day",
       "name": "on this day",
       "group": "review",
       "component": "NotesReview",

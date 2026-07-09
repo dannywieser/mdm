@@ -1,7 +1,7 @@
 # (m)ark(d)own (m)emory
 Markdown Memory (mdm) is for those of us who love markdown as a way to capture our thoughts, our journals, our experiences, our memories, photos, knowledge, and everything and anything else, but also acknowledge that the act of _reviewing_ and _reflecting_ on that markdown is very different than capturing it.
 
-mdm is a self-hosted application which you point at an [Obsidian](https://obsidian.md/) vault, and it will provide RESTful API access and a web application for viewing your notes. Nothing leaves your machine — mdm reads the vault directly off disk; the only thing it stores itself is a handful of read/done flags in its own Redis instance.
+mdm is a self-hosted application which you point at an [Obsidian](https://obsidian.md/) vault, and it will provide RESTful API access and a web application for viewing your notes. Nothing leaves your machine — mdm reads the vault directly off disk, and everything it stores itself (per-note read/done flags, a short-lived cache of resolved image URLs) lives in its own Redis instance.
 
 The core part of mdm are fully configurable **views**, which are similar to Bases in Obsidian, with some power ups to improve their interaction. A view is a name plus a set of folder/frontmatter/date filters, so the same vault can be sliced as many ways as you have use cases — no re-tagging notes, no schema to migrate. Point each view at whichever UI fits the content:
 
@@ -25,7 +25,7 @@ mdm ships as a set of published Docker images, so you can run it against your ow
 curl -fsSL https://raw.githubusercontent.com/dannywieser/mdm/main/infra/docker/quickstart.sh | bash -s -- mdm
 ```
 
-This downloads `docker-compose.yml` and an example config into `./mdm`, prompts for the absolute path to your notes vault and saves it as `NOTES_ROOT` in `.env` — this is what gets mounted read-only into the containers, so it has to point at your actual vault before anything will start — and creates `app.config.json` from the example. Then:
+This downloads `docker-compose.yml` and an example config into `./mdm`, prompts for the absolute path to your notes vault and saves it as `NOTES_ROOT` in `.env` — this is what gets mounted read-only into the containers, so it needs to point at your actual vault or the stack will start against an empty `./notes` folder instead — and creates `app.config.json` from the example. Then:
 
 1. Double-check `mdm/.env` has `NOTES_ROOT` set to the absolute path of your notes vault.
 2. Edit `mdm/app.config.json`:

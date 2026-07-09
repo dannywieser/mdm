@@ -36,8 +36,23 @@ else
   # NOTES_ROOT is the only value docker-compose.yml requires from .env; the
   # rest (obsidianVault, dateFormats, views, flags, ...) live in
   # app.config.json and are edited directly by the user.
-  read -rp "Absolute path to your notes vault (NOTES_ROOT): " notes_root
-  printf 'NOTES_ROOT=%s\n' "$notes_root" > .env
+  while true; do
+    read -rp "Absolute path to your notes vault (NOTES_ROOT): " notes_root
+    case "$notes_root" in
+      /*)
+        if [ ! -d "$notes_root" ]; then
+          echo "Warning: ${notes_root} doesn't exist (yet) - continuing anyway."
+        fi
+        break
+        ;;
+      *)
+        echo "NOTES_ROOT must be an absolute path (starting with /)."
+        ;;
+    esac
+  done
+  # Quoted so paths containing spaces are preserved as a single value -
+  # docker compose's .env parser strips the surrounding quotes.
+  printf 'NOTES_ROOT="%s"\n' "$notes_root" > .env
   echo "Created ${TARGET_DIR}/.env with NOTES_ROOT=${notes_root}"
 fi
 
@@ -48,8 +63,9 @@ All files were created in: ${TARGET_DIR}
 Next steps:
   1. cd ${TARGET_DIR}
   2. Double-check .env has NOTES_ROOT set to the absolute path of your notes
-     vault - it's mounted read-only into the containers, so nothing will
-     start correctly without it pointed at the right place.
+     vault - it's mounted read-only into the containers, so without it
+     pointed at the right place the stack starts against an empty
+     ./notes folder instead of your actual notes.
   3. Edit app.config.json:
      - set "obsidianVault" - needed for links to open notes in Obsidian
        to work correctly.
