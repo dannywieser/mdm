@@ -1,5 +1,14 @@
 # web
 
+## 2.1.4
+
+### Patch Changes
+
+- 0fe09d8: Fix the contribution graph's hover tooltip rendering all lines squished and overlapping on the stats page — the day cell's `lineHeight={0}` (used to keep grid cells tight) was inherited by the tooltip's text, collapsing every line's height to zero. Also drop the redundant "unusually high" outlier note from the visual tooltip, since the orange coloring already conveys it; it's still available in the legend and in the day cell's `aria-label` for screen reader users.
+- 7241f89: Removes the opt-in `watchtower` service and its labels from `docker-compose.yml`. Image updates are now manual only: run `docker compose pull && docker compose up -d --no-build` (or `npm run docker:update`) — `--no-build` avoids falling back to a source build when `docker-compose.yml`'s referenced Dockerfiles aren't present (e.g. a standalone install without a repo checkout).
+  - mdm-util@2.1.4
+  - services@2.1.4
+
 ## 2.1.3
 
 ### Patch Changes

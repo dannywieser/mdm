@@ -1,5 +1,15 @@
 # notes-api
 
+## 2.1.4
+
+### Patch Changes
+
+- 7241f89: Removes the opt-in `watchtower` service and its labels from `docker-compose.yml`. Image updates are now manual only: run `docker compose pull && docker compose up -d --no-build` (or `npm run docker:update`) — `--no-build` avoids falling back to a source build when `docker-compose.yml`'s referenced Dockerfiles aren't present (e.g. a standalone install without a repo checkout).
+  - app-config@2.1.4
+  - markdown@2.1.4
+  - mdm-util@2.1.4
+  - services@2.1.4
+
 ## 2.1.3
 
 ### Patch Changes

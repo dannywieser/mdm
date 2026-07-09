@@ -1,6 +1,6 @@
 {
   "name": "habit-tracker",
-  "version": "1.3.8",
+  "version": "1.3.9",
   "private": true,
   "license": "MIT",
   "main": "dist/server.js",
@@ -15,12 +15,12 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "app-config": "2.1.3",
+    "app-config": "2.1.4",
     "express": "5.2.1",
-    "markdown": "2.1.3",
+    "markdown": "2.1.4",
     "mdm-logger": "1.0.0",
-    "mdm-util": "2.1.3",
+    "mdm-util": "2.1.4",
     "pino-http": "11.0.0",
-    "services": "2.1.3"
+    "services": "2.1.4"
   }
 }
