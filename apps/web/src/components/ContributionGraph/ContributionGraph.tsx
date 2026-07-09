@@ -41,13 +41,15 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
   const hasOutliers = days.some((day) => day.isOutlier)
 
   const buildDetailLines = (day: ContributionDay) => [
-    t("stats.activityCreated", { created: day.entriesCreated }),
-    t("stats.activityModified", { modified: day.entriesModified }),
-    t("stats.activityFoldersTouched", { folders: day.foldersTouched }),
+    { id: "created", text: t("stats.activityCreated", { created: day.entriesCreated }) },
+    { id: "modified", text: t("stats.activityModified", { modified: day.entriesModified }) },
+    { id: "folders", text: t("stats.activityFoldersTouched", { folders: day.foldersTouched }) },
   ]
 
   const buildAriaDetails = (day: ContributionDay) => {
-    const details = buildDetailLines(day).join(" · ")
+    const details = buildDetailLines(day)
+      .map((line) => line.text)
+      .join(" · ")
     return day.isOutlier ? `${details} — ${t("stats.activityOutlier")}` : details
   }
 
@@ -124,8 +126,8 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                             {formatContributionDate(day.date)}
                           </Text>
                           {buildDetailLines(day).map((line) => (
-                            <Text key={line} fontSize="xs" color="app.textMuted">
-                              {line}
+                            <Text key={line.id} fontSize="xs" color="app.textMuted">
+                              {line.text}
                             </Text>
                           ))}
                           {day.isOutlier && (
