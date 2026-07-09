@@ -2,9 +2,6 @@ services:
   web:
     restart: unless-stopped
     image: ghcr.io/dannywieser/mdm-web:${MDM_IMAGE_TAG:-latest}
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-      - "com.centurylinklabs.watchtower.scope=mdm"
     build:
       context: .
       dockerfile: infra/docker/web.Dockerfile
@@ -25,9 +22,6 @@ services:
   notes-api:
     restart: unless-stopped
     image: ghcr.io/dannywieser/mdm-notes-api:${MDM_IMAGE_TAG:-latest}
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-      - "com.centurylinklabs.watchtower.scope=mdm"
     build:
       context: .
       dockerfile: infra/docker/notes-api.Dockerfile
@@ -44,9 +38,6 @@ services:
   flag-manager:
     restart: unless-stopped
     image: ghcr.io/dannywieser/mdm-flag-manager:${MDM_IMAGE_TAG:-latest}
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-      - "com.centurylinklabs.watchtower.scope=mdm"
     build:
       context: .
       dockerfile: infra/docker/flag-manager.Dockerfile
@@ -64,9 +55,6 @@ services:
   habit-tracker:
     restart: unless-stopped
     image: ghcr.io/dannywieser/mdm-habit-tracker:${MDM_IMAGE_TAG:-latest}
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-      - "com.centurylinklabs.watchtower.scope=mdm"
     build:
       context: .
       dockerfile: infra/docker/habit-tracker.Dockerfile
@@ -83,9 +71,6 @@ services:
   stats-service:
     restart: unless-stopped
     image: ghcr.io/dannywieser/mdm-stats-service:${MDM_IMAGE_TAG:-latest}
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-      - "com.centurylinklabs.watchtower.scope=mdm"
     build:
       context: .
       dockerfile: infra/docker/stats-service.Dockerfile
@@ -102,9 +87,6 @@ services:
   image-server:
     restart: unless-stopped
     image: ghcr.io/dannywieser/mdm-image-server:${MDM_IMAGE_TAG:-latest}
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-      - "com.centurylinklabs.watchtower.scope=mdm"
     build:
       context: .
       dockerfile: infra/docker/image-server.Dockerfile
@@ -144,40 +126,3 @@ services:
     image: redis:8.2.1-alpine3.22
     ports:
       - "127.0.0.1:6379:6379"
-
-  # Opt-in: only starts when the "watchtower" profile is active (set
-  # COMPOSE_PROFILES=watchtower in .env, or pass --profile watchtower).
-  # Watches the 6 mdm-* app services above (each labeled
-  # com.centurylinklabs.watchtower.enable=true and .scope=mdm) and pulls
-  # + recreates them when a new image is published, so `docker compose
-  # pull && docker compose up -d` never needs to run on a schedule.
-  watchtower:
-    profiles:
-      - watchtower
-    restart: unless-stopped
-    # containrrr/watchtower was archived unmaintained in Dec 2025 and ships
-    # a Docker client stuck on API 1.25, which newer Docker Engine releases
-    # (v29+) reject outright ("client version 1.25 is too old"). This uses
-    # nicholas-fedor/watchtower, the actively maintained fork the Watchtower
-    # community has standardized on - a verified drop-in replacement with
-    # the same env vars, labels, and volumes.
-    # Pinned by digest (in addition to the human-readable tag) so the
-    # container this host's Docker daemon actually pulls can't silently
-    # change out from under a service with root-equivalent socket access.
-    image: nickfedor/watchtower:1.19.0@sha256:c1dfdf27fe805dcfefe1cf048cee6960a511c097a99aa355b0bc4be6e6bb3bdf
-    volumes:
-      # Grants watchtower root-equivalent control over the host Docker
-      # daemon (it can create/remove any container, not just the ones
-      # it's scoped to watch) - this is inherent to how Watchtower
-      # works, not something this label scoping can fully mitigate.
-      # Only enable this profile on a host you trust the image for.
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      WATCHTOWER_LABEL_ENABLE: "true"
-      # Restricts this instance to only the containers labeled
-      # com.centurylinklabs.watchtower.scope=mdm (the 6 services above),
-      # so another unrelated container on the same host that happens to
-      # carry the enable label alone won't get swept up by this instance.
-      WATCHTOWER_SCOPE: "mdm"
-      WATCHTOWER_POLL_INTERVAL: "3600"
-      WATCHTOWER_CLEANUP: "true"
