@@ -25,11 +25,12 @@ mdm ships as a set of published Docker images, so you can run it against your ow
 curl -fsSL https://raw.githubusercontent.com/dannywieser/mdm/main/infra/docker/quickstart.sh | bash -s -- mdm
 ```
 
-This downloads `docker-compose.yml` and an example config into `./mdm`, creates `app.config.json` and `.env` from it, and prompts for the path to your notes vault. Then:
+This downloads `docker-compose.yml` and an example config into `./mdm`, prompts for the absolute path to your notes vault and saves it as `NOTES_ROOT` in `.env` — this is what gets mounted read-only into the containers, so it has to point at your actual vault before anything will start — and creates `app.config.json` from the example. Then:
 
-1. Edit `mdm/app.config.json` — set at least `obsidianVault`, and review `dateFormats`, `views`, `habits`, and `flags` for your vault (see [CONTRIBUTING.md](CONTRIBUTING.md#configuration) for the full field list).
-2. `cd mdm && docker compose pull && docker compose up -d`
-3. Open http://localhost
+1. Double-check `mdm/.env` has `NOTES_ROOT` set to the absolute path of your notes vault.
+2. Edit `mdm/app.config.json` — set at least `obsidianVault`, and review `dateFormats`, `views`, `habits`, and `flags` for your vault (see [CONTRIBUTING.md](CONTRIBUTING.md#configuration) for the full field list).
+3. `cd mdm && docker compose pull && docker compose up -d`
+4. Open http://localhost
 
 To update to newer images later, re-run `docker compose pull && docker compose up -d` from that same directory.
 

@@ -47,10 +47,13 @@ All files were created in: ${TARGET_DIR}
 
 Next steps:
   1. cd ${TARGET_DIR}
-  2. Edit app.config.json - set at least "obsidianVault", and review
+  2. Double-check .env has NOTES_ROOT set to the absolute path of your notes
+     vault - it's mounted read-only into the containers, so nothing will
+     start correctly without it pointed at the right place.
+  3. Edit app.config.json - set at least "obsidianVault", and review
      "dateFormats", "views", "habits", and "flags" for your vault.
-  3. docker compose pull && docker compose up -d
-  4. Open http://localhost
+  4. docker compose pull && docker compose up -d
+  5. Open http://localhost
 
-To update to newer images later, re-run step 3 from that directory.
+To update to newer images later, re-run step 4 from that directory.
 EOF
