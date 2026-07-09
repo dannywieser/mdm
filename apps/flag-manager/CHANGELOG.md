@@ -1,5 +1,13 @@
 # flag-manager
 
+## 1.1.8
+
+### Patch Changes
+
+- app-config@2.1.3
+- mdm-util@2.1.3
+- services@2.1.3
+
 ## 1.1.7
 
 ### Patch Changes

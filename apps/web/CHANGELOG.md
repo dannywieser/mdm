@@ -1,5 +1,13 @@
 # web
 
+## 2.1.3
+
+### Patch Changes
+
+- 7ea6359: Fix the contribution graph's hover tooltip on the stats page so each stat (created, modified, folders touched) renders on its own line with roomier padding, instead of being crammed into a single narrow line.
+  - mdm-util@2.1.3
+  - services@2.1.3
+
 ## 2.1.2
 
 ### Patch Changes
