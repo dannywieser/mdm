@@ -46,10 +46,8 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
     { id: "folders", text: t("stats.activityFoldersTouched", { folders: day.foldersTouched }) },
   ]
 
-  const buildAriaDetails = (day: ContributionDay) => {
-    const details = buildDetailLines(day)
-      .map((line) => line.text)
-      .join(" · ")
+  const buildAriaDetails = (day: ContributionDay, detailLines: ReturnType<typeof buildDetailLines>) => {
+    const details = detailLines.map((line) => line.text).join(" · ")
     return day.isOutlier ? `${details} — ${t("stats.activityOutlier")}` : details
   }
 
@@ -82,10 +80,11 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                 const style = day.isOutlier
                   ? OUTLIER_LEVEL_STYLES[day.outlierLevel - 1]
                   : LEVEL_STYLES[day.level]
+                const detailLines = buildDetailLines(day)
                 return (
                   <Box key={day.date} className="group" position="relative" lineHeight={0}>
                     <Box
-                      aria-label={`${formatContributionDate(day.date)} — ${buildAriaDetails(day)}`}
+                      aria-label={`${formatContributionDate(day.date)} — ${buildAriaDetails(day, detailLines)}`}
                       as="button"
                       aspectRatio={1}
                       bg={style.bg}
@@ -125,7 +124,7 @@ export function ContributionGraph({ history }: Readonly<ContributionGraphProps>)
                           <Text fontSize="xs" fontWeight="medium">
                             {formatContributionDate(day.date)}
                           </Text>
-                          {buildDetailLines(day).map((line) => (
+                          {detailLines.map((line) => (
                             <Text key={line.id} fontSize="xs" color="app.textMuted">
                               {line.text}
                             </Text>
