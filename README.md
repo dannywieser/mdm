@@ -32,10 +32,10 @@ This downloads `docker-compose.yml` and an example config into `./mdm`, prompts 
    - set `obsidianVault` — needed for links to open notes in Obsidian to work correctly.
    - update `dateFormats` to match how dates appear in your notes — this is key to mdm's date filtering.
    - see [CONTRIBUTING.md](CONTRIBUTING.md#configuration) for the full field list (`views`, `habits`, `flags`, etc.).
-3. `cd mdm && docker compose pull && docker compose up -d`
+3. `cd mdm && docker compose pull && docker compose up -d --no-build`
 4. Open http://localhost
 
-To update to newer images later, re-run `docker compose pull && docker compose up -d` from that same directory.
+To update to newer images later, re-run `docker compose pull && docker compose up -d --no-build` from that same directory.
 
 ## Developing mdm
 

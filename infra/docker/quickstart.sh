@@ -46,7 +46,7 @@ else
     if ! ( : < /dev/tty ) 2>/dev/null; then
       echo "No terminal available to prompt for NOTES_ROOT - set it as an" >&2
       echo "environment variable instead, e.g.:" >&2
-      echo "  NOTES_ROOT=/absolute/path/to/vault bash -s -- ${TARGET_DIR}" >&2
+      echo "  curl -fsSL ${RAW_BASE}/infra/docker/quickstart.sh | NOTES_ROOT=/absolute/path/to/vault bash -s -- ${TARGET_DIR}" >&2
       exit 1
     fi
     while true; do
@@ -87,7 +87,7 @@ Next steps:
        to work correctly.
      - update "dateFormats" to match how dates appear in your notes -
        this is key to mdm's date filtering.
-  4. docker compose pull && docker compose up -d
+  4. docker compose pull && docker compose up -d --no-build
   5. Open http://localhost
 
 To update to newer images later, re-run step 4 from that directory.
