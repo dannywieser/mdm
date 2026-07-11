@@ -1,5 +1,16 @@
 # web
 
+## 2.2.0
+
+### Minor Changes
+
+- acc307c: Add a monthly calendar heatmap to the habit detail page, showing intensity by the tracked frontmatter value per day (date and value on hover), covering the last 6 months that have tracked entries.
+
+### Patch Changes
+
+- mdm-util@2.2.0
+- services@2.1.7
+
 ## 2.1.6
 
 ### Patch Changes
