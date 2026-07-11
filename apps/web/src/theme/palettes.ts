@@ -42,7 +42,7 @@ export const colorPaletteDefinitions: Record<
       panelBackground: "#303445",
       panelBackgroundHover: "#3a3f55",
       text: "#f8f8f2",
-      mutedText: "#a0a8c0",
+      mutedText: "#bcc4e0",
       accent: "#bd93f9",
       border: "#44475a",
       borderHover: "#6272a4",
