@@ -1,5 +1,13 @@
 # web
 
+## 2.1.5
+
+### Patch Changes
+
+- 4eb85ae: Increase the Dracula theme's muted text color contrast so read notes in the notes review list are easier to read.
+  - mdm-util@2.1.5
+  - services@2.1.5
+
 ## 2.1.4
 
 ### Patch Changes
