@@ -29,6 +29,7 @@ import { useParams } from "react-router-dom"
 import { useHabitQuery } from "services"
 import { useI18n } from "../../i18n"
 
+import { HabitCalendar } from "../HabitCalendar"
 import { HabitScoreProgress } from "../HabitScoreProgress"
 import { HabitScoreValue } from "../HabitScoreValue"
 import { HabitScoreBreakdown } from "../HabitScoreBreakdown/HabitScoreBreakdown"
@@ -302,6 +303,14 @@ export function HabitDetail() {
                 </ComposedChart>
               </ResponsiveContainer>
             </Box>
+          )}
+
+          {habit.history.length > 0 && (
+            <HabitCalendar
+              history={habit.history}
+              referenceDate={habit.history[habit.history.length - 1].date}
+              trackingWindowDays={habit.trackingWindowDays}
+            />
           )}
 
           {habit.scoreEntries.length > 0 && (

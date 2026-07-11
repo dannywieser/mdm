@@ -7,6 +7,8 @@ const translations: Record<Locale, Record<string, string>> = {
     "app.name": "mdm",
     "habit.backToHome": "back to home",
     "habit.bestStreak": "best streak",
+    "habit.calendarDayValue": "value: {value}",
+    "habit.calendarTitle": "calendar",
     "habit.currentTrackingWindow": "current tracking window (since {date})",
     "habit.daysLogged": "days logged",
     "habit.entryDate": "date",
