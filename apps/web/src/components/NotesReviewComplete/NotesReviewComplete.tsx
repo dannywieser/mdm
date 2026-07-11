@@ -32,7 +32,7 @@ export const NotesReviewComplete = ({ isLoading, reviewedNotes }: NotesReviewCom
               {reviewedNotes.map((note, i) => (
                 <Text
                   key={note.id}
-                  color="fg.muted"
+                  color="app.textMuted"
                   fontSize="sm"
                   css={fadeInUp(i * 0.06)}
                 >
