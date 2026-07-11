@@ -11,7 +11,8 @@
       "name": "web-demo",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev:demo", "--workspace=apps/web"],
-      "port": 5173
+      "port": 5173,
+      "autoPort": true
     }
   ]
 }
