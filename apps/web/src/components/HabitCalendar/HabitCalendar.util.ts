@@ -1,12 +1,20 @@
 import type { HabitHistoryEntry } from "services"
 
-import { addDays, buildDateRange, getDateWindowStart, getDayOfWeek } from "mdm-util"
+import {
+  addMonths,
+  buildDateRange,
+  buildMonthRange,
+  getDayOfWeek,
+  getMonthEnd,
+  getMonthKey,
+  getMonthStart,
+} from "mdm-util"
 
 import type { HabitCalendarDay, HabitCalendarMonth, HabitCalendarWeek } from "./HabitCalendar.types"
 
 const INTENSITY_LEVEL_COUNT = 4
 const WEEK_LENGTH = 7
-const TRACKING_WINDOW_MULTIPLE = 2
+const MONTHS_TO_SHOW = 6
 
 /**
  * Scales `value` relative to `maxValue` (the highest value shown anywhere in
@@ -17,15 +25,6 @@ const computeIntensityLevel = (value: number, maxValue: number): number => {
   if (value <= 0 || maxValue <= 0) return 0
   const ratio = Math.min(value, maxValue) / maxValue
   return Math.min(INTENSITY_LEVEL_COUNT, Math.ceil(ratio * INTENSITY_LEVEL_COUNT))
-}
-
-const getMonthKey = (date: string): string => date.slice(0, 7)
-
-const getFirstOfMonth = (monthKey: string): string => `${monthKey}-01`
-
-const getDaysInMonth = (monthKey: string): number => {
-  const [year, month] = monthKey.split("-").map(Number)
-  return new Date(year, month, 0).getDate()
 }
 
 const formatMonthLabel = (monthKey: string): string =>
@@ -41,23 +40,10 @@ export const formatCalendarDate = (date: string): string =>
     year: "numeric",
   })
 
-/**
- * Lists every "YYYY-MM" month key from `startMonthKey` to `endMonthKey`
- * (inclusive, ascending) without relying on day-level date arithmetic, so it
- * can't be thrown off by months of differing lengths.
- */
-const enumerateMonthKeys = (startMonthKey: string, endMonthKey: string): string[] => {
-  const [startYear, startMonth] = startMonthKey.split("-").map(Number)
-  const [endYear, endMonth] = endMonthKey.split("-").map(Number)
-  const totalMonths = (endYear - startYear) * 12 + (endMonth - startMonth)
-
-  return Array.from({ length: totalMonths + 1 }, (_, index) => {
-    const monthIndex = startMonth - 1 + index
-    const year = startYear + Math.floor(monthIndex / 12)
-    const month = (monthIndex % 12) + 1
-    return `${year}-${String(month).padStart(2, "0")}`
-  })
-}
+const monthHasEntries = (monthKey: string, valueByDate: Map<string, number>): boolean =>
+  buildDateRange(getMonthStart(monthKey), getMonthEnd(monthKey)).some(
+    (date) => (valueByDate.get(date) ?? 0) > 0,
+  )
 
 const buildMonth = (
   monthKey: string,
@@ -65,8 +51,8 @@ const buildMonth = (
   referenceDate: string,
   maxValue: number,
 ): HabitCalendarMonth => {
-  const firstOfMonth = getFirstOfMonth(monthKey)
-  const lastOfMonth = addDays(firstOfMonth, getDaysInMonth(monthKey) - 1)
+  const firstOfMonth = getMonthStart(monthKey)
+  const lastOfMonth = getMonthEnd(monthKey)
   const leadingBlanks = getDayOfWeek(firstOfMonth)
 
   const cells: (HabitCalendarDay | null)[] = Array.from({ length: leadingBlanks }, () => null)
@@ -88,11 +74,13 @@ const buildMonth = (
 }
 
 /**
- * Builds one calendar grid per month, spanning from two tracking windows ago
- * through the reference date, most recent month first. Each week row starts
- * on Sunday so the grid matches a standard wall-calendar layout; days outside
- * the month (padding) or after the reference date are represented as
- * `null`/`isFuture` rather than dropped, so grid alignment is preserved.
+ * Builds one calendar grid per month, covering the last 6 calendar months up
+ * to the reference date and dropping any month with no tracked entries (e.g.
+ * before the habit started, or a gap with nothing logged). Most recent month
+ * first. Each week row starts on Sunday so the grid matches a standard
+ * wall-calendar layout; days outside the month (padding) or after the
+ * reference date are represented as `null`/`isFuture` rather than dropped,
+ * so grid alignment is preserved.
  *
  * Intensity levels are scaled relative to the highest value shown anywhere
  * in the visualization (not a fixed habit-value ceiling), so the busiest day
@@ -102,23 +90,19 @@ const buildMonth = (
 export const buildHabitCalendarMonths = (
   history: readonly HabitHistoryEntry[],
   referenceDate: string,
-  trackingWindowDays: number,
 ): HabitCalendarMonth[] => {
-  // getDateWindowStart(reference, n) lands n days *before* reference, so the
-  // inclusive [rangeStart, referenceDate] span is n + 1 days — subtract 1 so
-  // two windows cover exactly 2 * trackingWindowDays days, matching the
-  // inclusive-window convention used elsewhere in the habit scoring logic.
-  const rangeStart = getDateWindowStart(referenceDate, trackingWindowDays * TRACKING_WINDOW_MULTIPLE - 1)
   const valueByDate = new Map(history.map((entry) => [entry.date, entry.value]))
-  const monthKeys = enumerateMonthKeys(getMonthKey(rangeStart), getMonthKey(referenceDate))
-
-  const firstOfDisplayedRange = getFirstOfMonth(monthKeys[0])
-  const maxValue = Math.max(
-    0,
-    ...buildDateRange(firstOfDisplayedRange, referenceDate).map((date) => valueByDate.get(date) ?? 0),
+  const endMonthKey = getMonthKey(referenceDate)
+  const startMonthKey = addMonths(endMonthKey, -(MONTHS_TO_SHOW - 1))
+  const monthKeys = buildMonthRange(startMonthKey, endMonthKey).filter((monthKey) =>
+    monthHasEntries(monthKey, valueByDate),
   )
 
-  return monthKeys
-    .map((monthKey) => buildMonth(monthKey, valueByDate, referenceDate, maxValue))
-    .reverse()
+  const monthKeySet = new Set(monthKeys)
+  const maxValue = Math.max(
+    0,
+    ...history.filter((entry) => monthKeySet.has(getMonthKey(entry.date))).map((entry) => entry.value),
+  )
+
+  return monthKeys.map((monthKey) => buildMonth(monthKey, valueByDate, referenceDate, maxValue)).reverse()
 }

@@ -3,7 +3,6 @@ import type { HabitHistoryEntry } from "services"
 export interface HabitCalendarProps {
   history: HabitHistoryEntry[]
   referenceDate: string
-  trackingWindowDays: number
 }
 
 export interface HabitCalendarDay {

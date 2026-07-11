@@ -21,18 +21,18 @@ const LEVEL_STYLES = [
 
 const GRID_COLUMNS = `repeat(7, ${CELL_SIZE_PX}px)`
 
-export function HabitCalendar({
-  history,
-  referenceDate,
-  trackingWindowDays,
-}: Readonly<HabitCalendarProps>) {
+export function HabitCalendar({ history, referenceDate }: Readonly<HabitCalendarProps>) {
   const { t } = useI18n()
 
   if (history.length === 0) {
     return null
   }
 
-  const months = buildHabitCalendarMonths(history, referenceDate, trackingWindowDays)
+  const months = buildHabitCalendarMonths(history, referenceDate)
+
+  if (months.length === 0) {
+    return null
+  }
 
   return (
     <Box

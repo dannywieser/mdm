@@ -309,7 +309,6 @@ export function HabitDetail() {
             <HabitCalendar
               history={habit.history}
               referenceDate={habit.history[habit.history.length - 1].date}
-              trackingWindowDays={habit.trackingWindowDays}
             />
           )}
 

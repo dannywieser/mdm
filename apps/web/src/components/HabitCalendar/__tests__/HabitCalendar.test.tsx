@@ -29,24 +29,21 @@ const buildEntry = (date: string, value: number): HabitHistoryEntry => ({
   recentEntryAdditions: 0,
 })
 
-const renderCalendar = (
-  history: HabitHistoryEntry[] = [buildEntry("2026-07-01", 5)],
-  referenceDate = "2026-07-11",
-  trackingWindowDays = 10,
-) => {
+const DEFAULT_HISTORY: HabitHistoryEntry[] = [
+  buildEntry("2026-06-15", 6),
+  buildEntry("2026-07-01", 5),
+]
+
+const renderCalendar = (history: HabitHistoryEntry[] = DEFAULT_HISTORY, referenceDate = "2026-07-11") => {
   render(
     <ChakraProvider value={defaultSystem}>
-      <HabitCalendar
-        history={history}
-        referenceDate={referenceDate}
-        trackingWindowDays={trackingWindowDays}
-      />
+      <HabitCalendar history={history} referenceDate={referenceDate} />
     </ChakraProvider>,
   )
 }
 
 describe("HabitCalendar", () => {
-  test("renders the calendar title, one heading per spanned month, and the legend", () => {
+  test("renders the calendar title, one heading per month with tracked entries, and the legend", () => {
     renderCalendar()
 
     expect(screen.getByText("habit.calendarTitle")).toBeTruthy()
@@ -59,7 +56,17 @@ describe("HabitCalendar", () => {
   test("renders nothing when there is no history", () => {
     const { container } = render(
       <ChakraProvider value={defaultSystem}>
-        <HabitCalendar history={[]} referenceDate="2026-07-11" trackingWindowDays={10} />
+        <HabitCalendar history={[]} referenceDate="2026-07-11" />
+      </ChakraProvider>,
+    )
+
+    expect(container.firstChild).toBeNull()
+  })
+
+  test("renders nothing when none of the last 6 months have a tracked entry", () => {
+    const { container } = render(
+      <ChakraProvider value={defaultSystem}>
+        <HabitCalendar history={[buildEntry("2026-01-01", 5)]} referenceDate="2026-07-11" />
       </ChakraProvider>,
     )
 
