@@ -1,5 +1,11 @@
 # app-config
 
+## 2.1.6
+
+### Patch Changes
+
+- mdm-util@2.1.6
+
 ## 2.1.5
 
 ### Patch Changes
