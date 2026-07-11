@@ -85,6 +85,12 @@ describe("buildHabitCalendarMonths", () => {
     expect(findDay(june, "2026-06-15")).toMatchObject({ level: 4 })
   })
 
+  test("spans exactly 2 * trackingWindowDays inclusive days, not an extra day that pulls in another month", () => {
+    const months = buildHabitCalendarMonths([], "2026-03-01", 30)
+
+    expect(months.map((month) => month.monthKey)).toEqual(["2026-03", "2026-02", "2026-01"])
+  })
+
   test("pads the final week with trailing blanks up to a full 7-day row", () => {
     const months = buildHabitCalendarMonths([], "2026-07-11", 10)
     const june = months.find((month) => month.monthKey === "2026-06")!

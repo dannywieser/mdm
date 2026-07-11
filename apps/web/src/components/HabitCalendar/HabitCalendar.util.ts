@@ -104,7 +104,11 @@ export const buildHabitCalendarMonths = (
   referenceDate: string,
   trackingWindowDays: number,
 ): HabitCalendarMonth[] => {
-  const rangeStart = getDateWindowStart(referenceDate, trackingWindowDays * TRACKING_WINDOW_MULTIPLE)
+  // getDateWindowStart(reference, n) lands n days *before* reference, so the
+  // inclusive [rangeStart, referenceDate] span is n + 1 days — subtract 1 so
+  // two windows cover exactly 2 * trackingWindowDays days, matching the
+  // inclusive-window convention used elsewhere in the habit scoring logic.
+  const rangeStart = getDateWindowStart(referenceDate, trackingWindowDays * TRACKING_WINDOW_MULTIPLE - 1)
   const valueByDate = new Map(history.map((entry) => [entry.date, entry.value]))
   const monthKeys = enumerateMonthKeys(getMonthKey(rangeStart), getMonthKey(referenceDate))
 
