@@ -59,6 +59,10 @@ jobs:
         id: sha
         run: echo "value=${GITHUB_SHA:0:7}" >> "$GITHUB_OUTPUT"
 
+      - name: Compute cache bust
+        id: cachebust
+        run: echo "value=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+
       - name: Build image for scanning
         uses: docker/build-push-action@v7
         with:
@@ -67,6 +71,8 @@ jobs:
           push: false
           load: true
           tags: mdm-${{ matrix.name }}:scan
+          build-args: |
+            CACHE_BUST=${{ steps.cachebust.outputs.value }}
           cache-from: type=gha,scope=${{ matrix.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.name }}
 
@@ -91,5 +97,7 @@ jobs:
             ghcr.io/dannywieser/mdm-${{ matrix.name }}:latest
             ghcr.io/dannywieser/mdm-${{ matrix.name }}:sha-${{ steps.sha.outputs.value }}
             ghcr.io/dannywieser/mdm-${{ matrix.name }}:${{ steps.version.outputs.value }}
+          build-args: |
+            CACHE_BUST=${{ steps.cachebust.outputs.value }}
           cache-from: type=gha,scope=${{ matrix.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.name }}
