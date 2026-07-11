@@ -67,6 +67,7 @@ This repository is a Turborepo monorepo with:
   - `/stats/*` → `stats-service:3004/stats/*`
   - `/imgproxy/*` → `imgproxy:8080/*` (used by `image-server` redirects)
   - nginx config also defines an `/habit/*` route to `habit-tracker:3003/habit/*`, but no endpoint at that singular path exists anymore (the API is `/habits/:id`) — this route is currently dead and unused by the web app
+- nginx caching: `/assets/*` (Vite's content-hashed JS/CSS) is served with `Cache-Control: public, max-age=31536000, immutable`; everything else — `index.html` and SPA routes falling back to it — is served with `Cache-Control: no-cache` so browsers always revalidate and pick up a new deploy without a manual cache clear.
 - `app.config.json` is mounted (read-only) into all 5 backend containers as `/app/app.config.json`: `notes-api`, `flag-manager`, `habit-tracker`, `stats-service`, and `image-server`. `image-server` doesn't currently read this file (it's configured entirely by environment variables — see `apps/image-server/README.md`), so the mount is a no-op for it today.
 - The vault is mounted with `NOTES_ROOT` into the services that read notes directly: `notes-api`, `habit-tracker`, `stats-service`, `image-server`, and `imgproxy`. `flag-manager` (no vault access needed) and `web`/`redis` don't get this mount.
   - default: `./notes` on the host maps to `/data/notes`
