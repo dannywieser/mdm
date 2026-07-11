@@ -1,5 +1,13 @@
 # web
 
+## 2.1.6
+
+### Patch Changes
+
+- 1fbcbf0: Fix the notes review "complete" list still using Chakra's default muted color instead of the theme-aware muted text color, so the Dracula contrast fix actually applies to it.
+  - mdm-util@2.1.6
+  - services@2.1.6
+
 ## 2.1.5
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "services",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "private": true,
   "license": "MIT",
   "main": "dist/index.js",
@@ -18,8 +18,8 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "app-config": "2.1.5",
-    "markdown": "2.1.5"
+    "app-config": "2.1.6",
+    "markdown": "2.1.6"
   },
   "peerDependencies": {
     "@tanstack/react-query": "5.100.14",
