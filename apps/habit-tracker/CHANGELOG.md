@@ -1,5 +1,14 @@
 # habit-tracker
 
+## 1.3.10
+
+### Patch Changes
+
+- app-config@2.1.5
+- markdown@2.1.5
+- mdm-util@2.1.5
+- services@2.1.5
+
 ## 1.3.9
 
 ### Patch Changes
