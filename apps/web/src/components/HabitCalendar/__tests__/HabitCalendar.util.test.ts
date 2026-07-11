@@ -59,13 +59,12 @@ describe("buildHabitCalendarMonths", () => {
     expect(findDay(july, "2026-07-03")).toMatchObject({ value: 0, level: 0 })
   })
 
-  test("scales intensity level from the day's value out of a 10-point max, capped at 4 levels", () => {
+  test("scales intensity level relative to the highest value shown anywhere in the visualization", () => {
     const history = [
-      buildEntry("2026-07-01", 1),
-      buildEntry("2026-07-02", 3),
+      buildEntry("2026-07-01", 2),
+      buildEntry("2026-07-02", 4),
       buildEntry("2026-07-03", 6),
       buildEntry("2026-07-04", 8),
-      buildEntry("2026-07-05", 10),
     ]
     const months = buildHabitCalendarMonths(history, "2026-07-11", 10)
     const july = months.find((month) => month.monthKey === "2026-07")!
@@ -74,7 +73,16 @@ describe("buildHabitCalendarMonths", () => {
     expect(findDay(july, "2026-07-02")).toMatchObject({ level: 2 })
     expect(findDay(july, "2026-07-03")).toMatchObject({ level: 3 })
     expect(findDay(july, "2026-07-04")).toMatchObject({ level: 4 })
-    expect(findDay(july, "2026-07-05")).toMatchObject({ level: 4 })
+  })
+
+  test("scales off the max value across every displayed month, not just the current one, so the busiest day is always the most intense", () => {
+    const history = [buildEntry("2026-06-15", 10), buildEntry("2026-07-01", 5)]
+    const months = buildHabitCalendarMonths(history, "2026-07-11", 10)
+    const july = months.find((month) => month.monthKey === "2026-07")!
+    const june = months.find((month) => month.monthKey === "2026-06")!
+
+    expect(findDay(july, "2026-07-01")).toMatchObject({ level: 2 })
+    expect(findDay(june, "2026-06-15")).toMatchObject({ level: 4 })
   })
 
   test("pads the final week with trailing blanks up to a full 7-day row", () => {

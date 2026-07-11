@@ -5,13 +5,17 @@ import { addDays, buildDateRange, getDateWindowStart, getDayOfWeek } from "mdm-u
 import type { HabitCalendarDay, HabitCalendarMonth, HabitCalendarWeek } from "./HabitCalendar.types"
 
 const INTENSITY_LEVEL_COUNT = 4
-const HABIT_VALUE_MAX = 10
 const WEEK_LENGTH = 7
 const TRACKING_WINDOW_MULTIPLE = 2
 
-const computeIntensityLevel = (value: number): number => {
-  if (value <= 0) return 0
-  const ratio = Math.min(value, HABIT_VALUE_MAX) / HABIT_VALUE_MAX
+/**
+ * Scales `value` relative to `maxValue` (the highest value shown anywhere in
+ * the visualization) so the busiest day always reaches the top intensity
+ * level, rather than assuming a fixed habit-value ceiling.
+ */
+const computeIntensityLevel = (value: number, maxValue: number): number => {
+  if (value <= 0 || maxValue <= 0) return 0
+  const ratio = Math.min(value, maxValue) / maxValue
   return Math.min(INTENSITY_LEVEL_COUNT, Math.ceil(ratio * INTENSITY_LEVEL_COUNT))
 }
 
@@ -59,6 +63,7 @@ const buildMonth = (
   monthKey: string,
   valueByDate: Map<string, number>,
   referenceDate: string,
+  maxValue: number,
 ): HabitCalendarMonth => {
   const firstOfMonth = getFirstOfMonth(monthKey)
   const lastOfMonth = addDays(firstOfMonth, getDaysInMonth(monthKey) - 1)
@@ -68,7 +73,7 @@ const buildMonth = (
   for (const date of buildDateRange(firstOfMonth, lastOfMonth)) {
     const isFuture = date > referenceDate
     const value = valueByDate.get(date) ?? 0
-    cells.push({ date, value, level: isFuture ? 0 : computeIntensityLevel(value), isFuture })
+    cells.push({ date, value, level: isFuture ? 0 : computeIntensityLevel(value, maxValue), isFuture })
   }
   while (cells.length % WEEK_LENGTH !== 0) {
     cells.push(null)
@@ -88,6 +93,11 @@ const buildMonth = (
  * on Sunday so the grid matches a standard wall-calendar layout; days outside
  * the month (padding) or after the reference date are represented as
  * `null`/`isFuture` rather than dropped, so grid alignment is preserved.
+ *
+ * Intensity levels are scaled relative to the highest value shown anywhere
+ * in the visualization (not a fixed habit-value ceiling), so the busiest day
+ * across the displayed months is always the most intense color and every
+ * other day scales back from it.
  */
 export const buildHabitCalendarMonths = (
   history: readonly HabitHistoryEntry[],
@@ -98,7 +108,13 @@ export const buildHabitCalendarMonths = (
   const valueByDate = new Map(history.map((entry) => [entry.date, entry.value]))
   const monthKeys = enumerateMonthKeys(getMonthKey(rangeStart), getMonthKey(referenceDate))
 
+  const firstOfDisplayedRange = getFirstOfMonth(monthKeys[0])
+  const maxValue = Math.max(
+    0,
+    ...buildDateRange(firstOfDisplayedRange, referenceDate).map((date) => valueByDate.get(date) ?? 0),
+  )
+
   return monthKeys
-    .map((monthKey) => buildMonth(monthKey, valueByDate, referenceDate))
+    .map((monthKey) => buildMonth(monthKey, valueByDate, referenceDate, maxValue))
     .reverse()
 }
