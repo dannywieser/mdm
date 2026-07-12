@@ -1,5 +1,14 @@
 # notes-api
 
+## 2.2.3
+
+### Patch Changes
+
+- app-config@2.2.3
+- markdown@2.2.3
+- mdm-util@2.2.3
+- services@2.1.10
+
 ## 2.2.2
 
 ### Patch Changes
