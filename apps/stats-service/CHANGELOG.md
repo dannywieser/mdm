@@ -1,5 +1,13 @@
 # stats-service
 
+## 1.1.9
+
+### Patch Changes
+
+- app-config@2.2.2
+- markdown@2.2.2
+- mdm-util@2.2.2
+
 ## 1.1.8
 
 ### Patch Changes
