@@ -20,7 +20,8 @@ const LEVEL_STYLES = [
 ] as const
 
 const GRID_COLUMNS = "repeat(7, 1fr)"
-const MONTHS_GRID_COLUMNS = "repeat(auto-fit, minmax(150px, 1fr))"
+const MIN_MONTH_WIDTH_PX = CELL_SIZE_PX * 7 + CELL_GAP_PX * 6
+const MONTHS_GRID_COLUMNS = `repeat(auto-fit, minmax(${MIN_MONTH_WIDTH_PX}px, 1fr))`
 
 export function HabitCalendar({ history, referenceDate }: Readonly<HabitCalendarProps>) {
   const { t } = useI18n()
@@ -49,7 +50,7 @@ export function HabitCalendar({ history, referenceDate }: Readonly<HabitCalendar
           {t("habit.calendarTitle")}
         </Text>
 
-        <Box display="grid" gap={4} gridTemplateColumns={MONTHS_GRID_COLUMNS}>
+        <Box display="grid" alignItems="start" gap={4} gridTemplateColumns={MONTHS_GRID_COLUMNS}>
           {months.map((month) => (
             <VStack key={month.monthKey} align="stretch" gap={1.5}>
               <Text fontSize="xs" color="app.textMuted" fontWeight="medium">
