@@ -1,5 +1,13 @@
 # web
 
+## 2.2.3
+
+### Patch Changes
+
+- 732ffdb: Fix the habit tracking calendar to lay out its months in a responsive grid that fills the available container width, instead of a fixed-width row that left empty space and wrapped awkwardly on smaller screens.
+  - mdm-util@2.2.3
+  - services@2.1.10
+
 ## 2.2.2
 
 ### Patch Changes
