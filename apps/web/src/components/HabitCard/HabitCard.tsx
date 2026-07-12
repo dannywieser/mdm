@@ -4,7 +4,6 @@ import {
   StatLabel,
   StatRoot,
   StatValueText,
-  Text,
 } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
 
@@ -45,9 +44,11 @@ export function HabitCard({ habit }: Readonly<HabitCardProps>) {
           width="full"
           _hover={{ borderColor: "app.borderHover" }}
         >
-          <Text fontSize="sm" fontWeight="semibold" color="app.text" mb={2}>
-            {t(`habit.${habit.mode}`, { name: habit.habitName })}
-          </Text>
+          <StatRoot size="sm" mb={2}>
+            <StatLabel>
+              {t(`habit.${habit.mode}`, { name: habit.habitName })}
+            </StatLabel>
+          </StatRoot>
           <SimpleGrid columns={3} gap={3}>
             <StatRoot size="sm">
               <StatLabel color="app.textMuted">{t("habit.score")}</StatLabel>
