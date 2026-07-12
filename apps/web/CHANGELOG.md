@@ -1,5 +1,13 @@
 # web
 
+## 2.2.1
+
+### Patch Changes
+
+- 380a398: Fix the web image serving stale content after a deploy: nginx now sends `no-cache` for `index.html`/SPA routes so browsers always revalidate them, and long-lived immutable caching for Vite's content-hashed `/assets/` files, so updates take effect without a manual browser cache clear.
+  - mdm-util@2.2.1
+  - services@2.1.8
+
 ## 2.2.0
 
 ### Minor Changes
