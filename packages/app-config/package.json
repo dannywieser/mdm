@@ -1,6 +1,6 @@
 {
   "name": "app-config",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "private": true,
   "license": "MIT",
   "main": "dist/index.js",
@@ -22,6 +22,6 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "mdm-util": "2.2.3"
+    "mdm-util": "2.2.4"
   }
 }
