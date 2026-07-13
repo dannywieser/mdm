@@ -49,6 +49,7 @@ describe("NotesView", () => {
   test("renders NotesReview when configured component is NotesReview", () => {
     useViewsQueryMock.mockReturnValue({
       data: {
+        coverProperty: "cover",
         views: [
           {
             component: "NotesReview",
@@ -69,6 +70,7 @@ describe("NotesView", () => {
   test("falls back to NotesList when component is missing", () => {
     useViewsQueryMock.mockReturnValue({
       data: {
+        coverProperty: "cover",
         views: [
           { component: "NotesList", count: 1, id: "books", name: "Books" },
         ],
@@ -83,6 +85,7 @@ describe("NotesView", () => {
   test("renders NotesSummaryTable when configured component is NotesSummaryTable", () => {
     useViewsQueryMock.mockReturnValue({
       data: {
+        coverProperty: "cover",
         views: [
           {
             component: "NotesSummaryTable",

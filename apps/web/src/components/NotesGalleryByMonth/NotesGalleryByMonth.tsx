@@ -12,7 +12,7 @@ import { filterNotesWithCovers } from "../NoteCoverGrid/NoteCoverGrid.util"
 import type { NotesGalleryByMonthProps, NotesGalleryByMonthRouteParamKey } from "./NotesGalleryByMonth.types"
 import { getMonthName, getMostRecentYear, groupNotesByMonth } from "./NotesGalleryByMonth.util"
 
-export const NotesGalleryByMonth = ({ aspectRatio, badges = [], year }: NotesGalleryByMonthProps) => {
+export const NotesGalleryByMonth = ({ aspectRatio, badges = [], coverProperty, year }: NotesGalleryByMonthProps) => {
   const { t } = useI18n()
   const { view } = useParams<NotesGalleryByMonthRouteParamKey>()
   const { data, error } = useNotesQuery({ includeContent: false, view })
@@ -20,7 +20,7 @@ export const NotesGalleryByMonth = ({ aspectRatio, badges = [], year }: NotesGal
 
   if (error) return <AppError message={error.message} />
 
-  const notesWithCovers = filterNotesWithCovers(data.notes)
+  const notesWithCovers = filterNotesWithCovers(data.notes, coverProperty)
   const targetYear = year ?? getMostRecentYear(notesWithCovers)
   const notesByMonth = groupNotesByMonth(notesWithCovers, targetYear)
   const months = [...notesByMonth.keys()]
@@ -53,7 +53,7 @@ export const NotesGalleryByMonth = ({ aspectRatio, badges = [], year }: NotesGal
           <Heading px={6} pt={6} size="md">
             {getMonthName(month)} {targetYear}
           </Heading>
-          <NoteCoverGrid aspectRatio={aspectRatio} badges={badges} notes={notesByMonth.get(month) ?? []} />
+          <NoteCoverGrid aspectRatio={aspectRatio} badges={badges} coverProperty={coverProperty} notes={notesByMonth.get(month) ?? []} />
         </Box>
       ))}
     </Box>

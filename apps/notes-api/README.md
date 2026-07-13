@@ -53,7 +53,7 @@ Express-based Node service with request logging via `pino-http`.
       ]
     }
     ```
-  - Notes without frontmatter return `"frontmatter": null`. `linkedNotes` (parsed notes referenced via `[[wikilink]]` syntax in the body) is only present on notes that link to others; unmatched wikilinks are left in the body as plain text
+  - Notes without frontmatter return `"frontmatter": null`, unless a fallback cover image is found (see `coverProperty` below), in which case `frontmatter` is `{ "cover": "..." }`. `linkedNotes` (parsed notes referenced via `[[wikilink]]` syntax in the body) is only present on notes that link to others; unmatched wikilinks are left in the body as plain text
   - Error responses: `500`
     ```json
     {
@@ -68,6 +68,7 @@ Express-based Node service with request logging via `pino-http`.
   - Success response: `200`
     ```json
     {
+      "coverProperty": "cover",
       "views": [
         {
           "id": "books",
@@ -83,6 +84,7 @@ Express-based Node service with request logging via `pino-http`.
       ]
     }
     ```
+    `coverProperty` is the configured frontmatter key (see Configuration below) that gallery-style components in the web app read for a note's cover image.
   - Error response: `500`
     ```json
     { "error": "Unable to load views" }
@@ -97,6 +99,7 @@ Configured via `app.config.json` at the repository root plus the `NOTES_ROOT` en
 - `obsidianVault`: vault folder name, used to build each note's `obsidianUrl` deep link.
 - `attachmentsDirectory` (optional): folder name (relative to `NOTES_ROOT`) where Obsidian stores attachments; used to resolve bare-filename images in note bodies to the `/images?path=...` proxy.
 - `createdDateProperty` (optional, defaults to `"created"`): frontmatter key treated as the note's created-date source.
+- `coverProperty` (optional, defaults to `"cover"`): frontmatter key holding a note's cover image. If a note has no value under this key, the first image found in the note's raw body text (standard `![alt](path)` markdown or an Obsidian `![[path]]` embed) is used as the cover instead.
 - `timezone` (optional, defaults to `"UTC"`): IANA timezone used to evaluate the `$today`/`$onThisDay` filter values against "now".
 - `views` (optional): array of view configs. Each view has:
   - `id`: route key used by `GET /notes?view=<id>`

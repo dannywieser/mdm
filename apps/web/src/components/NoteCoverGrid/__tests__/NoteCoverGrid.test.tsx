@@ -24,7 +24,7 @@ describe("NoteCoverGrid", () => {
   test("renders a card for each note in a masonry grid", () => {
     render(
       <ChakraProvider value={defaultSystem}>
-        <NoteCoverGrid notes={[noteWithCover]} />
+        <NoteCoverGrid coverProperty="cover" notes={[noteWithCover]} />
       </ChakraProvider>,
     )
 
@@ -36,6 +36,7 @@ describe("NoteCoverGrid", () => {
     render(
       <ChakraProvider value={defaultSystem}>
         <NoteCoverGrid
+          coverProperty="cover"
           notes={[
             {
               id: "1",
@@ -59,7 +60,7 @@ describe("NoteCoverGrid", () => {
   test("applies a default aspect ratio to the image placeholder when none is configured", () => {
     render(
       <ChakraProvider value={defaultSystem}>
-        <NoteCoverGrid notes={[noteWithCover]} />
+        <NoteCoverGrid coverProperty="cover" notes={[noteWithCover]} />
       </ChakraProvider>,
     )
 
@@ -70,7 +71,7 @@ describe("NoteCoverGrid", () => {
   test("uses a configured aspect ratio for the image placeholder", () => {
     render(
       <ChakraProvider value={defaultSystem}>
-        <NoteCoverGrid aspectRatio="16/9" notes={[noteWithCover]} />
+        <NoteCoverGrid aspectRatio="16/9" coverProperty="cover" notes={[noteWithCover]} />
       </ChakraProvider>,
     )
 
@@ -81,12 +82,32 @@ describe("NoteCoverGrid", () => {
   test("renders NoteBadges with configured badges", () => {
     render(
       <ChakraProvider value={defaultSystem}>
-        <NoteCoverGrid badges={["frontmatter.genre", "frontmatter.status"]} notes={[noteWithCover]} />
+        <NoteCoverGrid badges={["frontmatter.genre", "frontmatter.status"]} coverProperty="cover" notes={[noteWithCover]} />
       </ChakraProvider>,
     )
 
     expect(screen.getAllByTestId("note-badges").length).toBeGreaterThan(0)
     expect(screen.getAllByText("frontmatter.genre,frontmatter.status").length).toBeGreaterThan(0)
+  })
+
+  test("reads the image from the configured coverProperty instead of the hardcoded cover key", () => {
+    const noteWithThumbnail = {
+      id: "1",
+      title: "Thumbnail Note",
+      obsidianUrl: "obsidian://open?vault=v&file=1",
+      frontmatter: { thumbnail: "https://example.com/thumb.jpg" },
+    } as never
+
+    render(
+      <ChakraProvider value={defaultSystem}>
+        <NoteCoverGrid coverProperty="thumbnail" notes={[noteWithThumbnail]} />
+      </ChakraProvider>,
+    )
+
+    const img = screen.getByRole("img", { name: "Thumbnail Note" })
+    expect(img.getAttribute("src")).toBe(
+      `/images?path=${encodeURIComponent("https://example.com/thumb.jpg")}`,
+    )
   })
 })
 
@@ -114,26 +135,32 @@ describe("filterNotesWithCovers", () => {
   const note = (cover: unknown) => ({ id: "1", frontmatter: cover !== undefined ? { cover } : {} }) as never
 
   test("includes notes with a string cover", () => {
-    expect(filterNotesWithCovers([note("attachments/cover.jpg")])).toHaveLength(1)
+    expect(filterNotesWithCovers([note("attachments/cover.jpg")], "cover")).toHaveLength(1)
   })
 
   test("includes notes with a non-empty array cover", () => {
-    expect(filterNotesWithCovers([note(["attachments/cover.jpg"])])).toHaveLength(1)
+    expect(filterNotesWithCovers([note(["attachments/cover.jpg"])], "cover")).toHaveLength(1)
   })
 
   test("excludes notes with no cover field", () => {
-    expect(filterNotesWithCovers([note(undefined)])).toHaveLength(0)
+    expect(filterNotesWithCovers([note(undefined)], "cover")).toHaveLength(0)
   })
 
   test("excludes notes with an empty string cover", () => {
-    expect(filterNotesWithCovers([note("")])).toHaveLength(0)
+    expect(filterNotesWithCovers([note("")], "cover")).toHaveLength(0)
   })
 
   test("excludes notes with an empty array cover", () => {
-    expect(filterNotesWithCovers([note([])])).toHaveLength(0)
+    expect(filterNotesWithCovers([note([])], "cover")).toHaveLength(0)
   })
 
   test("excludes notes with an array whose first element is empty", () => {
-    expect(filterNotesWithCovers([note([""])])).toHaveLength(0)
+    expect(filterNotesWithCovers([note([""])], "cover")).toHaveLength(0)
+  })
+
+  test("looks up the configured coverProperty instead of the hardcoded cover key", () => {
+    const noteWithThumbnail = { id: "1", frontmatter: { thumbnail: "attachments/thumb.jpg" } } as never
+    expect(filterNotesWithCovers([noteWithThumbnail], "thumbnail")).toHaveLength(1)
+    expect(filterNotesWithCovers([noteWithThumbnail], "cover")).toHaveLength(0)
   })
 })

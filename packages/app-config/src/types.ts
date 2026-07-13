@@ -28,6 +28,7 @@ export interface NotesView {
 
 export interface ResolvedNotesConfig {
   attachmentsDirectory: string
+  coverProperty: string
   createdDateProperty: string
   dateFormats: string[]
   habits: HabitConfig[]

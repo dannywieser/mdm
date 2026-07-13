@@ -11,5 +11,6 @@ export interface ViewSummary {
 }
 
 export interface ViewsResponse {
+  coverProperty: string
   views: ViewSummary[]
 }

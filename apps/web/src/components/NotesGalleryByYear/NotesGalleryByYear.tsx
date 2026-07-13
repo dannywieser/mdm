@@ -12,7 +12,7 @@ import { filterNotesWithCovers } from "../NoteCoverGrid/NoteCoverGrid.util"
 import type { NotesGalleryByYearProps, NotesGalleryByYearRouteParamKey } from "./NotesGalleryByYear.types"
 import { groupNotesByYear } from "./NotesGalleryByYear.util"
 
-export const NotesGalleryByYear = ({ aspectRatio, badges = [] }: NotesGalleryByYearProps) => {
+export const NotesGalleryByYear = ({ aspectRatio, badges = [], coverProperty }: NotesGalleryByYearProps) => {
   const { t } = useI18n()
   const { view } = useParams<NotesGalleryByYearRouteParamKey>()
   const { data, error } = useNotesQuery({ includeContent: false, view })
@@ -20,7 +20,7 @@ export const NotesGalleryByYear = ({ aspectRatio, badges = [] }: NotesGalleryByY
 
   if (error) return <AppError message={error.message} />
 
-  const notesWithCovers = filterNotesWithCovers(data.notes)
+  const notesWithCovers = filterNotesWithCovers(data.notes, coverProperty)
   const notesByYear = groupNotesByYear(notesWithCovers)
   const years = [...notesByYear.keys()]
   const visibleYears = selectedYear === "all" ? years : years.filter((year) => year === selectedYear)
@@ -52,7 +52,7 @@ export const NotesGalleryByYear = ({ aspectRatio, badges = [] }: NotesGalleryByY
           <Heading px={6} pt={6} size="md">
             {year}
           </Heading>
-          <NoteCoverGrid aspectRatio={aspectRatio} badges={badges} notes={notesByYear.get(year) ?? []} />
+          <NoteCoverGrid aspectRatio={aspectRatio} badges={badges} coverProperty={coverProperty} notes={notesByYear.get(year) ?? []} />
         </Box>
       ))}
     </Box>

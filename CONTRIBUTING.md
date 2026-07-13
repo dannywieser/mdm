@@ -44,6 +44,7 @@ This repository is a Turborepo monorepo with:
   - `obsidianVault`: vault folder name, used to build each note's `obsidianUrl` deep link.
   - `attachmentsDirectory` (optional): folder name (relative to `NOTES_ROOT`) where Obsidian stores attachments.
   - `createdDateProperty` (optional, defaults to `"created"`): frontmatter key treated as a note's created-date source.
+  - `coverProperty` (optional, defaults to `"cover"`): frontmatter key treated as a note's cover image; see `apps/notes-api/README.md` for the raw-body fallback behavior when a note has no explicit value.
   - `timezone` (optional, defaults to `"UTC"`): IANA timezone used for date-relative filters (`$today`/`$onThisDay`) and habit scoring.
 - See each app's README for app-specific config fields (`views`, `flags`, `habits`, etc.).
 

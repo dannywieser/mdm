@@ -8,9 +8,9 @@ export function getCoverSrc(cover: FrontmatterValue): string {
   return buildImageUrl({ path: unquotedPath })
 }
 
-export function filterNotesWithCovers(notes: Note[]): Note[] {
+export function filterNotesWithCovers(notes: Note[], coverProperty: string): Note[] {
   return notes.filter((note) => {
-    const cover = note.frontmatter?.cover
+    const cover = note.frontmatter?.[coverProperty]
     if (cover == null) return false
     if (Array.isArray(cover)) return cover.length > 0 && cover[0] !== ""
     return cover !== ""

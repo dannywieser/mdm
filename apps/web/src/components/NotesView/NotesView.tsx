@@ -13,13 +13,8 @@ import { NotesSummaryTable } from "../NotesSummaryTable"
 import type {
   NotesViewRouteParamKey,
   ViewComponentName,
+  ViewComponentProps,
 } from "./NotesView.types"
-
-interface ViewComponentProps {
-  aspectRatio?: string
-  badges?: string[]
-  layout?: string
-}
 
 const VIEW_COMPONENTS: Record<ViewComponentName, ComponentType<ViewComponentProps>> = {
   NotesList,
@@ -39,5 +34,13 @@ export const NotesView = () => {
   const SelectedComponent =
     (componentName && VIEW_COMPONENTS[componentName]) ?? NotesList
 
-  return <SelectedComponent aspectRatio={configuredView?.aspectRatio} badges={configuredView?.badges} layout={configuredView?.layout} key={view} />
+  return (
+    <SelectedComponent
+      aspectRatio={configuredView?.aspectRatio}
+      badges={configuredView?.badges}
+      coverProperty={data.coverProperty}
+      layout={configuredView?.layout}
+      key={view}
+    />
+  )
 }

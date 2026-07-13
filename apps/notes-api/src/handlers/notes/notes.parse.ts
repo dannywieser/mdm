@@ -1,7 +1,7 @@
 import type { MarkdownNode, Note, NoteFrontmatter } from "markdown"
 
 import { resolveNotesConfig } from "app-config"
-import { parseFrontMatter } from "markdown"
+import { extractFirstImagePath, parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
@@ -52,23 +52,40 @@ export const parseMarkdownFile = async (
   }
 }
 
+const resolveCoverImagePath = (
+  rawPath: string,
+  noteRelativePath: string,
+  attachmentsDirectory: string,
+): string | null => {
+  const trimmedPath = rawPath.trim()
+  if (!trimmedPath) return null
+  if (EXTERNAL_IMAGE_URL_PATTERN.test(trimmedPath)) return trimmedPath
+  return resolveLocalImagePath(trimmedPath, noteRelativePath, attachmentsDirectory)
+}
+
 export const resolveFrontmatterImages = (
   frontmatter: NoteFrontmatter | null,
+  body: string,
   noteRelativePath: string,
-  attachmentsDirectory = "",
+  attachmentsDirectory: string,
+  coverProperty: string,
 ): NoteFrontmatter | null => {
-  if (!frontmatter) return null
+  const existingCover = frontmatter?.[coverProperty]
+  const rawExistingCover = Array.isArray(existingCover) ? existingCover[0] : existingCover
 
-  const cover = frontmatter.cover
-  if (!cover) return frontmatter
+  if (rawExistingCover) {
+    const resolvedPath = resolveCoverImagePath(rawExistingCover, noteRelativePath, attachmentsDirectory)
+    if (!resolvedPath) return frontmatter
+    return { ...frontmatter, [coverProperty]: resolvedPath }
+  }
 
-  const rawPath = Array.isArray(cover) ? cover[0] : cover
-  if (!rawPath) return frontmatter
+  const firstImagePath = extractFirstImagePath(body)
+  if (!firstImagePath) return frontmatter
 
-  const resolvedPath = resolveLocalImagePath(rawPath, noteRelativePath, attachmentsDirectory)
-  if (!resolvedPath) return frontmatter
+  const resolvedFallbackPath = resolveCoverImagePath(firstImagePath, noteRelativePath, attachmentsDirectory)
+  if (!resolvedFallbackPath) return frontmatter
 
-  return { ...frontmatter, cover: resolvedPath }
+  return { ...frontmatter, [coverProperty]: resolvedFallbackPath }
 }
 
 const buildMarkdownTree = (

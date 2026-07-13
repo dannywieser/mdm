@@ -7,12 +7,12 @@ afterEach(cleanup)
 
 import { NotesGallery } from "../NotesGallery"
 
-const renderGallery = (badges: string[] = []) =>
+const renderGallery = (badges: string[] = [], coverProperty = "cover") =>
   render(
     <ChakraProvider value={defaultSystem}>
       <MemoryRouter initialEntries={["/notes/books"]}>
         <Routes>
-          <Route path="/notes/:view" element={<NotesGallery badges={badges} />} />
+          <Route path="/notes/:view" element={<NotesGallery badges={badges} coverProperty={coverProperty} />} />
         </Routes>
       </MemoryRouter>
     </ChakraProvider>,
@@ -80,6 +80,29 @@ describe("NotesGallery", () => {
 
     expect(screen.getByText("With Cover")).toBeTruthy()
     expect(screen.queryByText("No Cover")).toBeNull()
+  })
+
+  test("filters using the configured coverProperty instead of the hardcoded cover key", () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          {
+            id: "3",
+            title: "Thumbnail Note",
+            obsidianUrl: "obsidian://open?vault=v&file=3",
+            frontmatter: { thumbnail: "https://example.com/thumb.jpg" },
+          },
+          noteWithCover,
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+
+    renderGallery([], "thumbnail")
+
+    expect(screen.getByText("Thumbnail Note")).toBeTruthy()
+    expect(screen.queryByText("With Cover")).toBeNull()
   })
 
   test("renders NoteBadges with configured badges", () => {

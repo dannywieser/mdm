@@ -76,6 +76,7 @@ const getJsonResult = (
 }
 
 const BASE_CONFIG = {
+  coverProperty: "cover",
   createdDateProperty: "created",
   dateFormats: ["YYYY.MM.DD"],
   deriveTitleDate: false,

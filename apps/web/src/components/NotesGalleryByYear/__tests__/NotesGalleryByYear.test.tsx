@@ -39,12 +39,12 @@ const note = (id: string, title: string, createdDate: string | null, modifiedDat
   modifiedDate,
 })
 
-const renderComponent = (props: Parameters<typeof NotesGalleryByYear>[0] = {}) =>
+const renderComponent = (props: Partial<Parameters<typeof NotesGalleryByYear>[0]> = {}) =>
   render(
     <ChakraProvider value={defaultSystem}>
       <MemoryRouter initialEntries={["/notes/books"]}>
         <Routes>
-          <Route path="/notes/:view" element={<NotesGalleryByYear {...props} />} />
+          <Route path="/notes/:view" element={<NotesGalleryByYear coverProperty="cover" {...props} />} />
         </Routes>
       </MemoryRouter>
     </ChakraProvider>,
@@ -112,5 +112,26 @@ describe("NotesGalleryByYear", () => {
 
     expect(screen.getByText("2023 Note")).toBeTruthy()
     expect(screen.queryByText("2024 Note")).toBeNull()
+  })
+
+  test("filters using the configured coverProperty instead of the hardcoded cover key", () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          {
+            ...note("1", "Thumbnail Note", "2024-01-15T00:00:00.000Z"),
+            frontmatter: { thumbnail: "https://example.com/thumb.jpg" },
+          },
+          note("2", "Cover Note", "2024-03-10T00:00:00.000Z"),
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+
+    renderComponent({ coverProperty: "thumbnail" })
+
+    expect(screen.getByText("Thumbnail Note")).toBeTruthy()
+    expect(screen.queryByText("Cover Note")).toBeNull()
   })
 })

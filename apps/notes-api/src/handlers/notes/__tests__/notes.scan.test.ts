@@ -274,4 +274,78 @@ This is a note.`)
 
     expect(note.frontmatter?.cover).toBe("https://example.com/cover.png")
   })
+
+  test("scanMarkdownFile falls back to the first body image when no cover frontmatter is set", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "# Note\n\n![alt](attach-20260616070917164.png)",
+      frontmatter: { topic: ["games"] },
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/citizen-sleeper-2.md")
+
+    expect(note.frontmatter).toEqual({
+      topic: ["games"],
+      cover: "games/citizen-sleeper-2/attach-20260616070917164.png",
+    })
+  })
+
+  test("scanMarkdownFile falls back to the first body image when there is no frontmatter at all", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![[photo.png]]",
+      frontmatter: null,
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/note.md")
+
+    expect(note.frontmatter).toEqual({ cover: "games/note/photo.png" })
+  })
+
+  test("scanMarkdownFile does not add a fallback cover when the note has no image", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "# Note\n\nJust text, no images here.",
+      frontmatter: { topic: ["games"] },
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/note.md")
+
+    expect(note.frontmatter).toEqual({ topic: ["games"] })
+  })
+
+  test("scanMarkdownFile does not use the fallback image when an explicit cover is already set", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![alt](body-image.png)",
+      frontmatter: { cover: "explicit-cover.png" },
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/note.md")
+
+    expect(note.frontmatter?.cover).toBe("games/note/explicit-cover.png")
+  })
+
+  test("scanMarkdownFile reads and writes the fallback cover under the configured coverProperty", async () => {
+    resolveNotesConfigMock.mockResolvedValue({ ...defaultConfig, coverProperty: "thumbnail" })
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![alt](body-image.png)",
+      frontmatter: {},
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/note.md")
+
+    expect(note.frontmatter).toEqual({ thumbnail: "games/note/body-image.png" })
+  })
 })

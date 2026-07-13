@@ -20,7 +20,7 @@ const MASONRY_ROW_HEIGHT_PX = 8
 const MASONRY_COLUMNS = { base: 1, md: 3, lg: 4, xl: 5, "2xl": 8 }
 const DEFAULT_ASPECT_RATIO = "3/4"
 
-const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => (
+const GalleryCard = ({ note, aspectRatio, badges, coverProperty }: GalleryCardProps) => (
   <a href={note.obsidianUrl} style={{ textDecoration: "none", outline: "none" }}>
     <Card.Root
       bg="app.panelBackground"
@@ -33,7 +33,7 @@ const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => (
         alt={note.title}
         aspectRatio={aspectRatio ?? DEFAULT_ASPECT_RATIO}
         objectFit="cover"
-        src={getCoverSrc(note.frontmatter?.cover ?? "")}
+        src={getCoverSrc(note.frontmatter?.[coverProperty] ?? "")}
       />
       <Box
         background="rgba(0,0,0,0.65)"
@@ -62,7 +62,7 @@ const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => (
   </a>
 )
 
-const MasonryGalleryCard = ({ aspectRatio, badges, note }: GalleryCardProps) => {
+const MasonryGalleryCard = ({ aspectRatio, badges, coverProperty, note }: GalleryCardProps) => {
   const { ref, rowSpan } = useMasonryRowSpan({ gapPx: MASONRY_GAP_PX, rowHeightPx: MASONRY_ROW_HEIGHT_PX })
 
   return (
@@ -74,12 +74,12 @@ const MasonryGalleryCard = ({ aspectRatio, badges, note }: GalleryCardProps) => 
       style={{ gridRowEnd: `span ${rowSpan}` }}
       _focusWithin={CARD_FOCUS_STYLE}
     >
-      <GalleryCard aspectRatio={aspectRatio} badges={badges} note={note} />
+      <GalleryCard aspectRatio={aspectRatio} badges={badges} coverProperty={coverProperty} note={note} />
     </Box>
   )
 }
 
-export const NoteCoverGrid = ({ aspectRatio, badges = [], notes }: NoteCoverGridProps) => (
+export const NoteCoverGrid = ({ aspectRatio, badges = [], coverProperty, notes }: NoteCoverGridProps) => (
   <Box
     data-testid="gallery-grid"
     display="grid"
@@ -96,7 +96,7 @@ export const NoteCoverGrid = ({ aspectRatio, badges = [], notes }: NoteCoverGrid
     p={6}
   >
     {notes.map((note) => (
-      <MasonryGalleryCard key={note.id} aspectRatio={aspectRatio} badges={badges} note={note} />
+      <MasonryGalleryCard key={note.id} aspectRatio={aspectRatio} badges={badges} coverProperty={coverProperty} note={note} />
     ))}
   </Box>
 )

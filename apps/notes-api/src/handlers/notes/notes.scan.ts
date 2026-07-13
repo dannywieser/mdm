@@ -21,7 +21,7 @@ export const resolveCreatedDate = (
 export const scanMarkdownFile = async (
   filePath: string,
 ): Promise<ScannedNote> => {
-  const { attachmentsDirectory, dateFormats, notesDirectory, obsidianVault } = await resolveNotesConfig()
+  const { attachmentsDirectory, coverProperty, dateFormats, notesDirectory, obsidianVault } = await resolveNotesConfig()
   const [source, stats] = await Promise.all([
     fs.readFile(filePath, "utf8"),
     fs.stat(filePath),
@@ -36,7 +36,13 @@ export const scanMarkdownFile = async (
 
   const obsidianUrl = buildObsidianUrl(obsidianVault, notesDirectory, filePath)
   const relativePath = path.relative(notesDirectory, filePath).split(path.sep).join("/")
-  const resolvedFrontmatter = resolveFrontmatterImages(frontmatter, relativePath, attachmentsDirectory)
+  const resolvedFrontmatter = resolveFrontmatterImages(
+    frontmatter,
+    body,
+    relativePath,
+    attachmentsDirectory,
+    coverProperty,
+  )
 
   return {
     basename,

@@ -16,8 +16,8 @@ mdm is an npm workspaces + Turbo monorepo of Express backend services and a Reac
 
 **Packages**
 
-- `packages/app-config` — reads and validates `app.config.json`, merges in the `NOTES_ROOT` env var, and caches the result. Exposes `resolveNotesConfig()` returning a `ResolvedNotesConfig` (`notesDirectory`, `obsidianVault`, `dateFormats`, `attachmentsDirectory`, `createdDateProperty`, `timezone`, `habits`, `views`). Config errors are thrown as plain `Error`s with a message describing what's wrong.
-- `packages/markdown` — low-level markdown utilities: `parseFrontMatter`, `parseMarkdownBodyDates`/`extractNoteDates`, `resolveDateFromFrontmatterOrTitle`/`resolveOldestDate`, `collectMarkdownFiles`, `buildObsidianUrl`. Owns the `Note` type used across the codebase.
+- `packages/app-config` — reads and validates `app.config.json`, merges in the `NOTES_ROOT` env var, and caches the result. Exposes `resolveNotesConfig()` returning a `ResolvedNotesConfig` (`notesDirectory`, `obsidianVault`, `dateFormats`, `attachmentsDirectory`, `createdDateProperty`, `coverProperty`, `timezone`, `habits`, `views`). Config errors are thrown as plain `Error`s with a message describing what's wrong.
+- `packages/markdown` — low-level markdown utilities: `parseFrontMatter`, `parseMarkdownBodyDates`/`extractNoteDates`, `resolveDateFromFrontmatterOrTitle`/`resolveOldestDate`, `collectMarkdownFiles`, `buildObsidianUrl`, `extractFirstImagePath` (raw-text fallback image extraction). Owns the `Note` type used across the codebase.
 - `packages/services` — shared response types and React Query hooks consumed by `apps/web`, plus the demo-mode config/URL helpers.
 - `packages/util` (`mdm-util`) — dependency-free pure-function helpers (dates, strings, objects, promises, regex, IDs), plus `./node` and `./redis` subpath exports.
 - `packages/logger` (`mdm-logger`) — shared `pino`-based logger factory used by every backend service.
