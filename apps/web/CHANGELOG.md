@@ -1,5 +1,13 @@
 # web
 
+## 2.2.4
+
+### Patch Changes
+
+- 217b1e0: Fix the web container's Docker healthcheck always reporting unhealthy: it hit "localhost", which resolves to the IPv6 loopback that nginx doesn't bind, so the check now targets 127.0.0.1 directly.
+  - mdm-util@2.2.4
+  - services@2.1.11
+
 ## 2.2.3
 
 ### Patch Changes
