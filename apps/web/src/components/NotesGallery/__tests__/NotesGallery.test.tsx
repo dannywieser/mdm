@@ -303,4 +303,25 @@ describe("NotesGallery", () => {
       expect(screen.getByText("With Cover")).toBeTruthy()
     })
   })
+
+  test("de-duplicates year selections that are distinct strings but the same number", async () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          {
+            ...noteWithCover,
+            createdDate: "2024-01-01T00:00:00.000Z",
+          },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+
+    renderGallery([], "/notes/books?year=2024&year=02024")
+
+    await waitFor(() => {
+      expect(screen.getAllByRole("button", { name: "gallery.removeFilter" })).toHaveLength(1)
+    })
+  })
 })

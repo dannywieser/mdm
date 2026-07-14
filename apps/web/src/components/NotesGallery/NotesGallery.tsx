@@ -50,10 +50,13 @@ export const NotesGallery = ({ badges = [], frontmatterFilters = [] }: NotesGall
   )
 
   const selectedYears = useMemo(
-    () =>
-      parseParamValues(searchParams, YEAR_PARAM_KEY)
-        .map(Number)
-        .filter((year) => !Number.isNaN(year)),
+    () => [
+      ...new Set(
+        parseParamValues(searchParams, YEAR_PARAM_KEY)
+          .map(Number)
+          .filter((year) => !Number.isNaN(year)),
+      ),
+    ],
     [searchParams],
   )
   const selectedFrontmatter = useMemo(() => {
