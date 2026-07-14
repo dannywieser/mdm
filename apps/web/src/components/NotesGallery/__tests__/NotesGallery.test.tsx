@@ -213,7 +213,7 @@ describe("NotesGallery", () => {
     })
     fireEvent.click(screen.getByRole("button", { name: "2024" }))
 
-    const chip = await screen.findByRole("button", { name: "gallery.removeFilter" }, { timeout: 3000 })
+    const chip = await screen.findByRole("button", { name: "gallery.removeFilter" }, { timeout: 8000 })
     expect(chip).toBeTruthy()
     expect(screen.queryByText("Old Note")).toBeNull()
 

@@ -35,6 +35,8 @@ export const NotesFilterPanel = ({
               <IconButton
                 aria-label={t("gallery.closeFilters")}
                 variant="ghost"
+                color="app.text"
+                _hover={{ bg: "app.panelBackgroundHover" }}
                 {...focusRing}
               >
                 <X size={16} />
