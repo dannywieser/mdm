@@ -103,7 +103,6 @@ describe("config", () => {
 
     await expect(resolveNotesConfig()).resolves.toEqual({
       attachmentsDirectory: "",
-      coverProperty: "cover",
       createdDateProperty: "created",
       dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
       habits: [],
@@ -142,7 +141,6 @@ describe("config", () => {
 
     await expect(resolveNotesConfig()).resolves.toEqual({
       attachmentsDirectory: "",
-      coverProperty: "cover",
       createdDateProperty: "created",
       dateFormats: [],
       habits: [],
@@ -168,24 +166,6 @@ describe("config", () => {
 
     await expect(resolveNotesConfig()).resolves.toMatchObject({
       createdDateProperty: "date_created",
-    })
-  })
-
-  test("defaults coverProperty to cover when omitted", async () => {
-    mockReadFile.mockResolvedValue(JSON.stringify({ obsidianVault: "vault" }))
-
-    await expect(resolveNotesConfig()).resolves.toMatchObject({
-      coverProperty: "cover",
-    })
-  })
-
-  test("uses configured coverProperty when provided", async () => {
-    mockReadFile.mockResolvedValue(
-      JSON.stringify({ coverProperty: "thumbnail", obsidianVault: "vault" }),
-    )
-
-    await expect(resolveNotesConfig()).resolves.toMatchObject({
-      coverProperty: "thumbnail",
     })
   })
 

@@ -3,7 +3,7 @@ export { resolveDateFromFrontmatterOrTitle } from "./dates/resolveDateFromFrontm
 export { resolveOldestDate } from "./dates/resolveOldestDate"
 export { buildObsidianUrl } from "./files/buildObsidianUrl"
 export { collectMarkdownFiles } from "./files/collectMarkdownFiles"
-export { extractFirstImagePath } from "./parsers/extractFirstImagePath"
+export { extractImagePaths } from "./parsers/extractImagePaths"
 export { parseDateString } from "./parsers/parseDateString"
 export { parseFrontMatter } from "./parsers/parseFrontMatter"
 export { parseMarkdownBodyDates } from "./parsers/parseMarkdownBodyDates"

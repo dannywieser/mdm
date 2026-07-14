@@ -33,7 +33,7 @@ export const randomDateBefore = (
   random: RandomGenerator,
 ): string => addDays(endDate, -randomInt(random, 0, spanDays - 1))
 
-/** Creates an SVG cover attachment plus the frontmatter path pointing at it. */
+/** Creates an SVG cover attachment plus the body-relative path pointing at it. */
 export const buildCover = (
   kind: CoverKind,
   title: string,

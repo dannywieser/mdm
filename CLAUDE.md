@@ -6,7 +6,7 @@ mdm is an npm workspaces + Turbo monorepo of Express backend services and a Reac
 
 **Apps** (all Express services use `pino-http` for request logging; none use `morgan`)
 
-- `apps/notes-api` — `GET /health`, `GET /notes` (recursively parses every note into a `Note`: frontmatter, markdown node tree with wikilinks resolved and images rewritten to the image proxy, extracted dates, file metadata; optional `?view=` filter and `?includeContent=false`), `GET /views` (per-view note counts/IDs for the view picker, without full content).
+- `apps/notes-api` — `GET /health`, `GET /notes` (recursively parses every note into a `Note`: frontmatter (with every image found in the raw body added as a `frontmatter.images` array), markdown node tree with wikilinks resolved and images rewritten to the image proxy, extracted dates, file metadata; optional `?view=` filter and `?includeContent=false`), `GET /views` (per-view note counts/IDs for the view picker, without full content).
 - `apps/flag-manager` — Redis-backed per-ID feature flags (`GET`/`POST`/`PATCH /flags/:id/:flag`), driven by the `flags` config.
 - `apps/habit-tracker` — `GET /habits` (lightweight per-habit summary) and `GET /habits/:id` (full score history/streaks/breakdown), scoring notes' `frontmatterProperty` values via a tiered day/streak multiplier, driven by the `habits` config.
 - `apps/stats-service` — `GET /stats/meta`: aggregate note/folder/word/attachment counts, in-memory cached for 5 minutes with a shared in-flight scan.
@@ -16,8 +16,8 @@ mdm is an npm workspaces + Turbo monorepo of Express backend services and a Reac
 
 **Packages**
 
-- `packages/app-config` — reads and validates `app.config.json`, merges in the `NOTES_ROOT` env var, and caches the result. Exposes `resolveNotesConfig()` returning a `ResolvedNotesConfig` (`notesDirectory`, `obsidianVault`, `dateFormats`, `attachmentsDirectory`, `createdDateProperty`, `coverProperty`, `timezone`, `habits`, `views`). Config errors are thrown as plain `Error`s with a message describing what's wrong.
-- `packages/markdown` — low-level markdown utilities: `parseFrontMatter`, `parseMarkdownBodyDates`/`extractNoteDates`, `resolveDateFromFrontmatterOrTitle`/`resolveOldestDate`, `collectMarkdownFiles`, `buildObsidianUrl`, `extractFirstImagePath` (raw-text fallback image extraction). Owns the `Note` type used across the codebase.
+- `packages/app-config` — reads and validates `app.config.json`, merges in the `NOTES_ROOT` env var, and caches the result. Exposes `resolveNotesConfig()` returning a `ResolvedNotesConfig` (`notesDirectory`, `obsidianVault`, `dateFormats`, `attachmentsDirectory`, `createdDateProperty`, `timezone`, `habits`, `views`). Config errors are thrown as plain `Error`s with a message describing what's wrong.
+- `packages/markdown` — low-level markdown utilities: `parseFrontMatter`, `parseMarkdownBodyDates`/`extractNoteDates`, `resolveDateFromFrontmatterOrTitle`/`resolveOldestDate`, `collectMarkdownFiles`, `buildObsidianUrl`, `extractImagePaths` (raw-text extraction of every image in a note's body). Owns the `Note` type used across the codebase.
 - `packages/services` — shared response types and React Query hooks consumed by `apps/web`, plus the demo-mode config/URL helpers.
 - `packages/util` (`mdm-util`) — dependency-free pure-function helpers (dates, strings, objects, promises, regex, IDs), plus `./node` and `./redis` subpath exports.
 - `packages/logger` (`mdm-logger`) — shared `pino`-based logger factory used by every backend service.

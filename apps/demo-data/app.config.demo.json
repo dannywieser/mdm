@@ -30,24 +30,6 @@
       "badges": ["frontmatter.location", "frontmatter.tags"]
     },
     {
-      "id": "photos-by-month",
-      "name": "Photos by Month",
-      "group": "photos",
-      "component": "NotesGalleryByMonth",
-      "aspectRatio": "1/1",
-      "filters": [{ "folder": "photos" }],
-      "badges": ["frontmatter.location"]
-    },
-    {
-      "id": "photos-by-year",
-      "name": "Photos by Year",
-      "group": "photos",
-      "component": "NotesGalleryByYear",
-      "aspectRatio": "1/1",
-      "filters": [{ "folder": "photos" }],
-      "badges": ["frontmatter.location"]
-    },
-    {
       "id": "books",
       "name": "Books",
       "group": "library",

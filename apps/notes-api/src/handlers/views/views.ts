@@ -22,7 +22,6 @@ export const viewsHandler: RequestHandler = async (_request, response) => {
     )
 
     response.status(200).json({
-      coverProperty: notesConfig.coverProperty,
       views: await buildViews(scannedNotes),
     })
   } catch (error) {

@@ -2,6 +2,6 @@ import type { VaultAttachment } from "../vault.types"
 
 export interface CoverResult {
   attachment: VaultAttachment
-  /** Vault-relative path stored in the note's `cover` frontmatter. */
+  /** Vault-relative path embedded as an image in the note's body. */
   coverPath: string
 }

@@ -38,7 +38,6 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
 
   cachedNotesConfig = {
     attachmentsDirectory: appConfig.attachmentsDirectory ?? "",
-    coverProperty: isNonEmptyString(rawConfig.coverProperty) ? rawConfig.coverProperty : "cover",
     createdDateProperty: isNonEmptyString(rawConfig.createdDateProperty)
       ? rawConfig.createdDateProperty
       : "created",

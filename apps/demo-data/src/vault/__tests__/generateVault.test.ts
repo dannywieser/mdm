@@ -62,16 +62,10 @@ describe("generateVault", () => {
     expect(new Set(attachmentPaths).size).toBe(attachmentPaths.length)
   })
 
-  test("every cover in frontmatter has a matching attachment", () => {
-    const attachmentPaths = new Set(
-      vault.attachments.map(({ relativePath }) => relativePath),
-    )
-
-    for (const note of vault.notes) {
-      const cover = note.frontmatter.cover
-      if (typeof cover === "string") {
-        expect(attachmentPaths.has(cover)).toBe(true)
-      }
+  test("every generated cover attachment is embedded as an image in some note's body", () => {
+    for (const { relativePath } of vault.attachments) {
+      const isReferenced = vault.notes.some((note) => note.body.includes(relativePath))
+      expect(isReferenced).toBe(true)
     }
   })
 

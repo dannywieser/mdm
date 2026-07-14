@@ -96,7 +96,6 @@ describe("views handler interface", () => {
 
     expect(response.status).toBe(200)
     expect(response.body).toEqual({
-      coverProperty: "cover",
       views: [
         {
           badges: ["folder", "frontmatter.type"],

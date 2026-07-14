@@ -4,8 +4,6 @@ import { useParams } from "react-router-dom"
 import { useViewsQuery } from "services"
 
 import { NotesGallery } from "../NotesGallery"
-import { NotesGalleryByMonth } from "../NotesGalleryByMonth"
-import { NotesGalleryByYear } from "../NotesGalleryByYear"
 import { NotesList } from "../NotesList"
 import { NotesReview } from "../NotesReview"
 import { NotesSummaryTable } from "../NotesSummaryTable"
@@ -19,8 +17,6 @@ import type {
 const VIEW_COMPONENTS: Record<ViewComponentName, ComponentType<ViewComponentProps>> = {
   NotesList,
   NotesGallery,
-  NotesGalleryByMonth,
-  NotesGalleryByYear,
   NotesReview,
   NotesSummaryTable,
 }
@@ -38,7 +34,6 @@ export const NotesView = () => {
     <SelectedComponent
       aspectRatio={configuredView?.aspectRatio}
       badges={configuredView?.badges}
-      coverProperty={data.coverProperty}
       layout={configuredView?.layout}
       key={view}
     />

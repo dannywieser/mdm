@@ -1,12 +1,13 @@
 import { Box, Card, Text } from "@chakra-ui/react"
 
 import { useMasonryRowSpan } from "../../hooks/useMasonryRowSpan/useMasonryRowSpan"
+import { useRotatingIndex } from "../../hooks/useRotatingIndex/useRotatingIndex"
 
 import { FadeImage } from "../FadeImage"
 import { NoteBadges } from "../NoteBadges"
 
 import type { GalleryCardProps, NoteCoverGridProps } from "./NoteCoverGrid.types"
-import { getCoverSrc } from "./NoteCoverGrid.util"
+import { getImageSrc, getNoteImagePaths } from "./NoteCoverGrid.util"
 
 const CARD_FOCUS_STYLE = {
   outlineWidth: "2px",
@@ -19,50 +20,56 @@ const MASONRY_GAP_PX = 16
 const MASONRY_ROW_HEIGHT_PX = 8
 const MASONRY_COLUMNS = { base: 1, md: 3, lg: 4, xl: 5, "2xl": 8 }
 const DEFAULT_ASPECT_RATIO = "3/4"
+const IMAGE_ROTATION_INTERVAL_MS = 10000
 
-const GalleryCard = ({ note, aspectRatio, badges, coverProperty }: GalleryCardProps) => (
-  <a href={note.obsidianUrl} style={{ textDecoration: "none", outline: "none" }}>
-    <Card.Root
-      bg="app.panelBackground"
-      borderColor="app.border"
-      overflow="hidden"
-      position="relative"
-      _hover={{ borderColor: "app.borderHover" }}
-    >
-      <FadeImage
-        alt={note.title}
-        aspectRatio={aspectRatio ?? DEFAULT_ASPECT_RATIO}
-        objectFit="cover"
-        src={getCoverSrc(note.frontmatter?.[coverProperty] ?? "")}
-      />
-      <Box
-        background="rgba(0,0,0,0.65)"
-        bottom={0}
-        left={0}
-        opacity={0}
-        p={3}
-        position="absolute"
-        right={0}
-        transition="opacity 0.2s"
-        _groupHover={{ opacity: 1 }}
-        _groupFocusWithin={{ opacity: 1 }}
+const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => {
+  const images = getNoteImagePaths(note)
+  const currentImageIndex = useRotatingIndex({ intervalMs: IMAGE_ROTATION_INTERVAL_MS, length: images.length })
+
+  return (
+    <a href={note.obsidianUrl} style={{ textDecoration: "none", outline: "none" }}>
+      <Card.Root
+        bg="app.panelBackground"
+        borderColor="app.border"
+        overflow="hidden"
+        position="relative"
+        _hover={{ borderColor: "app.borderHover" }}
       >
-        <Text
-          color="white"
-          fontSize="sm"
-          fontWeight="medium"
-          lineClamp={2}
-          mb={badges.length ? 2 : 0}
+        <FadeImage
+          alt={note.title}
+          aspectRatio={aspectRatio ?? DEFAULT_ASPECT_RATIO}
+          objectFit="cover"
+          src={getImageSrc(images[currentImageIndex] ?? "")}
+        />
+        <Box
+          background="rgba(0,0,0,0.65)"
+          bottom={0}
+          left={0}
+          opacity={0}
+          p={3}
+          position="absolute"
+          right={0}
+          transition="opacity 0.2s"
+          _groupHover={{ opacity: 1 }}
+          _groupFocusWithin={{ opacity: 1 }}
         >
-          {note.title}
-        </Text>
-        <NoteBadges badges={badges} note={note} />
-      </Box>
-    </Card.Root>
-  </a>
-)
+          <Text
+            color="white"
+            fontSize="sm"
+            fontWeight="medium"
+            lineClamp={2}
+            mb={badges.length ? 2 : 0}
+          >
+            {note.title}
+          </Text>
+          <NoteBadges badges={badges} note={note} />
+        </Box>
+      </Card.Root>
+    </a>
+  )
+}
 
-const MasonryGalleryCard = ({ aspectRatio, badges, coverProperty, note }: GalleryCardProps) => {
+const MasonryGalleryCard = ({ aspectRatio, badges, note }: GalleryCardProps) => {
   const { ref, rowSpan } = useMasonryRowSpan({ gapPx: MASONRY_GAP_PX, rowHeightPx: MASONRY_ROW_HEIGHT_PX })
 
   return (
@@ -74,12 +81,12 @@ const MasonryGalleryCard = ({ aspectRatio, badges, coverProperty, note }: Galler
       style={{ gridRowEnd: `span ${rowSpan}` }}
       _focusWithin={CARD_FOCUS_STYLE}
     >
-      <GalleryCard aspectRatio={aspectRatio} badges={badges} coverProperty={coverProperty} note={note} />
+      <GalleryCard aspectRatio={aspectRatio} badges={badges} note={note} />
     </Box>
   )
 }
 
-export const NoteCoverGrid = ({ aspectRatio, badges = [], coverProperty, notes }: NoteCoverGridProps) => (
+export const NoteCoverGrid = ({ aspectRatio, badges = [], notes }: NoteCoverGridProps) => (
   <Box
     data-testid="gallery-grid"
     display="grid"
@@ -96,7 +103,7 @@ export const NoteCoverGrid = ({ aspectRatio, badges = [], coverProperty, notes }
     p={6}
   >
     {notes.map((note) => (
-      <MasonryGalleryCard key={note.id} aspectRatio={aspectRatio} badges={badges} coverProperty={coverProperty} note={note} />
+      <MasonryGalleryCard key={note.id} aspectRatio={aspectRatio} badges={badges} note={note} />
     ))}
   </Box>
 )

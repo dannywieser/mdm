@@ -37,7 +37,6 @@ const getJsonResult = (json: ReturnType<typeof makeResponse>["json"]): HabitSumm
 }
 
 const BASE_CONFIG = {
-  coverProperty: "cover",
   createdDateProperty: "created",
   dateFormats: ["YYYY.MM.DD"],
   deriveTitleDate: false,

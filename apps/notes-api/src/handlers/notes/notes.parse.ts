@@ -1,7 +1,7 @@
 import type { MarkdownNode, Note, NoteFrontmatter } from "markdown"
 
 import { resolveNotesConfig } from "app-config"
-import { extractFirstImagePath, parseFrontMatter } from "markdown"
+import { extractImagePaths, parseFrontMatter } from "markdown"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
@@ -52,7 +52,7 @@ export const parseMarkdownFile = async (
   }
 }
 
-const resolveCoverImagePath = (
+const resolveImagePath = (
   rawPath: string,
   noteRelativePath: string,
   attachmentsDirectory: string,
@@ -68,24 +68,14 @@ export const resolveFrontmatterImages = (
   body: string,
   noteRelativePath: string,
   attachmentsDirectory: string,
-  coverProperty: string,
 ): NoteFrontmatter | null => {
-  const existingCover = frontmatter?.[coverProperty]
-  const rawExistingCover = Array.isArray(existingCover) ? existingCover[0] : existingCover
+  const resolvedImagePaths = extractImagePaths(body)
+    .map((imagePath) => resolveImagePath(imagePath, noteRelativePath, attachmentsDirectory))
+    .filter((imagePath): imagePath is string => imagePath !== null)
 
-  if (rawExistingCover) {
-    const resolvedPath = resolveCoverImagePath(rawExistingCover, noteRelativePath, attachmentsDirectory)
-    if (!resolvedPath) return frontmatter
-    return { ...frontmatter, [coverProperty]: resolvedPath }
-  }
+  if (resolvedImagePaths.length === 0) return frontmatter
 
-  const firstImagePath = extractFirstImagePath(body)
-  if (!firstImagePath) return frontmatter
-
-  const resolvedFallbackPath = resolveCoverImagePath(firstImagePath, noteRelativePath, attachmentsDirectory)
-  if (!resolvedFallbackPath) return frontmatter
-
-  return { ...frontmatter, [coverProperty]: resolvedFallbackPath }
+  return { ...frontmatter, images: resolvedImagePaths }
 }
 
 const buildMarkdownTree = (

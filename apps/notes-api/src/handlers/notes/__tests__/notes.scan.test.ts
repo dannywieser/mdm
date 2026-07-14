@@ -206,23 +206,23 @@ This is a note.`)
     expect(note.title).toBe("2026.05.27 (Wed) á")
   })
 
-  test("scanMarkdownFile resolves bare cover filename to attachment path", async () => {
+  test("scanMarkdownFile resolves a bare image filename found in the body to an attachment path", async () => {
     readFileMock.mockResolvedValue("")
     parseFrontMatterMock.mockReturnValue({
-      body: "",
-      frontmatter: { cover: "attach-20260616070917164.png" },
+      body: "![alt](attach-20260616070917164.png)",
+      frontmatter: null,
     })
     createFileIDMock.mockReturnValue("some-id")
     statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
 
     const note = await scanMarkdownFile("/notes/games/citizen-sleeper-2.md")
 
-    expect(note.frontmatter?.cover).toBe(
+    expect(note.frontmatter?.images).toEqual([
       "games/citizen-sleeper-2/attach-20260616070917164.png",
-    )
+    ])
   })
 
-  test("scanMarkdownFile prepends attachmentsDirectory to bare cover filename", async () => {
+  test("scanMarkdownFile prepends attachmentsDirectory to a bare image filename", async () => {
     resolveNotesConfigMock.mockResolvedValue({
       ...defaultConfig,
       attachmentsDirectory: "attachments",
@@ -230,69 +230,67 @@ This is a note.`)
 
     readFileMock.mockResolvedValue("")
     parseFrontMatterMock.mockReturnValue({
-      body: "",
-      frontmatter: { cover: "attach-20260616070917164.png" },
+      body: "![alt](attach-20260616070917164.png)",
+      frontmatter: null,
     })
     createFileIDMock.mockReturnValue("some-id")
     statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
 
     const note = await scanMarkdownFile("/notes/games/citizen-sleeper-2.md")
 
-    expect(note.frontmatter?.cover).toBe(
+    expect(note.frontmatter?.images).toEqual([
       "attachments/games/citizen-sleeper-2/attach-20260616070917164.png",
-    )
+    ])
   })
 
-  test("scanMarkdownFile passes through cover path that already has directory components", async () => {
+  test("scanMarkdownFile passes through an image path that already has directory components", async () => {
     readFileMock.mockResolvedValue("")
     parseFrontMatterMock.mockReturnValue({
-      body: "",
-      frontmatter: {
-        cover: "attachments/downtime/The Rogue Prince of Persia/attach-20260503144843356.jpg",
-      },
+      body: "![[attachments/downtime/The Rogue Prince of Persia/attach-20260503144843356.jpg]]",
+      frontmatter: null,
     })
     createFileIDMock.mockReturnValue("some-id")
     statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
 
     const note = await scanMarkdownFile("/notes/downtime/the-rogue-prince-of-persia.md")
 
-    expect(note.frontmatter?.cover).toBe(
+    expect(note.frontmatter?.images).toEqual([
       "attachments/downtime/The Rogue Prince of Persia/attach-20260503144843356.jpg",
-    )
+    ])
   })
 
-  test("scanMarkdownFile leaves external url in cover frontmatter unchanged", async () => {
+  test("scanMarkdownFile leaves an external image url unchanged", async () => {
     readFileMock.mockResolvedValue("")
     parseFrontMatterMock.mockReturnValue({
-      body: "",
-      frontmatter: { cover: "https://example.com/cover.png" },
+      body: "![alt](https://example.com/cover.png)",
+      frontmatter: null,
     })
     createFileIDMock.mockReturnValue("some-id")
     statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
 
     const note = await scanMarkdownFile("/notes/games/note.md")
 
-    expect(note.frontmatter?.cover).toBe("https://example.com/cover.png")
+    expect(note.frontmatter?.images).toEqual(["https://example.com/cover.png"])
   })
 
-  test("scanMarkdownFile falls back to the first body image when no cover frontmatter is set", async () => {
+  test("scanMarkdownFile collects every image found in the body, in order", async () => {
     readFileMock.mockResolvedValue("")
     parseFrontMatterMock.mockReturnValue({
-      body: "# Note\n\n![alt](attach-20260616070917164.png)",
+      body: "# Note\n\n![[first.png]]\n\nSome text\n\n![alt](second.png)",
       frontmatter: { topic: ["games"] },
     })
     createFileIDMock.mockReturnValue("some-id")
     statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
 
-    const note = await scanMarkdownFile("/notes/games/citizen-sleeper-2.md")
+    const note = await scanMarkdownFile("/notes/games/note.md")
 
     expect(note.frontmatter).toEqual({
       topic: ["games"],
-      cover: "games/citizen-sleeper-2/attach-20260616070917164.png",
+      images: ["games/note/first.png", "games/note/second.png"],
     })
   })
 
-  test("scanMarkdownFile falls back to the first body image when there is no frontmatter at all", async () => {
+  test("scanMarkdownFile sets images even when there is no frontmatter at all", async () => {
     readFileMock.mockResolvedValue("")
     parseFrontMatterMock.mockReturnValue({
       body: "![[photo.png]]",
@@ -303,10 +301,10 @@ This is a note.`)
 
     const note = await scanMarkdownFile("/notes/games/note.md")
 
-    expect(note.frontmatter).toEqual({ cover: "games/note/photo.png" })
+    expect(note.frontmatter).toEqual({ images: ["games/note/photo.png"] })
   })
 
-  test("scanMarkdownFile does not add a fallback cover when the note has no image", async () => {
+  test("scanMarkdownFile leaves frontmatter untouched when the note has no image", async () => {
     readFileMock.mockResolvedValue("")
     parseFrontMatterMock.mockReturnValue({
       body: "# Note\n\nJust text, no images here.",
@@ -320,32 +318,17 @@ This is a note.`)
     expect(note.frontmatter).toEqual({ topic: ["games"] })
   })
 
-  test("scanMarkdownFile does not use the fallback image when an explicit cover is already set", async () => {
+  test("scanMarkdownFile ignores any pre-existing images value in frontmatter and derives it from the body", async () => {
     readFileMock.mockResolvedValue("")
     parseFrontMatterMock.mockReturnValue({
       body: "![alt](body-image.png)",
-      frontmatter: { cover: "explicit-cover.png" },
+      frontmatter: { images: ["manually-set.png"] },
     })
     createFileIDMock.mockReturnValue("some-id")
     statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
 
     const note = await scanMarkdownFile("/notes/games/note.md")
 
-    expect(note.frontmatter?.cover).toBe("games/note/explicit-cover.png")
-  })
-
-  test("scanMarkdownFile reads and writes the fallback cover under the configured coverProperty", async () => {
-    resolveNotesConfigMock.mockResolvedValue({ ...defaultConfig, coverProperty: "thumbnail" })
-    readFileMock.mockResolvedValue("")
-    parseFrontMatterMock.mockReturnValue({
-      body: "![alt](body-image.png)",
-      frontmatter: {},
-    })
-    createFileIDMock.mockReturnValue("some-id")
-    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
-
-    const note = await scanMarkdownFile("/notes/games/note.md")
-
-    expect(note.frontmatter).toEqual({ thumbnail: "games/note/body-image.png" })
+    expect(note.frontmatter?.images).toEqual(["games/note/body-image.png"])
   })
 })

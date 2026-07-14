@@ -15,7 +15,7 @@ Express-based Node service with request logging via `pino-http`.
     { "status": "error", "error": "ENOENT: no such file or directory, access '/data/notes'" }
     ```
 - `GET /notes`
-  - Purpose: recursively load `*.md` and `*.markdown` files from the vault directory (`NOTES_ROOT` env var), extract optional frontmatter metadata, collect all dates found in the title, body, and frontmatter (plus the file's modified date) using configured `dateFormats`, parse markdown into a node tree (resolving Obsidian wikilinks and rewriting local image paths to the image-server), and return note metadata
+  - Purpose: recursively load `*.md` and `*.markdown` files from the vault directory (`NOTES_ROOT` env var), extract optional frontmatter metadata (adding every image found in the raw body as a `frontmatter.images` array), collect all dates found in the title, body, and frontmatter (plus the file's modified date) using configured `dateFormats`, parse markdown into a node tree (resolving Obsidian wikilinks and rewriting local image paths to the image-server), and return note metadata
   - Optional query: `view=<id>` to apply a configured notes view filter by view ID
   - Optional query: `includeContent=false` to skip markdown parsing and return an empty `content` tree — useful for lightweight listing requests that only need frontmatter/metadata
   - The vault scan (walking the directory and reading each file's frontmatter/dates) is cached in memory for 5 minutes and shared across all requests regardless of `view`/`includeContent`; concurrent requests during a cache miss share a single in-flight scan instead of each triggering their own. View filtering and markdown body parsing still run fresh per request against the cached scan, since both depend on the request's query params.
@@ -36,7 +36,8 @@ Express-based Node service with request logging via `pino-http`.
           "obsidianUrl": "obsidian://open?vault=vault-name&file=welcome",
           "frontmatter": {
             "topic": ["AI"],
-            "created": "2026.05.26"
+            "created": "2026.05.26",
+            "images": ["notes/welcome/photo.png"]
           },
           "content": {
             "type": "root",
@@ -53,7 +54,7 @@ Express-based Node service with request logging via `pino-http`.
       ]
     }
     ```
-  - Notes without frontmatter return `"frontmatter": null`, unless a fallback cover image is found (see `coverProperty` below), in which case `frontmatter` is `{ "cover": "..." }`. `linkedNotes` (parsed notes referenced via `[[wikilink]]` syntax in the body) is only present on notes that link to others; unmatched wikilinks are left in the body as plain text
+  - Every note's raw body text is scanned for image references (standard `![alt](path)` markdown and Obsidian `![[path]]` embeds), and every image found is resolved and added to `frontmatter.images` as an array, in the order they appear in the note — this is always derived from the body scan and isn't configurable. Notes without frontmatter and without any images return `"frontmatter": null`; notes with images but no other frontmatter return `"frontmatter": { "images": [...] }`. `linkedNotes` (parsed notes referenced via `[[wikilink]]` syntax in the body) is only present on notes that link to others; unmatched wikilinks are left in the body as plain text
   - Error responses: `500`
     ```json
     {
@@ -68,7 +69,6 @@ Express-based Node service with request logging via `pino-http`.
   - Success response: `200`
     ```json
     {
-      "coverProperty": "cover",
       "views": [
         {
           "id": "books",
@@ -84,7 +84,6 @@ Express-based Node service with request logging via `pino-http`.
       ]
     }
     ```
-    `coverProperty` is the configured frontmatter key (see Configuration below) that gallery-style components in the web app read for a note's cover image.
   - Error response: `500`
     ```json
     { "error": "Unable to load views" }
@@ -99,7 +98,6 @@ Configured via `app.config.json` at the repository root plus the `NOTES_ROOT` en
 - `obsidianVault`: vault folder name, used to build each note's `obsidianUrl` deep link.
 - `attachmentsDirectory` (optional): folder name (relative to `NOTES_ROOT`) where Obsidian stores attachments; used to resolve bare-filename images in note bodies to the `/images?path=...` proxy.
 - `createdDateProperty` (optional, defaults to `"created"`): frontmatter key treated as the note's created-date source.
-- `coverProperty` (optional, defaults to `"cover"`): frontmatter key holding a note's cover image. If a note has no value under this key, the first image found in the note's raw body text (standard `![alt](path)` markdown or an Obsidian `![[path]]` embed) is used as the cover instead.
 - `timezone` (optional, defaults to `"UTC"`): IANA timezone used to evaluate the `$today`/`$onThisDay` filter values against "now".
 - `views` (optional): array of view configs. Each view has:
   - `id`: route key used by `GET /notes?view=<id>`

@@ -84,14 +84,13 @@ export const buildMovieNotes = ({ endDate, random }: VaultBuilderOptions): Gener
       director: pickOne(random, DIRECTORS),
       genre: pickOne(random, GENRES),
       status: watched ? "watched" : "watchlist",
-      cover: cover.coverPath,
     }
     if (watched) {
       frontmatter.rating = `${String(randomInt(random, 2, 5))}/5`
     }
 
     notes.push({
-      body: `${pickOne(random, REVIEW_SENTENCES)} ${pickOne(random, REVIEW_SENTENCES)}`,
+      body: `![](${cover.coverPath})\n\n${pickOne(random, REVIEW_SENTENCES)} ${pickOne(random, REVIEW_SENTENCES)}`,
       folder: "library/movies",
       frontmatter,
       modifiedDate,

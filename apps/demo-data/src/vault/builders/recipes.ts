@@ -76,14 +76,13 @@ export const buildRecipeNotes = ({ endDate, random }: VaultBuilderOptions): Gene
       .join("\n")
 
     notes.push({
-      body: `## Ingredients\n\n${ingredients}\n\n## Steps\n\n${steps}`,
+      body: `![](${cover.coverPath})\n\n## Ingredients\n\n${ingredients}\n\n## Steps\n\n${steps}`,
       folder: "recipes",
       frontmatter: {
         created,
         cuisine: pickOne(random, CUISINES),
         difficulty: pickOne(random, DIFFICULTIES),
         servings: String(randomInt(random, 2, 6)),
-        cover: cover.coverPath,
       },
       modifiedDate,
       title,
