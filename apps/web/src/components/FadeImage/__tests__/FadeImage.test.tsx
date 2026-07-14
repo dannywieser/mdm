@@ -52,6 +52,13 @@ describe("FadeImage", () => {
     expect(screen.getByRole("img", { name: "test image" })).toBeTruthy()
   })
 
+  test("omits the src attribute entirely for an empty string src", () => {
+    renderFadeImage({ src: "" })
+
+    const img = screen.getByRole("img", { name: "test image" })
+    expect(img.hasAttribute("src")).toBe(false)
+  })
+
   test("resets to skeleton state when src changes", () => {
     const { rerender } = render(
       <ChakraProvider value={defaultSystem}>
