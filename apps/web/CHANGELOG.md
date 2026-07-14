@@ -1,5 +1,13 @@
 # web
 
+## 2.3.1
+
+### Patch Changes
+
+- 054f1ea: Fixed `FadeImage` to omit the `src` attribute entirely instead of rendering `<img src="">` when there's no valid image to show — an empty `src` attribute causes browsers to issue an unintended request for the current document URL.
+  - mdm-util@2.3.1
+  - services@2.2.1
+
 ## 2.3.0
 
 ### Minor Changes
