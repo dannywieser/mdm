@@ -47,6 +47,18 @@ describe("parseParamValues", () => {
   test("drops empty segments", () => {
     expect(parseParamValues(new URLSearchParams("year=2023,,2024"), "year")).toEqual(["2023", "2024"])
   })
+
+  test("trims incidental whitespace around segments", () => {
+    expect(parseParamValues(new URLSearchParams("year=2024,%202023"), "year")).toEqual(["2024", "2023"])
+  })
+
+  test("drops segments that are only whitespace", () => {
+    expect(parseParamValues(new URLSearchParams("year=2023,%20,2024"), "year")).toEqual(["2023", "2024"])
+  })
+
+  test("de-duplicates repeated segments", () => {
+    expect(parseParamValues(new URLSearchParams("year=2023,2024,2023"), "year")).toEqual(["2023", "2024"])
+  })
 })
 
 describe("toggleParamValue", () => {

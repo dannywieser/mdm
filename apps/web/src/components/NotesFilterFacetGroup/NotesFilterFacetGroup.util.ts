@@ -21,7 +21,8 @@ export function parseParamValues(searchParams: URLSearchParams, paramKey: string
   const raw = searchParams.get(paramKey)
   if (!raw) return []
 
-  return raw.split(",").filter(Boolean)
+  const values = raw.split(",").map((value) => value.trim()).filter(Boolean)
+  return [...new Set(values)]
 }
 
 export function toggleParamValue(values: string[], value: string): string[] {
