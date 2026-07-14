@@ -56,7 +56,7 @@ describe("NoteCoverGrid", () => {
     )
   })
 
-  test("applies a default aspect ratio to the image placeholder when none is configured", () => {
+  test("applies a fixed aspect ratio to the image placeholder", () => {
     render(
       <ChakraProvider value={defaultSystem}>
         <NoteCoverGrid notes={[noteWithCover]} />
@@ -65,17 +65,6 @@ describe("NoteCoverGrid", () => {
 
     const skeleton = screen.getByTestId("fade-image-skeleton")
     expect(getComputedStyle(skeleton.parentElement!).aspectRatio).toBe("3/4")
-  })
-
-  test("uses a configured aspect ratio for the image placeholder", () => {
-    render(
-      <ChakraProvider value={defaultSystem}>
-        <NoteCoverGrid aspectRatio="16/9" notes={[noteWithCover]} />
-      </ChakraProvider>,
-    )
-
-    const skeleton = screen.getByTestId("fade-image-skeleton")
-    expect(getComputedStyle(skeleton.parentElement!).aspectRatio).toBe("16/9")
   })
 
   test("renders NoteBadges with configured badges", () => {

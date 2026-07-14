@@ -22,7 +22,7 @@ const MASONRY_COLUMNS = { base: 1, md: 3, lg: 4, xl: 5, "2xl": 8 }
 const DEFAULT_ASPECT_RATIO = "3/4"
 const IMAGE_ROTATION_INTERVAL_MS = 10000
 
-const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => {
+const GalleryCard = ({ note, badges }: GalleryCardProps) => {
   const images = getNoteImagePaths(note)
   const currentImageIndex = useRotatingIndex({ intervalMs: IMAGE_ROTATION_INTERVAL_MS, length: images.length })
 
@@ -37,7 +37,7 @@ const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => {
       >
         <FadeImage
           alt={note.title}
-          aspectRatio={aspectRatio ?? DEFAULT_ASPECT_RATIO}
+          aspectRatio={DEFAULT_ASPECT_RATIO}
           objectFit="cover"
           src={getImageSrc(images[currentImageIndex] ?? "")}
         />
@@ -69,7 +69,7 @@ const GalleryCard = ({ note, aspectRatio, badges }: GalleryCardProps) => {
   )
 }
 
-const MasonryGalleryCard = ({ aspectRatio, badges, note }: GalleryCardProps) => {
+const MasonryGalleryCard = ({ badges, note }: GalleryCardProps) => {
   const { ref, rowSpan } = useMasonryRowSpan({ gapPx: MASONRY_GAP_PX, rowHeightPx: MASONRY_ROW_HEIGHT_PX })
 
   return (
@@ -81,12 +81,12 @@ const MasonryGalleryCard = ({ aspectRatio, badges, note }: GalleryCardProps) => 
       style={{ gridRowEnd: `span ${rowSpan}` }}
       _focusWithin={CARD_FOCUS_STYLE}
     >
-      <GalleryCard aspectRatio={aspectRatio} badges={badges} note={note} />
+      <GalleryCard badges={badges} note={note} />
     </Box>
   )
 }
 
-export const NoteCoverGrid = ({ aspectRatio, badges = [], notes }: NoteCoverGridProps) => (
+export const NoteCoverGrid = ({ badges = [], notes }: NoteCoverGridProps) => (
   <Box
     data-testid="gallery-grid"
     display="grid"
@@ -103,7 +103,7 @@ export const NoteCoverGrid = ({ aspectRatio, badges = [], notes }: NoteCoverGrid
     p={6}
   >
     {notes.map((note) => (
-      <MasonryGalleryCard key={note.id} aspectRatio={aspectRatio} badges={badges} note={note} />
+      <MasonryGalleryCard key={note.id} badges={badges} note={note} />
     ))}
   </Box>
 )

@@ -7,7 +7,5 @@ export type ViewComponentName =
   | "NotesSummaryTable"
 
 export interface ViewComponentProps {
-  aspectRatio?: string
   badges?: string[]
-  layout?: string
 }

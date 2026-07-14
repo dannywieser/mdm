@@ -30,12 +30,5 @@ export const NotesView = () => {
   const SelectedComponent =
     (componentName && VIEW_COMPONENTS[componentName]) ?? NotesList
 
-  return (
-    <SelectedComponent
-      aspectRatio={configuredView?.aspectRatio}
-      badges={configuredView?.badges}
-      layout={configuredView?.layout}
-      key={view}
-    />
-  )
+  return <SelectedComponent badges={configuredView?.badges} key={view} />
 }

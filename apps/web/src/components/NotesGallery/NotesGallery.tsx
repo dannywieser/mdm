@@ -11,7 +11,7 @@ import { buildSearchIndex, filterSearchIndex } from "./NotesGallery.util"
 import type { NotesGalleryProps, NotesGalleryRouteParamKey } from "./NotesGallery.types"
 import { SEARCH_PARAM_KEY } from "../NotesSearchInput/NotesSearchInput.constants"
 
-export const NotesGallery = ({ aspectRatio, badges = [] }: NotesGalleryProps) => {
+export const NotesGallery = ({ badges = [] }: NotesGalleryProps) => {
   const { view } = useParams<NotesGalleryRouteParamKey>()
   const [searchParams] = useSearchParams()
   const { data, error } = useNotesQuery({ includeContent: false, view })
@@ -29,5 +29,5 @@ export const NotesGallery = ({ aspectRatio, badges = [] }: NotesGalleryProps) =>
 
   if (error) return <AppError message={error.message} />
 
-  return <NoteCoverGrid aspectRatio={aspectRatio} badges={badges} notes={filteredNotes} />
+  return <NoteCoverGrid badges={badges} notes={filteredNotes} />
 }

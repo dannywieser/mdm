@@ -25,7 +25,6 @@
       "name": "Photo Wall",
       "group": "photos",
       "component": "NotesGallery",
-      "aspectRatio": "1/1",
       "filters": [{ "folder": "photos" }],
       "badges": ["frontmatter.location", "frontmatter.tags"]
     },
@@ -34,7 +33,6 @@
       "name": "Books",
       "group": "library",
       "component": "NotesGallery",
-      "aspectRatio": "2/3",
       "filters": [{ "folder": "library/books" }],
       "badges": ["frontmatter.author", "frontmatter.genre"]
     },
@@ -54,7 +52,6 @@
       "name": "Movies",
       "group": "library",
       "component": "NotesGallery",
-      "aspectRatio": "2/3",
       "filters": [
         { "folder": "library/movies" },
         { "$exclude": { "frontmatter.status": "watchlist" } }
@@ -93,7 +90,6 @@
       "name": "Recipes",
       "group": "knowledge",
       "component": "NotesGallery",
-      "aspectRatio": "1/1",
       "filters": [{ "folder": "recipes" }],
       "badges": ["frontmatter.cuisine", "frontmatter.difficulty"]
     }
