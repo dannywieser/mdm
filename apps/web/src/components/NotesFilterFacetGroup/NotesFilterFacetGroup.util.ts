@@ -17,11 +17,9 @@ export function getFrontmatterKeysFromParams(searchParams: URLSearchParams): str
   return [...keys]
 }
 
+/** Reads a multi-select filter's selections as repeated `paramKey` query params, so an arbitrary value (including one containing a comma) is never ambiguous. */
 export function parseParamValues(searchParams: URLSearchParams, paramKey: string): string[] {
-  const raw = searchParams.get(paramKey)
-  if (!raw) return []
-
-  const values = raw.split(",").map((value) => value.trim()).filter(Boolean)
+  const values = searchParams.getAll(paramKey).map((value) => value.trim()).filter(Boolean)
   return [...new Set(values)]
 }
 
@@ -31,10 +29,6 @@ export function toggleParamValue(values: string[], value: string): string[] {
     : [...values, value]
 }
 
-export function serializeParamValues(values: string[]): string {
-  return values.join(",")
-}
-
 export function toggleSearchParams(
   searchParams: URLSearchParams,
   paramKey: string,
@@ -42,12 +36,10 @@ export function toggleSearchParams(
 ): URLSearchParams {
   const nextSearchParams = new URLSearchParams(searchParams)
   const nextValues = toggleParamValue(parseParamValues(nextSearchParams, paramKey), value)
-  const serialized = serializeParamValues(nextValues)
 
-  if (serialized) {
-    nextSearchParams.set(paramKey, serialized)
-  } else {
-    nextSearchParams.delete(paramKey)
+  nextSearchParams.delete(paramKey)
+  for (const nextValue of nextValues) {
+    nextSearchParams.append(paramKey, nextValue)
   }
 
   return nextSearchParams

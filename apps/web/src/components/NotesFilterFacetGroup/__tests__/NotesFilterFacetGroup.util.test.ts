@@ -4,7 +4,6 @@ import {
   buildFrontmatterParamKey,
   getFrontmatterKeysFromParams,
   parseParamValues,
-  serializeParamValues,
   toggleParamValue,
   toggleSearchParams,
 } from "../NotesFilterFacetGroup.util"
@@ -40,24 +39,44 @@ describe("parseParamValues", () => {
     expect(parseParamValues(new URLSearchParams(""), "year")).toEqual([])
   })
 
-  test("splits a comma-separated param", () => {
-    expect(parseParamValues(new URLSearchParams("year=2023,2024"), "year")).toEqual(["2023", "2024"])
+  test("reads every occurrence of a repeated param", () => {
+    const searchParams = new URLSearchParams()
+    searchParams.append("year", "2023")
+    searchParams.append("year", "2024")
+
+    expect(parseParamValues(searchParams, "year")).toEqual(["2023", "2024"])
   })
 
-  test("drops empty segments", () => {
-    expect(parseParamValues(new URLSearchParams("year=2023,,2024"), "year")).toEqual(["2023", "2024"])
+  test("preserves a value that itself contains a comma", () => {
+    const searchParams = new URLSearchParams()
+    searchParams.append("fm.genre", "sci-fi, fantasy")
+
+    expect(parseParamValues(searchParams, "fm.genre")).toEqual(["sci-fi, fantasy"])
   })
 
-  test("trims incidental whitespace around segments", () => {
-    expect(parseParamValues(new URLSearchParams("year=2024,%202023"), "year")).toEqual(["2024", "2023"])
+  test("trims incidental whitespace around a value", () => {
+    const searchParams = new URLSearchParams()
+    searchParams.append("year", "  2024  ")
+
+    expect(parseParamValues(searchParams, "year")).toEqual(["2024"])
   })
 
-  test("drops segments that are only whitespace", () => {
-    expect(parseParamValues(new URLSearchParams("year=2023,%20,2024"), "year")).toEqual(["2023", "2024"])
+  test("drops occurrences that are only whitespace", () => {
+    const searchParams = new URLSearchParams()
+    searchParams.append("year", "2023")
+    searchParams.append("year", "   ")
+    searchParams.append("year", "2024")
+
+    expect(parseParamValues(searchParams, "year")).toEqual(["2023", "2024"])
   })
 
-  test("de-duplicates repeated segments", () => {
-    expect(parseParamValues(new URLSearchParams("year=2023,2024,2023"), "year")).toEqual(["2023", "2024"])
+  test("de-duplicates repeated occurrences", () => {
+    const searchParams = new URLSearchParams()
+    searchParams.append("year", "2023")
+    searchParams.append("year", "2024")
+    searchParams.append("year", "2023")
+
+    expect(parseParamValues(searchParams, "year")).toEqual(["2023", "2024"])
   })
 })
 
@@ -71,33 +90,27 @@ describe("toggleParamValue", () => {
   })
 })
 
-describe("serializeParamValues", () => {
-  test("joins values with a comma", () => {
-    expect(serializeParamValues(["2023", "2024"])).toBe("2023,2024")
-  })
-
-  test("returns an empty string for no values", () => {
-    expect(serializeParamValues([])).toBe("")
-  })
-})
-
 describe("toggleSearchParams", () => {
   test("adds a value to an unset param", () => {
     const result = toggleSearchParams(new URLSearchParams(""), "year", "2024")
 
-    expect(result.get("year")).toBe("2024")
+    expect(result.getAll("year")).toEqual(["2024"])
   })
 
   test("adds a value alongside existing selections for the same param", () => {
     const result = toggleSearchParams(new URLSearchParams("year=2023"), "year", "2024")
 
-    expect(result.get("year")).toBe("2023,2024")
+    expect(result.getAll("year")).toEqual(["2023", "2024"])
   })
 
   test("removes a value that is already selected", () => {
-    const result = toggleSearchParams(new URLSearchParams("year=2023,2024"), "year", "2023")
+    const searchParams = new URLSearchParams()
+    searchParams.append("year", "2023")
+    searchParams.append("year", "2024")
 
-    expect(result.get("year")).toBe("2024")
+    const result = toggleSearchParams(searchParams, "year", "2023")
+
+    expect(result.getAll("year")).toEqual(["2024"])
   })
 
   test("deletes the param entirely when removing the last selected value", () => {
@@ -110,5 +123,11 @@ describe("toggleSearchParams", () => {
     const result = toggleSearchParams(new URLSearchParams("q=game&year=2024"), "year", "2023")
 
     expect(result.get("q")).toBe("game")
+  })
+
+  test("preserves a value that itself contains a comma", () => {
+    const result = toggleSearchParams(new URLSearchParams(""), "fm.genre", "sci-fi, fantasy")
+
+    expect(result.getAll("fm.genre")).toEqual(["sci-fi, fantasy"])
   })
 })
