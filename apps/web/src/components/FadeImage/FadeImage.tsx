@@ -13,9 +13,12 @@ export const FadeImage = ({
   objectFit,
   src,
 }: FadeImageProps) => {
+  // An empty string src would render <img src="">, which browsers treat as a
+  // request for the current document URL — omit the attribute entirely instead.
+  const resolvedSrc = src === "" ? undefined : src
   const [loadedSrc, setLoadedSrc] = useState<string | undefined>(undefined)
-  const loaded = loadedSrc === src
-  const onSettled = () => { setLoadedSrc(src); }
+  const loaded = loadedSrc === resolvedSrc
+  const onSettled = () => { setLoadedSrc(resolvedSrc); }
 
   return (
     <Box
@@ -42,7 +45,7 @@ export const FadeImage = ({
         opacity={loaded ? 1 : 0}
         onError={onSettled}
         onLoad={onSettled}
-        src={src}
+        src={resolvedSrc}
         transition="opacity 0.3s ease-in"
         width={aspectRatio ? "full" : undefined}
       />

@@ -16,3 +16,5 @@ Fixed a bug where a note's external image URL (e.g. `https://...`) in `frontmatt
 Fixed two smaller edge cases in `frontmatter.images` derivation: a fragment-only image destination (`![alt](#section)`) is no longer surfaced as an image, since it isn't a resolvable image source; and a frontmatter image value with extra whitespace (e.g. from YAML like `" https://... "`) is now trimmed before checking whether it's an external URL, so it no longer gets incorrectly routed through the image proxy.
 
 Narrowed which external URLs the web app will render directly: only http(s) or protocol-relative URLs bypass the local image proxy now. Any other scheme (`javascript:`, `data:`, `obsidian://`, etc.) renders nothing instead of being passed to `<img src>` unchecked. Added a new `isHttpUrl` helper to `mdm-util` for this.
+
+Fixed `FadeImage` to omit the `src` attribute entirely instead of rendering `<img src="">` when there's no valid image to show — an empty `src` attribute causes browsers to issue an unintended request for the current document URL.
