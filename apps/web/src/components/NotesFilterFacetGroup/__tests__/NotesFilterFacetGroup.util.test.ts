@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest"
 
 import {
   buildFrontmatterParamKey,
+  getFrontmatterKeysFromParams,
   parseParamValues,
   serializeParamValues,
   toggleParamValue,
@@ -11,6 +12,26 @@ import {
 describe("buildFrontmatterParamKey", () => {
   test("prefixes the frontmatter key with fm.", () => {
     expect(buildFrontmatterParamKey("status")).toBe("fm.status")
+  })
+})
+
+describe("getFrontmatterKeysFromParams", () => {
+  test("returns an empty array when there are no fm. params", () => {
+    expect(getFrontmatterKeysFromParams(new URLSearchParams("q=game&year=2024"))).toEqual([])
+  })
+
+  test("strips the fm. prefix from each matching param", () => {
+    expect(
+      getFrontmatterKeysFromParams(new URLSearchParams("fm.status=done&fm.genre=fiction")),
+    ).toEqual(["status", "genre"])
+  })
+
+  test("de-duplicates keys", () => {
+    const searchParams = new URLSearchParams()
+    searchParams.append("fm.status", "done")
+    searchParams.append("fm.status", "active")
+
+    expect(getFrontmatterKeysFromParams(searchParams)).toEqual(["status"])
   })
 })
 

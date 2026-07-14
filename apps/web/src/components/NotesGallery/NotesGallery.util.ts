@@ -51,6 +51,7 @@ export function buildFrontmatterFacets(notes: Note[]): FrontmatterFacet[] {
     for (const [key, value] of Object.entries(note.frontmatter ?? {})) {
       const counts = countsByKey.get(key) ?? new Map<string, number>()
       for (const entry of Array.isArray(value) ? value : [value]) {
+        if (!entry.trim()) continue
         counts.set(entry, (counts.get(entry) ?? 0) + 1)
       }
       countsByKey.set(key, counts)

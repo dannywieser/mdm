@@ -1,6 +1,21 @@
 export const YEAR_PARAM_KEY = "year"
 
-export const buildFrontmatterParamKey = (key: string): string => `fm.${key}`
+const FRONTMATTER_PARAM_PREFIX = "fm."
+
+export const buildFrontmatterParamKey = (key: string): string => `${FRONTMATTER_PARAM_PREFIX}${key}`
+
+/** Recovers frontmatter keys with an active `fm.<key>` selection from the URL, even ones not present in the current view's facets. */
+export function getFrontmatterKeysFromParams(searchParams: URLSearchParams): string[] {
+  const keys = new Set<string>()
+
+  for (const paramKey of searchParams.keys()) {
+    if (paramKey.startsWith(FRONTMATTER_PARAM_PREFIX)) {
+      keys.add(paramKey.slice(FRONTMATTER_PARAM_PREFIX.length))
+    }
+  }
+
+  return [...keys]
+}
 
 export function parseParamValues(searchParams: URLSearchParams, paramKey: string): string[] {
   const raw = searchParams.get(paramKey)

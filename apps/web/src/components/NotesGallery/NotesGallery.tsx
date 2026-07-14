@@ -14,6 +14,7 @@ import { filterNotesWithImages } from "../NoteCoverGrid/NoteCoverGrid.util"
 import { NotesFilterPanel } from "../NotesFilterPanel"
 import {
   buildFrontmatterParamKey,
+  getFrontmatterKeysFromParams,
   parseParamValues,
   YEAR_PARAM_KEY,
 } from "../NotesFilterFacetGroup/NotesFilterFacetGroup.util"
@@ -55,16 +56,16 @@ export const NotesGallery = ({ badges = [] }: NotesGalleryProps) => {
         .filter((year) => !Number.isNaN(year)),
     [searchParams],
   )
-  const selectedFrontmatter = useMemo(
-    () =>
-      Object.fromEntries(
-        frontmatterFacets.map(({ key }) => [
-          key,
-          parseParamValues(searchParams, buildFrontmatterParamKey(key)),
-        ]),
-      ),
-    [frontmatterFacets, searchParams],
-  )
+  const selectedFrontmatter = useMemo(() => {
+    const keys = new Set([
+      ...frontmatterFacets.map(({ key }) => key),
+      ...getFrontmatterKeysFromParams(searchParams),
+    ])
+
+    return Object.fromEntries(
+      [...keys].map((key) => [key, parseParamValues(searchParams, buildFrontmatterParamKey(key))]),
+    )
+  }, [frontmatterFacets, searchParams])
 
   const filteredNotes = useMemo(() => {
     const bySearch = filterSearchIndex(searchIndex, searchQuery)

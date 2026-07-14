@@ -163,6 +163,21 @@ describe("buildFrontmatterFacets", () => {
     expect(facet?.values).toContain("common")
   })
 
+  test("ignores blank entries in array frontmatter values", () => {
+    const notes = [
+      buildNote({ frontmatter: { tags: ["rpg", "", "  "] } }),
+      buildNote({ frontmatter: { tags: [""] } }),
+    ]
+
+    expect(buildFrontmatterFacets(notes)).toEqual([{ key: "tags", values: ["rpg"] }])
+  })
+
+  test("drops a key entirely when all of its values are blank", () => {
+    const notes = [buildNote({ frontmatter: { tags: ["", "  "] } })]
+
+    expect(buildFrontmatterFacets(notes)).toEqual([])
+  })
+
   test("returns an empty list when no notes have frontmatter", () => {
     const notes = [buildNote({ frontmatter: null })]
 

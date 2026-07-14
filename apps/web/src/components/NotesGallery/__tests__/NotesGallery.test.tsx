@@ -7,10 +7,10 @@ afterEach(cleanup)
 
 import { NotesGallery } from "../NotesGallery"
 
-const renderGallery = (badges: string[] = []) =>
+const renderGallery = (badges: string[] = [], path = "/notes/books") =>
   render(
     <ChakraProvider value={defaultSystem}>
-      <MemoryRouter initialEntries={["/notes/books"]}>
+      <MemoryRouter initialEntries={[path]}>
         <Routes>
           <Route path="/notes/:view" element={<NotesGallery badges={badges} />} />
         </Routes>
@@ -222,6 +222,26 @@ describe("NotesGallery", () => {
     await waitFor(() => {
       expect(screen.getByText("Old Note")).toBeTruthy()
       expect(screen.queryByRole("button", { name: "gallery.removeFilter" })).toBeNull()
+    })
+  })
+
+  test("honors an fm.* filter in the URL even when its key isn't part of the current view's facets", async () => {
+    useNotesQueryMock.mockReturnValue({
+      data: { notes: [noteWithCover] },
+      error: undefined,
+      isLoading: false,
+    })
+
+    renderGallery([], "/notes/books?fm.status=archived")
+
+    expect(screen.queryByText("With Cover")).toBeNull()
+    const chip = await screen.findByRole("button", { name: "gallery.removeFilter" })
+    expect(chip).toBeTruthy()
+
+    fireEvent.click(chip)
+
+    await waitFor(() => {
+      expect(screen.getByText("With Cover")).toBeTruthy()
     })
   })
 })
