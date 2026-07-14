@@ -1,5 +1,12 @@
 # services
 
+## 2.2.1
+
+### Patch Changes
+
+- app-config@2.3.1
+- markdown@2.3.1
+
 ## 2.2.0
 
 ### Minor Changes
