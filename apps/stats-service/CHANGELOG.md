@@ -1,5 +1,14 @@
 # stats-service
 
+## 1.1.12
+
+### Patch Changes
+
+- Updated dependencies [5b101ab]
+  - app-config@2.3.0
+  - markdown@2.3.0
+  - mdm-util@2.3.0
+
 ## 1.1.11
 
 ### Patch Changes
