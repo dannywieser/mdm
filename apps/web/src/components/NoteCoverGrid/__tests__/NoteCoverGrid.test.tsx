@@ -106,8 +106,28 @@ describe("getImageSrc", () => {
     )
   })
 
-  test("returns an external image URL unchanged, bypassing the proxy", () => {
+  test("returns an https image URL unchanged, bypassing the proxy", () => {
     expect(getImageSrc("https://example.com/cover.jpg")).toBe("https://example.com/cover.jpg")
+  })
+
+  test("returns an http image URL unchanged, bypassing the proxy", () => {
+    expect(getImageSrc("http://example.com/cover.jpg")).toBe("http://example.com/cover.jpg")
+  })
+
+  test("returns a protocol-relative image URL unchanged, bypassing the proxy", () => {
+    expect(getImageSrc("//example.com/cover.jpg")).toBe("//example.com/cover.jpg")
+  })
+
+  test("returns an empty string for a javascript: URL instead of rendering it", () => {
+    expect(getImageSrc("javascript:alert(1)")).toBe("")
+  })
+
+  test("returns an empty string for a data: URL instead of rendering it", () => {
+    expect(getImageSrc("data:image/png;base64,abc123")).toBe("")
+  })
+
+  test("returns an empty string for an obsidian: URL instead of rendering it", () => {
+    expect(getImageSrc("obsidian://open?vault=v&file=note")).toBe("")
   })
 })
 

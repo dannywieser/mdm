@@ -1,5 +1,5 @@
 import type { Note } from "markdown"
-import { isExternalUrl } from "mdm-util"
+import { isExternalUrl, isHttpUrl } from "mdm-util"
 import { buildImageUrl } from "services"
 
 export function getNoteImagePaths(note: Note): string[] {
@@ -14,7 +14,11 @@ export function getNoteImagePaths(note: Note): string[] {
 }
 
 export function getImageSrc(path: string): string {
-  return isExternalUrl(path) ? path : buildImageUrl({ path })
+  if (isHttpUrl(path)) return path
+  // Any other external scheme (javascript:, data:, obsidian://, etc.) isn't safe
+  // to render directly, and the local image proxy would reject it too.
+  if (isExternalUrl(path)) return ""
+  return buildImageUrl({ path })
 }
 
 export function filterNotesWithImages(notes: Note[]): Note[] {
