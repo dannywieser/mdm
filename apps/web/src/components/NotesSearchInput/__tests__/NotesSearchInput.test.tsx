@@ -108,4 +108,40 @@ describe("NotesSearchInput", () => {
 
     expect(locationState.search).toBe("?q=game")
   })
+
+  test("does not render a clear button when the input is empty", () => {
+    renderAt("/notes/books")
+
+    expect(screen.queryByRole("button", { name: "gallery.clearSearch" })).toBeNull()
+  })
+
+  test("renders a clear button once there is a value", () => {
+    renderAt("/notes/books?q=game")
+
+    expect(screen.getByRole("button", { name: "gallery.clearSearch" })).toBeTruthy()
+  })
+
+  test("clicking the clear button empties the input and the URL immediately", () => {
+    renderAt("/notes/books?q=game")
+
+    fireEvent.click(screen.getByRole("button", { name: "gallery.clearSearch" }))
+
+    const input = screen.getByRole<HTMLInputElement>("textbox", { name: "header.searchNotes" })
+    expect(input.value).toBe("")
+    expect(locationState.search).toBe("")
+  })
+
+  test("clicking clear cancels a pending debounced update", () => {
+    renderAt("/notes/books")
+
+    const input = screen.getByRole("textbox", { name: "header.searchNotes" })
+    fireEvent.change(input, { target: { value: "game" } })
+    fireEvent.click(screen.getByRole("button", { name: "gallery.clearSearch" }))
+
+    act(() => {
+      vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS)
+    })
+
+    expect(locationState.search).toBe("")
+  })
 })

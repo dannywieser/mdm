@@ -1,5 +1,5 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
-import { cleanup, render, screen } from "@testing-library/react"
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
@@ -105,5 +105,123 @@ describe("NotesGallery", () => {
     renderGallery()
 
     expect(screen.getByTestId("gallery-grid")).toBeTruthy()
+  })
+
+  test("renders a filters button", () => {
+    useNotesQueryMock.mockReturnValue({
+      data: { notes: [noteWithCover] },
+      error: undefined,
+      isLoading: false,
+    })
+
+    renderGallery()
+
+    expect(screen.getByRole("button", { name: "gallery.filters" })).toBeTruthy()
+  })
+
+  test("opens the filter panel with year and frontmatter facets on click", async () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          {
+            ...noteWithCover,
+            createdDate: "2024-01-01T00:00:00.000Z",
+            frontmatter: { images: ["https://example.com/cover.jpg"], type: "game" },
+          },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+
+    renderGallery()
+    fireEvent.click(screen.getByRole("button", { name: "gallery.filters" }))
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "2024" })).toBeTruthy()
+      expect(screen.getByRole("button", { name: "game" })).toBeTruthy()
+    })
+  })
+
+  test("selecting a year facet filters the grid down to matching notes", async () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          {
+            id: "1",
+            title: "Old Note",
+            obsidianUrl: "obsidian://open?vault=v&file=1",
+            createdDate: "2022-01-01T00:00:00.000Z",
+            frontmatter: { images: ["https://example.com/cover1.jpg"] },
+          },
+          {
+            id: "2",
+            title: "New Note",
+            obsidianUrl: "obsidian://open?vault=v&file=2",
+            createdDate: "2024-01-01T00:00:00.000Z",
+            frontmatter: { images: ["https://example.com/cover2.jpg"] },
+          },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+
+    renderGallery()
+    fireEvent.click(screen.getByRole("button", { name: "gallery.filters" }))
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "2024" })).toBeTruthy()
+    })
+    fireEvent.click(screen.getByRole("button", { name: "2024" }))
+
+    await waitFor(() => {
+      expect(screen.getByText("New Note")).toBeTruthy()
+      expect(screen.queryByText("Old Note")).toBeNull()
+    })
+  })
+
+  test("shows an active filter chip after selecting a year, and clicking it clears the filter", async () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          {
+            id: "1",
+            title: "Old Note",
+            obsidianUrl: "obsidian://open?vault=v&file=1",
+            createdDate: "2022-01-01T00:00:00.000Z",
+            frontmatter: { images: ["https://example.com/cover1.jpg"] },
+          },
+          {
+            id: "2",
+            title: "New Note",
+            obsidianUrl: "obsidian://open?vault=v&file=2",
+            createdDate: "2024-01-01T00:00:00.000Z",
+            frontmatter: { images: ["https://example.com/cover2.jpg"] },
+          },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+
+    renderGallery()
+    fireEvent.click(screen.getByRole("button", { name: "gallery.filters" }))
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "2024" })).toBeTruthy()
+    })
+    fireEvent.click(screen.getByRole("button", { name: "2024" }))
+
+    const chip = await screen.findByRole("button", { name: "gallery.removeFilter" }, { timeout: 3000 })
+    expect(chip).toBeTruthy()
+    expect(screen.queryByText("Old Note")).toBeNull()
+
+    fireEvent.click(chip)
+
+    await waitFor(() => {
+      expect(screen.getByText("Old Note")).toBeTruthy()
+      expect(screen.queryByRole("button", { name: "gallery.removeFilter" })).toBeNull()
+    })
   })
 })
