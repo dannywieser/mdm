@@ -44,31 +44,45 @@ function getFrontmatterValues(note: Note, key: string): string[] {
   return Array.isArray(value) ? value : [value]
 }
 
-export function buildFrontmatterFacets(notes: Note[]): FrontmatterFacet[] {
+function countFrontmatterValue(counts: Map<string, number>, value: string): void {
+  if (!value.trim()) return
+  counts.set(value, (counts.get(value) ?? 0) + 1)
+}
+
+function countFrontmatterValues(notes: Note[], allowedKeys: string[]): Map<string, Map<string, number>> {
   const countsByKey = new Map<string, Map<string, number>>()
 
   for (const note of notes) {
-    for (const [key, value] of Object.entries(note.frontmatter ?? {})) {
+    for (const key of allowedKeys) {
+      const value = note.frontmatter?.[key]
+      if (value === undefined) continue
+
       const counts = countsByKey.get(key) ?? new Map<string, number>()
       for (const entry of Array.isArray(value) ? value : [value]) {
-        if (!entry.trim()) continue
-        counts.set(entry, (counts.get(entry) ?? 0) + 1)
+        countFrontmatterValue(counts, entry)
       }
       countsByKey.set(key, counts)
     }
   }
 
-  return [...countsByKey.entries()]
-    .filter(([, counts]) => counts.size > 0)
-    .map(([key, counts]) => ({
-      key,
-      values: [...counts.entries()]
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, MAX_FACET_VALUES)
-        .map(([value]) => value)
-        .sort((a, b) => a.localeCompare(b)),
-    }))
-    .sort((a, b) => a.key.localeCompare(b.key))
+  return countsByKey
+}
+
+function rankFacetValues(counts: Map<string, number>): string[] {
+  return [...counts.entries()]
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, MAX_FACET_VALUES)
+    .map(([value]) => value)
+    .sort((a, b) => a.localeCompare(b))
+}
+
+export function buildFrontmatterFacets(notes: Note[], allowedKeys: string[]): FrontmatterFacet[] {
+  const uniqueKeys = [...new Set(allowedKeys)]
+  const countsByKey = countFrontmatterValues(notes, uniqueKeys)
+
+  return uniqueKeys
+    .filter((key) => (countsByKey.get(key)?.size ?? 0) > 0)
+    .map((key) => ({ key, values: rankFacetValues(countsByKey.get(key) ?? new Map<string, number>()) }))
 }
 
 export function buildYearFacet(notes: Note[]): number[] {

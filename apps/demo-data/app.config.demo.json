@@ -26,7 +26,8 @@
       "group": "photos",
       "component": "NotesGallery",
       "filters": [{ "folder": "photos" }],
-      "badges": ["frontmatter.location", "frontmatter.tags"]
+      "badges": ["frontmatter.location", "frontmatter.tags"],
+      "frontmatterFilters": ["location", "tags"]
     },
     {
       "id": "books",
@@ -34,7 +35,8 @@
       "group": "library",
       "component": "NotesGallery",
       "filters": [{ "folder": "library/books" }],
-      "badges": ["frontmatter.author", "frontmatter.genre"]
+      "badges": ["frontmatter.author", "frontmatter.genre"],
+      "frontmatterFilters": ["author", "genre", "status", "rating"]
     },
     {
       "id": "reading-list",
@@ -56,7 +58,8 @@
         { "folder": "library/movies" },
         { "$exclude": { "frontmatter.status": "watchlist" } }
       ],
-      "badges": ["frontmatter.director", "frontmatter.genre", "frontmatter.rating"]
+      "badges": ["frontmatter.director", "frontmatter.genre", "frontmatter.rating"],
+      "frontmatterFilters": ["director", "genre", "rating"]
     },
     {
       "id": "quote-review",
@@ -91,7 +94,8 @@
       "group": "knowledge",
       "component": "NotesGallery",
       "filters": [{ "folder": "recipes" }],
-      "badges": ["frontmatter.cuisine", "frontmatter.difficulty"]
+      "badges": ["frontmatter.cuisine", "frontmatter.difficulty"],
+      "frontmatterFilters": ["cuisine", "difficulty"]
     }
   ],
   "habits": [

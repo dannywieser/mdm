@@ -77,6 +77,7 @@ Express-based Node service with request logging via `pino-http`.
           "count": 42,
           "noteIds": ["book-1", "book-2"],
           "badges": ["frontmatter.type"],
+          "frontmatterFilters": ["genre", "status"],
           "group": "Library"
         }
       ]
@@ -106,4 +107,5 @@ Configured via `app.config.json` at the repository root plus the `NOTES_ROOT` en
     - Use `$missing` as a filter value to match notes where a property path is absent (for example `{"frontmatter.type": "$missing"}`).
     - Use `$today` or `$onThisDay` as a filter value to match a date property against today's date, or against today's month/day in a past year, respectively (both evaluated in the configured `timezone`).
   - `badges` (optional): array of note property paths to render as badges in the UI, such as `folder` or `frontmatter.type`
+  - `frontmatterFilters` (optional): array of bare frontmatter keys (not full property paths, for example `genre` rather than `frontmatter.genre`) that the web app's `NotesGallery` view offers as quick-filter facets, alongside the built-in year facet. A listed key that no note in the view actually has is silently ignored. If omitted or empty, the gallery only shows search and the year facet.
   - `group` (optional): label used to group views together in the web app's view picker

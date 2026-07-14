@@ -138,15 +138,52 @@ describe("filterByYear", () => {
 })
 
 describe("buildFrontmatterFacets", () => {
-  test("collects distinct values per frontmatter key", () => {
+  test("collects distinct values only for allowed keys", () => {
     const notes = [
       buildNote({ frontmatter: { type: "game", tags: ["rpg", "coop"] } }),
       buildNote({ frontmatter: { type: "cooking", tags: ["coop"] } }),
     ]
 
-    expect(buildFrontmatterFacets(notes)).toEqual([
+    expect(buildFrontmatterFacets(notes, ["tags", "type"])).toEqual([
       { key: "tags", values: ["coop", "rpg"] },
       { key: "type", values: ["cooking", "game"] },
+    ])
+  })
+
+  test("preserves the order keys are declared in, not alphabetical order", () => {
+    const notes = [buildNote({ frontmatter: { tags: ["rpg"], type: "game" } })]
+
+    expect(buildFrontmatterFacets(notes, ["type", "tags"]).map(({ key }) => key)).toEqual([
+      "type",
+      "tags",
+    ])
+  })
+
+  test("ignores a frontmatter key that isn't in the allowed list", () => {
+    const notes = [buildNote({ frontmatter: { type: "game", tags: ["rpg"] } })]
+
+    expect(buildFrontmatterFacets(notes, ["type"])).toEqual([{ key: "type", values: ["game"] }])
+  })
+
+  test("ignores an allowed key that no note actually has", () => {
+    const notes = [buildNote({ frontmatter: { type: "game" } })]
+
+    expect(buildFrontmatterFacets(notes, ["type", "missingKey"])).toEqual([
+      { key: "type", values: ["game"] },
+    ])
+  })
+
+  test("returns an empty list when the allowed keys list is empty", () => {
+    const notes = [buildNote({ frontmatter: { type: "game" } })]
+
+    expect(buildFrontmatterFacets(notes, [])).toEqual([])
+  })
+
+  test("de-duplicates repeated entries in the allowed keys list", () => {
+    const notes = [buildNote({ frontmatter: { type: "game" } })]
+
+    expect(buildFrontmatterFacets(notes, ["type", "type"])).toEqual([
+      { key: "type", values: ["game"] },
     ])
   })
 
@@ -157,7 +194,7 @@ describe("buildFrontmatterFacets", () => {
       ...Array.from({ length: MAX_FACET_VALUES }, (_, i) => buildNote({ frontmatter: { free: `rare-${i}` } })),
     ]
 
-    const facet = buildFrontmatterFacets(notes).find(({ key }) => key === "free")
+    const facet = buildFrontmatterFacets(notes, ["free"]).find(({ key }) => key === "free")
 
     expect(facet?.values).toHaveLength(MAX_FACET_VALUES)
     expect(facet?.values).toContain("common")
@@ -169,19 +206,19 @@ describe("buildFrontmatterFacets", () => {
       buildNote({ frontmatter: { tags: [""] } }),
     ]
 
-    expect(buildFrontmatterFacets(notes)).toEqual([{ key: "tags", values: ["rpg"] }])
+    expect(buildFrontmatterFacets(notes, ["tags"])).toEqual([{ key: "tags", values: ["rpg"] }])
   })
 
   test("drops a key entirely when all of its values are blank", () => {
     const notes = [buildNote({ frontmatter: { tags: ["", "  "] } })]
 
-    expect(buildFrontmatterFacets(notes)).toEqual([])
+    expect(buildFrontmatterFacets(notes, ["tags"])).toEqual([])
   })
 
   test("returns an empty list when no notes have frontmatter", () => {
     const notes = [buildNote({ frontmatter: null })]
 
-    expect(buildFrontmatterFacets(notes)).toEqual([])
+    expect(buildFrontmatterFacets(notes, ["type"])).toEqual([])
   })
 })
 

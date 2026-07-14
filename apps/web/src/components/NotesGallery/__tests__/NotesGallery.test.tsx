@@ -7,12 +7,19 @@ afterEach(cleanup)
 
 import { NotesGallery } from "../NotesGallery"
 
-const renderGallery = (badges: string[] = [], path = "/notes/books") =>
+const renderGallery = (
+  badges: string[] = [],
+  path = "/notes/books",
+  frontmatterFilters: string[] = [],
+) =>
   render(
     <ChakraProvider value={defaultSystem}>
       <MemoryRouter initialEntries={[path]}>
         <Routes>
-          <Route path="/notes/:view" element={<NotesGallery badges={badges} />} />
+          <Route
+            path="/notes/:view"
+            element={<NotesGallery badges={badges} frontmatterFilters={frontmatterFilters} />}
+          />
         </Routes>
       </MemoryRouter>
     </ChakraProvider>,
@@ -134,13 +141,61 @@ describe("NotesGallery", () => {
       isLoading: false,
     })
 
-    renderGallery()
+    renderGallery([], "/notes/books", ["type"])
     fireEvent.click(screen.getByRole("button", { name: "gallery.filters" }))
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "2024" })).toBeTruthy()
       expect(screen.getByRole("button", { name: "game" })).toBeTruthy()
     })
+  })
+
+  test("only shows search and the year facet when frontmatterFilters is not configured", async () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          {
+            ...noteWithCover,
+            createdDate: "2024-01-01T00:00:00.000Z",
+            frontmatter: { images: ["https://example.com/cover.jpg"], type: "game" },
+          },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+
+    renderGallery()
+    fireEvent.click(screen.getByRole("button", { name: "gallery.filters" }))
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "2024" })).toBeTruthy()
+    })
+    expect(screen.queryByRole("button", { name: "game" })).toBeNull()
+  })
+
+  test("ignores a configured frontmatterFilters key that no note actually has", async () => {
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          {
+            ...noteWithCover,
+            createdDate: "2024-01-01T00:00:00.000Z",
+            frontmatter: { images: ["https://example.com/cover.jpg"], type: "game" },
+          },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+
+    renderGallery([], "/notes/books", ["type", "missingKey"])
+    fireEvent.click(screen.getByRole("button", { name: "gallery.filters" }))
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "game" })).toBeTruthy()
+    })
+    expect(screen.queryByText("missingKey")).toBeNull()
   })
 
   test("selecting a year facet filters the grid down to matching notes", async () => {
