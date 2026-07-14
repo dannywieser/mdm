@@ -51,9 +51,7 @@ describe("NoteCoverGrid", () => {
     )
 
     const img = screen.getByRole("img", { name: "Multiple Images" })
-    expect(img.getAttribute("src")).toBe(
-      `/images?path=${encodeURIComponent("https://example.com/first.jpg")}`,
-    )
+    expect(img.getAttribute("src")).toBe("https://example.com/first.jpg")
   })
 
   test("applies a fixed aspect ratio to the image placeholder", () => {
@@ -110,9 +108,7 @@ describe("NoteCoverGrid", () => {
       })
 
       const img = screen.getByRole("img", { name: "Multiple Images" })
-      expect(img.getAttribute("src")).toBe(
-        `/images?path=${encodeURIComponent("https://example.com/second.jpg")}`,
-      )
+      expect(img.getAttribute("src")).toBe("https://example.com/second.jpg")
     })
 
     test("does not rotate when there is only one image", () => {
@@ -127,9 +123,7 @@ describe("NoteCoverGrid", () => {
       })
 
       const img = screen.getByRole("img", { name: "With Cover" })
-      expect(img.getAttribute("src")).toBe(
-        `/images?path=${encodeURIComponent("https://example.com/cover.jpg")}`,
-      )
+      expect(img.getAttribute("src")).toBe("https://example.com/cover.jpg")
     })
 
     test("uses a single shared timer no matter how many cards are rendered", () => {
@@ -163,6 +157,7 @@ describe("NoteCoverGrid", () => {
       )
 
       expect(setIntervalSpy).toHaveBeenCalledTimes(1)
+      setIntervalSpy.mockRestore()
     })
 
     test("rotates cards with different image counts from the same shared tick", () => {
@@ -200,20 +195,24 @@ describe("NoteCoverGrid", () => {
       // Shared tick is 2: card with 2 images shows index 2 % 2 = 0 (back to first);
       // card with 3 images shows index 2 % 3 = 2 (third).
       expect(screen.getByRole("img", { name: "Two Images" }).getAttribute("src")).toBe(
-        `/images?path=${encodeURIComponent("https://example.com/a1.jpg")}`,
+        "https://example.com/a1.jpg",
       )
       expect(screen.getByRole("img", { name: "Three Images" }).getAttribute("src")).toBe(
-        `/images?path=${encodeURIComponent("https://example.com/b3.jpg")}`,
+        "https://example.com/b3.jpg",
       )
     })
   })
 })
 
 describe("getImageSrc", () => {
-  test("builds a proxy URL from an image path", () => {
+  test("builds a proxy URL from a local image path", () => {
     expect(getImageSrc("attachments/cover.jpg")).toBe(
       `/images?path=${encodeURIComponent("attachments/cover.jpg")}`,
     )
+  })
+
+  test("returns an external image URL unchanged, bypassing the proxy", () => {
+    expect(getImageSrc("https://example.com/cover.jpg")).toBe("https://example.com/cover.jpg")
   })
 })
 

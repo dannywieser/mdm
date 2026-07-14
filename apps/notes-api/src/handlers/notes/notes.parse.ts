@@ -2,6 +2,7 @@ import type { MarkdownNode, Note, NoteFrontmatter } from "markdown"
 
 import { resolveNotesConfig } from "app-config"
 import { extractImagePaths, parseFrontMatter } from "markdown"
+import { isExternalUrl } from "mdm-util"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
@@ -16,7 +17,6 @@ import {
 } from "./notes.wikilinks"
 
 const IMAGE_SERVER_PATH = "/images"
-const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
 
 export const EMPTY_MARKDOWN_NODE: MarkdownNode = { type: "root", children: [] }
 
@@ -59,7 +59,7 @@ const resolveImagePath = (
 ): string | null => {
   const trimmedPath = rawPath.trim()
   if (!trimmedPath) return null
-  if (EXTERNAL_IMAGE_URL_PATTERN.test(trimmedPath)) return trimmedPath
+  if (isExternalUrl(trimmedPath)) return trimmedPath
   return resolveLocalImagePath(trimmedPath, noteRelativePath, attachmentsDirectory)
 }
 
@@ -215,7 +215,7 @@ const resolveLocalImagePath = (
 ): string | null => {
   const sanitizedImagePath = rawImagePath.trim()
 
-  if (!sanitizedImagePath || EXTERNAL_IMAGE_URL_PATTERN.test(sanitizedImagePath)) {
+  if (!sanitizedImagePath || isExternalUrl(sanitizedImagePath)) {
     return null
   }
 

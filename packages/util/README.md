@@ -5,7 +5,7 @@ Shared, dependency-free pure functions used across the mdm codebase: date arithm
 ## Usage
 
 ```ts
-import { addDays, buildDateRange, daysBetween, getDateWindowStart, formatDate, getDateComponents, toISODateString, parseDateFromFormats, isValidTimezone, isNonEmptyString, mapWithConcurrency, toLoggableError } from "mdm-util"
+import { addDays, buildDateRange, daysBetween, getDateWindowStart, formatDate, getDateComponents, toISODateString, parseDateFromFormats, isValidTimezone, isExternalUrl, isNonEmptyString, mapWithConcurrency, toLoggableError } from "mdm-util"
 ```
 
 Two additional subpath exports isolate dependencies that don't belong in every consumer's bundle:
@@ -16,7 +16,7 @@ Two additional subpath exports isolate dependencies that don't belong in every c
 ## Structure
 
 - `date/` — `addDays`, `daysBetween`, `daysToSeconds`, `buildDateRange`, `getDateWindowStart`, `formatDate`, `getDateComponents`, `toISODateString`, `isValidTimezone`, `parseDateFromFormats`. Before writing new date logic anywhere in the repo, check here first (see the root `CLAUDE.md` util package guidelines).
-- `strings/` — `countWords`, `isNonEmptyString`, `isStringArray`, `isStringRecord`.
+- `strings/` — `countWords`, `isExternalUrl` (URL scheme, protocol-relative, or fragment detection), `isNonEmptyString`, `isStringArray`, `isStringRecord`.
 - `objects/` — `getObjectValue`, `getValueByPath` (dot-path property access used by the notes view filters).
 - `promises/` — `mapWithConcurrency`, a bounded-concurrency async map that preserves input order regardless of completion order.
 - `regex/` — `buildCapturingPattern`, builds a full-string regex + token list from a tokenized format string (backs date format parsing).

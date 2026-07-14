@@ -29,9 +29,13 @@ vi.mock("markdown", async (importOriginal) => {
   }
 })
 
-vi.mock("mdm-util", () => ({
-  createFileID: vi.fn(),
-}))
+vi.mock("mdm-util", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("mdm-util")>()
+  return {
+    ...actual,
+    createFileID: vi.fn(),
+  }
+})
 
 const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
 const createFileIDMock = vi.mocked(createFileID)

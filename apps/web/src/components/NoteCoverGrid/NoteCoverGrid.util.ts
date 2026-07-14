@@ -1,4 +1,5 @@
 import type { Note } from "markdown"
+import { isExternalUrl } from "mdm-util"
 import { buildImageUrl } from "services"
 
 export function getNoteImagePaths(note: Note): string[] {
@@ -13,7 +14,7 @@ export function getNoteImagePaths(note: Note): string[] {
 }
 
 export function getImageSrc(path: string): string {
-  return buildImageUrl({ path })
+  return isExternalUrl(path) ? path : buildImageUrl({ path })
 }
 
 export function filterNotesWithImages(notes: Note[]): Note[] {

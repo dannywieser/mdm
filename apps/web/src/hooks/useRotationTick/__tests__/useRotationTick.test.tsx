@@ -38,5 +38,6 @@ describe("useRotationTick", () => {
     renderHook(() => useRotationTick({ intervalMs: 10000 }))
 
     expect(setIntervalSpy).toHaveBeenCalledTimes(1)
+    setIntervalSpy.mockRestore()
   })
 })
