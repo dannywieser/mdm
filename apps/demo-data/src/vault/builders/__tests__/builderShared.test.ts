@@ -39,7 +39,7 @@ describe("randomDateBefore", () => {
 })
 
 describe("buildCover", () => {
-  test("returns an attachment whose path matches the cover frontmatter", () => {
+  test("returns an attachment whose path matches the returned cover path", () => {
     const { attachment, coverPath } = buildCover(
       "book",
       "The Glass Cartographer",

@@ -67,13 +67,12 @@ export const buildPhotoNotes = ({ endDate, random }: VaultBuilderOptions): Gener
     const coverPath = `attachments/covers/photos/${date}-${slugify(place)}.svg`
 
     notes.push({
-      body: pickOne(random, CAPTIONS),
+      body: `![](${coverPath})\n\n${pickOne(random, CAPTIONS)}`,
       folder: "photos",
       frontmatter: {
         created: date,
         location: place,
         tags: pickMany(random, PHOTO_TAGS, randomInt(random, 1, 2)),
-        cover: coverPath,
       },
       modifiedDate,
       title: `${date} ${place}`,

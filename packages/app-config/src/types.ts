@@ -16,13 +16,11 @@ export interface ExcludeViewFilter {
 export type ViewFilter = ExcludeViewFilter | Record<string, string>
 
 export interface NotesView {
-  aspectRatio?: string
   badges?: string[]
   component: string
   filters: ViewFilter[]
   group?: string
   id: string
-  layout?: string
   name: string
 }
 
@@ -47,12 +45,10 @@ export interface AppConfig {
 }
 
 export interface AppConfigView {
-  aspectRatio?: string
   badges?: string[]
   component: string
   filters: ViewFilter[]
   group?: string
   id: string
-  layout?: string
   name: string
 }

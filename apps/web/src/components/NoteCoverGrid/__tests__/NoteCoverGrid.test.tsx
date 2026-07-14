@@ -11,13 +11,13 @@ vi.mock("../../NoteBadges", () => ({
 }))
 
 import { NoteCoverGrid } from "../NoteCoverGrid"
-import { filterNotesWithCovers, getCoverSrc } from "../NoteCoverGrid.util"
+import { filterNotesWithImages, getImageSrc, getNoteImagePaths } from "../NoteCoverGrid.util"
 
 const noteWithCover = {
   id: "1",
   title: "With Cover",
   obsidianUrl: "obsidian://open?vault=v&file=1",
-  frontmatter: { cover: "https://example.com/cover.jpg" },
+  frontmatter: { images: ["https://example.com/cover.jpg"] },
 } as never
 
 describe("NoteCoverGrid", () => {
@@ -32,17 +32,17 @@ describe("NoteCoverGrid", () => {
     expect(screen.getByText("With Cover")).toBeTruthy()
   })
 
-  test("uses the first element when cover is an array", () => {
+  test("uses the first image when a note has multiple images", () => {
     render(
       <ChakraProvider value={defaultSystem}>
         <NoteCoverGrid
           notes={[
             {
               id: "1",
-              title: "Array Cover",
+              title: "Multiple Images",
               obsidianUrl: "obsidian://open?vault=v&file=1",
               frontmatter: {
-                cover: ["https://example.com/first.jpg", "https://example.com/second.jpg"],
+                images: ["https://example.com/first.jpg", "https://example.com/second.jpg"],
               },
             } as never,
           ]}
@@ -50,13 +50,11 @@ describe("NoteCoverGrid", () => {
       </ChakraProvider>,
     )
 
-    const img = screen.getByRole("img", { name: "Array Cover" })
-    expect(img.getAttribute("src")).toBe(
-      `/images?path=${encodeURIComponent("https://example.com/first.jpg")}`,
-    )
+    const img = screen.getByRole("img", { name: "Multiple Images" })
+    expect(img.getAttribute("src")).toBe("https://example.com/first.jpg")
   })
 
-  test("applies a default aspect ratio to the image placeholder when none is configured", () => {
+  test("applies a fixed aspect ratio to the image placeholder", () => {
     render(
       <ChakraProvider value={defaultSystem}>
         <NoteCoverGrid notes={[noteWithCover]} />
@@ -65,17 +63,6 @@ describe("NoteCoverGrid", () => {
 
     const skeleton = screen.getByTestId("fade-image-skeleton")
     expect(getComputedStyle(skeleton.parentElement!).aspectRatio).toBe("3/4")
-  })
-
-  test("uses a configured aspect ratio for the image placeholder", () => {
-    render(
-      <ChakraProvider value={defaultSystem}>
-        <NoteCoverGrid aspectRatio="16/9" notes={[noteWithCover]} />
-      </ChakraProvider>,
-    )
-
-    const skeleton = screen.getByTestId("fade-image-skeleton")
-    expect(getComputedStyle(skeleton.parentElement!).aspectRatio).toBe("16/9")
   })
 
   test("renders NoteBadges with configured badges", () => {
@@ -90,50 +77,80 @@ describe("NoteCoverGrid", () => {
   })
 })
 
-describe("getCoverSrc", () => {
-  test("builds a proxy URL from a string cover", () => {
-    expect(getCoverSrc("attachments/cover.jpg")).toBe(
-      `/images?path=${encodeURIComponent("attachments/cover.jpg")}`,
-    )
+describe("getNoteImagePaths", () => {
+  const note = (images: unknown) => ({ id: "1", frontmatter: { images } }) as never
+
+  test("strips surrounding whitespace around a quoted value", () => {
+    expect(getNoteImagePaths(note([' "https://example.com/cover.jpg" ']))).toEqual([
+      "https://example.com/cover.jpg",
+    ])
   })
 
-  test("uses the first element of an array cover", () => {
-    expect(getCoverSrc(["attachments/first.jpg", "attachments/second.jpg"])).toBe(
-      `/images?path=${encodeURIComponent("attachments/first.jpg")}`,
-    )
+  test("strips surrounding whitespace inside quotes", () => {
+    expect(getNoteImagePaths(note(['" https://example.com/cover.jpg "']))).toEqual([
+      "https://example.com/cover.jpg",
+    ])
   })
 
-  test("strips surrounding quotes from the cover path", () => {
-    expect(getCoverSrc('"attachments/cover.jpg"')).toBe(
-      `/images?path=${encodeURIComponent("attachments/cover.jpg")}`,
-    )
+  test("strips surrounding whitespace around an unquoted value", () => {
+    expect(getNoteImagePaths(note(["  attachments/cover.jpg  "]))).toEqual([
+      "attachments/cover.jpg",
+    ])
   })
 })
 
-describe("filterNotesWithCovers", () => {
-  const note = (cover: unknown) => ({ id: "1", frontmatter: cover !== undefined ? { cover } : {} }) as never
-
-  test("includes notes with a string cover", () => {
-    expect(filterNotesWithCovers([note("attachments/cover.jpg")])).toHaveLength(1)
+describe("getImageSrc", () => {
+  test("builds a proxy URL from a local image path", () => {
+    expect(getImageSrc("attachments/cover.jpg")).toBe(
+      `/images?path=${encodeURIComponent("attachments/cover.jpg")}`,
+    )
   })
 
-  test("includes notes with a non-empty array cover", () => {
-    expect(filterNotesWithCovers([note(["attachments/cover.jpg"])])).toHaveLength(1)
+  test("returns an https image URL unchanged, bypassing the proxy", () => {
+    expect(getImageSrc("https://example.com/cover.jpg")).toBe("https://example.com/cover.jpg")
   })
 
-  test("excludes notes with no cover field", () => {
-    expect(filterNotesWithCovers([note(undefined)])).toHaveLength(0)
+  test("returns an http image URL unchanged, bypassing the proxy", () => {
+    expect(getImageSrc("http://example.com/cover.jpg")).toBe("http://example.com/cover.jpg")
   })
 
-  test("excludes notes with an empty string cover", () => {
-    expect(filterNotesWithCovers([note("")])).toHaveLength(0)
+  test("returns a protocol-relative image URL unchanged, bypassing the proxy", () => {
+    expect(getImageSrc("//example.com/cover.jpg")).toBe("//example.com/cover.jpg")
   })
 
-  test("excludes notes with an empty array cover", () => {
-    expect(filterNotesWithCovers([note([])])).toHaveLength(0)
+  test("returns an empty string for a javascript: URL instead of rendering it", () => {
+    expect(getImageSrc("javascript:alert(1)")).toBe("")
   })
 
-  test("excludes notes with an array whose first element is empty", () => {
-    expect(filterNotesWithCovers([note([""])])).toHaveLength(0)
+  test("returns an empty string for a data: URL instead of rendering it", () => {
+    expect(getImageSrc("data:image/png;base64,abc123")).toBe("")
+  })
+
+  test("returns an empty string for an obsidian: URL instead of rendering it", () => {
+    expect(getImageSrc("obsidian://open?vault=v&file=note")).toBe("")
+  })
+})
+
+describe("filterNotesWithImages", () => {
+  const note = (images: unknown) => ({ id: "1", frontmatter: images !== undefined ? { images } : {} }) as never
+
+  test("includes notes with a non-empty images array", () => {
+    expect(filterNotesWithImages([note(["attachments/cover.jpg"])])).toHaveLength(1)
+  })
+
+  test("includes notes with a single string image value", () => {
+    expect(filterNotesWithImages([note("attachments/cover.jpg")])).toHaveLength(1)
+  })
+
+  test("excludes notes with no images field", () => {
+    expect(filterNotesWithImages([note(undefined)])).toHaveLength(0)
+  })
+
+  test("excludes notes with an empty images array", () => {
+    expect(filterNotesWithImages([note([])])).toHaveLength(0)
+  })
+
+  test("excludes notes with an empty string image value", () => {
+    expect(filterNotesWithImages([note("")])).toHaveLength(0)
   })
 })

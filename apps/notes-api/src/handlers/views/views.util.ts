@@ -13,13 +13,11 @@ export const buildViews = async (
     views.map(async (view) => {
       const matchedNotes = await applyViewFilter(notes, view.id)
       return {
-        aspectRatio: view.aspectRatio,
         badges: view.badges,
         component: view.component,
         count: matchedNotes.length,
         group: view.group,
         id: view.id,
-        layout: view.layout,
         name: view.name,
         noteIds: matchedNotes.map((note) => note.id),
       }

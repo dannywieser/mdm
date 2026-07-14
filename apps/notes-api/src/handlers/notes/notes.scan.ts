@@ -36,7 +36,7 @@ export const scanMarkdownFile = async (
 
   const obsidianUrl = buildObsidianUrl(obsidianVault, notesDirectory, filePath)
   const relativePath = path.relative(notesDirectory, filePath).split(path.sep).join("/")
-  const resolvedFrontmatter = resolveFrontmatterImages(frontmatter, relativePath, attachmentsDirectory)
+  const resolvedFrontmatter = resolveFrontmatterImages(frontmatter, body, relativePath, attachmentsDirectory)
 
   return {
     basename,

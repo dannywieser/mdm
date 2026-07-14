@@ -1,7 +1,8 @@
 import type { MarkdownNode, Note, NoteFrontmatter } from "markdown"
 
 import { resolveNotesConfig } from "app-config"
-import { parseFrontMatter } from "markdown"
+import { extractImagePaths, parseFrontMatter } from "markdown"
+import { isExternalUrl } from "mdm-util"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
@@ -16,7 +17,6 @@ import {
 } from "./notes.wikilinks"
 
 const IMAGE_SERVER_PATH = "/images"
-const EXTERNAL_IMAGE_URL_PATTERN = /^(?:[a-zA-Z][a-zA-Z\d+.-]*:|\/\/|#)/
 
 export const EMPTY_MARKDOWN_NODE: MarkdownNode = { type: "root", children: [] }
 
@@ -52,23 +52,39 @@ export const parseMarkdownFile = async (
   }
 }
 
+const resolveImagePath = (
+  rawPath: string,
+  noteRelativePath: string,
+  attachmentsDirectory: string,
+): string | null => {
+  const trimmedPath = rawPath.trim()
+  if (!trimmedPath || trimmedPath.startsWith("#")) return null
+  if (isExternalUrl(trimmedPath)) return trimmedPath
+  return resolveLocalImagePath(trimmedPath, noteRelativePath, attachmentsDirectory)
+}
+
+const omitImages = (frontmatter: NoteFrontmatter): NoteFrontmatter =>
+  Object.fromEntries(
+    Object.entries(frontmatter).filter(([key]) => key !== "images"),
+  )
+
 export const resolveFrontmatterImages = (
   frontmatter: NoteFrontmatter | null,
+  body: string,
   noteRelativePath: string,
-  attachmentsDirectory = "",
+  attachmentsDirectory: string,
 ): NoteFrontmatter | null => {
-  if (!frontmatter) return null
+  const resolvedImagePaths = extractImagePaths(body)
+    .map((imagePath) => resolveImagePath(imagePath, noteRelativePath, attachmentsDirectory))
+    .filter((imagePath): imagePath is string => imagePath !== null)
 
-  const cover = frontmatter.cover
-  if (!cover) return frontmatter
+  const restFrontmatter = frontmatter ? omitImages(frontmatter) : null
 
-  const rawPath = Array.isArray(cover) ? cover[0] : cover
-  if (!rawPath) return frontmatter
+  if (resolvedImagePaths.length === 0) {
+    return restFrontmatter && Object.keys(restFrontmatter).length > 0 ? restFrontmatter : null
+  }
 
-  const resolvedPath = resolveLocalImagePath(rawPath, noteRelativePath, attachmentsDirectory)
-  if (!resolvedPath) return frontmatter
-
-  return { ...frontmatter, cover: resolvedPath }
+  return { ...restFrontmatter, images: resolvedImagePaths }
 }
 
 const buildMarkdownTree = (
@@ -199,7 +215,7 @@ const resolveLocalImagePath = (
 ): string | null => {
   const sanitizedImagePath = rawImagePath.trim()
 
-  if (!sanitizedImagePath || EXTERNAL_IMAGE_URL_PATTERN.test(sanitizedImagePath)) {
+  if (!sanitizedImagePath || isExternalUrl(sanitizedImagePath)) {
     return null
   }
 

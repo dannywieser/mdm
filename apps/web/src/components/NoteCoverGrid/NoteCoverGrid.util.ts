@@ -1,18 +1,26 @@
-import type { FrontmatterValue, Note } from "markdown"
+import type { Note } from "markdown"
+import { isExternalUrl, isHttpUrl } from "mdm-util"
 import { buildImageUrl } from "services"
 
-export function getCoverSrc(cover: FrontmatterValue): string {
-  const path = Array.isArray(cover) ? cover[0] : cover
-  // eslint-disable-next-line sonarjs/slow-regex -- input is a bounded frontmatter value, not user-controlled input
-  const unquotedPath = path.replace(/^["']+|["']+$/g, "")
-  return buildImageUrl({ path: unquotedPath })
+export function getNoteImagePaths(note: Note): string[] {
+  const images = note.frontmatter?.images
+  if (images == null) return []
+
+  const list = Array.isArray(images) ? images : [images]
+  return list
+    // eslint-disable-next-line sonarjs/slow-regex -- input is a bounded frontmatter value, not user-controlled input
+    .map((path) => path.trim().replace(/^["']+|["']+$/g, "").trim())
+    .filter((path) => path !== "")
 }
 
-export function filterNotesWithCovers(notes: Note[]): Note[] {
-  return notes.filter((note) => {
-    const cover = note.frontmatter?.cover
-    if (cover == null) return false
-    if (Array.isArray(cover)) return cover.length > 0 && cover[0] !== ""
-    return cover !== ""
-  })
+export function getImageSrc(path: string): string {
+  if (isHttpUrl(path)) return path
+  // Any other external scheme (javascript:, data:, obsidian://, etc.) isn't safe
+  // to render directly, and the local image proxy would reject it too.
+  if (isExternalUrl(path)) return ""
+  return buildImageUrl({ path })
+}
+
+export function filterNotesWithImages(notes: Note[]): Note[] {
+  return notes.filter((note) => getNoteImagePaths(note).length > 0)
 }

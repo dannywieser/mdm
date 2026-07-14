@@ -15,7 +15,7 @@ Express-based Node service with request logging via `pino-http`.
     { "status": "error", "error": "ENOENT: no such file or directory, access '/data/notes'" }
     ```
 - `GET /notes`
-  - Purpose: recursively load `*.md` and `*.markdown` files from the vault directory (`NOTES_ROOT` env var), extract optional frontmatter metadata, collect all dates found in the title, body, and frontmatter (plus the file's modified date) using configured `dateFormats`, parse markdown into a node tree (resolving Obsidian wikilinks and rewriting local image paths to the image-server), and return note metadata
+  - Purpose: recursively load `*.md` and `*.markdown` files from the vault directory (`NOTES_ROOT` env var), extract optional frontmatter metadata (adding every image found in the raw body as a `frontmatter.images` array), collect all dates found in the title, body, and frontmatter (plus the file's modified date) using configured `dateFormats`, parse markdown into a node tree (resolving Obsidian wikilinks and rewriting local image paths to the image-server), and return note metadata
   - Optional query: `view=<id>` to apply a configured notes view filter by view ID
   - Optional query: `includeContent=false` to skip markdown parsing and return an empty `content` tree — useful for lightweight listing requests that only need frontmatter/metadata
   - The vault scan (walking the directory and reading each file's frontmatter/dates) is cached in memory for 5 minutes and shared across all requests regardless of `view`/`includeContent`; concurrent requests during a cache miss share a single in-flight scan instead of each triggering their own. View filtering and markdown body parsing still run fresh per request against the cached scan, since both depend on the request's query params.
@@ -36,7 +36,8 @@ Express-based Node service with request logging via `pino-http`.
           "obsidianUrl": "obsidian://open?vault=vault-name&file=welcome",
           "frontmatter": {
             "topic": ["AI"],
-            "created": "2026.05.26"
+            "created": "2026.05.26",
+            "images": ["notes/welcome/photo.png"]
           },
           "content": {
             "type": "root",
@@ -53,7 +54,7 @@ Express-based Node service with request logging via `pino-http`.
       ]
     }
     ```
-  - Notes without frontmatter return `"frontmatter": null`. `linkedNotes` (parsed notes referenced via `[[wikilink]]` syntax in the body) is only present on notes that link to others; unmatched wikilinks are left in the body as plain text
+  - Every note's raw body text is scanned for image references (standard `![alt](path)` markdown and Obsidian `![[path]]` embeds), and every image found is resolved and added to `frontmatter.images` as an array, in the order they appear in the note — this is always derived from the body scan and isn't configurable. Notes without frontmatter and without any images return `"frontmatter": null`; notes with images but no other frontmatter return `"frontmatter": { "images": [...] }`. `linkedNotes` (parsed notes referenced via `[[wikilink]]` syntax in the body) is only present on notes that link to others; unmatched wikilinks are left in the body as plain text
   - Error responses: `500`
     ```json
     {
@@ -76,9 +77,7 @@ Express-based Node service with request logging via `pino-http`.
           "count": 42,
           "noteIds": ["book-1", "book-2"],
           "badges": ["frontmatter.type"],
-          "aspectRatio": "2/3",
-          "group": "Library",
-          "layout": "grid"
+          "group": "Library"
         }
       ]
     }
@@ -107,4 +106,4 @@ Configured via `app.config.json` at the repository root plus the `NOTES_ROOT` en
     - Use `$missing` as a filter value to match notes where a property path is absent (for example `{"frontmatter.type": "$missing"}`).
     - Use `$today` or `$onThisDay` as a filter value to match a date property against today's date, or against today's month/day in a past year, respectively (both evaluated in the configured `timezone`).
   - `badges` (optional): array of note property paths to render as badges in the UI, such as `folder` or `frontmatter.type`
-  - `aspectRatio`, `group`, `layout` (optional): presentation hints passed through to the web app for gallery-style views
+  - `group` (optional): label used to group views together in the web app's view picker

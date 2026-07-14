@@ -43,7 +43,7 @@ const noteWithCover = {
   id: "1",
   title: "With Cover",
   obsidianUrl: "obsidian://open?vault=v&file=1",
-  frontmatter: { cover: "https://example.com/cover.jpg" },
+  frontmatter: { images: ["https://example.com/cover.jpg"] },
 }
 
 describe("NotesGallery", () => {

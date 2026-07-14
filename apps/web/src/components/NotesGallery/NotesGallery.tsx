@@ -5,23 +5,23 @@ import { useNotesQuery } from "services"
 
 import { AppError } from "../AppError"
 import { NoteCoverGrid } from "../NoteCoverGrid"
-import { filterNotesWithCovers } from "../NoteCoverGrid/NoteCoverGrid.util"
+import { filterNotesWithImages } from "../NoteCoverGrid/NoteCoverGrid.util"
 
 import { buildSearchIndex, filterSearchIndex } from "./NotesGallery.util"
 import type { NotesGalleryProps, NotesGalleryRouteParamKey } from "./NotesGallery.types"
 import { SEARCH_PARAM_KEY } from "../NotesSearchInput/NotesSearchInput.constants"
 
-export const NotesGallery = ({ aspectRatio, badges = [] }: NotesGalleryProps) => {
+export const NotesGallery = ({ badges = [] }: NotesGalleryProps) => {
   const { view } = useParams<NotesGalleryRouteParamKey>()
   const [searchParams] = useSearchParams()
   const { data, error } = useNotesQuery({ includeContent: false, view })
 
   const searchQuery = searchParams.get(SEARCH_PARAM_KEY) ?? ""
-  const notesWithCovers = useMemo(
-    () => filterNotesWithCovers(data.notes),
+  const notesWithImages = useMemo(
+    () => filterNotesWithImages(data.notes),
     [data.notes],
   )
-  const searchIndex = useMemo(() => buildSearchIndex(notesWithCovers), [notesWithCovers])
+  const searchIndex = useMemo(() => buildSearchIndex(notesWithImages), [notesWithImages])
   const filteredNotes = useMemo(
     () => filterSearchIndex(searchIndex, searchQuery),
     [searchIndex, searchQuery],
@@ -29,5 +29,5 @@ export const NotesGallery = ({ aspectRatio, badges = [] }: NotesGalleryProps) =>
 
   if (error) return <AppError message={error.message} />
 
-  return <NoteCoverGrid aspectRatio={aspectRatio} badges={badges} notes={filteredNotes} />
+  return <NoteCoverGrid badges={badges} notes={filteredNotes} />
 }

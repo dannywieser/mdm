@@ -5,7 +5,7 @@ Low-level parsing utilities for Obsidian-flavored markdown notes: YAML-ish front
 ## Usage
 
 ```ts
-import { collectMarkdownFiles, parseFrontMatter, parseMarkdownBodyDates, extractNoteDates, resolveDateFromFrontmatterOrTitle, resolveOldestDate, buildObsidianUrl, parseDateString } from "markdown"
+import { collectMarkdownFiles, parseFrontMatter, parseMarkdownBodyDates, extractNoteDates, resolveDateFromFrontmatterOrTitle, resolveOldestDate, buildObsidianUrl, parseDateString, extractImagePaths } from "markdown"
 import type { Note, NoteFrontmatter, MarkdownNode } from "markdown"
 ```
 
@@ -16,6 +16,7 @@ import type { Note, NoteFrontmatter, MarkdownNode } from "markdown"
 - `parsers/parseFrontMatter.ts` — splits a raw file's `---`-delimited YAML frontmatter block from its body, resolving Obsidian `[[wikilink]]`/`[[wikilink|alias]]` frontmatter values to their plain target string.
 - `parsers/parseMarkdownBodyDates.ts` — scans arbitrary text for every substring matching a set of tokenized date formats (`YYYY`, `YY`, `MM`, `DD`), returning matches in the order first found.
 - `parsers/parseDateString.ts` — parses a single string against a set of date formats into a `Date`.
+- `parsers/extractImagePaths.ts` — scans raw markdown text (not the parsed node tree) for every image, matching either standard `![alt](path)` syntax (including `<path>`-bracketed and titled destinations) or an Obsidian `![[path]]`/`![[path|alias]]` embed, and returns each raw path in document order, deduplicated.
 - `dates/extractNoteDates.ts` — extracts every date found across a note's title and full raw source (frontmatter + body) in one pass, deduplicated.
 - `dates/resolveDateFromFrontmatterOrTitle.ts` — resolves a note's date from a configured frontmatter property, falling back to a date embedded in the title.
 - `dates/resolveOldestDate.ts` — resolves the earliest of a list of date strings, parsing each against the configured formats and then as ISO 8601.

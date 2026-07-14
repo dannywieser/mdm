@@ -25,34 +25,14 @@
       "name": "Photo Wall",
       "group": "photos",
       "component": "NotesGallery",
-      "aspectRatio": "1/1",
       "filters": [{ "folder": "photos" }],
       "badges": ["frontmatter.location", "frontmatter.tags"]
-    },
-    {
-      "id": "photos-by-month",
-      "name": "Photos by Month",
-      "group": "photos",
-      "component": "NotesGalleryByMonth",
-      "aspectRatio": "1/1",
-      "filters": [{ "folder": "photos" }],
-      "badges": ["frontmatter.location"]
-    },
-    {
-      "id": "photos-by-year",
-      "name": "Photos by Year",
-      "group": "photos",
-      "component": "NotesGalleryByYear",
-      "aspectRatio": "1/1",
-      "filters": [{ "folder": "photos" }],
-      "badges": ["frontmatter.location"]
     },
     {
       "id": "books",
       "name": "Books",
       "group": "library",
       "component": "NotesGallery",
-      "aspectRatio": "2/3",
       "filters": [{ "folder": "library/books" }],
       "badges": ["frontmatter.author", "frontmatter.genre"]
     },
@@ -72,7 +52,6 @@
       "name": "Movies",
       "group": "library",
       "component": "NotesGallery",
-      "aspectRatio": "2/3",
       "filters": [
         { "folder": "library/movies" },
         { "$exclude": { "frontmatter.status": "watchlist" } }
@@ -111,7 +90,6 @@
       "name": "Recipes",
       "group": "knowledge",
       "component": "NotesGallery",
-      "aspectRatio": "1/1",
       "filters": [{ "folder": "recipes" }],
       "badges": ["frontmatter.cuisine", "frontmatter.difficulty"]
     }

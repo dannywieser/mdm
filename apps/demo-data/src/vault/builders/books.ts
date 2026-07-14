@@ -110,14 +110,13 @@ export const buildBookNotes = ({ endDate, random }: VaultBuilderOptions): Genera
       author: pickOne(random, AUTHORS),
       genre: pickOne(random, GENRES),
       status,
-      cover: cover.coverPath,
     }
     if (status === READ_STATUS) {
       frontmatter.rating = `${String(randomInt(random, 2, 5))}/5`
     }
 
     notes.push({
-      body: `## Summary\n\n${pickOne(random, SUMMARY_SENTENCES)} ${pickOne(random, SUMMARY_SENTENCES)}\n\n## Notes\n\n- ${pickOne(random, NOTE_BULLETS)}\n- ${pickOne(random, NOTE_BULLETS)}\n`,
+      body: `![](${cover.coverPath})\n\n## Summary\n\n${pickOne(random, SUMMARY_SENTENCES)} ${pickOne(random, SUMMARY_SENTENCES)}\n\n## Notes\n\n- ${pickOne(random, NOTE_BULLETS)}\n- ${pickOne(random, NOTE_BULLETS)}\n`,
       folder: "library/books",
       frontmatter,
       modifiedDate,
