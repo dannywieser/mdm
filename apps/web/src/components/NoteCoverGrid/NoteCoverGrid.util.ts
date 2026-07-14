@@ -9,7 +9,7 @@ export function getNoteImagePaths(note: Note): string[] {
   const list = Array.isArray(images) ? images : [images]
   return list
     // eslint-disable-next-line sonarjs/slow-regex -- input is a bounded frontmatter value, not user-controlled input
-    .map((path) => path.replace(/^["']+|["']+$/g, ""))
+    .map((path) => path.trim().replace(/^["']+|["']+$/g, "").trim())
     .filter((path) => path !== "")
 }
 

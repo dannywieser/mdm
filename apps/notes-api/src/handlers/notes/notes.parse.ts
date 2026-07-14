@@ -58,7 +58,7 @@ const resolveImagePath = (
   attachmentsDirectory: string,
 ): string | null => {
   const trimmedPath = rawPath.trim()
-  if (!trimmedPath) return null
+  if (!trimmedPath || trimmedPath.startsWith("#")) return null
   if (isExternalUrl(trimmedPath)) return trimmedPath
   return resolveLocalImagePath(trimmedPath, noteRelativePath, attachmentsDirectory)
 }

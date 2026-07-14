@@ -363,4 +363,32 @@ This is a note.`)
 
     expect(note.frontmatter).toBeNull()
   })
+
+  test("scanMarkdownFile ignores a fragment-only image destination", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![alt](#section)",
+      frontmatter: null,
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/note.md")
+
+    expect(note.frontmatter).toBeNull()
+  })
+
+  test("scanMarkdownFile ignores a fragment-only destination alongside a real image", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "![alt](#section)\n\n![alt](photo.png)",
+      frontmatter: null,
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/note.md")
+
+    expect(note.frontmatter).toEqual({ images: ["games/note/photo.png"] })
+  })
 })

@@ -11,7 +11,7 @@ vi.mock("../../NoteBadges", () => ({
 }))
 
 import { NoteCoverGrid } from "../NoteCoverGrid"
-import { filterNotesWithImages, getImageSrc } from "../NoteCoverGrid.util"
+import { filterNotesWithImages, getImageSrc, getNoteImagePaths } from "../NoteCoverGrid.util"
 
 const noteWithCover = {
   id: "1",
@@ -201,6 +201,28 @@ describe("NoteCoverGrid", () => {
         "https://example.com/b3.jpg",
       )
     })
+  })
+})
+
+describe("getNoteImagePaths", () => {
+  const note = (images: unknown) => ({ id: "1", frontmatter: { images } }) as never
+
+  test("strips surrounding whitespace around a quoted value", () => {
+    expect(getNoteImagePaths(note([' "https://example.com/cover.jpg" ']))).toEqual([
+      "https://example.com/cover.jpg",
+    ])
+  })
+
+  test("strips surrounding whitespace inside quotes", () => {
+    expect(getNoteImagePaths(note(['" https://example.com/cover.jpg "']))).toEqual([
+      "https://example.com/cover.jpg",
+    ])
+  })
+
+  test("strips surrounding whitespace around an unquoted value", () => {
+    expect(getNoteImagePaths(note(["  attachments/cover.jpg  "]))).toEqual([
+      "attachments/cover.jpg",
+    ])
   })
 })
 
