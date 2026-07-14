@@ -63,6 +63,11 @@ const resolveImagePath = (
   return resolveLocalImagePath(trimmedPath, noteRelativePath, attachmentsDirectory)
 }
 
+const omitImages = (frontmatter: NoteFrontmatter): NoteFrontmatter =>
+  Object.fromEntries(
+    Object.entries(frontmatter).filter(([key]) => key !== "images"),
+  )
+
 export const resolveFrontmatterImages = (
   frontmatter: NoteFrontmatter | null,
   body: string,
@@ -73,9 +78,13 @@ export const resolveFrontmatterImages = (
     .map((imagePath) => resolveImagePath(imagePath, noteRelativePath, attachmentsDirectory))
     .filter((imagePath): imagePath is string => imagePath !== null)
 
-  if (resolvedImagePaths.length === 0) return frontmatter
+  const restFrontmatter = frontmatter ? omitImages(frontmatter) : null
 
-  return { ...frontmatter, images: resolvedImagePaths }
+  if (resolvedImagePaths.length === 0) {
+    return restFrontmatter && Object.keys(restFrontmatter).length > 0 ? restFrontmatter : null
+  }
+
+  return { ...restFrontmatter, images: resolvedImagePaths }
 }
 
 const buildMarkdownTree = (

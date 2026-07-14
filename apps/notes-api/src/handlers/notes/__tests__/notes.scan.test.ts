@@ -331,4 +331,32 @@ This is a note.`)
 
     expect(note.frontmatter?.images).toEqual(["games/note/body-image.png"])
   })
+
+  test("scanMarkdownFile strips a stale images value from frontmatter when the body no longer has images", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "# Note\n\nJust text, no images here.",
+      frontmatter: { images: ["stale.png"], topic: ["games"] },
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/note.md")
+
+    expect(note.frontmatter).toEqual({ topic: ["games"] })
+  })
+
+  test("scanMarkdownFile returns null frontmatter when only a stale images value remains and the body has no images", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "# Note\n\nJust text, no images here.",
+      frontmatter: { images: ["stale.png"] },
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/note.md")
+
+    expect(note.frontmatter).toBeNull()
+  })
 })

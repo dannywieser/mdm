@@ -1,7 +1,7 @@
 import { Box, Card, Text } from "@chakra-ui/react"
 
 import { useMasonryRowSpan } from "../../hooks/useMasonryRowSpan/useMasonryRowSpan"
-import { useRotatingIndex } from "../../hooks/useRotatingIndex/useRotatingIndex"
+import { useRotationTick } from "../../hooks/useRotationTick/useRotationTick"
 
 import { FadeImage } from "../FadeImage"
 import { NoteBadges } from "../NoteBadges"
@@ -22,9 +22,9 @@ const MASONRY_COLUMNS = { base: 1, md: 3, lg: 4, xl: 5, "2xl": 8 }
 const DEFAULT_ASPECT_RATIO = "3/4"
 const IMAGE_ROTATION_INTERVAL_MS = 10000
 
-const GalleryCard = ({ note, badges }: GalleryCardProps) => {
+const GalleryCard = ({ note, badges, rotationTick }: GalleryCardProps) => {
   const images = getNoteImagePaths(note)
-  const currentImageIndex = useRotatingIndex({ intervalMs: IMAGE_ROTATION_INTERVAL_MS, length: images.length })
+  const currentImageIndex = images.length > 0 ? rotationTick % images.length : 0
 
   return (
     <a href={note.obsidianUrl} style={{ textDecoration: "none", outline: "none" }}>
@@ -69,7 +69,7 @@ const GalleryCard = ({ note, badges }: GalleryCardProps) => {
   )
 }
 
-const MasonryGalleryCard = ({ badges, note }: GalleryCardProps) => {
+const MasonryGalleryCard = ({ badges, note, rotationTick }: GalleryCardProps) => {
   const { ref, rowSpan } = useMasonryRowSpan({ gapPx: MASONRY_GAP_PX, rowHeightPx: MASONRY_ROW_HEIGHT_PX })
 
   return (
@@ -81,29 +81,33 @@ const MasonryGalleryCard = ({ badges, note }: GalleryCardProps) => {
       style={{ gridRowEnd: `span ${rowSpan}` }}
       _focusWithin={CARD_FOCUS_STYLE}
     >
-      <GalleryCard badges={badges} note={note} />
+      <GalleryCard badges={badges} note={note} rotationTick={rotationTick} />
     </Box>
   )
 }
 
-export const NoteCoverGrid = ({ badges = [], notes }: NoteCoverGridProps) => (
-  <Box
-    data-testid="gallery-grid"
-    display="grid"
-    gap={`${MASONRY_GAP_PX}px`}
-    gridAutoFlow="dense"
-    gridAutoRows={`${MASONRY_ROW_HEIGHT_PX}px`}
-    gridTemplateColumns={{
-      base: `repeat(${MASONRY_COLUMNS.base}, 1fr)`,
-      md: `repeat(${MASONRY_COLUMNS.md}, 1fr)`,
-      lg: `repeat(${MASONRY_COLUMNS.lg}, 1fr)`,
-      xl: `repeat(${MASONRY_COLUMNS.xl}, 1fr)`,
-      "2xl": `repeat(${MASONRY_COLUMNS["2xl"]}, 1fr)`,
-    }}
-    p={6}
-  >
-    {notes.map((note) => (
-      <MasonryGalleryCard key={note.id} badges={badges} note={note} />
-    ))}
-  </Box>
-)
+export const NoteCoverGrid = ({ badges = [], notes }: NoteCoverGridProps) => {
+  const rotationTick = useRotationTick({ intervalMs: IMAGE_ROTATION_INTERVAL_MS })
+
+  return (
+    <Box
+      data-testid="gallery-grid"
+      display="grid"
+      gap={`${MASONRY_GAP_PX}px`}
+      gridAutoFlow="dense"
+      gridAutoRows={`${MASONRY_ROW_HEIGHT_PX}px`}
+      gridTemplateColumns={{
+        base: `repeat(${MASONRY_COLUMNS.base}, 1fr)`,
+        md: `repeat(${MASONRY_COLUMNS.md}, 1fr)`,
+        lg: `repeat(${MASONRY_COLUMNS.lg}, 1fr)`,
+        xl: `repeat(${MASONRY_COLUMNS.xl}, 1fr)`,
+        "2xl": `repeat(${MASONRY_COLUMNS["2xl"]}, 1fr)`,
+      }}
+      p={6}
+    >
+      {notes.map((note) => (
+        <MasonryGalleryCard key={note.id} badges={badges} note={note} rotationTick={rotationTick} />
+      ))}
+    </Box>
+  )
+}

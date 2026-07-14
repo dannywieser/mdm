@@ -11,7 +11,7 @@ vi.mock("../../NoteBadges", () => ({
 }))
 
 import { NoteCoverGrid } from "../NoteCoverGrid"
-import { filterNotesWithCovers, getImageSrc } from "../NoteCoverGrid.util"
+import { filterNotesWithImages, getImageSrc } from "../NoteCoverGrid.util"
 
 const noteWithCover = {
   id: "1",
@@ -131,6 +131,81 @@ describe("NoteCoverGrid", () => {
         `/images?path=${encodeURIComponent("https://example.com/cover.jpg")}`,
       )
     })
+
+    test("uses a single shared timer no matter how many cards are rendered", () => {
+      const setIntervalSpy = vi.spyOn(global, "setInterval")
+
+      render(
+        <ChakraProvider value={defaultSystem}>
+          <NoteCoverGrid
+            notes={[
+              {
+                id: "1",
+                title: "First",
+                obsidianUrl: "obsidian://open?vault=v&file=1",
+                frontmatter: { images: ["https://example.com/a1.jpg", "https://example.com/a2.jpg"] },
+              },
+              {
+                id: "2",
+                title: "Second",
+                obsidianUrl: "obsidian://open?vault=v&file=2",
+                frontmatter: { images: ["https://example.com/b1.jpg", "https://example.com/b2.jpg"] },
+              },
+              {
+                id: "3",
+                title: "Third",
+                obsidianUrl: "obsidian://open?vault=v&file=3",
+                frontmatter: { images: ["https://example.com/c1.jpg", "https://example.com/c2.jpg"] },
+              },
+            ] as never}
+          />
+        </ChakraProvider>,
+      )
+
+      expect(setIntervalSpy).toHaveBeenCalledTimes(1)
+    })
+
+    test("rotates cards with different image counts from the same shared tick", () => {
+      render(
+        <ChakraProvider value={defaultSystem}>
+          <NoteCoverGrid
+            notes={[
+              {
+                id: "1",
+                title: "Two Images",
+                obsidianUrl: "obsidian://open?vault=v&file=1",
+                frontmatter: { images: ["https://example.com/a1.jpg", "https://example.com/a2.jpg"] },
+              },
+              {
+                id: "2",
+                title: "Three Images",
+                obsidianUrl: "obsidian://open?vault=v&file=2",
+                frontmatter: {
+                  images: [
+                    "https://example.com/b1.jpg",
+                    "https://example.com/b2.jpg",
+                    "https://example.com/b3.jpg",
+                  ],
+                },
+              },
+            ] as never}
+          />
+        </ChakraProvider>,
+      )
+
+      act(() => {
+        vi.advanceTimersByTime(20000)
+      })
+
+      // Shared tick is 2: card with 2 images shows index 2 % 2 = 0 (back to first);
+      // card with 3 images shows index 2 % 3 = 2 (third).
+      expect(screen.getByRole("img", { name: "Two Images" }).getAttribute("src")).toBe(
+        `/images?path=${encodeURIComponent("https://example.com/a1.jpg")}`,
+      )
+      expect(screen.getByRole("img", { name: "Three Images" }).getAttribute("src")).toBe(
+        `/images?path=${encodeURIComponent("https://example.com/b3.jpg")}`,
+      )
+    })
   })
 })
 
@@ -142,26 +217,26 @@ describe("getImageSrc", () => {
   })
 })
 
-describe("filterNotesWithCovers", () => {
+describe("filterNotesWithImages", () => {
   const note = (images: unknown) => ({ id: "1", frontmatter: images !== undefined ? { images } : {} }) as never
 
   test("includes notes with a non-empty images array", () => {
-    expect(filterNotesWithCovers([note(["attachments/cover.jpg"])])).toHaveLength(1)
+    expect(filterNotesWithImages([note(["attachments/cover.jpg"])])).toHaveLength(1)
   })
 
   test("includes notes with a single string image value", () => {
-    expect(filterNotesWithCovers([note("attachments/cover.jpg")])).toHaveLength(1)
+    expect(filterNotesWithImages([note("attachments/cover.jpg")])).toHaveLength(1)
   })
 
   test("excludes notes with no images field", () => {
-    expect(filterNotesWithCovers([note(undefined)])).toHaveLength(0)
+    expect(filterNotesWithImages([note(undefined)])).toHaveLength(0)
   })
 
   test("excludes notes with an empty images array", () => {
-    expect(filterNotesWithCovers([note([])])).toHaveLength(0)
+    expect(filterNotesWithImages([note([])])).toHaveLength(0)
   })
 
   test("excludes notes with an empty string image value", () => {
-    expect(filterNotesWithCovers([note("")])).toHaveLength(0)
+    expect(filterNotesWithImages([note("")])).toHaveLength(0)
   })
 })

@@ -16,6 +16,6 @@ export function getImageSrc(path: string): string {
   return buildImageUrl({ path })
 }
 
-export function filterNotesWithCovers(notes: Note[]): Note[] {
+export function filterNotesWithImages(notes: Note[]): Note[] {
   return notes.filter((note) => getNoteImagePaths(note).length > 0)
 }
