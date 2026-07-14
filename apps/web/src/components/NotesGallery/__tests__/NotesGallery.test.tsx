@@ -236,8 +236,9 @@ describe("NotesGallery", () => {
     })
   })
 
-  // Raised per-test timeout: the findByRole below waits up to 10s under CI contention,
-  // which exceeds Vitest's 5s default test timeout.
+  // The chips row lives in the main page, outside the drawer's portal, so while the
+  // drawer is open Chakra marks it aria-hidden/inert (correct modal a11y behavior) —
+  // close the drawer before querying/interacting with a chip, matching real usage.
   test("shows an active filter chip after selecting a year, and clicking it clears the filter", async () => {
     useNotesQueryMock.mockReturnValue({
       data: {
@@ -269,8 +270,9 @@ describe("NotesGallery", () => {
       expect(screen.getByRole("button", { name: "2024" })).toBeTruthy()
     })
     fireEvent.click(screen.getByRole("button", { name: "2024" }))
+    fireEvent.click(screen.getByRole("button", { name: "gallery.closeFilters" }))
 
-    const chip = await screen.findByRole("button", { name: "gallery.removeFilter" }, { timeout: 10000 })
+    const chip = await screen.findByRole("button", { name: "gallery.removeFilter" })
     expect(chip).toBeTruthy()
     expect(screen.queryByText("Old Note")).toBeNull()
 
@@ -280,7 +282,7 @@ describe("NotesGallery", () => {
       expect(screen.getByText("Old Note")).toBeTruthy()
       expect(screen.queryByRole("button", { name: "gallery.removeFilter" })).toBeNull()
     })
-  }, 15000)
+  })
 
   test("honors an fm.* filter in the URL even when its key isn't part of the current view's facets", async () => {
     useNotesQueryMock.mockReturnValue({
