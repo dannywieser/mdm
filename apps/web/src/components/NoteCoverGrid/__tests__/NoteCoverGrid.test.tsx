@@ -75,6 +75,26 @@ describe("NoteCoverGrid", () => {
     expect(screen.getAllByTestId("note-badges").length).toBeGreaterThan(0)
     expect(screen.getAllByText("frontmatter.genre,frontmatter.status").length).toBeGreaterThan(0)
   })
+
+  test("omits the src attribute instead of rendering a disallowed image scheme", () => {
+    render(
+      <ChakraProvider value={defaultSystem}>
+        <NoteCoverGrid
+          notes={[
+            {
+              id: "1",
+              title: "Bad Scheme",
+              obsidianUrl: "obsidian://open?vault=v&file=1",
+              frontmatter: { images: ["javascript:alert(1)"] },
+            } as never,
+          ]}
+        />
+      </ChakraProvider>,
+    )
+
+    const img = screen.getByRole("img", { name: "Bad Scheme" })
+    expect(img.hasAttribute("src")).toBe(false)
+  })
 })
 
 describe("getNoteImagePaths", () => {
