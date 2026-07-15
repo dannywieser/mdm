@@ -1,5 +1,17 @@
 # services
 
+## 2.3.0
+
+### Minor Changes
+
+- 8e4fb01: Add a filter panel to the notes gallery view with quick filters for year and frontmatter values, move note search into the panel with a new clear button, and show active filters as removable chips above the gallery. Which frontmatter properties are offered as gallery filters is now controlled per-view via a new `notesGalleryFilters` array in `app.config.json`'s `views` config (exposed through `GET /views`); a view with no `notesGalleryFilters` configured only shows search and the year filter.
+
+### Patch Changes
+
+- Updated dependencies [8e4fb01]
+  - app-config@3.0.0
+  - markdown@3.0.0
+
 ## 2.2.1
 
 ### Patch Changes
