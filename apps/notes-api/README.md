@@ -18,6 +18,7 @@ Express-based Node service with request logging via `pino-http`.
   - Purpose: recursively load `*.md` and `*.markdown` files from the vault directory (`NOTES_ROOT` env var), extract optional frontmatter metadata (adding every image found in the raw body as a `frontmatter.images` array), collect all dates found in the title, body, and frontmatter (plus the file's modified date) using configured `dateFormats`, parse markdown into a node tree (resolving Obsidian wikilinks and rewriting local image paths to the image-server), and return note metadata
   - Optional query: `view=<id>` to apply a configured notes view filter by view ID
   - Optional query: `includeContent=false` to skip markdown parsing and return an empty `content` tree — useful for lightweight listing requests that only need frontmatter/metadata
+  - No other query params are read by this endpoint. In particular, the web app's `NotesGallery` quick filters (year, and any configured `notesGalleryFilters`) are applied entirely client-side against the already-fetched note list — the `year`/`fm.<key>` query params those filters use live only in the browser URL and are never sent to or interpreted by `GET /notes`.
   - The vault scan (walking the directory and reading each file's frontmatter/dates) is cached in memory for 5 minutes and shared across all requests regardless of `view`/`includeContent`; concurrent requests during a cache miss share a single in-flight scan instead of each triggering their own. View filtering and markdown body parsing still run fresh per request against the cached scan, since both depend on the request's query params.
   - Success response: `200`
     ```json
@@ -77,6 +78,7 @@ Express-based Node service with request logging via `pino-http`.
           "count": 42,
           "noteIds": ["book-1", "book-2"],
           "badges": ["frontmatter.type"],
+          "notesGalleryFilters": ["genre", "status"],
           "group": "Library"
         }
       ]
@@ -106,4 +108,5 @@ Configured via `app.config.json` at the repository root plus the `NOTES_ROOT` en
     - Use `$missing` as a filter value to match notes where a property path is absent (for example `{"frontmatter.type": "$missing"}`).
     - Use `$today` or `$onThisDay` as a filter value to match a date property against today's date, or against today's month/day in a past year, respectively (both evaluated in the configured `timezone`).
   - `badges` (optional): array of note property paths to render as badges in the UI, such as `folder` or `frontmatter.type`
+  - `notesGalleryFilters` (optional): array of bare frontmatter keys (not full property paths, for example `genre` rather than `frontmatter.genre`) that the web app's `NotesGallery` view offers as quick-filter facets, alongside the built-in year facet. This value is only a UI hint passed through to the web app as-is; this API does not evaluate it or filter notes by it — actual filtering happens client-side, per the `GET /notes` note above. A listed key that no note in the view actually has is silently ignored. If omitted or empty, the gallery only shows search and the year facet.
   - `group` (optional): label used to group views together in the web app's view picker

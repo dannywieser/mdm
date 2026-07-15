@@ -34,6 +34,12 @@ vi.mock("../../NotesSummaryTable", () => ({
   ),
 }))
 
+vi.mock("../../NotesGallery", () => ({
+  NotesGallery: ({ notesGalleryFilters }: { notesGalleryFilters?: string[] }) => (
+    <div>{`notes-gallery:${notesGalleryFilters?.join(",") ?? ""}`}</div>
+  ),
+}))
+
 const renderNotesView = (path: string) =>
   render(
     <ChakraProvider value={defaultSystem}>
@@ -98,5 +104,25 @@ describe("NotesView", () => {
     renderNotesView("/notes/books")
 
     expect(screen.getByText("note-summary-list:folder,frontmatter.genre")).toBeTruthy()
+  })
+
+  test("forwards notesGalleryFilters to NotesGallery", () => {
+    useViewsQueryMock.mockReturnValue({
+      data: {
+        views: [
+          {
+            component: "NotesGallery",
+            count: 1,
+            notesGalleryFilters: ["genre", "status"],
+            id: "books",
+            name: "Books",
+          },
+        ],
+      },
+    })
+
+    renderNotesView("/notes/books")
+
+    expect(screen.getByText("notes-gallery:genre,status")).toBeTruthy()
   })
 })

@@ -16,6 +16,7 @@ export const buildViews = async (
         badges: view.badges,
         component: view.component,
         count: matchedNotes.length,
+        notesGalleryFilters: view.notesGalleryFilters,
         group: view.group,
         id: view.id,
         name: view.name,

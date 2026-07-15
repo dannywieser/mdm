@@ -30,5 +30,11 @@ export const NotesView = () => {
   const SelectedComponent =
     (componentName && VIEW_COMPONENTS[componentName]) ?? NotesList
 
-  return <SelectedComponent badges={configuredView?.badges} key={view} />
+  return (
+    <SelectedComponent
+      badges={configuredView?.badges}
+      notesGalleryFilters={configuredView?.notesGalleryFilters}
+      key={view}
+    />
+  )
 }

@@ -1,15 +1,13 @@
 import { Box, Flex, Text } from "@chakra-ui/react"
 import { formatDate } from "mdm-util"
 import { X } from "lucide-react"
-import { useLocation, useMatch, useNavigate, useParams } from "react-router-dom"
+import { useLocation, useMatch, useNavigate } from "react-router-dom"
 
-import { useViewsQuery } from "services"
 import { useI18n } from "../../i18n"
 import { focusRing } from "../../theme/focusRing"
 import { HeaderBreadcrumb } from "../HeaderBreadcrumb"
 import { HeaderShell } from "../HeaderShell"
 import { HeaderStatsLink } from "../HeaderStatsLink"
-import { NotesSearchInput } from "../NotesSearchInput"
 import { HeaderPaletteSelector } from "../HeaderPaletteSelector"
 
 export function HeaderSkeleton() {
@@ -28,19 +26,14 @@ export function HeaderSkeleton() {
 }
 
 export function Header() {
-  const { view } = useParams<{ view?: string }>()
   const location = useLocation()
   const navigate = useNavigate()
   const isStatsPage = useMatch("/stats")
   const isColorsPage = useMatch("/colors")
-  const { data } = useViewsQuery({})
-  const currentView = view ? data.views.find(({ id }) => id === view) : undefined
-  const showNotesSearch = currentView?.component === "NotesGallery"
   const isSecondaryPage = !!(isStatsPage ?? isColorsPage)
 
   return (
     <HeaderShell
-      center={showNotesSearch ? <NotesSearchInput /> : null}
       left={<HeaderBreadcrumb />}
       right={
         isSecondaryPage ? (

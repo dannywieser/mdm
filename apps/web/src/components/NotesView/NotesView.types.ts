@@ -8,4 +8,5 @@ export type ViewComponentName =
 
 export interface ViewComponentProps {
   badges?: string[]
+  notesGalleryFilters?: string[]
 }

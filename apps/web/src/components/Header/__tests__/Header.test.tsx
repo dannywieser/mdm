@@ -26,22 +26,6 @@ vi.mock("../../../i18n", () => ({
   useI18n: () => ({ t: (key: string) => key }),
 }))
 
-vi.mock("services", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("services")>()
-
-  return {
-    ...actual,
-    useViewsQuery: () => ({
-      data: {
-        views: [
-          { id: "daily", name: "daily review" },
-          { component: "NotesGallery", id: "books", name: "books" },
-        ],
-      },
-    }),
-  }
-})
-
 afterEach(() => {
   cleanup()
 })
@@ -87,23 +71,5 @@ describe("Header", () => {
     expect(screen.queryByText("2026-06-01")).toBeNull()
     expect(screen.queryByTestId("header-stats-link")).toBeNull()
     expect(screen.queryByTestId("palette-selector")).toBeNull()
-  })
-
-  test("shows notes search input on a NotesGallery view route", () => {
-    renderAt("/notes/books")
-
-    expect(screen.getByRole("textbox", { name: "header.searchNotes" })).toBeTruthy()
-  })
-
-  test("hides notes search input on routes with a different view component", () => {
-    renderAt("/notes/daily")
-
-    expect(screen.queryByRole("textbox", { name: "header.searchNotes" })).toBeNull()
-  })
-
-  test("hides notes search input on the home route", () => {
-    renderAt("/")
-
-    expect(screen.queryByRole("textbox", { name: "header.searchNotes" })).toBeNull()
   })
 })
