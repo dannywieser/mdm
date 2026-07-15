@@ -1,5 +1,7 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { MemoryRouter } from "react-router-dom"
+import { configureDemoMode, resetDemoMode } from "services"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
 import { NotesReviewTableOfContentsMobileTrigger } from "../NotesReviewTableOfContentsMobileTrigger"
@@ -18,10 +20,15 @@ const notes = [
 
 afterEach(() => {
   cleanup()
+  resetDemoMode()
 })
 
 const renderWith = (ui: React.ReactElement) =>
-  render(<ChakraProvider value={defaultSystem}>{ui}</ChakraProvider>)
+  render(
+    <ChakraProvider value={defaultSystem}>
+      <MemoryRouter>{ui}</MemoryRouter>
+    </ChakraProvider>,
+  )
 
 describe("NotesReviewTableOfContentsMobileTrigger", () => {
   test("renders nothing when notes list is empty", () => {
@@ -56,6 +63,29 @@ describe("NotesReviewTableOfContentsMobileTrigger", () => {
     fireEvent.click(screen.getByRole("button", { name: /review\.forReview/ }))
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "review.close" })).toBeTruthy()
+    })
+  })
+
+  test("links to the note's obsidianUrl outside of demo mode", async () => {
+    renderWith(
+      <NotesReviewTableOfContentsMobileTrigger notes={notes} currentIndex={0} />,
+    )
+    fireEvent.click(screen.getByRole("button", { name: /review\.forReview/ }))
+    await waitFor(() => {
+      expect(screen.getByRole("link", { name: "Note One" }).getAttribute("href")).toBe(
+        notes[0].obsidianUrl,
+      )
+    })
+  })
+
+  test("links to the in-app note source route in demo mode", async () => {
+    configureDemoMode({ dataBasePath: "/demo-data" })
+    renderWith(
+      <NotesReviewTableOfContentsMobileTrigger notes={notes} currentIndex={0} />,
+    )
+    fireEvent.click(screen.getByRole("button", { name: /review\.forReview/ }))
+    await waitFor(() => {
+      expect(screen.getByRole("link", { name: "Note One" }).getAttribute("href")).toBe("/source/1")
     })
   })
 })

@@ -1,8 +1,13 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
 import { cleanup, render, screen } from "@testing-library/react"
+import { MemoryRouter } from "react-router-dom"
+import { configureDemoMode, resetDemoMode } from "services"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  resetDemoMode()
+})
 
 vi.mock("../../NoteBadges", () => ({
   NoteBadges: ({ badges }: { badges: string[] }) => (
@@ -94,6 +99,31 @@ describe("NoteCoverGrid", () => {
 
     const img = screen.getByRole("img", { name: "Bad Scheme" })
     expect(img.hasAttribute("src")).toBe(false)
+  })
+
+  test("links the card to the note's obsidianUrl outside of demo mode", () => {
+    render(
+      <ChakraProvider value={defaultSystem}>
+        <MemoryRouter>
+          <NoteCoverGrid notes={[noteWithCover]} />
+        </MemoryRouter>
+      </ChakraProvider>,
+    )
+
+    expect(screen.getByRole("link").getAttribute("href")).toBe("obsidian://open?vault=v&file=1")
+  })
+
+  test("links the card to the in-app note source route in demo mode", () => {
+    configureDemoMode({ dataBasePath: "/demo-data" })
+    render(
+      <ChakraProvider value={defaultSystem}>
+        <MemoryRouter>
+          <NoteCoverGrid notes={[noteWithCover]} />
+        </MemoryRouter>
+      </ChakraProvider>,
+    )
+
+    expect(screen.getByRole("link").getAttribute("href")).toBe("/source/1")
   })
 })
 

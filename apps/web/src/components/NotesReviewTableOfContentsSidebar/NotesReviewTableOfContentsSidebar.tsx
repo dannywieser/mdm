@@ -1,7 +1,8 @@
-import { Link, Text, VStack } from "@chakra-ui/react"
+import { Text, VStack } from "@chakra-ui/react"
 
 import { useI18n } from "../../i18n"
 import { focusRing } from "../../theme/focusRing"
+import { NoteLink } from "../NoteLink"
 import type { NotesReviewTableOfContentsProps } from "../NotesReviewTableOfContents/NotesReviewTableOfContents.types"
 import { getNoteColor } from "../NotesReviewTableOfContents/NotesReviewTableOfContents.util"
 
@@ -35,9 +36,9 @@ export const NotesReviewTableOfContentsSidebar = ({
             {t("review.forReview", { count: notes.length })}
           </Text>
           {notes.map((note, i) => (
-            <Link
+            <NoteLink
               key={note.id}
-              href={note.obsidianUrl}
+              note={note}
               display="block"
               color={getNoteColor(i === currentIndex, note.isRead)}
               fontWeight={i === currentIndex || !note.isRead ? "bold" : undefined}
@@ -49,7 +50,7 @@ export const NotesReviewTableOfContentsSidebar = ({
               {...focusRing}
             >
               {note.title}
-            </Link>
+            </NoteLink>
           ))}
         </VStack>
       )}

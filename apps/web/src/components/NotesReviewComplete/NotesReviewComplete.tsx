@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 
 import { useI18n } from "../../i18n"
 import { NotebookIcon } from "../NotebookIcon"
+import { NoteLink } from "../NoteLink"
 import type { NotesReviewCompleteProps } from "./NotesReviewComplete.types"
 
 const reviewItemIn = keyframes`
@@ -36,12 +37,9 @@ export const NotesReviewComplete = ({ isLoading, reviewedNotes }: NotesReviewCom
                   fontSize="sm"
                   css={fadeInUp(i * 0.06)}
                 >
-                  <a
-                    href={note.obsidianUrl}
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
+                  <NoteLink note={note} textDecoration="none" color="inherit">
                     {note.title}
-                  </a>
+                  </NoteLink>
                 </Text>
               ))}
             </VStack>

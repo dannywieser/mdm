@@ -5,6 +5,7 @@ import { useNotesQuery } from "services"
 import { useI18n } from "../../i18n"
 
 import { AppError } from "../AppError"
+import { NoteLink } from "../NoteLink"
 
 import type {
   NotesSummaryTableProps,
@@ -61,9 +62,9 @@ export const NotesSummaryTable = ({ badges = [] }: NotesSummaryTableProps) => {
               _hover={{ bg: "app.panelBackgroundHover" }}
             >
               <Table.Cell borderColor="app.border">
-                <Link href={note.obsidianUrl} color="app.accent" fontWeight="semibold" fontSize="md">
+                <NoteLink note={note} color="app.accent" fontWeight="semibold" fontSize="md">
                   {note.title}
-                </Link>
+                </NoteLink>
               </Table.Cell>
               {badges.map((badge) => {
                 const values = resolveBadgeValues(note, badge)
