@@ -1,5 +1,15 @@
 # habit-tracker
 
+## 1.3.19
+
+### Patch Changes
+
+- Updated dependencies [8e4fb01]
+  - app-config@3.0.0
+  - services@2.3.0
+  - markdown@3.0.0
+  - mdm-util@3.0.0
+
 ## 1.3.18
 
 ### Patch Changes
