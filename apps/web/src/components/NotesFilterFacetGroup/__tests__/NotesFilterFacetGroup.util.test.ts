@@ -78,6 +78,28 @@ describe("parseParamValues", () => {
 
     expect(parseParamValues(searchParams, "year")).toEqual(["2023", "2024"])
   })
+
+  test("normalizes a non-canonical numeric year to its canonical form", () => {
+    const searchParams = new URLSearchParams()
+    searchParams.append("year", "02024")
+
+    expect(parseParamValues(searchParams, "year")).toEqual(["2024"])
+  })
+
+  test("de-duplicates year values that differ only in their string form", () => {
+    const searchParams = new URLSearchParams()
+    searchParams.append("year", "2024")
+    searchParams.append("year", "02024")
+
+    expect(parseParamValues(searchParams, "year")).toEqual(["2024"])
+  })
+
+  test("does not numerically normalize non-year params", () => {
+    const searchParams = new URLSearchParams()
+    searchParams.append("fm.genre", "02024")
+
+    expect(parseParamValues(searchParams, "fm.genre")).toEqual(["02024"])
+  })
 })
 
 describe("toggleParamValue", () => {
@@ -129,5 +151,11 @@ describe("toggleSearchParams", () => {
     const result = toggleSearchParams(new URLSearchParams(""), "fm.genre", "sci-fi, fantasy")
 
     expect(result.getAll("fm.genre")).toEqual(["sci-fi, fantasy"])
+  })
+
+  test("removes a year even when the URL had it in a non-canonical string form", () => {
+    const result = toggleSearchParams(new URLSearchParams("year=02024"), "year", "2024")
+
+    expect(result.has("year")).toBe(false)
   })
 })

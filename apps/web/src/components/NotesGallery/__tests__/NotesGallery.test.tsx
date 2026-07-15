@@ -10,7 +10,7 @@ import { NotesGallery } from "../NotesGallery"
 const renderGallery = (
   badges: string[] = [],
   path = "/notes/books",
-  frontmatterFilters: string[] = [],
+  notesGalleryFilters: string[] = [],
 ) =>
   render(
     <ChakraProvider value={defaultSystem}>
@@ -18,7 +18,7 @@ const renderGallery = (
         <Routes>
           <Route
             path="/notes/:view"
-            element={<NotesGallery badges={badges} frontmatterFilters={frontmatterFilters} />}
+            element={<NotesGallery badges={badges} notesGalleryFilters={notesGalleryFilters} />}
           />
         </Routes>
       </MemoryRouter>
@@ -150,7 +150,7 @@ describe("NotesGallery", () => {
     })
   })
 
-  test("only shows search and the year facet when frontmatterFilters is not configured", async () => {
+  test("only shows search and the year facet when notesGalleryFilters is not configured", async () => {
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [
@@ -174,7 +174,7 @@ describe("NotesGallery", () => {
     expect(screen.queryByRole("button", { name: "game" })).toBeNull()
   })
 
-  test("ignores a configured frontmatterFilters key that no note actually has", async () => {
+  test("ignores a configured notesGalleryFilters key that no note actually has", async () => {
     useNotesQueryMock.mockReturnValue({
       data: {
         notes: [

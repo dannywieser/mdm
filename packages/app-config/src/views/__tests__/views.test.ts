@@ -8,7 +8,7 @@ const VALID_VIEW = {
 }
 
 const ERROR =
-  "app.config.json views must be an array of objects with non-empty id, name, component, optional string badges/frontmatterFilters/group, and filters as string records or $exclude objects"
+  "app.config.json views must be an array of objects with non-empty id, name, component, optional string arrays badges/notesGalleryFilters, optional string group, and filters as string records or $exclude objects"
 
 describe("validateViews", () => {
   test("returns empty array when value is undefined", () => {
@@ -24,8 +24,8 @@ describe("validateViews", () => {
     expect(validateViews([view])).toEqual([view])
   })
 
-  test("accepts optional frontmatterFilters array", () => {
-    const view = { ...VALID_VIEW, frontmatterFilters: ["genre", "status"] }
+  test("accepts optional notesGalleryFilters array", () => {
+    const view = { ...VALID_VIEW, notesGalleryFilters: ["genre", "status"] }
     expect(validateViews([view])).toEqual([view])
   })
 
@@ -83,12 +83,12 @@ describe("validateViews", () => {
     expect(() => validateViews([{ ...VALID_VIEW, badges: ["folder", ""] }])).toThrow(ERROR)
   })
 
-  test("throws when frontmatterFilters contains an empty string", () => {
-    expect(() => validateViews([{ ...VALID_VIEW, frontmatterFilters: ["genre", ""] }])).toThrow(ERROR)
+  test("throws when notesGalleryFilters contains an empty string", () => {
+    expect(() => validateViews([{ ...VALID_VIEW, notesGalleryFilters: ["genre", ""] }])).toThrow(ERROR)
   })
 
-  test("throws when frontmatterFilters is not an array", () => {
-    expect(() => validateViews([{ ...VALID_VIEW, frontmatterFilters: "genre" }])).toThrow(ERROR)
+  test("throws when notesGalleryFilters is not an array", () => {
+    expect(() => validateViews([{ ...VALID_VIEW, notesGalleryFilters: "genre" }])).toThrow(ERROR)
   })
 
   test("throws when group is an empty string", () => {

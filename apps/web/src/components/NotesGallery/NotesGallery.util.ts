@@ -41,12 +41,15 @@ function getFrontmatterValues(note: Note, key: string): string[] {
   const value = note.frontmatter?.[key]
   if (value === undefined) return []
 
-  return Array.isArray(value) ? value : [value]
+  return (Array.isArray(value) ? value : [value])
+    .map((entry) => entry.trim())
+    .filter(Boolean)
 }
 
 function countFrontmatterValue(counts: Map<string, number>, value: string): void {
-  if (!value.trim()) return
-  counts.set(value, (counts.get(value) ?? 0) + 1)
+  const trimmed = value.trim()
+  if (!trimmed) return
+  counts.set(trimmed, (counts.get(trimmed) ?? 0) + 1)
 }
 
 function countFrontmatterValues(notes: Note[], allowedKeys: string[]): Map<string, Map<string, number>> {

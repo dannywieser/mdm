@@ -2,7 +2,7 @@ export type NotesGalleryRouteParamKey = "view"
 
 export interface NotesGalleryProps {
   badges?: string[]
-  frontmatterFilters?: string[]
+  notesGalleryFilters?: string[]
 }
 
 export interface FrontmatterFacet {

@@ -30,7 +30,7 @@ import {
 } from "./NotesGallery.util"
 import type { NotesGalleryProps, NotesGalleryRouteParamKey } from "./NotesGallery.types"
 
-export const NotesGallery = ({ badges = [], frontmatterFilters = [] }: NotesGalleryProps) => {
+export const NotesGallery = ({ badges = [], notesGalleryFilters = [] }: NotesGalleryProps) => {
   const { t } = useI18n()
   const { view } = useParams<NotesGalleryRouteParamKey>()
   const [searchParams] = useSearchParams()
@@ -45,8 +45,8 @@ export const NotesGallery = ({ badges = [], frontmatterFilters = [] }: NotesGall
   const searchIndex = useMemo(() => buildSearchIndex(notesWithImages), [notesWithImages])
   const yearOptions = useMemo(() => buildYearFacet(notesWithImages), [notesWithImages])
   const frontmatterFacets = useMemo(
-    () => buildFrontmatterFacets(notesWithImages, frontmatterFilters),
-    [notesWithImages, frontmatterFilters],
+    () => buildFrontmatterFacets(notesWithImages, notesGalleryFilters),
+    [notesWithImages, notesGalleryFilters],
   )
 
   const selectedYears = useMemo(

@@ -215,6 +215,21 @@ describe("buildFrontmatterFacets", () => {
     expect(buildFrontmatterFacets(notes, ["tags"])).toEqual([])
   })
 
+  test("trims incidental whitespace around a value", () => {
+    const notes = [buildNote({ frontmatter: { type: " game " } })]
+
+    expect(buildFrontmatterFacets(notes, ["type"])).toEqual([{ key: "type", values: ["game"] }])
+  })
+
+  test("merges values that only differ by incidental whitespace", () => {
+    const notes = [
+      buildNote({ frontmatter: { type: " game" } }),
+      buildNote({ frontmatter: { type: "game " } }),
+    ]
+
+    expect(buildFrontmatterFacets(notes, ["type"])).toEqual([{ key: "type", values: ["game"] }])
+  })
+
   test("returns an empty list when no notes have frontmatter", () => {
     const notes = [buildNote({ frontmatter: null })]
 
@@ -257,5 +272,11 @@ describe("filterByFrontmatter", () => {
     ]
 
     expect(filterByFrontmatter(notes, { tags: ["coop"] })).toEqual([notes[0]])
+  })
+
+  test("matches a note value with incidental whitespace against a trimmed selection", () => {
+    const notes = [buildNote({ title: "a", frontmatter: { type: " game " } })]
+
+    expect(filterByFrontmatter(notes, { type: ["game"] })).toEqual(notes)
   })
 })

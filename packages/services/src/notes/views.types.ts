@@ -2,7 +2,7 @@ export interface ViewSummary {
   badges?: string[]
   component: string
   count: number
-  frontmatterFilters?: string[]
+  notesGalleryFilters?: string[]
   group?: string
   id: string
   name: string

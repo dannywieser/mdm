@@ -17,10 +17,18 @@ export function getFrontmatterKeysFromParams(searchParams: URLSearchParams): str
   return [...keys]
 }
 
+/** Collapses a numeric-looking string to its canonical integer form (e.g. "02024" -> "2024") so equivalent year values compare equal; non-numeric values pass through unchanged. */
+function normalizeYearValue(value: string): string {
+  const numeric = Number(value)
+  return Number.isFinite(numeric) ? String(numeric) : value
+}
+
 /** Reads a multi-select filter's selections as repeated `paramKey` query params, so an arbitrary value (including one containing a comma) is never ambiguous. */
 export function parseParamValues(searchParams: URLSearchParams, paramKey: string): string[] {
   const values = searchParams.getAll(paramKey).map((value) => value.trim()).filter(Boolean)
-  return [...new Set(values)]
+  const normalized = paramKey === YEAR_PARAM_KEY ? values.map(normalizeYearValue) : values
+
+  return [...new Set(normalized)]
 }
 
 export function toggleParamValue(values: string[], value: string): string[] {

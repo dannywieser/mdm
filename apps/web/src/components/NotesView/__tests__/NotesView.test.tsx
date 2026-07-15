@@ -35,8 +35,8 @@ vi.mock("../../NotesSummaryTable", () => ({
 }))
 
 vi.mock("../../NotesGallery", () => ({
-  NotesGallery: ({ frontmatterFilters }: { frontmatterFilters?: string[] }) => (
-    <div>{`notes-gallery:${frontmatterFilters?.join(",") ?? ""}`}</div>
+  NotesGallery: ({ notesGalleryFilters }: { notesGalleryFilters?: string[] }) => (
+    <div>{`notes-gallery:${notesGalleryFilters?.join(",") ?? ""}`}</div>
   ),
 }))
 
@@ -106,14 +106,14 @@ describe("NotesView", () => {
     expect(screen.getByText("note-summary-list:folder,frontmatter.genre")).toBeTruthy()
   })
 
-  test("forwards frontmatterFilters to NotesGallery", () => {
+  test("forwards notesGalleryFilters to NotesGallery", () => {
     useViewsQueryMock.mockReturnValue({
       data: {
         views: [
           {
             component: "NotesGallery",
             count: 1,
-            frontmatterFilters: ["genre", "status"],
+            notesGalleryFilters: ["genre", "status"],
             id: "books",
             name: "Books",
           },

@@ -33,7 +33,7 @@ export const NotesView = () => {
   return (
     <SelectedComponent
       badges={configuredView?.badges}
-      frontmatterFilters={configuredView?.frontmatterFilters}
+      notesGalleryFilters={configuredView?.notesGalleryFilters}
       key={view}
     />
   )
