@@ -5,96 +5,40 @@ import type {
   VaultNote,
 } from "../vault.types"
 
-import { chance, pickOne, randomInt } from "../random/random"
-import {
-  buildCover,
-  randomDateBefore,
-  TIMELINE_DAYS,
-  toModifiedTimestamp,
-} from "./builderShared"
+import { buildCover, randomDateBefore, TIMELINE_DAYS, toModifiedTimestamp } from "./builderShared"
+import { MOVIES_CORPUS } from "./moviesCorpus"
 
-const TITLE_OPENINGS = [
-  "Midnight",
-  "Static",
-  "The Seventh",
-  "Paper",
-  "Neon",
-  "Silent",
-  "The Last",
-  "Iron",
-] as const
-
-const TITLE_SUBJECTS = [
-  "Harbor",
-  "Signal",
-  "Summer",
-  "Protocol",
-  "Orchard",
-  "Divide",
-  "Reel",
-  "Country",
-  "Verdict",
-  "Mile",
-] as const
-
-const DIRECTORS = [
-  "R. Okonkwo",
-  "J. Marchand",
-  "S. Whitfield",
-  "A. Kobayashi",
-  "M. Espinoza",
-  "L. Toivonen",
-  "D. Falkner",
-  "P. Iyer",
-] as const
-
-const GENRES = [
-  "drama",
-  "thriller",
-  "documentary",
-  "comedy",
-  "science-fiction",
-  "animation",
-] as const
-
-const REVIEW_SENTENCES = [
-  "The first act promises less than the film delivers.",
-  "Beautifully shot, even when nothing much is happening.",
-  "The ending divides every room it plays in.",
-  "A tight script with no wasted scenes.",
-  "Worth it for the score alone.",
-  "The rare sequel-bait that earns the sequel.",
-] as const
-
-export const buildMovieNotes = ({ endDate, random }: VaultBuilderOptions): GeneratedVault => {
+export const buildMovieNotes = async ({
+  endDate,
+  random,
+}: VaultBuilderOptions): Promise<GeneratedVault> => {
   const notes: VaultNote[] = []
   const attachments: VaultAttachment[] = []
-  const titles = TITLE_OPENINGS.flatMap((opening) =>
-    TITLE_SUBJECTS.map((subject) => `${opening} ${subject}`),
-  )
 
-  for (const title of titles) {
+  for (const movie of MOVIES_CORPUS) {
     const created = randomDateBefore(endDate, TIMELINE_DAYS, random)
     const modifiedDate = toModifiedTimestamp(created, random)
-    const watched = chance(random, 0.7)
-    const cover = buildCover("movie", title, modifiedDate, random)
+    const cover = await buildCover("movie", movie.title, modifiedDate, random, movie.photoKey)
     const frontmatter: VaultNote["frontmatter"] = {
       created,
       type: "movie",
-      director: pickOne(random, DIRECTORS),
-      genre: pickOne(random, GENRES),
-      status: watched ? "watched" : "watchlist",
+      director: movie.director,
+      genre: movie.genre,
+      status: movie.status,
     }
-    if (watched) {
-      frontmatter.rating = `${String(randomInt(random, 2, 5))}/5`
+    if (movie.status === "watched" && movie.rating) {
+      frontmatter.rating = `${String(movie.rating)}/5`
+    }
+    if (cover.isRealPhoto) {
+      frontmatter.source = "pexels"
     }
 
     notes.push({
-      body: `![](${cover.coverPath})\n\n${pickOne(random, REVIEW_SENTENCES)} ${pickOne(random, REVIEW_SENTENCES)}`,
+      body: `![](${cover.coverPath})\n\n${movie.body}`,
       folder: "library/movies",
       frontmatter,
       modifiedDate,
-      title,
+      title: movie.title,
     })
     attachments.push(cover.attachment)
   }

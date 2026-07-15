@@ -4,6 +4,7 @@ import { useMasonryRowSpan } from "../../hooks/useMasonryRowSpan/useMasonryRowSp
 
 import { FadeImage } from "../FadeImage"
 import { NoteBadges } from "../NoteBadges"
+import { NoteLink } from "../NoteLink"
 
 import type { GalleryCardProps, NoteCoverGridProps } from "./NoteCoverGrid.types"
 import { getImageSrc, getNoteImagePaths } from "./NoteCoverGrid.util"
@@ -24,7 +25,7 @@ const GalleryCard = ({ note, badges }: GalleryCardProps) => {
   const images = getNoteImagePaths(note)
 
   return (
-    <a href={note.obsidianUrl} style={{ textDecoration: "none", outline: "none" }}>
+    <NoteLink note={note} display="block" textDecoration="none" outline="none">
       <Card.Root
         bg="app.panelBackground"
         borderColor="app.border"
@@ -62,7 +63,7 @@ const GalleryCard = ({ note, badges }: GalleryCardProps) => {
           <NoteBadges badges={badges} note={note} />
         </Box>
       </Card.Root>
-    </a>
+    </NoteLink>
   )
 }
 

@@ -1,7 +1,8 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
-import { render, screen } from "@testing-library/react"
+import { cleanup, render, screen } from "@testing-library/react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
-import { beforeEach, describe, expect, test, vi } from "vitest"
+import { configureDemoMode, resetDemoMode } from "services"
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 
 import { NotesSummaryTable } from "../NotesSummaryTable"
 
@@ -43,6 +44,11 @@ describe("NotesSummaryTable", () => {
     resolveBadgeValuesMock.mockReset()
     getColumnLabelMock.mockReset()
     getColumnLabelMock.mockImplementation((badge: string) => badge)
+  })
+
+  afterEach(() => {
+    cleanup()
+    resetDemoMode()
   })
 
   test("renders an error state", () => {
@@ -123,5 +129,28 @@ describe("NotesSummaryTable", () => {
       expect.objectContaining({ id: "2", title: "Book Two" }),
       "frontmatter.genre",
     )
+  })
+
+  test("links note titles to the in-app note source route in demo mode", () => {
+    configureDemoMode({ dataBasePath: "/demo-data" })
+    useNotesQueryMock.mockReturnValue({
+      data: {
+        notes: [
+          {
+            id: "1",
+            title: "Book One",
+            obsidianUrl: "obsidian://open?vault=v&file=book-one",
+            folder: "books",
+            frontmatter: { type: "book" },
+          },
+        ],
+      },
+      error: undefined,
+      isLoading: false,
+    })
+
+    renderSummaryList()
+
+    expect(screen.getByRole("link", { name: "Book One" }).getAttribute("href")).toBe("/source/1")
   })
 })

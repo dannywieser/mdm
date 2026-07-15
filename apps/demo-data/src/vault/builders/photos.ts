@@ -1,91 +1,84 @@
 import { addDays } from "mdm-util"
 
+import type { RandomGenerator } from "../random/random.types"
 import type {
   GeneratedVault,
   VaultAttachment,
   VaultBuilderOptions,
   VaultNote,
 } from "../vault.types"
+import type { PhotoCorpusEntry } from "./photosCorpus.types"
 
-import { generateCoverSvg } from "../covers/coverSvg"
-import { pickMany, pickOne, randomInt } from "../random/random"
-import { slugify, TIMELINE_DAYS, toModifiedTimestamp } from "./builderShared"
+import { randomInt } from "../random/random"
+import { buildCover, TIMELINE_DAYS, toModifiedTimestamp } from "./builderShared"
+import { PHOTOS_CORPUS } from "./photosCorpus"
 
-const PLACES = [
-  "Ravine Trail",
-  "Lakeshore",
-  "Old Town",
-  "Harbor Market",
-  "Botanical Garden",
-  "Mountain Pass",
-  "Riverside Path",
-  "City Rooftop",
-  "Winter Forest",
-  "Farmers Market",
-  "Lighthouse Point",
-  "Meadow Loop",
-  "Canyon Overlook",
-  "Backyard",
-  "Museum District",
-  "Prairie Road",
-] as const
+const shuffle = <T,>(random: RandomGenerator, values: readonly T[]): T[] => {
+  const result = [...values]
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const swapIndex = randomInt(random, 0, index)
+    ;[result[index], result[swapIndex]] = [result[swapIndex], result[index]]
+  }
+  return result
+}
 
-const PHOTO_TAGS = [
-  "landscape",
-  "family",
-  "golden-hour",
-  "hiking",
-  "architecture",
-  "weekend",
-  "wildlife",
-  "snow",
-] as const
+/** Spreads entries roughly evenly across the timeline, with light jitter so the spacing isn't robotic. */
+const buildEntryDate = (
+  endDate: string,
+  startDate: string,
+  index: number,
+  spacing: number,
+  random: RandomGenerator,
+): string => {
+  const jitter = randomInt(random, -Math.floor(spacing / 3), Math.floor(spacing / 3))
+  const offset = Math.min(TIMELINE_DAYS - 1, Math.max(0, Math.round(index * spacing + jitter)))
+  return addDays(startDate, offset) > endDate ? endDate : addDays(startDate, offset)
+}
 
-const CAPTIONS = [
-  "The light lasted about four minutes and this was minute three.",
-  "Stopped mid-stride for this one and it was worth it.",
-  "Almost didn't bring the camera. Lesson learned again.",
-  "The kind of view that makes the detour feel planned.",
-  "Quiet morning, empty path, perfect timing.",
-  "Everyone kept walking; this deserved a pause.",
-] as const
-
-/** Builds a photo-journal note (with SVG cover) every few days of the timeline. */
-export const buildPhotoNotes = ({ endDate, random }: VaultBuilderOptions): GeneratedVault => {
+/**
+ * Builds one photo-journal note per curated place, each with its own
+ * distinct real photo — no image or caption repeats. Dates are spread across
+ * the timeline rather than looping every few days, since there are far fewer
+ * curated photos than the old high-frequency cadence assumed.
+ */
+export const buildPhotoNotes = async ({
+  endDate,
+  random,
+}: VaultBuilderOptions): Promise<GeneratedVault> => {
   const notes: VaultNote[] = []
   const attachments: VaultAttachment[] = []
   const startDate = addDays(endDate, -(TIMELINE_DAYS - 1))
+  const entries: readonly PhotoCorpusEntry[] = shuffle(random, PHOTOS_CORPUS)
+  const spacing = TIMELINE_DAYS / entries.length
 
-  for (
-    let date = startDate;
-    date <= endDate;
-    date = addDays(date, randomInt(random, 2, 5))
-  ) {
-    const place = pickOne(random, PLACES)
+  for (const [index, entry] of entries.entries()) {
+    const date = buildEntryDate(endDate, startDate, index, spacing, random)
     const modifiedDate = toModifiedTimestamp(date, random)
-    // Dates make cover filenames unique even when a place repeats.
-    const coverPath = `attachments/covers/photos/${date}-${slugify(place)}.svg`
+    const cover = await buildCover(
+      "photo",
+      `${date} ${entry.place}`,
+      modifiedDate,
+      random,
+      entry.photoKey,
+    )
+
+    const frontmatter: VaultNote["frontmatter"] = {
+      created: date,
+      location: entry.place,
+      tags: [...entry.tags],
+    }
+    if (cover.isRealPhoto) {
+      frontmatter.source = "pexels"
+    }
 
     notes.push({
-      body: `![](${coverPath})\n\n${pickOne(random, CAPTIONS)}`,
+      body: `![](${cover.coverPath})\n\n${entry.caption}`,
       folder: "photos",
-      frontmatter: {
-        created: date,
-        location: place,
-        tags: pickMany(random, PHOTO_TAGS, randomInt(random, 1, 2)),
-      },
+      frontmatter,
       modifiedDate,
-      title: `${date} ${place}`,
+      title: `${date} ${entry.place}`,
     })
-    attachments.push({
-      contents: generateCoverSvg({
-        kind: "photo",
-        seed: randomInt(random, 0, 2_147_483_646),
-        title: place,
-      }),
-      modifiedDate,
-      relativePath: coverPath,
-    })
+    attachments.push(cover.attachment)
   }
 
   return { attachments, notes }

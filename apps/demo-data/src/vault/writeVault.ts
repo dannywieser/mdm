@@ -7,11 +7,15 @@ import { serializeNote } from "./serializeNote"
 
 const writeFileWithMtime = async (
   filePath: string,
-  contents: string,
+  contents: string | Buffer,
   modifiedDate: string,
 ): Promise<void> => {
   await fs.mkdir(path.dirname(filePath), { recursive: true })
-  await fs.writeFile(filePath, contents, "utf8")
+  if (Buffer.isBuffer(contents)) {
+    await fs.writeFile(filePath, contents)
+  } else {
+    await fs.writeFile(filePath, contents, "utf8")
+  }
   // Historic mtimes keep the stats endpoint realistic (e.g. "modified today").
   const modified = new Date(modifiedDate)
   await fs.utimes(filePath, modified, modified)

@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 
 import { createRandom } from "../../random/random"
 import {
@@ -7,6 +7,12 @@ import {
   slugify,
   toModifiedTimestamp,
 } from "../builderShared"
+
+const downloadImageMock = vi.hoisted(() => vi.fn())
+
+vi.mock("../../images/downloadImage", () => ({
+  downloadImage: downloadImageMock,
+}))
 
 describe("slugify", () => {
   test("lowercases and replaces non-alphanumeric runs with hyphens", () => {
@@ -39,17 +45,53 @@ describe("randomDateBefore", () => {
 })
 
 describe("buildCover", () => {
-  test("returns an attachment whose path matches the returned cover path", () => {
-    const { attachment, coverPath } = buildCover(
+  test("falls back to a generated SVG cover when the photoKey has no lockfile match", async () => {
+    downloadImageMock.mockResolvedValue(null)
+
+    const { attachment, coverPath, isRealPhoto } = await buildCover(
       "book",
       "The Glass Cartographer",
       "2024-03-15T10:00:00.000Z",
       createRandom(3),
+      "no-matching-photo",
     )
 
     expect(coverPath).toBe("attachments/covers/books/the-glass-cartographer.svg")
     expect(attachment.relativePath).toBe(coverPath)
     expect(attachment.contents).toContain("<svg")
     expect(attachment.modifiedDate).toBe("2024-03-15T10:00:00.000Z")
+    expect(isRealPhoto).toBe(false)
+  })
+
+  test("falls back to a generated SVG cover when the photo download fails", async () => {
+    downloadImageMock.mockResolvedValue(null)
+
+    const { attachment, coverPath, isRealPhoto } = await buildCover(
+      "book",
+      "The Glass Cartographer",
+      "2024-03-15T10:00:00.000Z",
+      createRandom(3),
+      "reading-nook",
+    )
+
+    expect(coverPath).toBe("attachments/covers/books/the-glass-cartographer.svg")
+    expect(attachment.contents).toContain("<svg")
+    expect(isRealPhoto).toBe(false)
+  })
+
+  test("reports a real photo when the download succeeds", async () => {
+    downloadImageMock.mockResolvedValue(Buffer.from("fake-jpeg-bytes"))
+
+    const { attachment, coverPath, isRealPhoto } = await buildCover(
+      "book",
+      "The Glass Cartographer",
+      "2024-03-15T10:00:00.000Z",
+      createRandom(3),
+      "reading-nook",
+    )
+
+    expect(coverPath).toBe("attachments/covers/books/the-glass-cartographer.jpg")
+    expect(attachment.contents).toEqual(Buffer.from("fake-jpeg-bytes"))
+    expect(isRealPhoto).toBe(true)
   })
 })

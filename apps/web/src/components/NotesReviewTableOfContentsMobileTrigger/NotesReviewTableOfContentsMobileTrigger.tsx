@@ -1,8 +1,9 @@
-import { Drawer, IconButton, Link, Text, VStack } from "@chakra-ui/react"
+import { Drawer, IconButton, Text, VStack } from "@chakra-ui/react"
 import { BookCheck, X } from "lucide-react"
 
 import { useI18n } from "../../i18n"
 import { focusRing } from "../../theme/focusRing"
+import { NoteLink } from "../NoteLink"
 import type { NotesReviewTableOfContentsProps } from "../NotesReviewTableOfContents/NotesReviewTableOfContents.types"
 import { getNoteColor } from "../NotesReviewTableOfContents/NotesReviewTableOfContents.util"
 
@@ -51,9 +52,9 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
           <Drawer.Body>
             <VStack align="stretch" gap="3">
               {notes.map((note, i) => (
-                <Link
+                <NoteLink
                   key={note.id}
-                  href={note.obsidianUrl}
+                  note={note}
                   color={getNoteColor(i === currentIndex, note.isRead)}
                   fontWeight={
                     i === currentIndex || !note.isRead ? "bold" : undefined
@@ -63,7 +64,7 @@ export const NotesReviewTableOfContentsMobileTrigger = ({
                   {...focusRing}
                 >
                   {note.title}
-                </Link>
+                </NoteLink>
               ))}
             </VStack>
           </Drawer.Body>

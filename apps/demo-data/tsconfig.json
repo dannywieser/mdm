@@ -3,7 +3,8 @@
   "compilerOptions": {
     "isolatedModules": true,
     "outDir": "dist",
+    "resolveJsonModule": true,
     "rootDir": "src"
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "src/**/*.json"]
 }

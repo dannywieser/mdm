@@ -2,8 +2,7 @@ import { IconButton } from "@chakra-ui/react"
 import { ExternalLink, FileCode } from "lucide-react"
 import { Link } from "react-router-dom"
 
-import { isDemoMode } from "services"
-
+import { useNoteLink } from "../../hooks/useNoteLink/useNoteLink"
 import { focusRing } from "../../theme/focusRing"
 import type { OpenInObsidianButtonProps } from "./OpenInObsidianButton.types"
 
@@ -17,9 +16,11 @@ const buttonStyleProps = {
 } as const
 
 export const OpenInObsidianButton = ({ note }: OpenInObsidianButtonProps) => {
-  if (isDemoMode()) {
-    // The demo has no Obsidian vault behind it, so show the note's markdown
-    // source in the browser instead of an obsidian:// deep link.
+  const { href, isDemo } = useNoteLink(note)
+
+  // The demo has no Obsidian vault behind it, so show the note's markdown
+  // source in the browser instead of an obsidian:// deep link.
+  if (isDemo) {
     return (
       <IconButton
         asChild
@@ -27,7 +28,7 @@ export const OpenInObsidianButton = ({ note }: OpenInObsidianButtonProps) => {
         title="View note source"
         {...buttonStyleProps}
       >
-        <Link to={`/source/${encodeURIComponent(note.id)}`}>
+        <Link to={href}>
           <FileCode size={16} />
         </Link>
       </IconButton>
@@ -41,7 +42,7 @@ export const OpenInObsidianButton = ({ note }: OpenInObsidianButtonProps) => {
       title="Open in Obsidian"
       {...buttonStyleProps}
     >
-      <a href={note.obsidianUrl}>
+      <a href={href}>
         <ExternalLink size={16} />
       </a>
     </IconButton>
