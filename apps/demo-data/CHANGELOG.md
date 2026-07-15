@@ -1,5 +1,20 @@
 # demo-data
 
+## 1.2.0
+
+### Minor Changes
+
+- 2f79f5a: Replace the demo vault's combinatorially-generated notes and SVG placeholder covers with a smaller, hand-written note corpus and real Pexels photos (with an offline SVG fallback), and widen the "On This Day" anniversary window so it stays reliable as the vault shrinks.
+
+### Patch Changes
+
+- 2f79f5a: Lowercase all demo view and habit names, and drop the two "do-more" habits (exercise, reading) from the demo config, leaving a single "screen time" do-less habit until do-more scoring is tuned for the demo.
+- 2f79f5a: Add a `source: pexels` frontmatter value to demo notes whose cover photo downloaded successfully from Pexels, and surface it as a badge on the photo wall, books, movies, and recipes views.
+  - mdm-util@3.0.1
+  - notes-api@3.0.1
+  - habit-tracker@1.3.20
+  - stats-service@1.1.15
+
 ## 1.1.17
 
 ### Patch Changes

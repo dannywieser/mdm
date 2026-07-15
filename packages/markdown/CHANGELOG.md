@@ -1,5 +1,11 @@
 # markdown
 
+## 3.0.1
+
+### Patch Changes
+
+- mdm-util@3.0.1
+
 ## 3.0.0
 
 ### Patch Changes
