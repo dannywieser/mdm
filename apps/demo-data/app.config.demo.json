@@ -6,7 +6,7 @@
   "views": [
     {
       "id": "on-this-day",
-      "name": "On This Day",
+      "name": "on this day",
       "group": "journal",
       "component": "NotesReview",
       "filters": [{ "folder": "journal", "frontmatter.created": "$onThisDay" }],
@@ -14,7 +14,7 @@
     },
     {
       "id": "today",
-      "name": "Today's Entry",
+      "name": "today's entry",
       "group": "journal",
       "component": "NotesList",
       "filters": [{ "folder": "journal", "frontmatter.created": "$today" }],
@@ -22,25 +22,25 @@
     },
     {
       "id": "photo-wall",
-      "name": "Photo Wall",
+      "name": "photo wall",
       "group": "photos",
       "component": "NotesGallery",
       "filters": [{ "folder": "photos" }],
-      "badges": ["frontmatter.location", "frontmatter.tags"],
+      "badges": ["frontmatter.location", "frontmatter.tags", "frontmatter.source"],
       "notesGalleryFilters": ["location", "tags"]
     },
     {
       "id": "books",
-      "name": "Books",
+      "name": "books",
       "group": "library",
       "component": "NotesGallery",
       "filters": [{ "folder": "library/books" }],
-      "badges": ["frontmatter.author", "frontmatter.genre"],
+      "badges": ["frontmatter.author", "frontmatter.genre", "frontmatter.source"],
       "notesGalleryFilters": ["author", "genre", "status", "rating"]
     },
     {
       "id": "reading-list",
-      "name": "Reading List",
+      "name": "reading list",
       "group": "library",
       "component": "NotesSummaryTable",
       "filters": [
@@ -51,19 +51,19 @@
     },
     {
       "id": "movies",
-      "name": "Movies",
+      "name": "movies",
       "group": "library",
       "component": "NotesGallery",
       "filters": [
         { "folder": "library/movies" },
         { "$exclude": { "frontmatter.status": "watchlist" } }
       ],
-      "badges": ["frontmatter.director", "frontmatter.genre", "frontmatter.rating"],
+      "badges": ["frontmatter.director", "frontmatter.genre", "frontmatter.rating", "frontmatter.source"],
       "notesGalleryFilters": ["director", "genre", "rating"]
     },
     {
       "id": "quote-review",
-      "name": "Quote Review",
+      "name": "quote review",
       "group": "library",
       "component": "NotesReview",
       "filters": [{ "folder": "quotes" }],
@@ -71,7 +71,7 @@
     },
     {
       "id": "ideas",
-      "name": "Ideas",
+      "name": "ideas",
       "group": "knowledge",
       "component": "NotesList",
       "filters": [{ "folder": "ideas", "frontmatter.archived": "$missing" }],
@@ -79,7 +79,7 @@
     },
     {
       "id": "projects",
-      "name": "Active Projects",
+      "name": "active projects",
       "group": "knowledge",
       "component": "NotesSummaryTable",
       "filters": [
@@ -90,32 +90,18 @@
     },
     {
       "id": "recipes",
-      "name": "Recipes",
+      "name": "recipes",
       "group": "knowledge",
       "component": "NotesGallery",
       "filters": [{ "folder": "recipes" }],
-      "badges": ["frontmatter.cuisine", "frontmatter.difficulty"],
+      "badges": ["frontmatter.cuisine", "frontmatter.difficulty", "frontmatter.source"],
       "notesGalleryFilters": ["cuisine", "difficulty"]
     }
   ],
   "habits": [
     {
-      "id": "exercise",
-      "name": "Daily Exercise",
-      "mode": "do-more",
-      "frontmatterProperty": "exercise",
-      "trackingWindowDays": 90
-    },
-    {
-      "id": "reading",
-      "name": "Reading",
-      "mode": "do-more",
-      "frontmatterProperty": "reading",
-      "trackingWindowDays": 30
-    },
-    {
       "id": "screen-time",
-      "name": "Screen Time",
+      "name": "screen time",
       "mode": "do-less",
       "frontmatterProperty": "screentime",
       "trackingWindowDays": 30,

@@ -16,14 +16,14 @@ import { createRandom } from "./random/random"
  * quotes, ideas, projects, recipes, and people notes. Deterministic for a
  * given seed and end date.
  */
-export const generateVault = (endDate: string, seed: number): GeneratedVault => {
+export const generateVault = async (endDate: string, seed: number): Promise<GeneratedVault> => {
   const random = createRandom(seed)
   const options = { endDate, random }
 
-  const books = buildBookNotes(options)
-  const movies = buildMovieNotes(options)
-  const photos = buildPhotoNotes(options)
-  const recipes = buildRecipeNotes(options)
+  const books = await buildBookNotes(options)
+  const movies = await buildMovieNotes(options)
+  const photos = await buildPhotoNotes(options)
+  const recipes = await buildRecipeNotes(options)
 
   return {
     attachments: [

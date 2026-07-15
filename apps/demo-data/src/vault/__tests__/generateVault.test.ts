@@ -1,19 +1,32 @@
-import { describe, expect, test } from "vitest"
+import { beforeAll, describe, expect, test, vi } from "vitest"
+
+import type { GeneratedVault } from "../vault.types"
 
 import { generateVault } from "../generateVault"
+
+// Keeps vault generation offline and fast — real photo download is covered
+// separately by builderShared's buildCover behavior. Returns bytes derived
+// from the URL so tests can tell which source photo an attachment came from.
+vi.mock("../images/downloadImage", () => ({
+  downloadImage: vi.fn((url: string) => Promise.resolve(Buffer.from(url))),
+}))
 
 const END_DATE = "2026-07-01"
 const SEED = 1337
 
 describe("generateVault", () => {
-  const vault = generateVault(END_DATE, SEED)
+  let vault: GeneratedVault
 
-  test("generates at least 1000 notes", () => {
-    expect(vault.notes.length).toBeGreaterThanOrEqual(1000)
+  beforeAll(async () => {
+    vault = await generateVault(END_DATE, SEED)
   })
 
-  test("is deterministic for the same seed and end date", () => {
-    const again = generateVault(END_DATE, SEED)
+  test("generates at least 700 notes", () => {
+    expect(vault.notes.length).toBeGreaterThanOrEqual(700)
+  })
+
+  test("is deterministic for the same seed and end date", async () => {
+    const again = await generateVault(END_DATE, SEED)
 
     expect(again.notes).toEqual(vault.notes)
     expect(again.attachments).toEqual(vault.attachments)
@@ -66,6 +79,29 @@ describe("generateVault", () => {
     for (const { relativePath } of vault.attachments) {
       const isReferenced = vault.notes.some((note) => note.body.includes(relativePath))
       expect(isReferenced).toBe(true)
+    }
+  })
+
+  test("never downloads the same photo for two different cover attachments", () => {
+    const jpgAttachments = vault.attachments.filter(({ relativePath }) =>
+      relativePath.endsWith(".jpg"),
+    )
+    const contentsAsHex = jpgAttachments.map(({ contents }) => Buffer.from(contents).toString("hex"))
+
+    expect(jpgAttachments.length).toBeGreaterThan(0)
+    expect(new Set(contentsAsHex).size).toBe(contentsAsHex.length)
+  })
+
+  test("marks frontmatter.source as pexels only for notes with a real downloaded photo", () => {
+    const notesWithJpgCover = vault.notes.filter((note) => note.body.includes(".jpg)"))
+    const notesWithSvgCover = vault.notes.filter((note) => note.body.includes(".svg)"))
+
+    expect(notesWithJpgCover.length).toBeGreaterThan(0)
+    for (const note of notesWithJpgCover) {
+      expect(note.frontmatter.source).toBe("pexels")
+    }
+    for (const note of notesWithSvgCover) {
+      expect(note.frontmatter.source).toBeUndefined()
     }
   })
 

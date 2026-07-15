@@ -13,7 +13,8 @@ export interface VaultNote {
 }
 
 export interface VaultAttachment {
-  contents: string
+  /** SVG markup (string) or downloaded photo bytes (Buffer). */
+  contents: string | Buffer
   /** ISO timestamp applied as the file's modification time. */
   modifiedDate: string
   /** Vault-relative path, e.g. "attachments/covers/books/dune.svg". */

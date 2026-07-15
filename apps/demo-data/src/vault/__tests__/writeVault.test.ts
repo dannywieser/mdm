@@ -69,4 +69,26 @@ describe("writeVault", () => {
       new Date("2024-01-01T10:00:00.000Z"),
     )
   })
+
+  test("writes a Buffer attachment (a downloaded photo) as raw bytes with no encoding", async () => {
+    const photoBytes = Buffer.from([0xff, 0xd8, 0xff])
+    await writeVault(
+      {
+        attachments: [
+          {
+            contents: photoBytes,
+            modifiedDate: "2024-02-02T09:30:00.000Z",
+            relativePath: "attachments/covers/photos/ravine-trail.jpg",
+          },
+        ],
+        notes: [],
+      },
+      "/vault",
+    )
+
+    expect(fsMock.writeFile).toHaveBeenCalledWith(
+      "/vault/attachments/covers/photos/ravine-trail.jpg",
+      photoBytes,
+    )
+  })
 })

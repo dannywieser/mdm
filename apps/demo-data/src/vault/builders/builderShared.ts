@@ -1,14 +1,24 @@
 import { addDays } from "mdm-util"
 
 import type { CoverKind } from "../covers/coverSvg.types"
+import type { PexelsCategory } from "../images/pexelsPhoto.types"
 import type { RandomGenerator } from "../random/random.types"
 import type { CoverResult } from "./builderShared.types"
 
 import { generateCoverSvg } from "../covers/coverSvg"
+import { downloadImage } from "../images/downloadImage"
+import { findPhotoByKey } from "../images/pexelsPhotoLibrary"
 import { randomInt } from "../random/random"
 
-/** Number of days of history the demo vault spans (roughly 3.5 years). */
-export const TIMELINE_DAYS = 1275
+/**
+ * Number of days of history the demo vault spans (a little over 3 years) —
+ * long enough to guarantee 3 anniversary hits for the "On This Day" review
+ * view (see `journal.ts`'s `isAnniversary`) regardless of leap-year
+ * alignment (3 consecutive years span at most 366 + 365 + 365 = 1096 days),
+ * short enough to keep the vault feeling like a real, occasionally-kept
+ * notebook rather than a daily-for-years log.
+ */
+export const TIMELINE_DAYS = 1100
 
 export const slugify = (value: string): string =>
   value
@@ -33,8 +43,7 @@ export const randomDateBefore = (
   random: RandomGenerator,
 ): string => addDays(endDate, -randomInt(random, 0, spanDays - 1))
 
-/** Creates an SVG cover attachment plus the body-relative path pointing at it. */
-export const buildCover = (
+const buildSvgCover = (
   kind: CoverKind,
   title: string,
   modifiedDate: string,
@@ -52,5 +61,34 @@ export const buildCover = (
       relativePath: coverPath,
     },
     coverPath,
+    isRealPhoto: false,
+  }
+}
+
+/**
+ * Builds a cover attachment for a note from its own curated, 1:1 Pexels
+ * photo (`photoKey` looks it up in the lockfile) — every note gets a
+ * distinct real photo, never a reused one. Falls back to the existing
+ * generated SVG cover when the lockfile entry is missing or the download
+ * fails, so generation never hard-fails and still works fully offline.
+ */
+export const buildCover = async (
+  kind: CoverKind,
+  title: string,
+  modifiedDate: string,
+  random: RandomGenerator,
+  photoKey: string,
+): Promise<CoverResult> => {
+  const category = `${kind}s` as PexelsCategory
+  const photo = findPhotoByKey(category, photoKey)
+  const bytes = photo ? await downloadImage(photo.src) : null
+
+  if (!photo || !bytes) return buildSvgCover(kind, title, modifiedDate, random)
+
+  const coverPath = `attachments/covers/${kind}s/${slugify(title)}.jpg`
+  return {
+    attachment: { contents: bytes, modifiedDate, relativePath: coverPath },
+    coverPath,
+    isRealPhoto: true,
   }
 }

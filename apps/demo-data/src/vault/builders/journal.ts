@@ -20,6 +20,19 @@ import { PERSON_NAMES } from "./people"
 /** Days at the end of the timeline that always have entries, so current habit streaks show up in the demo. */
 const STREAK_TAIL_DAYS = 12
 
+const MAX_FILL_PROBABILITY = 0.85
+const MIN_FILL_PROBABILITY = 0.3
+
+/**
+ * Chance a non-anniversary, non-tail day gets a journal entry, decaying from
+ * `MAX_FILL_PROBABILITY` near the end of the timeline down to
+ * `MIN_FILL_PROBABILITY` at its oldest — reads like journaling that picked up
+ * more seriously recently, rather than a flat daily habit for years straight.
+ */
+const buildFillProbability = (daysFromEnd: number): number =>
+  MAX_FILL_PROBABILITY -
+  (MAX_FILL_PROBABILITY - MIN_FILL_PROBABILITY) * (daysFromEnd / TIMELINE_DAYS)
+
 const buildParagraph = (random: RandomGenerator): string =>
   pickMany(random, SENTENCES, randomInt(random, 2, 3)).join(" ")
 
@@ -110,7 +123,9 @@ export const buildJournalNotes = ({ endDate, random }: VaultBuilderOptions): Vau
     const daysFromEnd = dates.length - 1 - dayIndex
     const isAnniversary = date.slice(5) === anniversaryMonthDay
     const skipDay =
-      !isAnniversary && daysFromEnd >= STREAK_TAIL_DAYS && !chance(random, 0.8)
+      !isAnniversary &&
+      daysFromEnd >= STREAK_TAIL_DAYS &&
+      !chance(random, buildFillProbability(daysFromEnd))
     if (skipDay) return []
     return [buildJournalNote(date, dayIndex, daysFromEnd, random)]
   })

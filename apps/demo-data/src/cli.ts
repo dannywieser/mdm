@@ -19,7 +19,7 @@ const main = async (): Promise<void> => {
   const endDate = new Date().toISOString().slice(0, 10)
 
   console.info(`[demo-data] generating demo vault ending ${endDate}`)
-  const vault = generateVault(endDate, DEMO_SEED)
+  const vault = await generateVault(endDate, DEMO_SEED)
   await writeVault(vault, VAULT_DIRECTORY)
   console.info(
     `[demo-data] wrote ${String(vault.notes.length)} notes and ${String(vault.attachments.length)} attachments to ${VAULT_DIRECTORY}`,

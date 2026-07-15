@@ -29,6 +29,10 @@ export const OPENERS = [
   "Good energy today, most of it spent where it mattered.",
   "A day of small wins and one stubborn problem.",
   "Mostly an ordinary day, which is its own kind of good.",
+  "Woke up to rain on the window and didn't mind it for once.",
+  "Every plan for today got rearranged by nine a.m., and it was fine.",
+  "Not a productive day by any conventional metric, and I'm trying not to care.",
+  "The kind of day that's hard to describe without sounding boring, which is its own compliment.",
 ] as const
 
 export const SENTENCES = [
@@ -52,6 +56,14 @@ export const SENTENCES = [
   "Cooked a double batch so tomorrow's lunch is already sorted.",
   "The inbox reached zero for about eleven minutes.",
   "Fixed the squeaky door that has been announcing everyone for months.",
+  "Read for an hour with no podcast queued up for after, no task-list guilt.",
+  "Chopped vegetables for longer than strictly necessary; it's basically meditation at this point.",
+  "Took the long way on the walk on purpose, no destination in mind.",
+  "The phone went in the drawer at nine, not just on silent, and the evening felt longer for it.",
+  "Reorganized one shelf and somehow that made the whole room feel different.",
+  "Burned the first attempt at dinner and made peace with ordering in.",
+  "Noticed the same tree on the commute has started turning color.",
+  "Spent the coffee break actually looking out the window instead of at a screen.",
 ] as const
 
 export const HIGHLIGHTS = [
@@ -63,6 +75,10 @@ export const HIGHLIGHTS = [
   "Found the perfect quote for the presentation",
   "Homemade bread actually rose this time",
   "Cleared the weekend for the family trip",
+  "Read three chapters in one sitting for the first time in months",
+  "The garden finally looks intentional instead of surviving",
+  "Fixed something on the first try for once",
+  "A whole afternoon with nowhere to be",
 ] as const
 
 export const TASKS = [
@@ -82,4 +98,8 @@ export const REFLECTIONS = [
   "Attention is the only currency that matters.",
   "Slow is smooth, and smooth is fast.",
   "The streak matters more than the score.",
+  "There's a version of 'productive' that's really just anxiety about not doing enough.",
+  "The things I remember most clearly are rarely the deliverables I shipped.",
+  "Maybe the ratio of slow to fast just needs recalibrating.",
+  "Busy and effective are not the same thing, and I keep mixing them up.",
 ] as const
