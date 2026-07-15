@@ -22,7 +22,7 @@ export const NotesFilterFacetGroup = ({ label, options, paramKey }: NotesFilterF
 
   return (
     <Box>
-      <Text fontSize="xs" fontWeight="semibold" color="app.textMuted" mb={2} textTransform="uppercase">
+      <Text fontSize="xs" fontWeight="semibold" color="app.textMuted" mb={2}>
         {label}
       </Text>
       <Wrap gap={2}>
