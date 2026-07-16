@@ -1,9 +1,12 @@
 import { describe, expect, test } from "vitest"
 import type { Note } from "markdown"
 
-import { getColumnLabel, resolveBadgeValues } from "../NotesSummaryTable.util"
+import { getColumnLabel, getSortValue, resolveBadgeValues, sortNotes } from "../NotesSummaryTable.util"
 
-const createNote = (frontmatter: Note["frontmatter"]): Note => ({
+const createNote = (
+  frontmatter: Note["frontmatter"],
+  overrides: Partial<Note> = {},
+): Note => ({
   basename: "book",
   dates: [],
   createdDate: "2024-01-01",
@@ -16,6 +19,7 @@ const createNote = (frontmatter: Note["frontmatter"]): Note => ({
   modifiedDate: "2024-01-02",
   obsidianUrl: "obsidian://open?vault=v&file=book",
   title: "Book",
+  ...overrides,
 })
 
 describe("resolveBadgeValues", () => {
@@ -45,5 +49,74 @@ describe("getColumnLabel", () => {
 
   test("returns original badge for non-path badge", () => {
     expect(getColumnLabel("folder")).toBe("folder")
+  })
+})
+
+describe("getSortValue", () => {
+  test("returns the note title for the title sort key", () => {
+    const note = createNote({ type: "book" }, { title: "Zebra" })
+
+    expect(getSortValue(note, "title")).toBe("Zebra")
+  })
+
+  test("returns joined badge values for other sort keys", () => {
+    const note = createNote({ genre: ["fiction", "mystery"] })
+
+    expect(getSortValue(note, "frontmatter.genre")).toBe("fiction, mystery")
+  })
+})
+
+describe("sortNotes", () => {
+  test("sorts notes by title ascending and descending", () => {
+    const notes = [
+      createNote({}, { id: "1", title: "Zebra" }),
+      createNote({}, { id: "2", title: "Apple" }),
+    ]
+
+    expect(sortNotes(notes, "title", "asc").map((note) => note.title)).toEqual([
+      "Apple",
+      "Zebra",
+    ])
+    expect(sortNotes(notes, "title", "desc").map((note) => note.title)).toEqual([
+      "Zebra",
+      "Apple",
+    ])
+  })
+
+  test("sorts notes by a badge column", () => {
+    const notes = [
+      createNote({ type: "novel" }, { id: "1", title: "One" }),
+      createNote({ type: "biography" }, { id: "2", title: "Two" }),
+    ]
+
+    expect(
+      sortNotes(notes, "frontmatter.type", "asc").map((note) => note.title),
+    ).toEqual(["Two", "One"])
+  })
+
+  test("does not mutate the original notes array", () => {
+    const notes = [
+      createNote({}, { id: "1", title: "Zebra" }),
+      createNote({}, { id: "2", title: "Apple" }),
+    ]
+
+    sortNotes(notes, "title", "asc")
+
+    expect(notes.map((note) => note.title)).toEqual(["Zebra", "Apple"])
+  })
+
+  test("keeps the original relative order for equal sort values in either direction", () => {
+    const notes = [
+      createNote({ type: "novel" }, { id: "1", title: "First" }),
+      createNote({ type: "novel" }, { id: "2", title: "Second" }),
+      createNote({ type: "novel" }, { id: "3", title: "Third" }),
+    ]
+
+    expect(
+      sortNotes(notes, "frontmatter.type", "asc").map((note) => note.title),
+    ).toEqual(["First", "Second", "Third"])
+    expect(
+      sortNotes(notes, "frontmatter.type", "desc").map((note) => note.title),
+    ).toEqual(["First", "Second", "Third"])
   })
 })

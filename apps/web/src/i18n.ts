@@ -62,6 +62,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "notes.linkedNotes": "linked notes",
     "notes.matchedCount": "{count} matched notes",
     "notes.nameColumn": "note title",
+    "notes.sortColumn": "sort by {column}",
     "notes.markAsRead": "mark as read",
     "notes.markAsUnread": "mark as unread",
     "notes.meta": "Vault: {vault} · Directory: {directory}",
