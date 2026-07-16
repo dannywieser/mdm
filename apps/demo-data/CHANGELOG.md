@@ -1,5 +1,14 @@
 # demo-data
 
+## 1.2.1
+
+### Patch Changes
+
+- mdm-util@3.1.0
+- notes-api@3.1.0
+- habit-tracker@1.3.21
+- stats-service@1.1.16
+
 ## 1.2.0
 
 ### Minor Changes

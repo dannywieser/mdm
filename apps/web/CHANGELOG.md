@@ -1,5 +1,16 @@
 # web
 
+## 3.1.0
+
+### Minor Changes
+
+- 4781a0c: Notes summary table columns are now sortable — click a column header to sort by it, click again to reverse direction. The last sort used for a view is remembered in local storage.
+
+### Patch Changes
+
+- mdm-util@3.1.0
+- services@2.3.2
+
 ## 3.0.1
 
 ### Patch Changes
