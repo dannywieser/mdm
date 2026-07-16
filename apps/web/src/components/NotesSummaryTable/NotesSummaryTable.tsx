@@ -66,6 +66,7 @@ export const NotesSummaryTable = ({ badges = [] }: NotesSummaryTableProps) => {
           cursor="pointer"
           _hover={{ color: "app.text" }}
           {...focusRing}
+          _focusVisible={{ ...focusRing._focusVisible, outlineOffset: "-2px" }}
           onClick={() => {
             toggleSort(columnKey)
           }}
