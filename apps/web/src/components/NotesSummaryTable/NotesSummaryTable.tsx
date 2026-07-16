@@ -5,6 +5,7 @@ import { Link as RouterLink, useParams } from "react-router-dom"
 import { useNotesQuery } from "services"
 import { useI18n } from "../../i18n"
 import { useColumnSort } from "../../hooks/useColumnSort/useColumnSort"
+import { focusRing } from "../../theme/focusRing"
 
 import { AppError } from "../AppError"
 import { NoteLink } from "../NoteLink"
@@ -64,6 +65,7 @@ export const NotesSummaryTable = ({ badges = [] }: NotesSummaryTableProps) => {
           textAlign="left"
           cursor="pointer"
           _hover={{ color: "app.text" }}
+          {...focusRing}
           onClick={() => {
             toggleSort(columnKey)
           }}

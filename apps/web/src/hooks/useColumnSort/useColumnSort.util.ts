@@ -11,11 +11,11 @@ export const readStoredSort = (
 
   if (typeof window === "undefined") return fallback
 
-  const raw = window.localStorage.getItem(storageKey)
-
-  if (!raw) return fallback
-
   try {
+    const raw = window.localStorage.getItem(storageKey)
+
+    if (!raw) return fallback
+
     const parsed = JSON.parse(raw) as Partial<ColumnSortState>
 
     if (typeof parsed.sortKey === "string" && isSortDirection(parsed.direction)) {

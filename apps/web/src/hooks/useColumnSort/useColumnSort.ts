@@ -3,19 +3,15 @@ import { useCallback, useEffect, useState } from "react"
 import type { ColumnSortState, UseColumnSortOptions, UseColumnSortResult } from "./useColumnSort.types"
 import { getNextSortState, readStoredSort } from "./useColumnSort.util"
 
+// storageKey is only read once per mount — callers that need a fresh read when
+// it changes (e.g. switching views) should remount via a `key` prop.
 export const useColumnSort = ({
   storageKey,
   defaultSortKey,
 }: UseColumnSortOptions): UseColumnSortResult => {
-  const [loadedStorageKey, setLoadedStorageKey] = useState(storageKey)
   const [state, setState] = useState<ColumnSortState>(() =>
     readStoredSort(storageKey, defaultSortKey),
   )
-
-  if (storageKey !== loadedStorageKey) {
-    setLoadedStorageKey(storageKey)
-    setState(readStoredSort(storageKey, defaultSortKey))
-  }
 
   useEffect(() => {
     window.localStorage.setItem(storageKey, JSON.stringify(state))

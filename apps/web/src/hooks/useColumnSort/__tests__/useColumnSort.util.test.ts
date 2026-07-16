@@ -47,6 +47,19 @@ describe("readStoredSort", () => {
     })
   })
 
+  test("falls back to the default when localStorage.getItem throws", () => {
+    const getItemSpy = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new DOMException("blocked", "SecurityError")
+    })
+
+    expect(readStoredSort("mdm.sort.books", "title")).toEqual({
+      sortKey: "title",
+      direction: "asc",
+    })
+
+    getItemSpy.mockRestore()
+  })
+
   test("returns the default when window is undefined", () => {
     vi.stubGlobal("window", undefined)
 
