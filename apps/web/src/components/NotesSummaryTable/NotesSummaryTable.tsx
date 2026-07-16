@@ -1,8 +1,10 @@
 import { Badge, Flex, Heading, Link, Table, VStack } from "@chakra-ui/react"
+import { useMemo } from "react"
 import { Link as RouterLink, useParams } from "react-router-dom"
 
 import { useNotesQuery } from "services"
 import { useI18n } from "../../i18n"
+import { useColumnSort } from "../../hooks/useColumnSort/useColumnSort"
 
 import { AppError } from "../AppError"
 import { NoteLink } from "../NoteLink"
@@ -11,14 +13,68 @@ import type {
   NotesSummaryTableProps,
   NotesSummaryTableRouteParamKey,
 } from "./NotesSummaryTable.types"
-import { getColumnLabel, resolveBadgeValues } from "./NotesSummaryTable.util"
+import {
+  getAriaSort,
+  getColumnLabel,
+  nameColumnSortKey,
+  resolveBadgeValues,
+  sortNotes,
+} from "./NotesSummaryTable.util"
+
+const sortStorageKeyForView = (view: string | undefined): string =>
+  `mdm.notesSummaryTable.sort.${view ?? "all"}`
 
 export const NotesSummaryTable = ({ badges = [] }: NotesSummaryTableProps) => {
   const { view } = useParams<NotesSummaryTableRouteParamKey>()
   const { data, error } = useNotesQuery({ view })
   const { t } = useI18n()
+  const { sortKey, direction, toggleSort } = useColumnSort({
+    storageKey: sortStorageKeyForView(view),
+    defaultSortKey: nameColumnSortKey,
+  })
+
+  const sortedNotes = useMemo(
+    () => sortNotes(data.notes, sortKey, direction),
+    [data, sortKey, direction],
+  )
 
   if (error) return <AppError message={error.message} />
+
+  const renderColumnHeader = (columnKey: string, label: string) => {
+    const isSorted = sortKey === columnKey
+
+    return (
+      <Table.ColumnHeader
+        key={columnKey}
+        color="app.textMuted"
+        borderColor="app.border"
+        p="0"
+        aria-sort={getAriaSort(isSorted, direction)}
+      >
+        <Flex
+          as="button"
+          align="center"
+          gap="1"
+          width="100%"
+          px="4"
+          py="3"
+          color="inherit"
+          fontWeight="inherit"
+          fontSize="inherit"
+          textAlign="left"
+          cursor="pointer"
+          _hover={{ color: "app.text" }}
+          onClick={() => {
+            toggleSort(columnKey)
+          }}
+          aria-label={t("notes.sortColumn", { column: label })}
+        >
+          {label}
+          {isSorted && <span aria-hidden="true">{direction === "asc" ? "▲" : "▼"}</span>}
+        </Flex>
+      </Table.ColumnHeader>
+    )
+  }
 
   return (
     <VStack align="stretch" gap="4" p="6">
@@ -40,22 +96,12 @@ export const NotesSummaryTable = ({ badges = [] }: NotesSummaryTableProps) => {
       >
         <Table.Header bg="app.panelBackgroundHover">
           <Table.Row bg="app.panelBackgroundHover">
-            <Table.ColumnHeader color="app.textMuted" borderColor="app.border">
-              {t("notes.nameColumn")}
-            </Table.ColumnHeader>
-            {badges.map((badge) => (
-              <Table.ColumnHeader
-                key={badge}
-                color="app.textMuted"
-                borderColor="app.border"
-              >
-                {getColumnLabel(badge)}
-              </Table.ColumnHeader>
-            ))}
+            {renderColumnHeader(nameColumnSortKey, t("notes.nameColumn"))}
+            {badges.map((badge) => renderColumnHeader(badge, getColumnLabel(badge)))}
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {data.notes.map((note) => (
+          {sortedNotes.map((note) => (
             <Table.Row
               key={note.id}
               bg="app.panelBackground"
