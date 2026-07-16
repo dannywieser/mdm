@@ -1,5 +1,13 @@
 # web
 
+## 3.0.1
+
+### Patch Changes
+
+- 2f79f5a: Fix note links that bypassed demo mode: the table-of-contents sidebar/drawer, review-complete list, notes summary table, and gallery cards now redirect to the in-app note-source view instead of an unusable `obsidian://` link when running the demo, matching the existing NotesReview behavior. (The habit detail chart's date links still point at `obsidian://` in demo mode — its data has no note id to redirect with, which needs a habit-tracker API change to fix.)
+  - mdm-util@3.0.1
+  - services@2.3.1
+
 ## 3.0.0
 
 ### Major Changes
