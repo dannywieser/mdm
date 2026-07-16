@@ -1,4 +1,5 @@
 # (m)ark(d)own (m)emory
+
 Markdown Memory (mdm) is for those of us who love markdown as a way to capture our thoughts, our journals, our experiences, our memories, photos, knowledge, and everything and anything else, but also acknowledge that the act of _reviewing_ and _reflecting_ on that markdown is very different than capturing it.
 
 mdm is a self-hosted application which you point at an [Obsidian](https://obsidian.md/) vault, and it will provide RESTful API access and a web application for viewing your notes. Nothing leaves your machine — mdm reads the vault directly off disk, and everything it stores itself (per-note read/done flags, a short-lived cache of resolved image URLs) lives in its own Redis instance.
@@ -6,7 +7,8 @@ mdm is a self-hosted application which you point at an [Obsidian](https://obsidi
 mdm's core feature is fully configurable **views**, similar to Bases in Obsidian, with some power-ups to improve their interaction. A view is a name plus a set of folder/frontmatter/date filters, so the same vault can be sliced as many ways as you have use cases — no re-tagging notes, no schema to migrate. Point each view at whichever UI fits the content:
 
 - an [inbox-style review](https://demo.markdownmemory.com/notes/on-this-day) that surfaces notes one at a time and tracks what you've read,
-- a **sortable table** with badge-annotated columns, or
+- a [scrolling list of notes with ability to collapse notes as read](https://demo.markdownmemory.com/notes/ideas),
+- a [sortable table](https://demo.markdownmemory.com/notes/reading-list) with badge-annotated columns, or
 - a [gallery](https://demo.markdownmemory.com/notes/movies) — grid, or grouped by month/year — for image-heavy notes like books, journals, or photos.
 
 Wikilinks between notes resolve automatically (so a view can surface a note's linked notes too), and every note carries a deep link back into Obsidian, so you're never more than a click from editing the real thing.
@@ -40,4 +42,3 @@ To update to newer images later, re-run `docker compose pull && docker compose u
 ## Developing mdm
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for running the apps from source, the full Docker Compose reference, and contribution guidelines.
-
