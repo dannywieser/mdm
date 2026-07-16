@@ -1,4 +1,4 @@
-import { Badge, Flex, Heading, Link, Table, VStack } from "@chakra-ui/react"
+import { Badge, Flex, Heading, Link, Table, VStack, chakra } from "@chakra-ui/react"
 import { useMemo } from "react"
 import { Link as RouterLink, useParams } from "react-router-dom"
 
@@ -52,9 +52,10 @@ export const NotesSummaryTable = ({ badges = [] }: NotesSummaryTableProps) => {
         p="0"
         aria-sort={getAriaSort(isSorted, direction)}
       >
-        <Flex
-          as="button"
-          align="center"
+        <chakra.button
+          type="button"
+          display="flex"
+          alignItems="center"
           gap="1"
           width="100%"
           px="4"
@@ -74,7 +75,7 @@ export const NotesSummaryTable = ({ badges = [] }: NotesSummaryTableProps) => {
         >
           {label}
           {isSorted && <span aria-hidden="true">{direction === "asc" ? "▲" : "▼"}</span>}
-        </Flex>
+        </chakra.button>
       </Table.ColumnHeader>
     )
   }

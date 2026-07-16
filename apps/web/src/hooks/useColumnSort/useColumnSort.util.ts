@@ -28,6 +28,16 @@ export const readStoredSort = (
   return fallback
 }
 
+export const writeStoredSort = (storageKey: string, state: ColumnSortState): void => {
+  if (typeof window === "undefined") return
+
+  try {
+    window.localStorage.setItem(storageKey, JSON.stringify(state))
+  } catch {
+    // localStorage may be unavailable (quota exceeded, blocked, private browsing) — sorting still works in memory
+  }
+}
+
 export const getNextSortState = (
   current: ColumnSortState,
   key: string,

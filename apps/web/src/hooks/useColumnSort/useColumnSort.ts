@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 
 import type { ColumnSortState, UseColumnSortOptions, UseColumnSortResult } from "./useColumnSort.types"
-import { getNextSortState, readStoredSort } from "./useColumnSort.util"
+import { getNextSortState, readStoredSort, writeStoredSort } from "./useColumnSort.util"
 
 // storageKey is only read once per mount — callers that need a fresh read when
 // it changes (e.g. switching views) should remount via a `key` prop.
@@ -14,7 +14,7 @@ export const useColumnSort = ({
   )
 
   useEffect(() => {
-    window.localStorage.setItem(storageKey, JSON.stringify(state))
+    writeStoredSort(storageKey, state)
   }, [storageKey, state])
 
   const toggleSort = useCallback((key: string) => {

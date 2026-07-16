@@ -104,4 +104,19 @@ describe("sortNotes", () => {
 
     expect(notes.map((note) => note.title)).toEqual(["Zebra", "Apple"])
   })
+
+  test("keeps the original relative order for equal sort values in either direction", () => {
+    const notes = [
+      createNote({ type: "novel" }, { id: "1", title: "First" }),
+      createNote({ type: "novel" }, { id: "2", title: "Second" }),
+      createNote({ type: "novel" }, { id: "3", title: "Third" }),
+    ]
+
+    expect(
+      sortNotes(notes, "frontmatter.type", "asc").map((note) => note.title),
+    ).toEqual(["First", "Second", "Third"])
+    expect(
+      sortNotes(notes, "frontmatter.type", "desc").map((note) => note.title),
+    ).toEqual(["First", "Second", "Third"])
+  })
 })

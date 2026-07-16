@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, test, vi } from "vitest"
 
-import { getNextSortState, readStoredSort } from "../useColumnSort.util"
+import { getNextSortState, readStoredSort, writeStoredSort } from "../useColumnSort.util"
 
 afterEach(() => {
+  vi.unstubAllGlobals()
   window.localStorage.clear()
 })
 
@@ -67,8 +68,36 @@ describe("readStoredSort", () => {
       sortKey: "title",
       direction: "asc",
     })
+  })
+})
 
-    vi.unstubAllGlobals()
+describe("writeStoredSort", () => {
+  test("writes the sort state to local storage", () => {
+    writeStoredSort("mdm.sort.books", { sortKey: "folder", direction: "desc" })
+
+    expect(window.localStorage.getItem("mdm.sort.books")).toBe(
+      JSON.stringify({ sortKey: "folder", direction: "desc" }),
+    )
+  })
+
+  test("does not throw when localStorage.setItem throws", () => {
+    const setItemSpy = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("quota exceeded", "QuotaExceededError")
+    })
+
+    expect(() => {
+      writeStoredSort("mdm.sort.books", { sortKey: "folder", direction: "desc" })
+    }).not.toThrow()
+
+    setItemSpy.mockRestore()
+  })
+
+  test("does not throw when window is undefined", () => {
+    vi.stubGlobal("window", undefined)
+
+    expect(() => {
+      writeStoredSort("mdm.sort.books", { sortKey: "folder", direction: "desc" })
+    }).not.toThrow()
   })
 })
 

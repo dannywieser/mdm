@@ -39,12 +39,14 @@ export const sortNotes = (
   sortKey: string,
   direction: SortDirection,
 ): Note[] => {
-  const sorted = [...notes].sort((a, b) =>
-    getSortValue(a, sortKey).localeCompare(getSortValue(b, sortKey), undefined, {
-      sensitivity: "base",
-      numeric: true,
-    }),
-  )
+  const directionMultiplier = direction === "asc" ? 1 : -1
 
-  return direction === "asc" ? sorted : sorted.reverse()
+  return [...notes].sort(
+    (a, b) =>
+      directionMultiplier *
+      getSortValue(a, sortKey).localeCompare(getSortValue(b, sortKey), undefined, {
+        sensitivity: "base",
+        numeric: true,
+      }),
+  )
 }
