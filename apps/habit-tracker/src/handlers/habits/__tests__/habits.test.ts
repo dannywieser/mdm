@@ -1,4 +1,4 @@
-import { resolveNotesConfig } from "app-config"
+import { DEFAULT_HABIT_SCORING, resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 
 import type { HabitEntry } from "../../habit-detail/habit-detail.types"
@@ -7,9 +7,13 @@ import type { HabitSummary } from "../habits.types"
 import { scanHabitEntries } from "../../habit-detail/habit-detail.files"
 import { habitsHandler } from "../habits"
 
-vi.mock("app-config", () => ({
-  resolveNotesConfig: vi.fn(),
-}))
+vi.mock("app-config", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("app-config")>()
+  return {
+    ...actual,
+    resolveNotesConfig: vi.fn(),
+  }
+})
 
 vi.mock("markdown", async (importOriginal) => {
   const actual = await importOriginal<typeof import("markdown")>()
@@ -52,6 +56,7 @@ const HABIT_DO_MORE = {
   name: "Exercise",
   mode: "do-more" as const,
   frontmatterProperty: "exercise",
+  scoring: DEFAULT_HABIT_SCORING,
   trackingWindowDays: 30,
 }
 
@@ -60,6 +65,7 @@ const HABIT_DO_LESS = {
   name: "Stress",
   mode: "do-less" as const,
   frontmatterProperty: "stress",
+  scoring: DEFAULT_HABIT_SCORING,
   trackingWindowDays: 30,
   targetScore: 100,
 }

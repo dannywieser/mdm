@@ -1,4 +1,4 @@
-import { resolveNotesConfig } from "app-config"
+import { DEFAULT_HABIT_SCORING, resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 import { addDays } from "mdm-util"
 
@@ -23,9 +23,13 @@ import {
   getWindowEntries,
 } from "../habit-detail.util"
 
-vi.mock("app-config", () => ({
-  resolveNotesConfig: vi.fn(),
-}))
+vi.mock("app-config", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("app-config")>()
+  return {
+    ...actual,
+    resolveNotesConfig: vi.fn(),
+  }
+})
 
 vi.mock("markdown", async (importOriginal) => {
   const actual = await importOriginal<typeof import("markdown")>()
@@ -60,6 +64,8 @@ const makeEntry = (date: string, value: number): HabitEntry => ({
   obsidianUrl: `obsidian://open?vault=vault&file=${date}`,
 })
 
+const SCORING = DEFAULT_HABIT_SCORING
+
 const makeRequest = (id: string) => ({ params: { id } }) as never
 
 const makeResponse = () => {
@@ -91,6 +97,7 @@ const HABIT_DO_MORE = {
   name: "Exercise",
   mode: "do-more" as const,
   frontmatterProperty: "exercise",
+  scoring: DEFAULT_HABIT_SCORING,
   trackingWindowDays: 30,
 }
 
@@ -99,6 +106,7 @@ const HABIT_DO_LESS = {
   name: "Stress",
   mode: "do-less" as const,
   frontmatterProperty: "stress",
+  scoring: DEFAULT_HABIT_SCORING,
   trackingWindowDays: 30,
   targetScore: 100,
 }
@@ -188,12 +196,12 @@ describe("calculateConsecutiveEntryStreak (do-more streak)", () => {
       makeEntry("2025-01-09", 5),
       makeEntry("2025-01-10", 5),
     ]
-    expect(calculateConsecutiveEntryStreak(entries, "2025-01-10")).toBe(3)
+    expect(calculateConsecutiveEntryStreak(entries, "2025-01-10", SCORING.minStreakDays)).toBe(3)
   })
 
   test("returns 0 when no entry on reference date", () => {
     const entries = [makeEntry("2025-01-08", 5), makeEntry("2025-01-09", 5)]
-    expect(calculateConsecutiveEntryStreak(entries, "2025-01-10")).toBe(0)
+    expect(calculateConsecutiveEntryStreak(entries, "2025-01-10", SCORING.minStreakDays)).toBe(0)
   })
 
   test("stops counting at gap", () => {
@@ -203,7 +211,7 @@ describe("calculateConsecutiveEntryStreak (do-more streak)", () => {
       makeEntry("2025-01-09", 5),
       makeEntry("2025-01-10", 5),
     ]
-    expect(calculateConsecutiveEntryStreak(entries, "2025-01-10")).toBe(3)
+    expect(calculateConsecutiveEntryStreak(entries, "2025-01-10", SCORING.minStreakDays)).toBe(3)
   })
 
   test("returns 0 for a single entry on reference date (below minimum streak length)", () => {
@@ -211,13 +219,14 @@ describe("calculateConsecutiveEntryStreak (do-more streak)", () => {
       calculateConsecutiveEntryStreak(
         [makeEntry("2025-01-10", 5)],
         "2025-01-10",
+        SCORING.minStreakDays,
       ),
     ).toBe(0)
   })
 
   test("returns 2 once a second consecutive day is logged", () => {
     const entries = [makeEntry("2025-01-09", 5), makeEntry("2025-01-10", 5)]
-    expect(calculateConsecutiveEntryStreak(entries, "2025-01-10")).toBe(2)
+    expect(calculateConsecutiveEntryStreak(entries, "2025-01-10", SCORING.minStreakDays)).toBe(2)
   })
 
   test("ignores future entries when calculating streak", () => {
@@ -227,7 +236,7 @@ describe("calculateConsecutiveEntryStreak (do-more streak)", () => {
       makeEntry("2025-01-10", 5),
       makeEntry("2025-01-11", 5), // future
     ]
-    expect(calculateConsecutiveEntryStreak(entries, "2025-01-10")).toBe(3)
+    expect(calculateConsecutiveEntryStreak(entries, "2025-01-10", SCORING.minStreakDays)).toBe(3)
   })
 
   test("multiple entries on same day count as one streak day", () => {
@@ -236,7 +245,13 @@ describe("calculateConsecutiveEntryStreak (do-more streak)", () => {
       makeEntry("2025-01-09", 7), // duplicate date
       makeEntry("2025-01-10", 5),
     ]
-    expect(calculateConsecutiveEntryStreak(entries, "2025-01-10")).toBe(2)
+    expect(calculateConsecutiveEntryStreak(entries, "2025-01-10", SCORING.minStreakDays)).toBe(2)
+  })
+
+  test("minStreakDays of 0 removes the minimum, reporting a single logged day as a streak", () => {
+    expect(
+      calculateConsecutiveEntryStreak([makeEntry("2025-01-10", 5)], "2025-01-10", 0),
+    ).toBe(1)
   })
 })
 
@@ -275,13 +290,13 @@ describe("calculateStreak (mode dispatch)", () => {
   const entries = [makeEntry("2025-01-05", 5), makeEntry("2025-01-10", 3)]
 
   test("uses the consecutive-entry streak for do-more habits", () => {
-    expect(calculateStreak(entries, "2025-01-10", "do-more")).toBe(
-      calculateConsecutiveEntryStreak(entries, "2025-01-10"),
+    expect(calculateStreak(entries, "2025-01-10", "do-more", SCORING.minStreakDays)).toBe(
+      calculateConsecutiveEntryStreak(entries, "2025-01-10", SCORING.minStreakDays),
     )
   })
 
   test("uses the days-since-last-entry streak for do-less habits", () => {
-    expect(calculateStreak(entries, "2025-01-12", "do-less")).toBe(
+    expect(calculateStreak(entries, "2025-01-12", "do-less", SCORING.minStreakDays)).toBe(
       calculateDaysSinceLastEntry(entries, "2025-01-12"),
     )
   })
@@ -296,14 +311,14 @@ describe("calculateBaseScore", () => {
     const entries = [makeEntry("2025-01-10", 5)]
     // reference date = "2025-01-10", recentCutoff = "2024-12-27"
     // entry is recent → 5 * 10 = 50
-    expect(calculateBaseScore(entries, "2025-01-10")).toBe(50)
+    expect(calculateBaseScore(entries, "2025-01-10", SCORING)).toBe(50)
   })
 
   test("applies 1x multiplier for entries older than 14 days", () => {
     const entries = [makeEntry("2024-12-20", 5)]
     // reference date = "2025-01-10", recentCutoff = "2024-12-27"
     // entry is NOT recent → 5 * 1 = 5
-    expect(calculateBaseScore(entries, "2025-01-10")).toBe(5)
+    expect(calculateBaseScore(entries, "2025-01-10", SCORING)).toBe(5)
   })
 
   test("applies correct multipliers on boundary (14 days ago not recent)", () => {
@@ -313,8 +328,8 @@ describe("calculateBaseScore", () => {
     const refDate = "2025-01-14"
     const oldEntry = [makeEntry("2024-12-31", 5)]
     const recentEntry = [makeEntry("2025-01-01", 5)]
-    expect(calculateBaseScore(oldEntry, refDate)).toBe(50)
-    expect(calculateBaseScore(recentEntry, refDate)).toBe(50)
+    expect(calculateBaseScore(oldEntry, refDate, SCORING)).toBe(50)
+    expect(calculateBaseScore(recentEntry, refDate, SCORING)).toBe(50)
   })
 
   test("sums multiple entries with correct multipliers", () => {
@@ -325,11 +340,11 @@ describe("calculateBaseScore", () => {
       makeEntry("2025-01-07", 4), // recent → 4 * 10 = 40
       makeEntry("2025-01-20", 2), // recent → 2 * 10 = 20
     ]
-    expect(calculateBaseScore(entries, refDate)).toBe(63)
+    expect(calculateBaseScore(entries, refDate, SCORING)).toBe(63)
   })
 
   test("returns 0 for empty entries", () => {
-    expect(calculateBaseScore([], "2025-01-10")).toBe(0)
+    expect(calculateBaseScore([], "2025-01-10", SCORING)).toBe(0)
   })
 })
 
@@ -361,16 +376,16 @@ describe("calculateRecentEntryAdditions", () => {
       makeEntry("2025-01-07", 4), // recent → 4 * 9 = 36
       makeEntry("2025-01-20", 2), // recent → 2 * 9 = 18
     ]
-    expect(calculateRecentEntryAdditions(entries, refDate)).toBe(54)
+    expect(calculateRecentEntryAdditions(entries, refDate, SCORING)).toBe(54)
   })
 
   test("returns 0 when no entries are recent", () => {
     const entries = [makeEntry("2024-12-20", 5)]
-    expect(calculateRecentEntryAdditions(entries, "2025-01-10")).toBe(0)
+    expect(calculateRecentEntryAdditions(entries, "2025-01-10", SCORING)).toBe(0)
   })
 
   test("returns 0 for empty entries", () => {
-    expect(calculateRecentEntryAdditions([], "2025-01-10")).toBe(0)
+    expect(calculateRecentEntryAdditions([], "2025-01-10", SCORING)).toBe(0)
   })
 
   test("combines with raw score to equal the base score", () => {
@@ -382,8 +397,22 @@ describe("calculateRecentEntryAdditions", () => {
     ]
     expect(
       calculateRawScore(entries) +
-        calculateRecentEntryAdditions(entries, refDate),
-    ).toBe(calculateBaseScore(entries, refDate))
+        calculateRecentEntryAdditions(entries, refDate, SCORING),
+    ).toBe(calculateBaseScore(entries, refDate, SCORING))
+  })
+
+  test("recentWindowDays of 0 disables the recency bonus entirely", () => {
+    const entries = [makeEntry("2025-01-20", 4)]
+    expect(
+      calculateRecentEntryAdditions(entries, "2025-01-20", { ...SCORING, recentWindowDays: 0 }),
+    ).toBe(0)
+  })
+
+  test("recentMultiplier of 0 disables the recency bonus entirely", () => {
+    const entries = [makeEntry("2025-01-20", 4)]
+    expect(
+      calculateRecentEntryAdditions(entries, "2025-01-20", { ...SCORING, recentMultiplier: 0 }),
+    ).toBe(0)
   })
 })
 
@@ -396,7 +425,7 @@ describe("buildScoreEntries", () => {
     const refDate = "2025-01-20"
     // recentCutoff = addDays("2025-01-20", -14) = "2025-01-06"
     const entries = [makeEntry("2025-01-07", 4)]
-    expect(buildScoreEntries(entries, refDate)).toEqual([
+    expect(buildScoreEntries(entries, refDate, SCORING)).toEqual([
       {
         date: "2025-01-07",
         value: 4,
@@ -410,7 +439,7 @@ describe("buildScoreEntries", () => {
     const refDate = "2025-01-20"
     // recentCutoff = addDays("2025-01-20", -14) = "2025-01-06"
     const entries = [makeEntry("2025-01-05", 3)]
-    expect(buildScoreEntries(entries, refDate)).toEqual([
+    expect(buildScoreEntries(entries, refDate, SCORING)).toEqual([
       {
         date: "2025-01-05",
         value: 3,
@@ -427,7 +456,7 @@ describe("buildScoreEntries", () => {
       makeEntry("2025-01-20", 2),
       makeEntry("2025-01-07", 4),
     ]
-    expect(buildScoreEntries(entries, refDate).map((e) => e.date)).toEqual([
+    expect(buildScoreEntries(entries, refDate, SCORING).map((e) => e.date)).toEqual([
       "2025-01-20",
       "2025-01-07",
       "2025-01-05",
@@ -435,7 +464,14 @@ describe("buildScoreEntries", () => {
   })
 
   test("returns an empty array for no entries", () => {
-    expect(buildScoreEntries([], "2025-01-20")).toHaveLength(0)
+    expect(buildScoreEntries([], "2025-01-20", SCORING)).toHaveLength(0)
+  })
+
+  test("never tags a recency multiplier when the recency bonus is disabled", () => {
+    const entries = [makeEntry("2025-01-20", 4)]
+    expect(
+      buildScoreEntries(entries, "2025-01-20", { ...SCORING, recentWindowDays: 0 })[0]?.recentMultiplier,
+    ).toBeUndefined()
   })
 })
 
@@ -463,7 +499,7 @@ describe("calculateHabitScore", () => {
       streakMultiplier,
       dayMultiplier,
       recentEntryAdditions,
-    } = calculateHabitScore(entries, refDate, 30, "do-more")
+    } = calculateHabitScore(entries, refDate, 30, "do-more", SCORING)
     // rawScore = 5 * 10 = 50 (no recency multiplier)
     // recentEntryAdditions = 5 * (10 * 9) = 450 (all recent → +9x each)
     // scoreBeforeMultipliers = rawScore + recentEntryAdditions = 50 + 450 = 500
@@ -490,7 +526,7 @@ describe("calculateHabitScore", () => {
       makeEntry("2025-01-05", 10), // most recent entry, 5 days before refDate
     ]
     const { habitScore, streak, streakMultiplier, dayMultiplier } =
-      calculateHabitScore(entries, refDate, 30, "do-less")
+      calculateHabitScore(entries, refDate, 30, "do-less", SCORING)
     // baseScore = 5 * 10 * 10 = 500 (all within the recent 14-day window)
     // streak = days since last entry (2025-01-05 → 2025-01-10) = 5 → streakMultiplier (do-less, negative) = -0.025
     // uniqueWindowDays = 5 → dayMultiplier (always positive) = 0.025
@@ -504,7 +540,7 @@ describe("calculateHabitScore", () => {
   test("do-less: a fresh entry on the reference date resets the streak to 0", () => {
     const refDate = "2025-01-10"
     const entries = [makeEntry("2025-01-05", 10), makeEntry("2025-01-10", 10)]
-    const { streak } = calculateHabitScore(entries, refDate, 30, "do-less")
+    const { streak } = calculateHabitScore(entries, refDate, 30, "do-less", SCORING)
     expect(streak).toBe(0)
   })
 
@@ -516,7 +552,7 @@ describe("calculateHabitScore", () => {
       rawScore,
       scoreBeforeMultipliers,
       recentEntryAdditions,
-    } = calculateHabitScore([], "2025-01-10", 30, "do-more")
+    } = calculateHabitScore([], "2025-01-10", 30, "do-more", SCORING)
     expect(habitScore).toBe(0)
     expect(streak).toBe(0)
     expect(uniqueWindowDays).toBe(0)
@@ -526,7 +562,7 @@ describe("calculateHabitScore", () => {
   })
 
   test("windowStart begins the trackingWindowDays-day window ending on referenceDate", () => {
-    const { windowStart } = calculateHabitScore([], "2025-03-31", 90, "do-more")
+    const { windowStart } = calculateHabitScore([], "2025-03-31", 90, "do-more", SCORING)
     expect(windowStart).toBe("2025-01-01")
   })
 
@@ -542,6 +578,7 @@ describe("calculateHabitScore", () => {
       refDate,
       30,
       "do-more",
+      SCORING,
     )
     // windowStart = addDays("2025-01-31", -30) = "2025-01-01"
     // recentCutoff = addDays("2025-01-31", -14) = "2025-01-17"
@@ -569,6 +606,7 @@ describe("calculateHabitScore", () => {
       refDate,
       30,
       "do-more",
+      SCORING,
     )
     expect(streak).toBe(10)
     expect(habitScore).toBe(111)
@@ -587,9 +625,35 @@ describe("calculateHabitScore", () => {
       refDate,
       30,
       "do-less",
+      SCORING,
     )
     expect(streak).toBe(10)
     expect(habitScore).toBe(Math.floor(10 * (1 + 0.005) * (1 - 0.055)))
+  })
+
+  test("a fully-zeroed scoring config ('simple' habit) reduces the score to a plain sum of entry values", () => {
+    const simpleScoring = {
+      baseBonusRate: 0,
+      bonusRateIncrement: 0,
+      bonusTierSize: 0,
+      minStreakDays: 0,
+      recentMultiplier: 0,
+      recentWindowDays: 0,
+    }
+    const refDate = "2025-01-10"
+    const entries = [
+      makeEntry("2025-01-01", 3),
+      makeEntry("2025-01-05", 4),
+      makeEntry("2025-01-10", 2),
+    ]
+    const { habitScore, rawScore, recentEntryAdditions, dayMultiplier, streakMultiplier } =
+      calculateHabitScore(entries, refDate, 30, "do-more", simpleScoring)
+
+    expect(rawScore).toBe(9)
+    expect(recentEntryAdditions).toBe(0)
+    expect(dayMultiplier).toBe(0)
+    expect(streakMultiplier).toBe(0)
+    expect(habitScore).toBe(9)
   })
 })
 
@@ -600,7 +664,7 @@ describe("calculateHabitScore", () => {
 describe("buildHistory", () => {
   test("returns one entry for every day from the first entry through the reference date", () => {
     const entries = [makeEntry("2025-01-01", 5), makeEntry("2025-01-03", 7)]
-    const history = buildHistory(entries, 30, "do-more", "2025-01-05")
+    const history = buildHistory(entries, 30, "do-more", "2025-01-05", SCORING)
     expect(history.map((h) => h.date)).toEqual([
       "2025-01-01",
       "2025-01-02",
@@ -612,7 +676,7 @@ describe("buildHistory", () => {
 
   test("days with no logged entry have a value of 0", () => {
     const entries = [makeEntry("2025-01-01", 5), makeEntry("2025-01-03", 7)]
-    const history = buildHistory(entries, 30, "do-more", "2025-01-05")
+    const history = buildHistory(entries, 30, "do-more", "2025-01-05", SCORING)
     expect(history.map((h) => h.value)).toEqual([5, 0, 7, 0, 0])
   })
 
@@ -621,7 +685,7 @@ describe("buildHistory", () => {
       makeEntry("2025-01-01", 3),
       makeEntry("2025-01-01", 7), // same date
     ]
-    const history = buildHistory(entries, 30, "do-more", "2025-01-01")
+    const history = buildHistory(entries, 30, "do-more", "2025-01-01", SCORING)
     expect(history).toHaveLength(1)
     expect(history[0]?.date).toBe("2025-01-01")
     expect(history[0]?.value).toBe(10)
@@ -630,8 +694,8 @@ describe("buildHistory", () => {
   test("includes a point-in-time score breakdown for each day", () => {
     const refDate = "2025-01-01"
     const entries = [makeEntry(refDate, 10)]
-    const history = buildHistory(entries, 30, "do-more", refDate)
-    const expected = calculateHabitScore(entries, refDate, 30, "do-more")
+    const history = buildHistory(entries, 30, "do-more", refDate, SCORING)
+    const expected = calculateHabitScore(entries, refDate, 30, "do-more", SCORING)
 
     expect(history[0]?.habitScore).toBe(expected.habitScore)
     expect(history[0]?.streak).toBe(expected.streak)
@@ -650,7 +714,7 @@ describe("buildHistory", () => {
       makeEntry("2025-01-02", 7),
       makeEntry("2025-01-04", 3),
     ]
-    const history = buildHistory(entries, 30, "do-more", "2025-01-05")
+    const history = buildHistory(entries, 30, "do-more", "2025-01-05", SCORING)
     // 01-01: single day so far → below minimum streak length → 0
     // 01-02: two consecutive days → streak 2
     // 01-03: no entry → 0
@@ -661,7 +725,7 @@ describe("buildHistory", () => {
 
   test("do-less streak counts days since the last entry and resets to 0 on logged days", () => {
     const entries = [makeEntry("2025-01-01", 5), makeEntry("2025-01-03", 7)]
-    const history = buildHistory(entries, 30, "do-less", "2025-01-05")
+    const history = buildHistory(entries, 30, "do-less", "2025-01-05", SCORING)
     // 01-01: entry → 0; 01-02: 1 day since; 01-03: entry → 0; 01-04: 1; 01-05: 2
     expect(history.map((h) => h.streak)).toEqual([0, 1, 0, 1, 2])
   })
@@ -672,7 +736,7 @@ describe("buildHistory", () => {
       makeEntry("2025-01-05", 5),
       makeEntry("2025-01-10", 5),
     ]
-    const history = buildHistory(entries, 30, "do-more", "2025-01-10")
+    const history = buildHistory(entries, 30, "do-more", "2025-01-10", SCORING)
 
     // At 2025-01-01: only one entry in window → windowEntries=1
     expect(history[0]?.windowEntries).toBe(1)
@@ -682,7 +746,7 @@ describe("buildHistory", () => {
   })
 
   test("returns empty array for no entries", () => {
-    expect(buildHistory([], 30, "do-more", "2025-01-10")).toHaveLength(0)
+    expect(buildHistory([], 30, "do-more", "2025-01-10", SCORING)).toHaveLength(0)
   })
 })
 
@@ -909,11 +973,11 @@ describe("calculateLowestDaysTrackedPerPeriod", () => {
 
 describe("buildTieredBreakdown", () => {
   test("returns empty array for count 0", () => {
-    expect(buildTieredBreakdown(0, 100)).toEqual([])
+    expect(buildTieredBreakdown(0, 100, SCORING)).toEqual([])
   })
 
   test("returns one tier for count ≤ 5", () => {
-    const tiers = buildTieredBreakdown(5, 100)
+    const tiers = buildTieredBreakdown(5, 100, SCORING)
 
     expect(tiers).toHaveLength(1)
     expect(tiers[0]).toMatchObject({ startDay: 1, endDay: 5, rate: 0.005, days: 5 })
@@ -921,7 +985,7 @@ describe("buildTieredBreakdown", () => {
   })
 
   test("returns two tiers with escalating rates for count 10", () => {
-    const tiers = buildTieredBreakdown(10, 100)
+    const tiers = buildTieredBreakdown(10, 100, SCORING)
 
     expect(tiers).toHaveLength(2)
     expect(tiers[0]).toMatchObject({ startDay: 1, endDay: 5, rate: 0.005, days: 5 })
@@ -929,11 +993,21 @@ describe("buildTieredBreakdown", () => {
   })
 
   test("last tier is partial when count is not a multiple of 5", () => {
-    const tiers = buildTieredBreakdown(12, 100)
+    const tiers = buildTieredBreakdown(12, 100, SCORING)
 
     expect(tiers).toHaveLength(3)
     expect(tiers[2]).toMatchObject({ startDay: 11, endDay: 12, rate: 0.007, days: 2 })
     expect(tiers[2]?.amount).toBeCloseTo(100 * 2 * 0.007)
+  })
+
+  test("returns no tiers when bonusTierSize is 0", () => {
+    expect(buildTieredBreakdown(10, 100, { ...SCORING, bonusTierSize: 0 })).toEqual([])
+  })
+
+  test("returns no tiers when baseBonusRate and bonusRateIncrement are both 0", () => {
+    expect(
+      buildTieredBreakdown(10, 100, { ...SCORING, baseBonusRate: 0, bonusRateIncrement: 0 }),
+    ).toEqual([])
   })
 })
 
@@ -943,20 +1017,20 @@ describe("buildTieredBreakdown", () => {
 
 describe("buildScoreBreakdown", () => {
   test("entryScores matches scoreBeforeMultipliers", () => {
-    const result = buildScoreBreakdown(500, 0.025, 0.025, 5, 5)
+    const result = buildScoreBreakdown(500, 0.025, 0.025, 5, 5, SCORING)
 
     expect(result.entryScores).toBe(500)
   })
 
   test("days tiers are derived from uniqueWindowDays", () => {
-    const result = buildScoreBreakdown(500, 0.025, 0.025, 5, 5)
+    const result = buildScoreBreakdown(500, 0.025, 0.025, 5, 5, SCORING)
 
     expect(result.daysTiers).toHaveLength(1)
     expect(result.daysTiers[0]).toMatchObject({ startDay: 1, endDay: 5, rate: 0.005, days: 5 })
   })
 
   test("streak tier amounts are negated for do-less (negative streakMultiplier)", () => {
-    const result = buildScoreBreakdown(500, 0.025, -0.025, 5, 5)
+    const result = buildScoreBreakdown(500, 0.025, -0.025, 5, 5, SCORING)
 
     for (const tier of result.streakTiers) {
       expect(tier.amount).toBeLessThan(0)
@@ -966,14 +1040,14 @@ describe("buildScoreBreakdown", () => {
   test("streak tiers are computed on the post-day-bonus base", () => {
     const base = 100
     const dayMult = 0.025
-    const result = buildScoreBreakdown(base, dayMult, 0.025, 5, 5)
+    const result = buildScoreBreakdown(base, dayMult, 0.025, 5, 5, SCORING)
     const afterDay = base * (1 + dayMult)
 
     expect(result.streakTiers[0]?.amount).toBeCloseTo(afterDay * 5 * 0.005)
   })
 
   test("returns empty tier arrays when counts are zero", () => {
-    const result = buildScoreBreakdown(0, 0, 0, 0, 0)
+    const result = buildScoreBreakdown(0, 0, 0, 0, 0, SCORING)
 
     expect(result.daysTiers).toHaveLength(0)
     expect(result.streakTiers).toHaveLength(0)
@@ -1011,6 +1085,7 @@ describe("year-long dataset (2025)", () => {
       90,
       "do-more",
       YEAR_REFERENCE_DATE,
+      SCORING,
     )
     const sortedDates = [...YEAR_ENTRIES]
       .map((e) => e.date)
@@ -1034,6 +1109,7 @@ describe("year-long dataset (2025)", () => {
       90,
       "do-more",
       YEAR_REFERENCE_DATE,
+      SCORING,
     )
     const loggedDates = new Set(YEAR_ENTRIES.map((e) => e.date))
     const unloggedDay = history.find((h) => !loggedDates.has(h.date))
@@ -1046,6 +1122,7 @@ describe("year-long dataset (2025)", () => {
       90,
       "do-more",
       YEAR_REFERENCE_DATE,
+      SCORING,
     )
     for (let i = 1; i < history.length; i++) {
       expect(history[i].date).toBe(addDays(history[i - 1].date, 1))
@@ -1058,6 +1135,7 @@ describe("year-long dataset (2025)", () => {
       90,
       "do-more",
       YEAR_REFERENCE_DATE,
+      SCORING,
     )
     const allTimeHigh = history.reduce(
       (max, h) => Math.max(max, h.habitScore),
@@ -1098,6 +1176,7 @@ describe("year-long dataset (2025)", () => {
       90,
       "do-more",
       YEAR_REFERENCE_DATE,
+      SCORING,
     )
     const score30 = history[29]?.habitScore ?? 0
     const score60 = history[59]?.habitScore ?? 0
@@ -1110,12 +1189,14 @@ describe("year-long dataset (2025)", () => {
       90,
       "do-more",
       YEAR_REFERENCE_DATE,
+      SCORING,
     )
     const historyLess = buildHistory(
       YEAR_ENTRIES,
       90,
       "do-less",
       YEAR_REFERENCE_DATE,
+      SCORING,
     )
     // Compare at a mid-year entry where window is full
     const midIdx = Math.floor(historyMore.length / 2)
@@ -1131,6 +1212,7 @@ describe("year-long dataset (2025)", () => {
       windowDays,
       "do-more",
       YEAR_REFERENCE_DATE,
+      SCORING,
     )
     for (const h of history) {
       expect(h.windowEntries).toBeLessThanOrEqual(windowDays)
@@ -1144,6 +1226,7 @@ describe("year-long dataset (2025)", () => {
       windowDays,
       "do-more",
       YEAR_REFERENCE_DATE,
+      SCORING,
     )
     for (const h of history) {
       expect(h.windowStart).toBe(addDays(h.date, -(windowDays - 1)))
@@ -1156,6 +1239,7 @@ describe("year-long dataset (2025)", () => {
       90,
       "do-more",
       YEAR_REFERENCE_DATE,
+      SCORING,
     )
     for (const h of history) {
       expect(h.habitScore).toBeGreaterThanOrEqual(0)
@@ -1169,6 +1253,7 @@ describe("year-long dataset (2025)", () => {
       refDate,
       90,
       "do-more",
+      SCORING,
     )
     // With 90-day window ending Dec 30, all entries in the window are counted
     expect(uniqueWindowDays).toBeGreaterThan(0)
@@ -1186,6 +1271,7 @@ describe("year-long dataset (2025)", () => {
       90,
       "do-more",
       YEAR_REFERENCE_DATE,
+      SCORING,
     )
     const allTimeHigh = history.reduce(
       (max, h) => Math.max(max, h.habitScore),

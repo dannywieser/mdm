@@ -3,6 +3,7 @@ import path from "node:path"
 
 import type { ResolvedNotesConfig } from "./types"
 
+import { DEFAULT_HABIT_SCORING } from "./habits/habitScoring"
 import { readAppConfigFile } from "./readAppConfigFile"
 import { validateAppConfig } from "./validateAppConfig/validateAppConfig"
 
@@ -12,10 +13,13 @@ export type {
   ExcludeViewFilter,
   HabitConfig,
   HabitMode,
+  HabitScoringConfig,
   NotesView,
   ResolvedNotesConfig,
   ViewFilter,
 } from "./types"
+
+export { DEFAULT_HABIT_SCORING }
 
 export { readAppConfigFile } from "./readAppConfigFile"
 

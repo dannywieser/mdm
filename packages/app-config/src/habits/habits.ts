@@ -1,8 +1,10 @@
 import { isNonEmptyString } from "mdm-util"
 
-import type { HabitConfig } from "../types"
+import type { HabitConfig, HabitScoringConfig } from "../types"
 
-const isHabitConfig = (value: unknown): value is HabitConfig => {
+import { isValidHabitScoringInput, resolveHabitScoring } from "./habitScoring"
+
+const isHabitConfigShape = (value: unknown): value is Record<string, unknown> => {
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
     return false
   }
@@ -16,17 +18,21 @@ const isHabitConfig = (value: unknown): value is HabitConfig => {
     Number.isInteger(obj.trackingWindowDays) &&
     obj.trackingWindowDays > 0 &&
     (obj.targetScore === undefined ||
-      (typeof obj.targetScore === "number" && obj.targetScore > 0))
+      (typeof obj.targetScore === "number" && obj.targetScore > 0)) &&
+    (obj.scoring === undefined || isValidHabitScoringInput(obj.scoring))
   )
 }
 
 const HABITS_ERROR =
-  "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), a positive integer trackingWindowDays, and an optional positive targetScore"
+  "app.config.json habits must be an array of objects with non-empty id, name, frontmatterProperty, mode (\"do-more\" or \"do-less\"), a positive integer trackingWindowDays, an optional positive targetScore, and an optional scoring object of non-negative numeric overrides"
 
 export const validateHabits = (value: unknown): HabitConfig[] => {
   if (value === undefined) return []
-  if (!Array.isArray(value) || !value.every(isHabitConfig)) {
+  if (!Array.isArray(value) || !value.every(isHabitConfigShape)) {
     throw new Error(HABITS_ERROR)
   }
-  return value
+  return value.map((raw) => ({
+    ...(raw as Omit<HabitConfig, "scoring">),
+    scoring: resolveHabitScoring(raw.scoring as Partial<HabitScoringConfig> | undefined),
+  }))
 }

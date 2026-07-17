@@ -50,8 +50,8 @@ export const scanHabitEntries = async (
       }
 
       const numValue = parseFloat(cleanedValue)
-      if (numValue < 1 || numValue > 10) {
-        logger.debug({ basename, frontmatterProperty, rawValue }, "[habit] skipping: value out of 1-10 range")
+      if (numValue < 1) {
+        logger.debug({ basename, frontmatterProperty, rawValue }, "[habit] skipping: value below minimum of 1")
         return null
       }
 
