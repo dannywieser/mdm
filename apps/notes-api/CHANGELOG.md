@@ -1,5 +1,15 @@
 # notes-api
 
+## 3.2.0
+
+### Patch Changes
+
+- Updated dependencies [f1b9b9a]
+  - app-config@3.2.0
+  - services@2.3.3
+  - markdown@3.2.0
+  - mdm-util@3.2.0
+
 ## 3.1.0
 
 ### Patch Changes

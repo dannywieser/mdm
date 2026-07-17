@@ -1,5 +1,14 @@
 # flag-manager
 
+## 1.1.22
+
+### Patch Changes
+
+- Updated dependencies [f1b9b9a]
+  - app-config@3.2.0
+  - services@2.3.3
+  - mdm-util@3.2.0
+
 ## 1.1.21
 
 ### Patch Changes
