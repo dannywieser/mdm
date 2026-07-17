@@ -1,3 +1,7 @@
+import type { HabitScoringConfig } from "./habits/habitScoring.types"
+
+export type { HabitScoringConfig } from "./habits/habitScoring.types"
+
 export type HabitMode = "do-more" | "do-less"
 
 export interface HabitConfig {
@@ -5,6 +9,7 @@ export interface HabitConfig {
   id: string
   mode: HabitMode
   name: string
+  scoring: HabitScoringConfig
   targetScore?: number
   trackingWindowDays: number
 }

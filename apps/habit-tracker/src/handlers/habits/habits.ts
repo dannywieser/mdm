@@ -22,13 +22,14 @@ export const habitsHandler: RequestHandler = async (_request, response) => {
     const today = new Date().toLocaleDateString("en-CA", { timeZone: timezone })
 
     const summaries: HabitSummary[] = await Promise.all(
-      habits.map(async ({ id, name, mode, frontmatterProperty, targetScore, trackingWindowDays }) => {
+      habits.map(async ({ id, name, mode, frontmatterProperty, scoring, targetScore, trackingWindowDays }) => {
         const entries = await scanHabitEntries(filePaths, frontmatterProperty)
         const { habitScore, streak, uniqueWindowDays } = calculateHabitScore(
           entries,
           today,
           trackingWindowDays,
           mode,
+          scoring,
         )
 
         return {

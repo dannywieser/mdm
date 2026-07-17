@@ -83,16 +83,30 @@ describe("scanHabitEntries", () => {
     expect(entries).toEqual([])
   })
 
-  test("skips notes where the configured property is out of the 1-10 range", async () => {
-    readFileMock.mockResolvedValue("---\ndrinking: \"15\"\n---\nbody")
+  test("skips notes where the configured property is below the minimum of 1", async () => {
+    readFileMock.mockResolvedValue("---\ndrinking: \"0\"\n---\nbody")
     parseFrontMatterMock.mockReturnValue({
       body: "body",
-      frontmatter: { created: "2026.05.31", drinking: '"15"' },
+      frontmatter: { created: "2026.05.31", drinking: '"0"' },
     })
 
-    const entries = await scanHabitEntries(["/notes/out-of-range.md"], "drinking")
+    const entries = await scanHabitEntries(["/notes/below-minimum.md"], "drinking")
 
     expect(entries).toEqual([])
+  })
+
+  test("accepts values above 10, for habits tracking unbounded quantities like a dollar amount", async () => {
+    readFileMock.mockResolvedValue("---\nspending: \"80\"\n---\nbody")
+    parseFrontMatterMock.mockReturnValue({
+      body: "body",
+      frontmatter: { created: "2026.05.31", spending: '"80"' },
+    })
+
+    const entries = await scanHabitEntries(["/notes/2026.05.31.md"], "spending")
+
+    expect(entries).toEqual([
+      { date: "2026-05-31", value: 80, obsidianUrl: "obsidian://open?vault=vault&file=2026.05.31" },
+    ])
   })
 
   test("skips notes whose date cannot be resolved from frontmatter or title", async () => {

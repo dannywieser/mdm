@@ -26,7 +26,7 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
       return
     }
 
-    const { id, name, mode, frontmatterProperty, targetScore, trackingWindowDays } = habitConfig
+    const { id, name, mode, frontmatterProperty, scoring, targetScore, trackingWindowDays } = habitConfig
 
     logger.debug({
       frontmatterProperty,
@@ -53,12 +53,12 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
       streakMultiplier,
       dayMultiplier,
       recentEntryAdditions,
-    } = calculateHabitScore(entries, today, trackingWindowDays, mode)
+    } = calculateHabitScore(entries, today, trackingWindowDays, mode, scoring)
 
-    const history = buildHistory(entries, trackingWindowDays, mode, today)
+    const history = buildHistory(entries, trackingWindowDays, mode, today, scoring)
     const streaks = buildStreaks(entries, mode)
-    const scoreEntries = buildScoreEntries(getWindowEntries(entries, today, trackingWindowDays), today)
-    const scoreBreakdown = buildScoreBreakdown(scoreBeforeMultipliers, dayMultiplier, streakMultiplier, uniqueWindowDays, streak)
+    const scoreEntries = buildScoreEntries(getWindowEntries(entries, today, trackingWindowDays), today, scoring)
+    const scoreBreakdown = buildScoreBreakdown(scoreBeforeMultipliers, dayMultiplier, streakMultiplier, uniqueWindowDays, streak, scoring)
 
     const allTimeHighScore = history.reduce((max, h) => Math.max(max, h.habitScore), 0)
     const allTimeHighStreak = streaks.reduce((max, s) => Math.max(max, s.length), 0)
