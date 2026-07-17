@@ -1,5 +1,12 @@
 # web
 
+## 3.2.0
+
+### Patch Changes
+
+- services@2.3.3
+- mdm-util@3.2.0
+
 ## 3.1.0
 
 ### Minor Changes

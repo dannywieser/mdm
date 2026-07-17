@@ -1,5 +1,21 @@
 # habit-tracker
 
+## 1.4.0
+
+### Minor Changes
+
+- f1b9b9a: Habit scoring is now configurable per-habit via an optional `scoring` object in `app.config.json` (`recentWindowDays`, `recentMultiplier`, `bonusTierSize`, `baseBonusRate`, `bonusRateIncrement`, `minStreakDays`), defaulting to the previous hardcoded values. Setting a field to `0` disables the bonus/penalty it controls — setting every field to `0` reduces a habit to a plain sum of its entry values with a streak and no score bonuses, and the `scoreBreakdown` tiers are omitted entirely when the day/streak bonus is disabled.
+
+  Habit entries also no longer require a frontmatter value of 10 or less — the upper bound is removed so a habit can track an unbounded quantity like a dollar amount (a value below 1 is still rejected).
+
+### Patch Changes
+
+- Updated dependencies [f1b9b9a]
+  - app-config@3.2.0
+  - services@2.3.3
+  - markdown@3.2.0
+  - mdm-util@3.2.0
+
 ## 1.3.21
 
 ### Patch Changes
