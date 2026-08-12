@@ -1,6 +1,7 @@
 import type { ScannedNote } from "markdown"
 
 import { BEAR_NOTES_HASH_KEY } from "markdown"
+import { toLoggableError } from "mdm-util"
 
 import type { NoteSource, NotesRedisClient } from "./sources.types"
 
@@ -30,7 +31,10 @@ const parseScannedNote = (id: string, raw: string | undefined): ScannedNote | nu
   try {
     return JSON.parse(raw) as ScannedNote
   } catch (error) {
-    logger.error({ error, id }, "[notes] failed to parse note from redis, skipping")
+    logger.error(
+      { error: toLoggableError(error), id },
+      "[notes] failed to parse note from redis, skipping",
+    )
     return null
   }
 }

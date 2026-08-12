@@ -46,14 +46,49 @@ describe("validateSyncPayload", () => {
 
   test("throws when upserts is missing", () => {
     expect(() => validateSyncPayload({ deletedIds: [] })).toThrow(
-      "upserts must be an array of notes with a non-empty id",
+      "upserts must be an array of valid ScannedNote objects",
     )
   })
 
   test("throws when an upsert entry has no id", () => {
     expect(() =>
       validateSyncPayload({ deletedIds: [], upserts: [{ title: "no id" }] }),
-    ).toThrow("upserts must be an array of notes with a non-empty id")
+    ).toThrow("upserts must be an array of valid ScannedNote objects")
+  })
+
+  test("throws when an upsert entry is missing fullText", () => {
+    const note = createScannedNote() as Partial<ScannedNote>
+    delete note.fullText
+
+    expect(() => validateSyncPayload({ deletedIds: [], upserts: [note] })).toThrow(
+      "upserts must be an array of valid ScannedNote objects",
+    )
+  })
+
+  test("throws when an upsert entry is missing title", () => {
+    const note = createScannedNote() as Partial<ScannedNote>
+    delete note.title
+
+    expect(() => validateSyncPayload({ deletedIds: [], upserts: [note] })).toThrow(
+      "upserts must be an array of valid ScannedNote objects",
+    )
+  })
+
+  test("throws when an upsert entry's dates is not an array of strings", () => {
+    const note = { ...createScannedNote(), dates: ["ok", 1] }
+
+    expect(() => validateSyncPayload({ deletedIds: [], upserts: [note] })).toThrow(
+      "upserts must be an array of valid ScannedNote objects",
+    )
+  })
+
+  test("accepts an upsert entry with a null createdDate and frontmatter", () => {
+    const note = createScannedNote({ createdDate: null, frontmatter: null })
+
+    expect(validateSyncPayload({ deletedIds: [], upserts: [note] })).toEqual({
+      deletedIds: [],
+      upserts: [note],
+    })
   })
 
   test("throws when deletedIds is missing", () => {

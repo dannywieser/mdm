@@ -79,7 +79,7 @@ describe("createSyncHandler", () => {
 
     expect(response.status).toBe(400)
     expect(response.body).toEqual({
-      error: "upserts must be an array of notes with a non-empty id",
+      error: "upserts must be an array of valid ScannedNote objects",
     })
     expect(redisClient.hSet).not.toHaveBeenCalled()
   })

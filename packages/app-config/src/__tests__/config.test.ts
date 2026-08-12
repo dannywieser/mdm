@@ -272,6 +272,21 @@ describe("config", () => {
     )
   })
 
+  test("does not require NOTES_ROOT when notesSource is bear", async () => {
+    delete process.env.NOTES_ROOT
+    mockReadFile.mockResolvedValue(
+      JSON.stringify({
+        notesSource: "bear",
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      notesDirectory: "",
+      notesSource: "bear",
+    })
+  })
+
   test("resolves configured habits", async () => {
     mockReadFile.mockResolvedValue(
       JSON.stringify({
