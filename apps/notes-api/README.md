@@ -33,7 +33,7 @@ Express-based Node service with request logging via `pino-http`.
           "id": "welcome",
           "folder": "notes",
           "title": "Welcome",
-          "tags": ["personal/daily"],
+          "tags": ["personal", "daily", "personal/daily"],
           "fullText": "# Welcome\n\nHello world. #personal/daily",
           "obsidianUrl": "obsidian://open?vault=vault-name&file=welcome",
           "frontmatter": {
@@ -57,7 +57,7 @@ Express-based Node service with request logging via `pino-http`.
     }
     ```
   - Every note's raw body text is scanned for image references (standard `![alt](path)` markdown and Obsidian `![[path]]` embeds), and every image found is resolved and added to `frontmatter.images` as an array, in the order they appear in the note — this is always derived from the body scan and isn't configurable. Notes without frontmatter and without any images return `"frontmatter": null`; notes with images but no other frontmatter return `"frontmatter": { "images": [...] }`. `linkedNotes` (parsed notes referenced via `[[wikilink]]` syntax in the body) is only present on notes that link to others; unmatched wikilinks are left in the body as plain text
-  - Every note's raw body text is also scanned for inline hashtags — `#foo/bar` (`/` nests) or Bear's closing-hash `#multi word tag#` form for tags containing spaces — and every tag found (without the `#`) is added to a top-level `tags` array, deduplicated, in document order; this is separate from and unrelated to any `frontmatter.tags` a note's frontmatter block might define. `tags` is a plain string array like `dates`, so it can be used as-is in a view's `filters` (for example `{"tags": "personal/daily"}`) or `badges`. In `content`, each inline hashtag is replaced with a `{"type": "tag", "value": "foo/bar"}` node in place of plain text, the same way matched wikilinks become `link` nodes
+  - Every note's raw body text is also scanned for inline hashtags — `#foo/bar` (`/` nests) or Bear's closing-hash `#multi word tag#` form for tags containing spaces — and every tag found (without the `#`) is added to a top-level `tags` array, deduplicated, in document order; this is separate from and unrelated to any `frontmatter.tags` a note's frontmatter block might define. A nested tag like `#foo/bar` is expanded into its individual segments (`"foo"`, `"bar"`) in addition to the full tag (`"foo/bar"`), so a view filter can match on either a specific leaf or any level of the hierarchy. `tags` is a plain string array like `dates`, so it can be used as-is in a view's `filters` (for example `{"tags": "personal/daily"}`, or `{"tags": "personal"}` to match every note tagged anywhere under `personal/*`) or `badges`. In `content`, each inline hashtag is replaced with a single `{"type": "tag", "value": "foo/bar"}` node holding the full, unsplit tag — the segment expansion only applies to the `tags` array, not to how a tag renders inline — in place of plain text, the same way matched wikilinks become `link` nodes
   - Error responses: `500`
     ```json
     {

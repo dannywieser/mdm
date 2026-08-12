@@ -11,8 +11,22 @@ describe("extractTags", () => {
     expect(extractTags("Went for a run today #fitness")).toEqual(["fitness"])
   })
 
-  test("extracts a nested tag", () => {
-    expect(extractTags("Journal entry #personal/daily")).toEqual(["personal/daily"])
+  test("expands a nested tag into its segments plus the full tag", () => {
+    expect(extractTags("Journal entry #personal/daily")).toEqual(["personal", "daily", "personal/daily"])
+  })
+
+  test("expands a deeply nested tag into every segment plus the full tag", () => {
+    expect(extractTags("#work/project/mdm")).toEqual(["work", "project", "mdm", "work/project/mdm"])
+  })
+
+  test("deduplicates a segment shared across different nested tags", () => {
+    expect(extractTags("#personal/daily and #personal/weekly")).toEqual([
+      "personal",
+      "daily",
+      "personal/daily",
+      "weekly",
+      "personal/weekly",
+    ])
   })
 
   test("extracts a Bear-style multi-word closed tag", () => {

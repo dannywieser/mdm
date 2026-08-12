@@ -306,7 +306,7 @@ This is a note.`)
 
     const note = await scanMarkdownFile("/notes/journal/note.md")
 
-    expect(note.tags).toEqual(["personal/daily", "reflection"])
+    expect(note.tags).toEqual(["personal", "daily", "personal/daily", "reflection"])
   })
 
   test("scanMarkdownFile sets images even when there is no frontmatter at all", async () => {

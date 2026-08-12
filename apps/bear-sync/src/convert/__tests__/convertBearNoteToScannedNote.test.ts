@@ -74,7 +74,7 @@ describe("convertBearNoteToScannedNote", () => {
 
     const note = convertBearNoteToScannedNote(row, [])
 
-    expect(note.tags).toEqual(["personal/daily", "reflection"])
+    expect(note.tags).toEqual(["personal", "daily", "personal/daily", "reflection"])
   })
 
   test("extracts dates found in the note body using the configured formats", () => {
