@@ -86,6 +86,7 @@ const BASE_CONFIG = {
   dateFormats: ["YYYY.MM.DD"],
   deriveTitleDate: false,
   notesDirectory: "/notes",
+  notesSource: "obsidian" as const,
   obsidianVault: "vault",
   timezone: "UTC",
   attachmentsDirectory: "/images",

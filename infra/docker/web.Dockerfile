@@ -1,12 +1,22 @@
+FROM node:24.12.0-alpine3.22 AS pruner
+
+WORKDIR /app
+
+RUN npm install -g turbo@2.9.16
+
+COPY . .
+RUN turbo prune web --docker
+
 FROM node:24.12.0-alpine3.22 AS build
 
 WORKDIR /app
 
-COPY package.json package-lock.json turbo.json tsconfig.base.json ./
-COPY apps ./apps
-COPY packages ./packages
-
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/package-lock.json ./package-lock.json
 RUN npm ci
+
+COPY --from=pruner /app/out/full/ .
+COPY tsconfig.base.json ./tsconfig.base.json
 RUN npm run build --workspace web
 
 FROM nginx:1.29.3-alpine3.22

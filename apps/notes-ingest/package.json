@@ -1,0 +1,25 @@
+{
+  "name": "notes-ingest",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "main": "dist/server.js",
+  "scripts": {
+    "prebuild": "turbo run build --filter=notes-ingest^...",
+    "predev": "turbo run build --filter=notes-ingest^...",
+    "pretest": "turbo run build --filter=notes-ingest^...",
+    "dev": "tsx watch --env-file=../../.env src/server.ts | pino-pretty",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "express": "5.2.1",
+    "markdown": "3.2.0",
+    "mdm-logger": "1.0.0",
+    "mdm-util": "3.2.0",
+    "pino-http": "11.0.0",
+    "redis": "5.10.0"
+  }
+}

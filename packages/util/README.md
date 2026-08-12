@@ -11,7 +11,7 @@ import { addDays, buildDateRange, daysBetween, getDateWindowStart, formatDate, g
 Two additional subpath exports isolate dependencies that don't belong in every consumer's bundle:
 
 - `mdm-util/node` — Node-only helpers (`countFilesByExtension`, `assertDirectoryReadable`, `startServer`), kept out of the default entry point so it's safe to import `mdm-util` from browser code (`apps/web`). `startServer` wraps `app.listen(...)` with SIGTERM/SIGINT graceful shutdown (drain in-flight requests, run an optional cleanup callback, force-exit after a timeout) shared by all 5 backend services.
-- `mdm-util/redis` — `createRedisClient`, a thin wrapper around the `redis` client exposing the `connect`/`disconnect`/`get`/`set`/`on`/`ping` surface shared by `apps/flag-manager` and `apps/image-server`'s caches. `ping` is used by `flag-manager`'s `/health` endpoint to verify Redis is actually reachable; `disconnect` is called during graceful shutdown.
+- `mdm-util/redis` — `createRedisClient`, a thin wrapper around the `redis` client exposing the `connect`/`disconnect`/`get`/`set`/`hSet`/`hGetAll`/`hDel`/`on`/`ping` surface shared by `apps/flag-manager` and `apps/image-server`'s caches, and by `notes-api`/`notes-ingest`'s Bear note source (hash operations, since notes are stored one Redis hash keyed by note ID rather than individual keys). `ping` is used by `flag-manager`'s and `notes-ingest`'s `/health` endpoints to verify Redis is actually reachable; `disconnect` is called during graceful shutdown.
 
 ## Structure
 
@@ -23,5 +23,5 @@ Two additional subpath exports isolate dependencies that don't belong in every c
 - `ids/` — `createFileID`, a deterministic UUIDv5 for a file path within a namespace.
 - `file-system/` — `normalizeFilePathForId` (used by `createFileID`), `countFilesByExtension`, and `assertDirectoryReadable` (the latter two exposed via the `./node` subpath).
 - `logging/` — `toLoggableError`, normalizes thrown values into a loggable shape for pino-backed loggers.
-- `redis/` — `createRedisClient` (exposed via the `./redis` subpath).
+- `redis/` — `createRedisClient` (exposed via the `./redis` subpath), including `hSet`/`hGetAll`/`hDel` hash operations.
 - `server/` — `startServer` (exposed via the `./node` subpath).

@@ -107,6 +107,7 @@ describe("config", () => {
       dateFormats: ["YYYY.MM.DD", "YY/MM/DD"],
       habits: [],
       notesDirectory: path.resolve("/notes-root"),
+      notesSource: "obsidian",
       obsidianVault: "vault",
       timezone: "UTC",
       views: [
@@ -145,6 +146,7 @@ describe("config", () => {
       dateFormats: [],
       habits: [],
       notesDirectory: path.resolve("/notes-root"),
+      notesSource: "obsidian",
       obsidianVault: "vault",
       timezone: "UTC",
       views: [],
@@ -212,6 +214,24 @@ describe("config", () => {
     })
   })
 
+  test("defaults notesSource to obsidian when omitted", async () => {
+    mockReadFile.mockResolvedValue(JSON.stringify({ obsidianVault: "vault" }))
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      notesSource: "obsidian",
+    })
+  })
+
+  test("resolves configured notesSource", async () => {
+    mockReadFile.mockResolvedValue(
+      JSON.stringify({ obsidianVault: "vault", notesSource: "bear" }),
+    )
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      notesSource: "bear",
+    })
+  })
+
   test("throws when config file is missing", async () => {
     const err = Object.assign(new Error("ENOENT"), { code: "ENOENT" })
     mockReadFile.mockRejectedValue(err)
@@ -250,6 +270,21 @@ describe("config", () => {
     await expect(resolveNotesConfig()).rejects.toEqual(
       new Error("NOTES_ROOT environment variable is required"),
     )
+  })
+
+  test("does not require NOTES_ROOT when notesSource is bear", async () => {
+    delete process.env.NOTES_ROOT
+    mockReadFile.mockResolvedValue(
+      JSON.stringify({
+        notesSource: "bear",
+        obsidianVault: "vault",
+      }),
+    )
+
+    await expect(resolveNotesConfig()).resolves.toMatchObject({
+      notesDirectory: "",
+      notesSource: "bear",
+    })
   })
 
   test("resolves configured habits", async () => {

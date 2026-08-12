@@ -1,6 +1,6 @@
-import type { Note } from "markdown"
+import type { ScannedNote } from "markdown"
 
-export type ScannedNote = Omit<Note, "content">
+export type { ScannedNote }
 
 export interface WikilinkReplacement {
   displayText: string

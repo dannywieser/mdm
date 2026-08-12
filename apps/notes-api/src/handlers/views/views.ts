@@ -2,11 +2,11 @@ import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler } from "express"
 
 import { resolveNotesConfig } from "app-config"
-import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 
 import { logger } from "../../logger"
-import { scanMarkdownFile } from "../notes/notes.scan"
+import { getNotesRedisClient } from "../notes/sources/notesRedisClient"
+import { resolveNoteSource } from "../notes/sources/resolveNoteSource"
 import { buildViews } from "./views.util"
 
 export const viewsHandler: RequestHandler = async (_request, response) => {
@@ -14,12 +14,7 @@ export const viewsHandler: RequestHandler = async (_request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { notesDirectory } = notesConfig
-
-    const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted((a, b) => a.localeCompare(b))
-    const scannedNotes = await Promise.all(
-      markdownFiles.map((filePath) => scanMarkdownFile(filePath)),
-    )
+    const scannedNotes = await resolveNoteSource(notesConfig, getNotesRedisClient()).listNotes()
 
     response.status(200).json({
       views: await buildViews(scannedNotes),

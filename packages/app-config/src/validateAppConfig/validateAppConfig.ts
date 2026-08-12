@@ -1,9 +1,11 @@
 import { isNonEmptyString, isStringArray, isValidTimezone } from "mdm-util"
 
-import type { AppConfig } from "../types"
+import type { AppConfig, NotesSource } from "../types"
 
 import { validateHabits } from "../habits/habits"
 import { validateViews } from "../views/views"
+
+const NOTES_SOURCES: NotesSource[] = ["bear", "obsidian"]
 
 const validateObsidianVault = (value: unknown): string => {
   if (!isNonEmptyString(value)) {
@@ -36,6 +38,16 @@ const validateAttachmentsDirectory = (value: unknown): string | undefined => {
   return value
 }
 
+const validateNotesSource = (value: unknown): NotesSource | undefined => {
+  if (value === undefined) return undefined
+  if (typeof value !== "string" || !NOTES_SOURCES.includes(value as NotesSource)) {
+    throw new Error(
+      `app.config.json notesSource must be one of: ${NOTES_SOURCES.join(", ")}`,
+    )
+  }
+  return value as NotesSource
+}
+
 export const validateAppConfig = (raw: unknown): AppConfig => {
   if (!raw || typeof raw !== "object") {
     throw new Error("app.config.json must be a JSON object")
@@ -49,6 +61,7 @@ export const validateAppConfig = (raw: unknown): AppConfig => {
   const timezone = validateTimezone(config.timezone)
   const habits = validateHabits(config.habits)
   const views = validateViews(config.views)
+  const notesSource = validateNotesSource(config.notesSource)
 
-  return { attachmentsDirectory, dateFormats, habits, obsidianVault, timezone, views }
+  return { attachmentsDirectory, dateFormats, habits, notesSource, obsidianVault, timezone, views }
 }

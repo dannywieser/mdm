@@ -1,4 +1,5 @@
 import type { ExcludeViewFilter, ViewFilter } from "app-config"
+import type { DateComponents } from "mdm-util"
 
 import { resolveNotesConfig } from "app-config"
 import {
@@ -13,6 +14,35 @@ import { MISSING, ON_THIS_DAY, TODAY } from "./constants"
 
 interface FilterableNote {
   basename: string
+}
+
+/**
+ * Parses one entry of a date array field. Tries the configured dateFormats
+ * first (dates embedded in note text, e.g. "2026.05.26"), then falls back
+ * to native Date/ISO parsing (e.g. a note's modifiedDate/creationDate) —
+ * both kinds of value can appear side by side in a note's `dates` array.
+ */
+const parseArrayDateEntry = (
+  entry: unknown,
+  context: ViewFilterContext,
+): DateComponents | null => {
+  if (typeof entry !== "string") {
+    return null
+  }
+
+  const formatMatch = parseDateFromFormats(entry, context.dateFormats)
+
+  if (formatMatch) {
+    return formatMatch
+  }
+
+  const isoDate = new Date(entry)
+
+  if (isNaN(isoDate.getTime())) {
+    return null
+  }
+
+  return getDateComponents(isoDate, context.timezone)
 }
 
 const matchesOnThisDay = (
@@ -35,11 +65,7 @@ const matchesOnThisDay = (
 
   if (Array.isArray(noteValue)) {
     return (noteValue as unknown[]).some((entry) => {
-      if (typeof entry !== "string") {
-        return false
-      }
-
-      const parsed = parseDateFromFormats(entry, context.dateFormats)
+      const parsed = parseArrayDateEntry(entry, context)
 
       if (!parsed) {
         return false
@@ -76,11 +102,7 @@ const matchesToday = (
 
   if (Array.isArray(noteValue)) {
     return (noteValue as unknown[]).some((entry) => {
-      if (typeof entry !== "string") {
-        return false
-      }
-
-      const parsed = parseDateFromFormats(entry, context.dateFormats)
+      const parsed = parseArrayDateEntry(entry, context)
 
       if (!parsed) {
         return false

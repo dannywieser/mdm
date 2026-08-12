@@ -1,9 +1,8 @@
 import type { MarkdownNode, Note, NoteFrontmatter } from "markdown"
 
 import { resolveNotesConfig } from "app-config"
-import { extractImagePaths, parseFrontMatter } from "markdown"
+import { extractImagePaths } from "markdown"
 import { isExternalUrl } from "mdm-util"
-import { promises as fs } from "node:fs"
 import path from "node:path"
 import remark from "remark"
 import remarkGfm from "remark-gfm"
@@ -25,12 +24,10 @@ export const parseMarkdownFile = async (
   allNotes: ScannedNote[] = [],
 ): Promise<Note> => {
   const { attachmentsDirectory, notesDirectory } = await resolveNotesConfig()
-  const source = await fs.readFile(note.fullPath, "utf8")
-  const { body } = parseFrontMatter(source)
   const relativePath = path.relative(notesDirectory, note.fullPath)
   const normalizedRelativePath = relativePath.split(path.sep).join("/")
 
-  const { processedBody, linkedNoteRefs, replacements } = resolveWikilinks(body, allNotes)
+  const { processedBody, linkedNoteRefs, replacements } = resolveWikilinks(note.fullText, allNotes)
 
   const content = buildMarkdownTree(
     processedBody,

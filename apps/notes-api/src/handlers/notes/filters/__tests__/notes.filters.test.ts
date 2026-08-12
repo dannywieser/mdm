@@ -372,6 +372,63 @@ describe("notes filter helpers", () => {
       ])
     })
 
+    test("falls back to native Date parsing for a dates array entry that isn't format-matched (e.g. modifiedDate/creationDate)", async () => {
+      const notes = [
+        createMockNote("has-iso-match.md", {
+          dates: ["2024-05-27T08:00:00.000Z"],
+        }),
+        createMockNote("no-match.md", {
+          dates: ["2024-05-26T08:00:00.000Z"],
+        }),
+      ]
+
+      resolveNotesConfigMock.mockResolvedValue({
+        ...defaultConfig,
+        dateFormats: ["YYYY.MM.DD"],
+        views: [
+          {
+            component: "NotesList",
+            filters: [{ dates: "$onThisDay" }],
+            id: "memories",
+            name: "memories",
+          },
+        ],
+      })
+
+      getDateComponentsMock
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2024 })
+        .mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+        .mockReturnValueOnce({ day: 26, month: 5, year: 2024 })
+
+      const filtered = await applyViewFilter(notes, "memories")
+
+      expect(filtered).toEqual([notes[0]])
+    })
+
+    test("skips a dates array entry that matches neither the configured format nor a valid Date", async () => {
+      const notes = [createMockNote("garbage.md", { dates: ["not-a-date"] })]
+
+      resolveNotesConfigMock.mockResolvedValue({
+        ...defaultConfig,
+        dateFormats: ["YYYY.MM.DD"],
+        views: [
+          {
+            component: "NotesList",
+            filters: [{ dates: "$onThisDay" }],
+            id: "memories",
+            name: "memories",
+          },
+        ],
+      })
+
+      getDateComponentsMock.mockReturnValueOnce({ day: 27, month: 5, year: 2026 })
+
+      const filtered = await applyViewFilter(notes, "memories")
+
+      expect(filtered).toEqual([])
+    })
+
     test("applies the configured timezone when determining today's date", async () => {
       const notes = [
         createMockNote("may-26.md", {
@@ -508,6 +565,40 @@ describe("notes filter helpers", () => {
           year: parseInt(match[1], 10),
         }
       })
+
+      const filtered = await applyViewFilter(notes, "today")
+
+      expect(filtered).toEqual([notes[0]])
+    })
+
+    test("falls back to native Date parsing for a dates array entry that isn't format-matched", async () => {
+      const notes = [
+        createMockNote("today-iso.md", {
+          dates: ["2026-06-01T08:00:00.000Z"],
+        }),
+        createMockNote("yesterday-iso.md", {
+          dates: ["2026-05-31T08:00:00.000Z"],
+        }),
+      ]
+
+      resolveNotesConfigMock.mockResolvedValue({
+        ...defaultConfig,
+        dateFormats: ["YYYY.MM.DD"],
+        views: [
+          {
+            component: "NotesReview",
+            filters: [{ dates: "$today" }],
+            id: "today",
+            name: "Today",
+          },
+        ],
+      })
+
+      getDateComponentsMock
+        .mockReturnValueOnce({ day: 1, month: 6, year: 2026 })
+        .mockReturnValueOnce({ day: 1, month: 6, year: 2026 })
+        .mockReturnValueOnce({ day: 1, month: 6, year: 2026 })
+        .mockReturnValueOnce({ day: 31, month: 5, year: 2026 })
 
       const filtered = await applyViewFilter(notes, "today")
 

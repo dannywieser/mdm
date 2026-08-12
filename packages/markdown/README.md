@@ -1,13 +1,17 @@
 # markdown
 
-Low-level parsing utilities for Obsidian-flavored markdown notes: YAML-ish frontmatter parsing, date extraction from note text, and vault file collection. Owns the `Note` type used across the codebase. Depends only on `mdm-util`.
+Low-level parsing utilities for Obsidian-flavored markdown notes: YAML-ish frontmatter parsing, date extraction from note text, and vault file collection. Owns the `Note` type used across the codebase, and the `ScannedNote`/`NoteSyncPayload` shapes shared between `notes-api`, `notes-ingest`, and `bear-sync` for the Bear note source. Depends only on `mdm-util`.
 
 ## Usage
 
 ```ts
-import { collectMarkdownFiles, parseFrontMatter, parseMarkdownBodyDates, extractNoteDates, resolveDateFromFrontmatterOrTitle, resolveOldestDate, buildObsidianUrl, parseDateString, extractImagePaths } from "markdown"
-import type { Note, NoteFrontmatter, MarkdownNode } from "markdown"
+import { collectMarkdownFiles, parseFrontMatter, parseMarkdownBodyDates, extractNoteDates, resolveDateFromFrontmatterOrTitle, resolveOldestDate, buildObsidianUrl, parseDateString, extractImagePaths, BEAR_NOTES_HASH_KEY } from "markdown"
+import type { Note, NoteFrontmatter, MarkdownNode, ScannedNote, NoteSyncPayload } from "markdown"
 ```
+
+- `ScannedNote` (`Omit<Note, "content">`) is a note with frontmatter/dates/metadata parsed but before the expensive markdown AST parse + wikilink resolution step — the shape both the Obsidian file-scan path and the Bear sync path produce.
+- `NoteSyncPayload` (`{ upserts: ScannedNote[], deletedIds: string[] }`) is the request body `notes-ingest`'s `POST /notes/sync` accepts.
+- `BEAR_NOTES_HASH_KEY` is the Redis hash key `notes-ingest` writes Bear-sourced notes to and `notes-api`'s Bear note source reads from — kept here as the one shared constant so the two services can't drift on it independently.
 
 ## Structure
 
@@ -20,4 +24,5 @@ import type { Note, NoteFrontmatter, MarkdownNode } from "markdown"
 - `dates/extractNoteDates.ts` — extracts every date found across a note's title and full raw source (frontmatter + body) in one pass, deduplicated.
 - `dates/resolveDateFromFrontmatterOrTitle.ts` — resolves a note's date from a configured frontmatter property, falling back to a date embedded in the title.
 - `dates/resolveOldestDate.ts` — resolves the earliest of a list of date strings, parsing each against the configured formats and then as ISO 8601.
-- `types.ts` — `Note`, `NoteFrontmatter`, `FrontmatterValue`, `MarkdownNode`, `ParsedFrontMatter`, `ParsedDate`.
+- `types.ts` — `Note`, `NoteFrontmatter`, `FrontmatterValue`, `MarkdownNode`, `ParsedFrontMatter`, `ParsedDate`, `ScannedNote`, `NoteSyncPayload`.
+- `noteSync.ts` — `BEAR_NOTES_HASH_KEY`.

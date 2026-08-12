@@ -93,7 +93,10 @@ Express-based Node service with request logging via `pino-http`.
 
 Configured via `app.config.json` at the repository root plus the `NOTES_ROOT` environment variable (see `CONTRIBUTING.md` for the full config shape). Fields used by this service:
 
-- `NOTES_ROOT` (environment variable, required): absolute path to your notes root directory. Resolution fails with `"NOTES_ROOT environment variable is required"` if unset.
+- `notesSource` (optional, `"obsidian"` or `"bear"`, defaults to `"obsidian"`): selects where `GET /notes` and `GET /views` read notes from.
+  - `"obsidian"` (default): scans `NOTES_ROOT` on disk, as described below. `NOTES_ROOT`, `obsidianVault`, `attachmentsDirectory`, and `dateFormats` apply.
+  - `"bear"`: reads notes from Redis instead — the `notes:bear` hash that `notes-ingest` populates from `bear-sync` pushes (see `apps/bear-sync/README.md` and `apps/notes-ingest/README.md`). `NOTES_ROOT`/`obsidianVault`/`attachmentsDirectory` are unused in this mode. `REDIS_URL` (environment variable, default `redis://localhost:6379`) configures the connection; the service fails to start if Redis is unreachable when `notesSource` is `"bear"`. Attachments/images are out of scope for the Bear path for now — Bear-sourced notes sync as text/frontmatter only.
+- `NOTES_ROOT` (environment variable, required when `notesSource` is `"obsidian"`): absolute path to your notes root directory. Resolution fails with `"NOTES_ROOT environment variable is required"` if unset.
 - `dateFormats`: array of expected date patterns to extract from note bodies, such as `["YYYY.MM.DD", "YY/MM/DD"]`.
 - `obsidianVault`: vault folder name, used to build each note's `obsidianUrl` deep link.
 - `attachmentsDirectory` (optional): folder name (relative to `NOTES_ROOT`) where Obsidian stores attachments; used to resolve bare-filename images in note bodies to the `/images?path=...` proxy.

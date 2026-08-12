@@ -33,6 +33,20 @@ export interface Note {
   title: string
 }
 
+/**
+ * A note with its frontmatter/dates/metadata parsed, but before the
+ * expensive markdown AST parse + wikilink resolution step. Shared between
+ * note sources (file scan, Bear sync ingest) and the handlers that turn a
+ * ScannedNote into a full Note on demand.
+ */
+export type ScannedNote = Omit<Note, "content">
+
+/** Request body accepted by the notes-ingest sync endpoint. */
+export interface NoteSyncPayload {
+  deletedIds: string[]
+  upserts: ScannedNote[]
+}
+
 export interface ParsedFrontMatter {
   body: string
   frontmatter: NoteFrontmatter | null

@@ -1,10 +1,7 @@
 import type { MarkdownNode } from "markdown"
-import type { Mock } from "vitest"
 
 import { resolveNotesConfig } from "app-config"
 import { createMockNotesConfig } from "app-config/testing"
-import { parseFrontMatter } from "markdown"
-import { promises as fs } from "node:fs"
 
 import type { ScannedNote } from "../notes.types"
 
@@ -14,19 +11,7 @@ vi.mock("app-config", () => ({
   resolveNotesConfig: vi.fn(),
 }))
 
-vi.mock("node:fs", () => ({
-  promises: {
-    readFile: vi.fn(),
-  },
-}))
-
-vi.mock("markdown", () => ({
-  parseFrontMatter: vi.fn(),
-}))
-
 const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
-const readFileMock = fs.readFile as Mock
-const parseFrontMatterMock = vi.mocked(parseFrontMatter)
 
 const defaultConfig = createMockNotesConfig()
 
@@ -36,11 +21,9 @@ describe("notes parse helpers", () => {
   })
 
   test("parseMarkdownFile preserves task list state in markdown node tree", async () => {
-    const body = "- [x] Done\n- [ ] Todo\n"
-    readFileMock.mockResolvedValue(body)
-    parseFrontMatterMock.mockReturnValue({ body, frontmatter: null })
-
-    const note = await parseMarkdownFile(createScannedNote())
+    const note = await parseMarkdownFile(
+      createScannedNote({ fullText: "- [x] Done\n- [ ] Todo\n" }),
+    )
 
     const taskItems = findNodesByType(note.content, "listItem")
     expect(taskItems).toHaveLength(2)
@@ -48,16 +31,11 @@ describe("notes parse helpers", () => {
   })
 
   test("parseMarkdownFile returns a markdown node tree with scanned note metadata", async () => {
-    readFileMock.mockResolvedValue("# Welcome\n\nThis is a note.")
-    parseFrontMatterMock.mockReturnValue({
-      body: "# Welcome\n\nThis is a note.",
-      frontmatter: null,
-    })
-
     const note = await parseMarkdownFile(
       createScannedNote({
         basename: "welcome.md",
         fullPath: "/notes/topic/welcome.md",
+        fullText: "# Welcome\n\nThis is a note.",
         title: "welcome",
       }),
     )
@@ -74,21 +52,15 @@ describe("notes parse helpers", () => {
     expect(extractNodeText(heading)).toBe("Welcome")
     expect(extractNodeText(paragraph)).toBe("This is a note.")
     expect(note.linkedNotes).toEqual([])
-    expect(readFileMock).toHaveBeenCalledWith("/notes/topic/welcome.md", "utf8")
   })
 
   test("parseMarkdownFile rewrites bare-filename images to obsidian attachment path in subfolder note", async () => {
-    readFileMock.mockResolvedValue("![](attach-20260525090751252.jpg)")
-    parseFrontMatterMock.mockReturnValue({
-      body: "![](attach-20260525090751252.jpg)",
-      frontmatter: null,
-    })
-
     const note = await parseMarkdownFile(
       createScannedNote({
         basename: "file-name.md",
         folder: "folder",
         fullPath: "/notes/folder/file-name.md",
+        fullText: "![](attach-20260525090751252.jpg)",
         title: "file-name",
       }),
     )
@@ -100,17 +72,12 @@ describe("notes parse helpers", () => {
   })
 
   test("parseMarkdownFile rewrites bare-filename images to obsidian attachment path in root note", async () => {
-    readFileMock.mockResolvedValue("![](attach-123.jpg)")
-    parseFrontMatterMock.mockReturnValue({
-      body: "![](attach-123.jpg)",
-      frontmatter: null,
-    })
-
     const note = await parseMarkdownFile(
       createScannedNote({
         basename: "root-note.md",
         folder: "notes",
         fullPath: "/notes/root-note.md",
+        fullText: "![](attach-123.jpg)",
         title: "root-note",
       }),
     )
@@ -120,17 +87,12 @@ describe("notes parse helpers", () => {
   })
 
   test("parseMarkdownFile rewrites obsidian wikilink image embeds to attachment path", async () => {
-    readFileMock.mockResolvedValue("![[attach-20260523155741791.jpg]]")
-    parseFrontMatterMock.mockReturnValue({
-      body: "![[attach-20260523155741791.jpg]]",
-      frontmatter: null,
-    })
-
     const note = await parseMarkdownFile(
       createScannedNote({
         basename: "file-name.md",
         folder: "folder",
         fullPath: "/notes/folder/file-name.md",
+        fullText: "![[attach-20260523155741791.jpg]]",
         title: "file-name",
       }),
     )
@@ -142,17 +104,12 @@ describe("notes parse helpers", () => {
   })
 
   test("parseMarkdownFile strips pipe alias from obsidian wikilink image embeds", async () => {
-    readFileMock.mockResolvedValue("![[attach-20260523155741791.jpg|200]]")
-    parseFrontMatterMock.mockReturnValue({
-      body: "![[attach-20260523155741791.jpg|200]]",
-      frontmatter: null,
-    })
-
     const note = await parseMarkdownFile(
       createScannedNote({
         basename: "root-note.md",
         folder: "notes",
         fullPath: "/notes/root-note.md",
+        fullText: "![[attach-20260523155741791.jpg|200]]",
         title: "root-note",
       }),
     )
@@ -164,17 +121,10 @@ describe("notes parse helpers", () => {
   })
 
   test("parseMarkdownFile rewrites multiple obsidian wikilink image embeds in a single note", async () => {
-    readFileMock.mockResolvedValue(
-      "First ![[photo-a.jpg]] and second ![[photo-b.jpg|300]]",
-    )
-    parseFrontMatterMock.mockReturnValue({
-      body: "First ![[photo-a.jpg]] and second ![[photo-b.jpg|300]]",
-      frontmatter: null,
-    })
-
     const note = await parseMarkdownFile(
       createScannedNote({
         fullPath: "/notes/folder/note.md",
+        fullText: "First ![[photo-a.jpg]] and second ![[photo-b.jpg|300]]",
       }),
     )
 
@@ -187,17 +137,13 @@ describe("notes parse helpers", () => {
 
   test("parseMarkdownFile prepends attachmentsDirectory to bare-filename images", async () => {
     resolveNotesConfigMock.mockResolvedValue({ ...defaultConfig, attachmentsDirectory: "attachments" })
-    readFileMock.mockResolvedValue("![](attach-20260525090751252.jpg)")
-    parseFrontMatterMock.mockReturnValue({
-      body: "![](attach-20260525090751252.jpg)",
-      frontmatter: null,
-    })
 
     const note = await parseMarkdownFile(
       createScannedNote({
         basename: "file-name.md",
         folder: "folder",
         fullPath: "/notes/folder/file-name.md",
+        fullText: "![](attach-20260525090751252.jpg)",
         title: "file-name",
       }),
     )
@@ -209,17 +155,12 @@ describe("notes parse helpers", () => {
   })
 
   test("parseMarkdownFile rewrites relative markdown images to image server urls", async () => {
-    readFileMock.mockResolvedValue("![Screenshot](./assets/home%20page.png)")
-    parseFrontMatterMock.mockReturnValue({
-      body: "![Screenshot](./assets/home%20page.png)",
-      frontmatter: null,
-    })
-
     const note = await parseMarkdownFile(
       createScannedNote({
         basename: "journal.md",
         folder: "daily",
         fullPath: "/notes/daily/journal.md",
+        fullText: "![Screenshot](./assets/home%20page.png)",
         title: "journal",
       }),
     )
@@ -229,17 +170,12 @@ describe("notes parse helpers", () => {
   })
 
   test("parseMarkdownFile passes through markdown image url that already has directory components", async () => {
-    readFileMock.mockResolvedValue("![Cover](attachments/daily/journal/cover.jpg)")
-    parseFrontMatterMock.mockReturnValue({
-      body: "![Cover](attachments/daily/journal/cover.jpg)",
-      frontmatter: null,
-    })
-
     const note = await parseMarkdownFile(
       createScannedNote({
         basename: "journal.md",
         folder: "daily",
         fullPath: "/notes/daily/journal.md",
+        fullText: "![Cover](attachments/daily/journal/cover.jpg)",
         title: "journal",
       }),
     )
@@ -249,17 +185,12 @@ describe("notes parse helpers", () => {
   })
 
   test("parseMarkdownFile keeps external markdown image urls unchanged", async () => {
-    readFileMock.mockResolvedValue("![Screenshot](https://example.com/image.png)")
-    parseFrontMatterMock.mockReturnValue({
-      body: "![Screenshot](https://example.com/image.png)",
-      frontmatter: null,
-    })
-
     const note = await parseMarkdownFile(
       createScannedNote({
         basename: "journal.md",
         folder: "daily",
         fullPath: "/notes/daily/journal.md",
+        fullText: "![Screenshot](https://example.com/image.png)",
         title: "journal",
       }),
     )
@@ -269,14 +200,11 @@ describe("notes parse helpers", () => {
   })
 
   test("parseMarkdownFile replaces unmatched wikilink with unmatched wikilink text node", async () => {
-    readFileMock.mockResolvedValue("See [[Missing Note]] for details.")
-    parseFrontMatterMock.mockReturnValue({
-      body: "See [[Missing Note]] for details.",
-      frontmatter: null,
-    })
-
     const note = await parseMarkdownFile(
-      createScannedNote({ fullPath: "/notes/topic/note.md" }),
+      createScannedNote({
+        fullPath: "/notes/topic/note.md",
+        fullText: "See [[Missing Note]] for details.",
+      }),
       [],
     )
 
@@ -291,19 +219,17 @@ describe("notes parse helpers", () => {
     const linkedScannedNote = createScannedNote({
       basename: "other-note.md",
       fullPath: "/notes/topic/other-note.md",
+      fullText: "# Other Note content",
       id: "other-note",
       obsidianUrl: "obsidian://open?vault=vault&file=topic%2Fother-note",
       title: "other-note",
     })
-    readFileMock
-      .mockResolvedValueOnce("See [[other-note]] here.")
-      .mockResolvedValueOnce("# Other Note content")
-    parseFrontMatterMock
-      .mockReturnValueOnce({ body: "See [[other-note]] here.", frontmatter: null })
-      .mockReturnValueOnce({ body: "# Other Note content", frontmatter: null })
 
     const note = await parseMarkdownFile(
-      createScannedNote({ fullPath: "/notes/topic/note.md" }),
+      createScannedNote({
+        fullPath: "/notes/topic/note.md",
+        fullText: "See [[other-note]] here.",
+      }),
       [linkedScannedNote],
     )
 
@@ -324,22 +250,17 @@ describe("notes parse helpers", () => {
     const linkedScannedNote = createScannedNote({
       basename: "other-note.md",
       fullPath: "/notes/topic/other-note.md",
+      fullText: "# Other Note content",
       id: "other-note",
       obsidianUrl: "obsidian://open?vault=vault&file=topic%2Fother-note",
       title: "other-note",
     })
-    readFileMock
-      .mockResolvedValueOnce("See [[other-note|the linked note]] here.")
-      .mockResolvedValueOnce("# Other Note content")
-    parseFrontMatterMock
-      .mockReturnValueOnce({
-        body: "See [[other-note|the linked note]] here.",
-        frontmatter: null,
-      })
-      .mockReturnValueOnce({ body: "# Other Note content", frontmatter: null })
 
     const note = await parseMarkdownFile(
-      createScannedNote({ fullPath: "/notes/topic/note.md" }),
+      createScannedNote({
+        fullPath: "/notes/topic/note.md",
+        fullText: "See [[other-note|the linked note]] here.",
+      }),
       [linkedScannedNote],
     )
 
@@ -351,22 +272,17 @@ describe("notes parse helpers", () => {
     const linkedScannedNote = createScannedNote({
       basename: "other-note.md",
       fullPath: "/notes/topic/other-note.md",
+      fullText: "# Other Note content",
       id: "other-note",
       obsidianUrl: "obsidian://open?vault=vault&file=topic%2Fother-note",
       title: "other-note",
     })
-    readFileMock
-      .mockResolvedValueOnce("See [[other-note]] and [[other-note]] again.")
-      .mockResolvedValueOnce("# Other Note content")
-    parseFrontMatterMock
-      .mockReturnValueOnce({
-        body: "See [[other-note]] and [[other-note]] again.",
-        frontmatter: null,
-      })
-      .mockReturnValueOnce({ body: "# Other Note content", frontmatter: null })
 
     const note = await parseMarkdownFile(
-      createScannedNote({ fullPath: "/notes/topic/note.md" }),
+      createScannedNote({
+        fullPath: "/notes/topic/note.md",
+        fullText: "See [[other-note]] and [[other-note]] again.",
+      }),
       [linkedScannedNote],
     )
 
@@ -384,22 +300,17 @@ describe("notes parse helpers", () => {
     const linkedNote = createScannedNote({
       basename: "linked-note.md",
       fullPath: "/notes/topic/linked-note.md",
+      fullText: "Linked note body with [[deep-note]] inside.",
       id: "linked-note",
       obsidianUrl: "obsidian://open?vault=vault&file=topic%2Flinked-note",
       title: "linked-note",
     })
-    readFileMock
-      .mockResolvedValueOnce("See [[linked-note]] here.")
-      .mockResolvedValueOnce("Linked note body with [[deep-note]] inside.")
-    parseFrontMatterMock
-      .mockReturnValueOnce({ body: "See [[linked-note]] here.", frontmatter: null })
-      .mockReturnValueOnce({
-        body: "Linked note body with [[deep-note]] inside.",
-        frontmatter: null,
-      })
 
     const note = await parseMarkdownFile(
-      createScannedNote({ fullPath: "/notes/topic/note.md" }),
+      createScannedNote({
+        fullPath: "/notes/topic/note.md",
+        fullText: "See [[linked-note]] here.",
+      }),
       [linkedNote, deepNote],
     )
 

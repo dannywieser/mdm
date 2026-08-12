@@ -25,15 +25,36 @@ services:
     build:
       context: .
       dockerfile: infra/docker/notes-api.Dockerfile
+    depends_on:
+      - redis
     environment:
       APP_CONFIG_PATH: "/app/app.config.json"
       PORT: "3000"
       NOTES_ROOT: "/data/notes"
+      REDIS_URL: "redis://redis:6379"
     expose:
       - "3000"
     volumes:
       - ./app.config.json:/app/app.config.json:ro
       - ${NOTES_ROOT:-./notes}:/data/notes:ro
+
+  notes-ingest:
+    restart: unless-stopped
+    image: ghcr.io/dannywieser/mdm-notes-ingest:${MDM_IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: infra/docker/notes-ingest.Dockerfile
+    depends_on:
+      - redis
+    environment:
+      PORT: "3005"
+      REDIS_URL: "redis://redis:6379"
+    # Bound to all interfaces (not 127.0.0.1, unlike redis/imgproxy below) so
+    # bear-sync, running on a separate Mac on the LAN, can reach it directly.
+    # Only relevant when notesSource is "bear" — otherwise this service just
+    # sits idle.
+    ports:
+      - "3005:3005"
 
   flag-manager:
     restart: unless-stopped
@@ -126,3 +147,23 @@ services:
     image: redis:8.2.1-alpine3.22
     ports:
       - "127.0.0.1:6379:6379"
+
+  redisinsight:
+    restart: unless-stopped
+    image: redis/redisinsight:3.8.0
+    depends_on:
+      - redis
+    environment:
+      RI_REDIS_HOST: "redis"
+      RI_REDIS_PORT: "6379"
+      RI_REDIS_ALIAS: "mdm"
+    # Bound to all interfaces (not 127.0.0.1, unlike redis above) so you can
+    # browse it from a machine other than the Docker host, same reasoning as
+    # notes-ingest's port — no auth on this either, homelab-only.
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight-data:/data
+
+volumes:
+  redisinsight-data:

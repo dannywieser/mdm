@@ -3,11 +3,13 @@ import { createClient } from "redis"
 import type { RedisClient } from "./createRedisClient.types"
 
 /**
- * Creates a Redis client wrapper with the connect/disconnect/get/set/on/ping
- * surface shared across services that cache values in Redis.
+ * Creates a Redis client wrapper with the connect/disconnect/get/set/hSet/
+ * hGetAll/hDel/on/ping surface shared across services that cache or store
+ * values in Redis.
  *
  * @param redisUrl Connection URL passed to the underlying Redis client.
- * @returns A Redis client exposing connect, disconnect, get, set, on, and ping.
+ * @returns A Redis client exposing connect, disconnect, get, set, hSet,
+ * hGetAll, hDel, on, and ping.
  */
 export const createRedisClient = (redisUrl: string): RedisClient => {
   const client = createClient({ url: redisUrl })
@@ -24,6 +26,9 @@ export const createRedisClient = (redisUrl: string): RedisClient => {
 
       return value
     },
+    hDel: async (key, fields) => client.hDel(key, fields),
+    hGetAll: async (key) => client.hGetAll(key),
+    hSet: async (key, field, value) => client.hSet(key, field, value),
     on: (event, listener) => {
       client.on(event, listener)
     },

@@ -5,5 +5,9 @@ coverage
 **/dist
 .env
 app.config.json
+app.config.json.old
 .vault
 apps/web/public/demo-data
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
