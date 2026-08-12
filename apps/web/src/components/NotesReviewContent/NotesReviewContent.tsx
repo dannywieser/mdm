@@ -9,6 +9,7 @@ import { NoteBadges } from "../NoteBadges"
 import { OpenInObsidianButton } from "../OpenInObsidianButton"
 import { NotesReviewTableOfContentsMobileTrigger } from "../NotesReviewTableOfContentsMobileTrigger"
 import { NotesReviewTableOfContentsSidebar } from "../NotesReviewTableOfContentsSidebar"
+import { noteContentStartsWithH1 } from "./NotesReviewContent.util"
 import type { NotesReviewContentProps } from "./NotesReviewContent.types"
 
 export const NotesReviewContent = ({
@@ -36,9 +37,11 @@ export const NotesReviewContent = ({
           />
         </Flex>
 
-        <Text fontSize="xl" fontWeight="semibold" color="app.text">
-          {currentNote.title}
-        </Text>
+        {!noteContentStartsWithH1(currentNote.content) && (
+          <Text fontSize="xl" fontWeight="semibold" color="app.text">
+            {currentNote.title}
+          </Text>
+        )}
 
         <MarkdownTree content={currentNote.content} />
         <NoteBadges badges={badges} note={currentNote} />
