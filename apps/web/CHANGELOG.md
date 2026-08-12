@@ -1,5 +1,13 @@
 # web
 
+## 3.3.0
+
+### Patch Changes
+
+- Updated dependencies [e53c2a6]
+  - mdm-util@3.3.0
+  - services@2.3.4
+
 ## 3.2.0
 
 ### Patch Changes

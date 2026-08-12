@@ -1,5 +1,26 @@
 # notes-api
 
+## 3.3.0
+
+### Minor Changes
+
+- e53c2a6: Notes can now come from Bear instead of an Obsidian-style vault, selected via the new `notesSource` (`"obsidian"` | `"bear"`, defaults to `"obsidian"`) field in `app.config.json`.
+
+  Two new apps support the Bear path: `bear-sync`, a scheduled Mac-side script that reads notes out of Bear's local sqlite database and pushes changed/deleted notes to `notes-ingest`; and `notes-ingest`, an unauthenticated Express endpoint (`POST /notes/sync`) that stores pushed notes in Redis. When `notesSource: "bear"`, `notes-api`'s `GET /notes` and `GET /views` read from that Redis-backed source instead of scanning `NOTES_ROOT` — the expensive markdown parse/wikilink-resolution step still runs lazily per-request, same as the Obsidian path, so no new eager tokenization work is introduced either way.
+
+  `markdown` now exports the shared `ScannedNote`/`NoteSyncPayload` types and `BEAR_NOTES_HASH_KEY` constant used by all three services to agree on the Redis contract. `mdm-util`'s `createRedisClient` gained `hSet`/`hGetAll`/`hDel` hash operations to back it.
+
+  Attachments/images are out of scope for the Bear source in this pass — Bear notes sync as text/frontmatter only.
+
+### Patch Changes
+
+- e53c2a6: Fix `$onThisDay`/`$today` view filters to also match ISO-formatted dates (e.g. a note's `modifiedDate`/`creationDate`) inside a `dates` array field, not just dates extracted from note text in the configured `dateFormats`. Previously, ISO-formatted entries in a `dates` array were silently ignored by these filters even though the single-value date filter path already handled them — this made "on this day"-style views miss notes that don't have a format-matched date embedded in their title/body, which is common for Bear-sourced notes relying on their DB-tracked creation/modification dates.
+- Updated dependencies [e53c2a6]
+  - app-config@3.3.0
+  - markdown@3.3.0
+  - mdm-util@3.3.0
+  - services@2.3.4
+
 ## 3.2.0
 
 ### Patch Changes

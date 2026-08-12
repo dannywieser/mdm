@@ -1,5 +1,13 @@
 # services
 
+## 2.3.4
+
+### Patch Changes
+
+- Updated dependencies [e53c2a6]
+  - app-config@3.3.0
+  - markdown@3.3.0
+
 ## 2.3.3
 
 ### Patch Changes
