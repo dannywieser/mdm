@@ -26,6 +26,9 @@ jobs:
           - name: image-server
             dockerfile: infra/docker/image-server.Dockerfile
             package: apps/image-server/package.json
+          - name: notes-ingest
+            dockerfile: infra/docker/notes-ingest.Dockerfile
+            package: apps/notes-ingest/package.json
           - name: stats-service
             dockerfile: infra/docker/stats-service.Dockerfile
             package: apps/stats-service/package.json
