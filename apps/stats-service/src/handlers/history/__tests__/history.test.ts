@@ -96,6 +96,20 @@ describe("historyHandler", () => {
     expect(entryForBCreatedDate).toMatchObject({ foldersTouched: 1 })
   })
 
+  test("skips the filesystem scan and returns empty history when notesSource is bear", async () => {
+    resolveNotesConfigMock.mockResolvedValue(
+      createMockNotesConfig({ notesDirectory: "", notesSource: "bear" }),
+    )
+    const app = express()
+    app.get("/history", historyHandler)
+
+    const response = await request(app).get("/history")
+
+    expect(collectMarkdownFilesMock).not.toHaveBeenCalled()
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual([])
+  })
+
   test("returns a generic 500 for unexpected errors", async () => {
     resolveNotesConfigMock.mockRejectedValue(new Error("boom"))
     toLoggableErrorMock.mockReturnValue({ message: "boom", stack: "stack" })

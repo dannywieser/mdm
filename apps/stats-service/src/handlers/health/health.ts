@@ -5,9 +5,11 @@ import { assertDirectoryReadable } from "mdm-util/node"
 
 export const healthHandler: RequestHandler = async (_request, response) => {
   try {
-    const { notesDirectory } = await resolveNotesConfig()
+    const { notesDirectory, notesSource } = await resolveNotesConfig()
 
-    await assertDirectoryReadable(notesDirectory)
+    if (notesSource === "obsidian") {
+      await assertDirectoryReadable(notesDirectory)
+    }
 
     response.status(200).json({ status: "ok" })
   } catch (error) {

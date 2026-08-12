@@ -23,16 +23,18 @@ export const metaHandler: RequestHandler = async (_request, response) => {
   try {
     const result = await statsMetaCache.get(async () => {
       notesConfig = await resolveNotesConfig()
-      const { attachmentsDirectory, notesDirectory } = notesConfig
+      const { attachmentsDirectory, notesDirectory, notesSource } = notesConfig
 
-      const markdownFiles = await collectMarkdownFiles(notesDirectory)
+      // stats-service only knows how to scan a filesystem vault; the Bear source has no
+      // local files to count, so it degrades to zeroed-out stats instead of erroring.
+      const markdownFiles = notesSource === "obsidian" ? await collectMarkdownFiles(notesDirectory) : []
       const bodies = await mapWithConcurrency(markdownFiles, READ_CONCURRENCY, async (filePath) => {
         const source = await fs.readFile(filePath, "utf8")
         return parseFrontMatter(source).body
       })
       const folders = markdownFiles.map((filePath) => resolveNoteFolder(notesDirectory, filePath))
 
-      const absoluteAttachmentsDir = attachmentsDirectory
+      const absoluteAttachmentsDir = notesSource === "obsidian" && attachmentsDirectory
         ? path.join(notesDirectory, attachmentsDirectory)
         : ""
       const totalAttachments = absoluteAttachmentsDir

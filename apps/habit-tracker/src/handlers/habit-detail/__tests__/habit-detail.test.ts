@@ -1435,6 +1435,25 @@ describe("habitDetailHandler", () => {
     expect(json).toHaveBeenCalledWith({ error: "Unable to load habit" })
   })
 
+  test("skips the filesystem scan and returns a zero-entry result when notesSource is bear", async () => {
+    vi.mocked(resolveNotesConfig).mockResolvedValue({
+      ...mockConfig,
+      notesDirectory: "",
+      notesSource: "bear",
+    })
+    vi.mocked(scanHabitEntries).mockResolvedValue([])
+
+    const { response, status, json } = makeResponse()
+    await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
+
+    expect(collectMarkdownFiles).not.toHaveBeenCalled()
+    expect(scanHabitEntries).toHaveBeenCalledWith([], "exercise")
+    expect(status).toHaveBeenCalledWith(200)
+    const result = getJsonResult(json)
+    expect(result.habitScore).toBe(0)
+    expect(result.history).toEqual([])
+  })
+
   test("windowStart begins the trackingWindowDays-day window ending today", async () => {
     const { response, json } = makeResponse()
     await habitDetailHandler(makeRequest("exercise"), response, vi.fn())

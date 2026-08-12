@@ -51,9 +51,11 @@ export const historyHandler: RequestHandler = async (_request, response) => {
   try {
     const result = await statsHistoryCache.get(async () => {
       notesConfig = await resolveNotesConfig()
-      const { dateFormats, notesDirectory, timezone } = notesConfig
+      const { dateFormats, notesDirectory, notesSource, timezone } = notesConfig
 
-      const markdownFiles = await collectMarkdownFiles(notesDirectory)
+      // stats-service only knows how to scan a filesystem vault; the Bear source has no
+      // local files to build history from, so it degrades to an empty history instead of erroring.
+      const markdownFiles = notesSource === "obsidian" ? await collectMarkdownFiles(notesDirectory) : []
       const notes = await mapWithConcurrency(markdownFiles, READ_CONCURRENCY, (filePath) =>
         scanHistoryNote(filePath, notesDirectory, dateFormats),
       )

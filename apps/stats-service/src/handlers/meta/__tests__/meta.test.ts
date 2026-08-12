@@ -109,6 +109,30 @@ describe("metaHandler", () => {
     expect(response.body).toMatchObject({ totalAttachments: {} })
   })
 
+  test("skips the filesystem scan and returns zeroed stats when notesSource is bear", async () => {
+    resolveNotesConfigMock.mockResolvedValue(
+      createMockNotesConfig({
+        attachmentsDirectory: "attachments",
+        notesDirectory: "",
+        notesSource: "bear",
+      }),
+    )
+    const app = express()
+    app.get("/meta", metaHandler)
+
+    const response = await request(app).get("/meta")
+
+    expect(collectMarkdownFilesMock).not.toHaveBeenCalled()
+    expect(countFilesByExtensionMock).not.toHaveBeenCalled()
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      totalAttachments: {},
+      totalFolders: 0,
+      totalNotes: 0,
+      totalWords: 0,
+    })
+  })
+
   test("returns a generic 500 for unexpected errors", async () => {
     resolveNotesConfigMock.mockRejectedValue(new Error("boom"))
     toLoggableErrorMock.mockReturnValue({ message: "boom", stack: "stack" })

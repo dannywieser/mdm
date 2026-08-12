@@ -16,7 +16,7 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { habits, notesDirectory, timezone } = notesConfig
+    const { habits, notesDirectory, notesSource, timezone } = notesConfig
 
     const habitId = String(request.params.id)
     const habitConfig = habits.find((h) => h.id === habitId)
@@ -36,7 +36,9 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
       trackingWindowDays,
     }, "[habit] config resolved")
 
-    const filePaths = await collectMarkdownFiles(notesDirectory)
+    // habit-tracker only knows how to scan a filesystem vault; the Bear source has no
+    // local files to score against, so it degrades to zero-entry results instead of erroring.
+    const filePaths = notesSource === "obsidian" ? await collectMarkdownFiles(notesDirectory) : []
     logger.debug({ count: filePaths.length, notesDirectory }, "[habit] collectMarkdownFiles found files")
 
     const entries = await scanHabitEntries(filePaths, frontmatterProperty)
