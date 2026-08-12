@@ -5,12 +5,12 @@ Express-based Node service with request logging via `pino-http`.
 ## Endpoints
 
 - `GET /health`
-  - Purpose: verifies the vault directory (`NOTES_ROOT`) is readable
+  - Purpose: verifies the vault directory (`NOTES_ROOT`) is readable. Only checked when `notesSource` is `"obsidian"` — in `"bear"` mode there is no vault to check, so this only verifies config resolves.
   - Success response: `200`
     ```json
     { "status": "ok" }
     ```
-  - Error response: `503` when config can't be resolved or the vault directory isn't readable
+  - Error response: `503` when config can't be resolved, or (in `"obsidian"` mode only) the vault directory isn't readable
     ```json
     { "status": "error", "error": "ENOENT: no such file or directory, access '/data/notes'" }
     ```

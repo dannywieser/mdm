@@ -135,6 +135,34 @@ describe("habitsHandler", () => {
     expect(json).toHaveBeenCalledWith([])
   })
 
+  test("skips the filesystem scan and returns zero-entry summaries when notesSource is bear", async () => {
+    vi.mocked(resolveNotesConfig).mockResolvedValue({
+      ...BASE_CONFIG,
+      notesDirectory: "",
+      notesSource: "bear",
+      habits: [HABIT_DO_MORE],
+    })
+    vi.mocked(scanHabitEntries).mockResolvedValue([])
+
+    const { response, status, json } = makeResponse()
+    await habitsHandler({} as never, response, vi.fn())
+
+    expect(collectMarkdownFiles).not.toHaveBeenCalled()
+    expect(scanHabitEntries).toHaveBeenCalledWith([], "exercise")
+    expect(status).toHaveBeenCalledWith(200)
+    expect(getJsonResult(json)).toEqual([
+      {
+        habitId: "exercise",
+        habitName: "Exercise",
+        habitScore: 0,
+        mode: "do-more",
+        streak: 0,
+        targetScore: undefined,
+        windowEntries: 0,
+      },
+    ])
+  })
+
   test("returns generic 500 on unexpected error", async () => {
     vi.mocked(resolveNotesConfig).mockResolvedValue({ ...BASE_CONFIG, habits: [HABIT_DO_MORE] })
     vi.mocked(collectMarkdownFiles).mockRejectedValue(new Error("boom"))
