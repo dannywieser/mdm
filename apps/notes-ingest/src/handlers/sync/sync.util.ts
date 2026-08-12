@@ -25,6 +25,7 @@ const isScannedNote = (value: unknown): value is ScannedNote => {
     typeof note.modifiedDate === "string" &&
     (note.createdDate === null || typeof note.createdDate === "string") &&
     isStringArray(note.dates) &&
+    isStringArray(note.tags) &&
     typeof note.frontmatter === "object"
   )
 }

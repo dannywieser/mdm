@@ -24,6 +24,7 @@ const buildNote = (overrides: Partial<Note> = {}): Note => ({
   id: "note",
   modifiedDate: "2026-06-01T00:00:00.000Z",
   obsidianUrl: "obsidian://open?vault=v&file=note",
+  tags: [],
   title: "note",
   ...overrides,
 })

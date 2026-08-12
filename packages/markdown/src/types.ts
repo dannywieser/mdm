@@ -30,6 +30,7 @@ export interface Note {
   linkedNotes?: Note[]
   modifiedDate: string
   obsidianUrl: string
+  tags: string[]
   title: string
 }
 

@@ -13,6 +13,7 @@ const createScannedNote = (overrides: Partial<ScannedNote> = {}): ScannedNote =>
   id: "note",
   modifiedDate: "2026-01-01T00:00:00.000Z",
   obsidianUrl: "bear://x-callback-url/open-note?id=note",
+  tags: [],
   title: "note",
   ...overrides,
 })
@@ -76,6 +77,14 @@ describe("validateSyncPayload", () => {
 
   test("throws when an upsert entry's dates is not an array of strings", () => {
     const note = { ...createScannedNote(), dates: ["ok", 1] }
+
+    expect(() => validateSyncPayload({ deletedIds: [], upserts: [note] })).toThrow(
+      "upserts must be an array of valid ScannedNote objects",
+    )
+  })
+
+  test("throws when an upsert entry's tags is not an array of strings", () => {
+    const note = { ...createScannedNote(), tags: ["ok", 1] }
 
     expect(() => validateSyncPayload({ deletedIds: [], upserts: [note] })).toThrow(
       "upserts must be an array of valid ScannedNote objects",

@@ -1,5 +1,5 @@
 import { resolveNotesConfig } from "app-config"
-import { buildObsidianUrl, extractNoteDates, parseFrontMatter, resolveOldestDate } from "markdown"
+import { buildObsidianUrl, extractNoteDates, extractTags, parseFrontMatter, resolveOldestDate } from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
 import path from "node:path"
@@ -49,6 +49,7 @@ export const scanMarkdownFile = async (
     id: createFileID(filePath, FILE_ID_NAMESPACE),
     modifiedDate,
     obsidianUrl,
+    tags: extractTags(body),
     title,
   }
 }

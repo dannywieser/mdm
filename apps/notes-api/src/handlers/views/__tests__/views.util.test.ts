@@ -28,6 +28,7 @@ const createNote = (overrides: Partial<ScannedNote> & { id: string }): ScannedNo
   fullText: "",
   modifiedDate: "2026-06-01T00:00:00.000Z",
   obsidianUrl: "obsidian://open?vault=vault&file=note",
+  tags: [],
   title: "note",
   dates: [],
   ...overrides,

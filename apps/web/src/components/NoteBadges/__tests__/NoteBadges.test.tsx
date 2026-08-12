@@ -21,6 +21,7 @@ const noteFixture: Note = {
   linkedNotes: [],
   modifiedDate: "2026-01-01",
   obsidianUrl: "obsidian://open?vault=dgw&file=daily%2Fmy-note",
+  tags: ["personal/daily"],
   title: "My Note Title",
 }
 
@@ -54,6 +55,16 @@ describe("NoteBadges", () => {
 
     expect(screen.getByText("thriller")).toBeTruthy()
     expect(screen.getByText("classic")).toBeTruthy()
+  })
+
+  test("renders tag badges when configured", () => {
+    render(
+      <ChakraProvider value={defaultSystem}>
+        <NoteBadges badges={["tags"]} note={noteFixture} />
+      </ChakraProvider>,
+    )
+
+    expect(screen.getByText("personal/daily")).toBeTruthy()
   })
 
   test("does not render badges that do not exist", () => {

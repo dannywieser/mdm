@@ -18,6 +18,7 @@ Tokenization here is deliberately limited to frontmatter + date extraction — t
 - `title` / `basename`: Bear's `ZTITLE` column.
 - `fullText` / `frontmatter`: Bear's `ZTEXT`, run through `parseFrontMatter`.
 - `dates`: dates found in the title/body via `extractNoteDates`, plus both `ZCREATIONDATE` and `ZMODIFICATIONDATE` (converted from Core Data's reference epoch) folded in — unlike the Obsidian path, Bear notes have a real DB-tracked creation date, not just a file mtime.
+- `tags`: inline `#foo/bar`/`#multi word tag#` hashtags found in the body via `extractTags` — the same first-class tagging Bear's own UI understands, extracted from plain text since Bear stores no separate tag column.
 - `folder`: always empty — Bear has no folder concept (tags aren't a stand-in for one here).
 - Attachments/images: **out of scope**. `frontmatter.images` is left as whatever the parsed frontmatter contains (typically unset); embedded image links in Bear note bodies won't resolve through `image-server` yet.
 

@@ -149,6 +149,30 @@ describe("notes filter helpers", () => {
     )
   })
 
+  test("applyViewFilter matches notes by tags array", async () => {
+    const notes = [
+      createMockNote("journal.md", { tags: ["personal/daily", "reflection"] }),
+      createMockNote("other.md", { tags: ["work"] }),
+    ]
+
+    resolveNotesConfigMock.mockResolvedValue({
+      ...defaultConfig,
+      views: [
+        {
+          component: "NotesReview",
+          filters: [{ tags: "personal/daily" }],
+          id: "on-this-day",
+          name: "on this day",
+        },
+      ],
+    })
+
+    const filtered = await applyViewFilter(notes, "on-this-day")
+
+    expect(filtered).toEqual([notes[0]])
+    expect(getValueByPathMock).toHaveBeenCalledWith(notes[0], "tags")
+  })
+
   test("applyViewFilter matches notes satisfying any filter group (OR logic)", async () => {
     const notes = [
       createMockNote("book.md", {
@@ -632,5 +656,6 @@ const defaultMockNote = (basename: string): Note => ({
   obsidianUrl: `obsidian://open?vault=vault&file=${encodeURI(
     basename.replace(/\.[^.]+$/, ""),
   )}`,
+  tags: [],
   title: basename.replace(/\.md$/, ""),
 })

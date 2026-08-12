@@ -67,6 +67,16 @@ describe("convertBearNoteToScannedNote", () => {
     expect(note.createdDate).toBe("2001-01-01T00:00:00.000Z")
   })
 
+  test("extracts inline tags found in the note body", () => {
+    const row = createBearNoteRow({
+      ZTEXT: "# Why\nBody text #personal/daily and #reflection.",
+    })
+
+    const note = convertBearNoteToScannedNote(row, [])
+
+    expect(note.tags).toEqual(["personal", "daily", "personal/daily", "reflection"])
+  })
+
   test("extracts dates found in the note body using the configured formats", () => {
     const row = createBearNoteRow({
       ZTEXT: "# w.2026.02.24 (Tue)\n**c** 2026.02.20",
