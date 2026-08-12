@@ -14,6 +14,7 @@ const makeScannedNotes = (id: string): ScannedNote[] => [
     id,
     modifiedDate: "2026-05-26T00:00:00.000Z",
     obsidianUrl: `obsidian://open?vault=vault&file=${id}`,
+    tags: [],
     title: id,
   },
 ]

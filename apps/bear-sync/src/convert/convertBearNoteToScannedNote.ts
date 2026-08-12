@@ -1,6 +1,6 @@
 import type { ScannedNote } from "markdown"
 
-import { extractNoteDates, parseFrontMatter, resolveOldestDate } from "markdown"
+import { extractNoteDates, extractTags, parseFrontMatter, resolveOldestDate } from "markdown"
 
 import type { BearNoteRow } from "../db/db.types"
 
@@ -40,6 +40,7 @@ export const convertBearNoteToScannedNote = (
     id: row.ZUNIQUEIDENTIFIER,
     modifiedDate,
     obsidianUrl: buildBearUrl(row.ZUNIQUEIDENTIFIER),
+    tags: extractTags(body),
     title: row.ZTITLE,
   }
 }

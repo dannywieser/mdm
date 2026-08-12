@@ -67,6 +67,7 @@ const mockNote = {
   id: "a",
   modifiedDate: "2026-06-01T00:00:00.000Z",
   obsidianUrl: "obsidian://open?vault=vault&file=a",
+  tags: [],
   title: "a",
   dates: [],
 }

@@ -179,6 +179,7 @@ const createScannedNote = (overrides: Partial<ScannedNote> = {}): ScannedNote =>
   id: "note",
   modifiedDate: "2026-05-26T01:00:00.000Z",
   obsidianUrl: "obsidian://open?vault=vault&file=topic%2Fnote",
+  tags: [],
   title: "note",
   ...overrides,
 })

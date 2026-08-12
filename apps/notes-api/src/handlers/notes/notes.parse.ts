@@ -9,6 +9,7 @@ import remarkGfm from "remark-gfm"
 
 import type { ScannedNote, WikilinkReplacement } from "./notes.types"
 
+import { injectTagPlaceholders, TAG_PLACEHOLDER_PATTERN } from "./notes.tags"
 import {
   normalizeObsidianWikiEmbeds,
   resolveWikilinks,
@@ -27,12 +28,15 @@ export const parseMarkdownFile = async (
   const relativePath = path.relative(notesDirectory, note.fullPath)
   const normalizedRelativePath = relativePath.split(path.sep).join("/")
 
-  const { processedBody, linkedNoteRefs, replacements } = resolveWikilinks(note.fullText, allNotes)
+  const { processedBody: wikilinkProcessedBody, linkedNoteRefs, replacements } =
+    resolveWikilinks(note.fullText, allNotes)
+  const { processedBody, tagValues } = injectTagPlaceholders(wikilinkProcessedBody)
 
   const content = buildMarkdownTree(
     processedBody,
     normalizedRelativePath,
     replacements,
+    tagValues,
     attachmentsDirectory,
   )
 
@@ -88,6 +92,7 @@ const buildMarkdownTree = (
   markdownBody: string,
   noteRelativePath: string,
   replacements: WikilinkReplacement[],
+  tagValues: string[],
   attachmentsDirectory = "",
 ): MarkdownNode => {
   const normalizedBody = normalizeObsidianWikiEmbeds(markdownBody)
@@ -114,6 +119,7 @@ const buildMarkdownTree = (
   })
 
   applyWikilinkReplacementsToMarkdownTree(markdownTree, replacements)
+  applyTagPlaceholdersToMarkdownTree(markdownTree, tagValues)
 
   return markdownTree
 }
@@ -177,6 +183,69 @@ const replaceWikilinkPlaceholdersInNode = (
         wikilinkType: "unmatched",
       })
     }
+
+    cursor = end
+  }
+
+  if (parts.length === 0) {
+    return [node]
+  }
+
+  if (cursor < node.value.length) {
+    parts.push({
+      type: "text",
+      value: node.value.slice(cursor),
+    })
+  }
+
+  return parts
+}
+
+const applyTagPlaceholdersToMarkdownTree = (
+  tree: MarkdownNode,
+  tagValues: string[],
+): void => {
+  visitMarkdownTree(tree, (node) => {
+    if (!Array.isArray(node.children) || node.children.length === 0) {
+      return
+    }
+
+    node.children = node.children.flatMap((childNode) =>
+      replaceTagPlaceholdersInNode(childNode, tagValues),
+    )
+  })
+}
+
+const replaceTagPlaceholdersInNode = (
+  node: MarkdownNode,
+  tagValues: string[],
+): MarkdownNode[] => {
+  if (node.type !== "text" || typeof node.value !== "string") {
+    return [node]
+  }
+
+  const parts: MarkdownNode[] = []
+  let cursor = 0
+
+  for (const match of node.value.matchAll(TAG_PLACEHOLDER_PATTERN)) {
+    const matchedText = match[0]
+    const start = match.index
+    const end = start + matchedText.length
+    const index = Number.parseInt(match[1], 10)
+    const tagValue = tagValues.at(index)
+
+    if (tagValue === undefined) {
+      continue
+    }
+
+    if (start > cursor) {
+      parts.push({
+        type: "text",
+        value: node.value.slice(cursor, start),
+      })
+    }
+
+    parts.push({ type: "tag", value: tagValue })
 
     cursor = end
   }

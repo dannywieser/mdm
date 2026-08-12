@@ -103,6 +103,7 @@ describe("notes scan helpers", () => {
       id: "17e3771f-2773-5c87-8f66-6a455a878763",
       modifiedDate: "2026-05-26T01:00:00.000Z",
       obsidianUrl: "obsidian://open?vault=dgw&file=topic%2Fwelcome",
+      tags: [],
       title: "welcome",
     })
     expect(note).not.toHaveProperty("content")
@@ -292,6 +293,20 @@ This is a note.`)
       topic: ["games"],
       images: ["games/note/first.png", "games/note/second.png"],
     })
+  })
+
+  test("scanMarkdownFile collects every tag found in the body", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "Journal entry #personal/daily, also #reflection",
+      frontmatter: null,
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/journal/note.md")
+
+    expect(note.tags).toEqual(["personal/daily", "reflection"])
   })
 
   test("scanMarkdownFile sets images even when there is no frontmatter at all", async () => {

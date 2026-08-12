@@ -23,6 +23,7 @@ const noteFixture: Note = {
   linkedNotes: [],
   modifiedDate: '2026-01-01',
   obsidianUrl: 'obsidian://open?vault=dgw&file=daily%2Fmy-note',
+  tags: [],
   title: 'My Note',
 }
 

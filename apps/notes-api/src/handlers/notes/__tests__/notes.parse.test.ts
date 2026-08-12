@@ -321,6 +321,35 @@ describe("notes parse helpers", () => {
     expect(linkedUnmatchedNode?.value).toBe("deep-note")
     expect(note.linkedNotes?.[0]?.linkedNotes).toEqual([])
   })
+
+  test("parseMarkdownFile replaces an inline tag with a tag node", async () => {
+    const note = await parseMarkdownFile(
+      createScannedNote({ fullText: "Journal entry #personal/daily today." }),
+    )
+
+    const tagNode = findNodesByType(note.content, "tag")[0]
+    expect(tagNode.value).toBe("personal/daily")
+  })
+
+  test("parseMarkdownFile replaces multiple inline tags with tag nodes", async () => {
+    const note = await parseMarkdownFile(
+      createScannedNote({ fullText: "#todo and #urgent" }),
+    )
+
+    const tagNodes = findNodesByType(note.content, "tag")
+    expect(tagNodes.map((node) => node.value).toSorted((a, b) => (a ?? "").localeCompare(b ?? ""))).toEqual([
+      "todo",
+      "urgent",
+    ])
+  })
+
+  test("parseMarkdownFile does not treat a heading as a tag", async () => {
+    const note = await parseMarkdownFile(
+      createScannedNote({ fullText: "# Heading\n\nBody text." }),
+    )
+
+    expect(findNodesByType(note.content, "tag")).toEqual([])
+  })
 })
 
 const findNodesByType = (tree: MarkdownNode | undefined, type: string): MarkdownNode[] => {
@@ -379,6 +408,7 @@ const createScannedNote = (
   id: "note",
   modifiedDate: "2026-05-26T01:00:00.000Z",
   obsidianUrl: "obsidian://open?vault=vault&file=topic%2Fnote",
+  tags: [],
   title: "note",
   ...overrides,
 })

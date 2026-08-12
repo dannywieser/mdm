@@ -18,6 +18,7 @@ const createNote = (
   id: "1",
   modifiedDate: "2024-01-02",
   obsidianUrl: "obsidian://open?vault=v&file=book",
+  tags: [],
   title: "Book",
   ...overrides,
 })

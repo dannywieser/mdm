@@ -5,7 +5,7 @@ Low-level parsing utilities for Obsidian-flavored markdown notes: YAML-ish front
 ## Usage
 
 ```ts
-import { collectMarkdownFiles, parseFrontMatter, parseMarkdownBodyDates, extractNoteDates, resolveDateFromFrontmatterOrTitle, resolveOldestDate, buildObsidianUrl, parseDateString, extractImagePaths, BEAR_NOTES_HASH_KEY } from "markdown"
+import { collectMarkdownFiles, parseFrontMatter, parseMarkdownBodyDates, extractNoteDates, resolveDateFromFrontmatterOrTitle, resolveOldestDate, buildObsidianUrl, parseDateString, extractImagePaths, extractTags, TAG_PATTERN, BEAR_NOTES_HASH_KEY } from "markdown"
 import type { Note, NoteFrontmatter, MarkdownNode, ScannedNote, NoteSyncPayload } from "markdown"
 ```
 
@@ -21,8 +21,9 @@ import type { Note, NoteFrontmatter, MarkdownNode, ScannedNote, NoteSyncPayload 
 - `parsers/parseMarkdownBodyDates.ts` — scans arbitrary text for every substring matching a set of tokenized date formats (`YYYY`, `YY`, `MM`, `DD`), returning matches in the order first found.
 - `parsers/parseDateString.ts` — parses a single string against a set of date formats into a `Date`.
 - `parsers/extractImagePaths.ts` — scans raw markdown text (not the parsed node tree) for every image, matching either standard `![alt](path)` syntax (including `<path>`-bracketed and titled destinations) or an Obsidian `![[path]]`/`![[path|alias]]` embed, and returns each raw path in document order, deduplicated.
+- `parsers/extractTags.ts` — scans raw markdown text for inline hashtags the way Bear/Obsidian render them: `#foo/bar` (simple, `/` nests) or `#multi word tag#` (Bear's closing-hash form for tags containing spaces). Returns each tag (without the `#`) in document order, deduplicated. Also exports `TAG_PATTERN`, the underlying regex, so callers that need to locate (not just list) tags — like `notes-api`'s inline tag-node rendering — can reuse the same matching rules.
 - `dates/extractNoteDates.ts` — extracts every date found across a note's title and full raw source (frontmatter + body) in one pass, deduplicated.
 - `dates/resolveDateFromFrontmatterOrTitle.ts` — resolves a note's date from a configured frontmatter property, falling back to a date embedded in the title.
 - `dates/resolveOldestDate.ts` — resolves the earliest of a list of date strings, parsing each against the configured formats and then as ISO 8601.
-- `types.ts` — `Note`, `NoteFrontmatter`, `FrontmatterValue`, `MarkdownNode`, `ParsedFrontMatter`, `ParsedDate`, `ScannedNote`, `NoteSyncPayload`.
+- `types.ts` — `Note`, `NoteFrontmatter`, `FrontmatterValue`, `MarkdownNode`, `ParsedFrontMatter`, `ParsedDate`, `ScannedNote`, `NoteSyncPayload`. `Note.tags` is a plain `string[]` populated by `extractTags`, distinct from any `frontmatter.tags` a note's frontmatter block might separately define.
 - `noteSync.ts` — `BEAR_NOTES_HASH_KEY`.

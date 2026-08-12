@@ -314,6 +314,7 @@ const createScannedNote = (
   id: "note",
   modifiedDate: "2026-05-26T00:00:00.000Z",
   obsidianUrl: "obsidian://open?vault=vault&file=note",
+  tags: [],
   title: "note",
   ...overrides,
 })

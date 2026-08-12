@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Blockquote,
   Code,
@@ -123,6 +124,18 @@ const nodeRenderers: Partial<Record<string, NodeRenderer>> = {
       minH="12"
       my="4"
     />
+  ),
+  tag: (node, key) => (
+    <Badge
+      key={key}
+      variant="subtle"
+      bg="app.panelBackgroundHover"
+      color="app.textMuted"
+      fontWeight="normal"
+      mx="0.5"
+    >
+      {node.value ?? ""}
+    </Badge>
   ),
   thematicBreak: (_, key) => <Separator key={key} my="6" />,
   break: (_, key) => <br key={key} />,

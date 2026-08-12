@@ -30,4 +30,23 @@ describe("MarkdownTree", () => {
     expect(container.querySelectorAll("br")).toHaveLength(2)
     expect(container.textContent).toBe("abc")
   })
+
+  test("renders a tag node as a badge with its value", () => {
+    const content: MarkdownNode = {
+      type: "root",
+      children: [
+        {
+          type: "paragraph",
+          children: [
+            { type: "text", value: "Journal entry " },
+            { type: "tag", value: "personal/daily" },
+          ],
+        },
+      ],
+    }
+
+    const { container } = renderTree(content)
+
+    expect(container.textContent).toBe("Journal entry personal/daily")
+  })
 })
