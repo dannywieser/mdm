@@ -4,7 +4,7 @@ A scheduled Mac-side script — not a server, not part of the Docker stack — t
 
 ## What it does, each run
 
-1. Copies Bear's live sqlite database (and any `-wal`/`-shm` companion files) to a temp directory, so it can read a consistent snapshot without contending with Bear's own open connection.
+1. Backs up Bear's live sqlite database into a temp directory using SQLite's Online Backup API (via `better-sqlite3`'s `Database#backup`, opened read-only against the live file), so it reads a consistent snapshot regardless of concurrent writes from Bear — Bear's database uses the classic rollback-journal format (not WAL), where a raw filesystem copy caught mid-write could capture an internally inconsistent snapshot. The temp directory is removed after every run, success or failure.
 2. Queries every non-trashed note's ID and modification date only (cheap) and diffs it against the last-synced state (`SYNC_STATE_PATH`) to find changed and deleted note IDs.
 3. Fetches full content for changed notes only, and converts each into the same `ScannedNote` shape `notes-api` gets from scanning an Obsidian vault — reusing `parseFrontMatter`/`extractNoteDates` from `packages/markdown`, since Bear notes that use a literal `---frontmatter---` block at the top of their text parse the same way an Obsidian file's frontmatter does.
 4. POSTs `{ upserts, deletedIds }` to `notes-ingest`'s `POST /notes/sync`.

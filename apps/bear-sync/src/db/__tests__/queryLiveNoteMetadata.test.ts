@@ -7,7 +7,7 @@ describe("queryLiveNoteMetadata", () => {
     const rows = [{ ZMODIFICATIONDATE: 1, ZUNIQUEIDENTIFIER: "a" }]
     const all = vi.fn().mockReturnValue(rows)
     const prepare = vi.fn().mockReturnValue({ all })
-    const db: BearDatabase = { close: vi.fn(), prepare }
+    const db: BearDatabase = { backup: vi.fn(), close: vi.fn(), prepare }
 
     const result = queryLiveNoteMetadata(db)
 

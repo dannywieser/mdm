@@ -5,7 +5,7 @@ import { queryNotesByIds } from "../queryNotesByIds"
 describe("queryNotesByIds", () => {
   test("returns an empty array without querying when ids is empty", () => {
     const prepare = vi.fn()
-    const db: BearDatabase = { close: vi.fn(), prepare }
+    const db: BearDatabase = { backup: vi.fn(), close: vi.fn(), prepare }
 
     const result = queryNotesByIds(db, [])
 
@@ -17,7 +17,7 @@ describe("queryNotesByIds", () => {
     const rows = [{ ZCREATIONDATE: 1, ZMODIFICATIONDATE: 2, ZTEXT: "text", ZTITLE: "title", ZUNIQUEIDENTIFIER: "a" }]
     const all = vi.fn().mockReturnValue(rows)
     const prepare = vi.fn().mockReturnValue({ all })
-    const db: BearDatabase = { close: vi.fn(), prepare }
+    const db: BearDatabase = { backup: vi.fn(), close: vi.fn(), prepare }
 
     const result = queryNotesByIds(db, ["a", "b"])
 

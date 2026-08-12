@@ -13,6 +13,7 @@ export interface BearNoteRow {
 
 /** Narrow surface of better-sqlite3's Database this app relies on. */
 export interface BearDatabase {
+  backup: (destinationFile: string) => Promise<unknown>
   close: () => void
   prepare: (sql: string) => {
     all: (...params: unknown[]) => unknown[]
