@@ -50,6 +50,20 @@ describe("healthHandler", () => {
     })
   })
 
+  test("responds with 200 without checking the vault directory when notesSource is bear", async () => {
+    resolveNotesConfigMock.mockResolvedValue(
+      createMockNotesConfig({ notesDirectory: "", notesSource: "bear" }),
+    )
+    const json = vi.fn()
+    const response = { status: vi.fn().mockReturnValue({ json }) }
+
+    await healthHandler({} as never, response as never, vi.fn())
+
+    expect(assertDirectoryReadableMock).not.toHaveBeenCalled()
+    expect(response.status).toHaveBeenCalledWith(200)
+    expect(json).toHaveBeenCalledWith({ status: "ok" })
+  })
+
   test("responds with 503 when config cannot be resolved", async () => {
     resolveNotesConfigMock.mockRejectedValue(new Error("boom"))
     const json = vi.fn()

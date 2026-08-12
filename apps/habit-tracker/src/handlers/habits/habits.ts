@@ -16,9 +16,11 @@ export const habitsHandler: RequestHandler = async (_request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { habits, notesDirectory, timezone } = notesConfig
+    const { habits, notesDirectory, notesSource, timezone } = notesConfig
 
-    const filePaths = await collectMarkdownFiles(notesDirectory)
+    // habit-tracker only knows how to scan a filesystem vault; the Bear source has no
+    // local files to score against, so it degrades to zero-entry results instead of erroring.
+    const filePaths = notesSource === "obsidian" ? await collectMarkdownFiles(notesDirectory) : []
     const today = new Date().toLocaleDateString("en-CA", { timeZone: timezone })
 
     const summaries: HabitSummary[] = await Promise.all(
