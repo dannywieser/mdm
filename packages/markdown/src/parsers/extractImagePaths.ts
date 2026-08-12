@@ -1,5 +1,11 @@
+import { isImageUrl } from "./isImageUrl"
+
 const MARKDOWN_IMAGE_PATTERN = /!\[[^\]]*]\(([^()]*(?:\([^()]*\)[^()]*)*)\)/g
 const WIKILINK_IMAGE_PATTERN = /!\[\[([^\]|]+)(?:\|[^\]]*)?]]/g
+// A plain (non-`!`) markdown link, e.g. Bear's `[label](https://images.example.com/i/x.jpg)`
+// inline-image-preview format. Only kept when its destination looks like an image file.
+// eslint-disable-next-line sonarjs/slow-regex -- input is a note body, not user-controlled input
+const MARKDOWN_LINK_PATTERN = /(?<!!)\[[^\]]*]\(([^()]*(?:\([^()]*\)[^()]*)*)\)/g
 
 interface ImageMatch {
   index: number
@@ -40,6 +46,9 @@ export const extractImagePaths = (markdownText: string): string[] => {
   const matches = [
     ...collectMatches(markdownText, MARKDOWN_IMAGE_PATTERN, (match) => parseImageDestination(match[1])),
     ...collectMatches(markdownText, WIKILINK_IMAGE_PATTERN, (match) => match[1].trim()),
+    ...collectMatches(markdownText, MARKDOWN_LINK_PATTERN, (match) => parseImageDestination(match[1])).filter(
+      ({ path }) => isImageUrl(path),
+    ),
   ].sort((a, b) => a.index - b.index)
 
   const seenPaths = new Set<string>()

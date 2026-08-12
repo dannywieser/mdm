@@ -278,6 +278,20 @@ This is a note.`)
     expect(note.frontmatter?.images).toEqual(["https://example.com/cover.png"])
   })
 
+  test("scanMarkdownFile collects a plain link pointing at an image url", async () => {
+    readFileMock.mockResolvedValue("")
+    parseFrontMatterMock.mockReturnValue({
+      body: "[3h6HmH](https://images.dgwlab.net/i/3h6HmH.jpg)",
+      frontmatter: null,
+    })
+    createFileIDMock.mockReturnValue("some-id")
+    statMock.mockResolvedValue({ mtime: new Date("2026-06-16T00:00:00.000Z") })
+
+    const note = await scanMarkdownFile("/notes/games/note.md")
+
+    expect(note.frontmatter?.images).toEqual(["https://images.dgwlab.net/i/3h6HmH.jpg"])
+  })
+
   test("scanMarkdownFile collects every image found in the body, in order", async () => {
     readFileMock.mockResolvedValue("")
     parseFrontMatterMock.mockReturnValue({

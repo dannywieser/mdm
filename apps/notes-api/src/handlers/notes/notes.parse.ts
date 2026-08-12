@@ -1,7 +1,7 @@
 import type { MarkdownNode, Note, NoteFrontmatter } from "markdown"
 
 import { resolveNotesConfig } from "app-config"
-import { extractImagePaths } from "markdown"
+import { extractImagePaths, isImageUrl } from "markdown"
 import { isExternalUrl } from "mdm-util"
 import path from "node:path"
 import remark from "remark"
@@ -105,6 +105,8 @@ const buildMarkdownTree = (
   const markdownTree = parsedTree
 
   visitMarkdownTree(markdownTree, (node) => {
+    convertImageLinkNode(node)
+
     if (node.type !== "image" || typeof node.url !== "string") {
       return
     }
@@ -122,6 +124,29 @@ const buildMarkdownTree = (
   applyTagPlaceholdersToMarkdownTree(markdownTree, tagValues)
 
   return markdownTree
+}
+
+const extractLinkText = (node: MarkdownNode): string => {
+  if (node.type === "text" && typeof node.value === "string") {
+    return node.value
+  }
+  if (!Array.isArray(node.children)) {
+    return ""
+  }
+  return node.children.map(extractLinkText).join("")
+}
+
+// Bear renders a plain `[label](url)` link as an inline image preview when its
+// destination looks like an image file, so mdm mirrors that here rather than
+// leaving it as a plain link.
+const convertImageLinkNode = (node: MarkdownNode): void => {
+  if (node.type !== "link" || typeof node.url !== "string" || !isImageUrl(node.url)) {
+    return
+  }
+
+  node.alt = extractLinkText(node)
+  node.type = "image"
+  delete node.children
 }
 
 const applyWikilinkReplacementsToMarkdownTree = (
