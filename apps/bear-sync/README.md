@@ -16,11 +16,11 @@ Tokenization here is deliberately limited to frontmatter + date extraction — t
 
 - `id` / `obsidianUrl`: Bear's `ZUNIQUEIDENTIFIER` is used directly as the note ID (already a stable UUID); `obsidianUrl` is populated with a `bear://x-callback-url/open-note?id=...` deep link instead of an `obsidian://` one — the field name is reused as-is rather than renamed across the ~20 files in `apps/web` that reference it, since consumers just render it as a plain link href.
 - `title` / `basename`: Bear's `ZTITLE` column.
-- `fullText` / `frontmatter`: Bear's `ZTEXT`, run through `parseFrontMatter`.
+- `fullText` / `frontmatter`: Bear's `ZTEXT`, run through `parseFrontMatter`, then through `resolveFrontmatterImages` (same as the Obsidian path) so `frontmatter.images` picks up every image found in the body — standard `![alt](path)`/`![[path]]` syntax, and a plain `[label](url)` link whose destination looks like an image file (Bear's own inline-image-preview format).
 - `dates`: dates found in the title/body via `extractNoteDates`, plus both `ZCREATIONDATE` and `ZMODIFICATIONDATE` (converted from Core Data's reference epoch) folded in — unlike the Obsidian path, Bear notes have a real DB-tracked creation date, not just a file mtime.
 - `tags`: inline `#foo/bar`/`#multi word tag#` hashtags found in the body via `extractTags` — the same first-class tagging Bear's own UI understands, extracted from plain text since Bear stores no separate tag column.
 - `folder`: always empty — Bear has no folder concept (tags aren't a stand-in for one here).
-- Attachments/images: **out of scope**. `frontmatter.images` is left as whatever the parsed frontmatter contains (typically unset); embedded image links in Bear note bodies won't resolve through `image-server` yet.
+- Local attachments: **out of scope**. `resolveFrontmatterImages` is called with no attachments directory or note path to root a local image in, so only images referenced by an external URL actually resolve to something `image-server` can serve — a bare local filename in a Bear note's body just resolves to itself, which won't render.
 
 ## Configuration (environment variables)
 

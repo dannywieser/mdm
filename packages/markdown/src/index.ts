@@ -10,6 +10,8 @@ export { isImageUrl } from "./parsers/isImageUrl"
 export { parseDateString } from "./parsers/parseDateString"
 export { parseFrontMatter } from "./parsers/parseFrontMatter"
 export { parseMarkdownBodyDates } from "./parsers/parseMarkdownBodyDates"
+export { resolveFrontmatterImages } from "./parsers/resolveFrontmatterImages"
+export { resolveLocalImagePath } from "./parsers/resolveLocalImagePath"
 
 export type {
   FrontmatterValue,

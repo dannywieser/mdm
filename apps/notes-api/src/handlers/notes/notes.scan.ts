@@ -1,12 +1,17 @@
 import { resolveNotesConfig } from "app-config"
-import { buildObsidianUrl, extractNoteDates, extractTags, parseFrontMatter, resolveOldestDate } from "markdown"
+import {
+  buildObsidianUrl,
+  extractNoteDates,
+  extractTags,
+  parseFrontMatter,
+  resolveFrontmatterImages,
+  resolveOldestDate,
+} from "markdown"
 import { createFileID } from "mdm-util"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 
 import type { ScannedNote } from "./notes.types"
-
-import { resolveFrontmatterImages } from "./notes.parse"
 
 export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 

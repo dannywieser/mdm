@@ -67,6 +67,24 @@ describe("convertBearNoteToScannedNote", () => {
     expect(note.createdDate).toBe("2001-01-01T00:00:00.000Z")
   })
 
+  test("collects images found in the body into frontmatter.images", () => {
+    const row = createBearNoteRow({
+      ZTEXT: "# Why\n[3h6HmH](https://images.dgwlab.net/i/3h6HmH.jpg)",
+    })
+
+    const note = convertBearNoteToScannedNote(row, [])
+
+    expect(note.frontmatter).toEqual({
+      images: ["https://images.dgwlab.net/i/3h6HmH.jpg"],
+    })
+  })
+
+  test("returns null frontmatter when the body has no images", () => {
+    const note = convertBearNoteToScannedNote(createBearNoteRow(), [])
+
+    expect(note.frontmatter).toBeNull()
+  })
+
   test("extracts inline tags found in the note body", () => {
     const row = createBearNoteRow({
       ZTEXT: "# Why\nBody text #personal/daily and #reflection.",

@@ -56,7 +56,6 @@ vi.mock("../filters/notes.filters", () => ({
 vi.mock("../notes.parse", () => ({
   EMPTY_MARKDOWN_NODE: { children: [], type: "root" },
   parseMarkdownFile: vi.fn(),
-  resolveFrontmatterImages: vi.fn((fm: unknown) => fm),
 }))
 
 vi.mock("../notes.scan", () => ({

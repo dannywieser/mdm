@@ -1,8 +1,7 @@
-import type { MarkdownNode, Note, NoteFrontmatter } from "markdown"
+import type { MarkdownNode, Note } from "markdown"
 
 import { resolveNotesConfig } from "app-config"
-import { extractImagePaths, isImageUrl } from "markdown"
-import { isExternalUrl } from "mdm-util"
+import { isImageUrl, resolveLocalImagePath } from "markdown"
 import path from "node:path"
 import remark from "remark"
 import remarkGfm from "remark-gfm"
@@ -51,41 +50,6 @@ export const parseMarkdownFile = async (
     content,
     linkedNotes,
   }
-}
-
-const resolveImagePath = (
-  rawPath: string,
-  noteRelativePath: string,
-  attachmentsDirectory: string,
-): string | null => {
-  const trimmedPath = rawPath.trim()
-  if (!trimmedPath || trimmedPath.startsWith("#")) return null
-  if (isExternalUrl(trimmedPath)) return trimmedPath
-  return resolveLocalImagePath(trimmedPath, noteRelativePath, attachmentsDirectory)
-}
-
-const omitImages = (frontmatter: NoteFrontmatter): NoteFrontmatter =>
-  Object.fromEntries(
-    Object.entries(frontmatter).filter(([key]) => key !== "images"),
-  )
-
-export const resolveFrontmatterImages = (
-  frontmatter: NoteFrontmatter | null,
-  body: string,
-  noteRelativePath: string,
-  attachmentsDirectory: string,
-): NoteFrontmatter | null => {
-  const resolvedImagePaths = extractImagePaths(body)
-    .map((imagePath) => resolveImagePath(imagePath, noteRelativePath, attachmentsDirectory))
-    .filter((imagePath): imagePath is string => imagePath !== null)
-
-  const restFrontmatter = frontmatter ? omitImages(frontmatter) : null
-
-  if (resolvedImagePaths.length === 0) {
-    return restFrontmatter && Object.keys(restFrontmatter).length > 0 ? restFrontmatter : null
-  }
-
-  return { ...restFrontmatter, images: resolvedImagePaths }
 }
 
 const buildMarkdownTree = (
@@ -289,60 +253,6 @@ const replaceTagPlaceholdersInNode = (
   return parts
 }
 
-const resolveMultiComponentImagePath = (decodedImagePath: string, noteRelativePath: string): string => {
-  if (decodedImagePath.startsWith("/")) {
-    return decodedImagePath.replace(/^\/+/, "")
-  }
-  if (decodedImagePath.startsWith("./") || decodedImagePath.startsWith("../")) {
-    return path.posix.join(path.posix.dirname(noteRelativePath), decodedImagePath)
-  }
-  return decodedImagePath
-}
-
-const resolveLocalImagePath = (
-  rawImagePath: string,
-  noteRelativePath: string,
-  attachmentsDirectory = "",
-): string | null => {
-  const sanitizedImagePath = rawImagePath.trim()
-
-  if (!sanitizedImagePath || isExternalUrl(sanitizedImagePath)) {
-    return null
-  }
-
-  const baseImagePath = sanitizedImagePath.split(/[?#]/)[0] ?? ""
-
-  if (!baseImagePath) {
-    return null
-  }
-
-  const decodedImagePath = safeDecodeURIComponent(baseImagePath)
-
-  if (!decodedImagePath.includes("/")) {
-    const noteDir = path.posix.dirname(noteRelativePath)
-    const noteStem = path.posix.basename(noteRelativePath).replace(/\.[^.]+$/, "")
-    const parts: string[] = []
-    if (attachmentsDirectory) parts.push(attachmentsDirectory)
-    if (noteDir !== ".") parts.push(noteDir)
-    parts.push(noteStem, decodedImagePath)
-    return path.posix.join(...parts)
-  }
-
-  const resolvedImagePath = resolveMultiComponentImagePath(decodedImagePath, noteRelativePath)
-  const normalizedImagePath = path.posix.normalize(resolvedImagePath)
-
-  if (
-    normalizedImagePath === "" ||
-    normalizedImagePath === "." ||
-    normalizedImagePath === ".." ||
-    normalizedImagePath.startsWith("../")
-  ) {
-    return null
-  }
-
-  return normalizedImagePath
-}
-
 const visitMarkdownTree = (
   node: MarkdownNode | undefined,
   visitor: (node: MarkdownNode) => void,
@@ -358,14 +268,6 @@ const visitMarkdownTree = (
   }
 
   node.children.forEach((childNode) => { visitMarkdownTree(childNode, visitor); })
-}
-
-const safeDecodeURIComponent = (value: string): string => {
-  try {
-    return decodeURIComponent(value)
-  } catch {
-    return value
-  }
 }
 
 const isMarkdownNode = (value: unknown): value is MarkdownNode => {
