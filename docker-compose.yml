@@ -79,10 +79,13 @@ services:
     build:
       context: .
       dockerfile: infra/docker/habit-tracker.Dockerfile
+    depends_on:
+      - redis
     environment:
       APP_CONFIG_PATH: "/app/app.config.json"
       PORT: "3003"
       NOTES_ROOT: "/data/notes"
+      REDIS_URL: "redis://redis:6379"
     expose:
       - "3003"
     volumes:
@@ -95,10 +98,13 @@ services:
     build:
       context: .
       dockerfile: infra/docker/stats-service.Dockerfile
+    depends_on:
+      - redis
     environment:
       APP_CONFIG_PATH: "/app/app.config.json"
       PORT: "3004"
       NOTES_ROOT: "/data/notes"
+      REDIS_URL: "redis://redis:6379"
     expose:
       - "3004"
     volumes:

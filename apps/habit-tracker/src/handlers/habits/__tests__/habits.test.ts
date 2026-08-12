@@ -4,6 +4,8 @@ import { collectMarkdownFiles } from "markdown"
 import type { HabitEntry } from "../../habit-detail/habit-detail.types"
 import type { HabitSummary } from "../habits.types"
 
+import { loadBearNotes } from "../../../redis/loadBearNotes"
+import { scanHabitEntriesFromNotes } from "../../habit-detail/habit-detail.bear"
 import { scanHabitEntries } from "../../habit-detail/habit-detail.files"
 import { habitsHandler } from "../habits"
 
@@ -25,6 +27,14 @@ vi.mock("markdown", async (importOriginal) => {
 
 vi.mock("../../habit-detail/habit-detail.files", () => ({
   scanHabitEntries: vi.fn(),
+}))
+
+vi.mock("../../habit-detail/habit-detail.bear", () => ({
+  scanHabitEntriesFromNotes: vi.fn(),
+}))
+
+vi.mock("../../../redis/loadBearNotes", () => ({
+  loadBearNotes: vi.fn(),
 }))
 
 const makeEntry = (date: string, value: number): HabitEntry => ({ date, obsidianUrl: "", value })
@@ -135,32 +145,26 @@ describe("habitsHandler", () => {
     expect(json).toHaveBeenCalledWith([])
   })
 
-  test("skips the filesystem scan and returns zero-entry summaries when notesSource is bear", async () => {
+  test("skips the filesystem scan and loads notes from redis when notesSource is bear", async () => {
     vi.mocked(resolveNotesConfig).mockResolvedValue({
       ...BASE_CONFIG,
       notesDirectory: "",
       notesSource: "bear",
       habits: [HABIT_DO_MORE],
     })
-    vi.mocked(scanHabitEntries).mockResolvedValue([])
+    const bearNotes = [{ id: "a" } as never]
+    vi.mocked(loadBearNotes).mockResolvedValue(bearNotes)
+    vi.mocked(scanHabitEntriesFromNotes).mockReturnValue([makeEntry("2025-01-01", 5)])
 
     const { response, status, json } = makeResponse()
     await habitsHandler({} as never, response, vi.fn())
 
     expect(collectMarkdownFiles).not.toHaveBeenCalled()
-    expect(scanHabitEntries).toHaveBeenCalledWith([], "exercise")
+    expect(scanHabitEntries).not.toHaveBeenCalled()
+    expect(loadBearNotes).toHaveBeenCalled()
+    expect(scanHabitEntriesFromNotes).toHaveBeenCalledWith(bearNotes, "exercise", "created", ["YYYY.MM.DD"])
     expect(status).toHaveBeenCalledWith(200)
-    expect(getJsonResult(json)).toEqual([
-      {
-        habitId: "exercise",
-        habitName: "Exercise",
-        habitScore: 0,
-        mode: "do-more",
-        streak: 0,
-        targetScore: undefined,
-        windowEntries: 0,
-      },
-    ])
+    expect(getJsonResult(json)[0]).toMatchObject({ habitId: "exercise", habitName: "Exercise" })
   })
 
   test("returns generic 500 on unexpected error", async () => {

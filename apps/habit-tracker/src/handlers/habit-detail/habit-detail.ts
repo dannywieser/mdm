@@ -5,9 +5,11 @@ import { resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 
-import type { HabitResult } from "./habit-detail.types"
+import type { HabitEntry, HabitResult } from "./habit-detail.types"
 
 import { logger } from "../../logger"
+import { loadBearNotes } from "../../redis/loadBearNotes"
+import { scanHabitEntriesFromNotes } from "./habit-detail.bear"
 import { scanHabitEntries } from "./habit-detail.files"
 import { buildHistory, buildScoreBreakdown, buildScoreEntries, buildStreaks, calculateHabitScore, calculateLowestDaysTrackedPerPeriod, getWindowEntries } from "./habit-detail.util"
 
@@ -16,7 +18,7 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
 
   try {
     notesConfig = await resolveNotesConfig()
-    const { habits, notesDirectory, notesSource, timezone } = notesConfig
+    const { createdDateProperty, dateFormats, habits, notesDirectory, notesSource, timezone } = notesConfig
 
     const habitId = String(request.params.id)
     const habitConfig = habits.find((h) => h.id === habitId)
@@ -36,13 +38,10 @@ export const habitDetailHandler: RequestHandler = async (request, response) => {
       trackingWindowDays,
     }, "[habit] config resolved")
 
-    // habit-tracker only knows how to scan a filesystem vault; the Bear source has no
-    // local files to score against, so it degrades to zero-entry results instead of erroring.
-    const filePaths = notesSource === "obsidian" ? await collectMarkdownFiles(notesDirectory) : []
-    logger.debug({ count: filePaths.length, notesDirectory }, "[habit] collectMarkdownFiles found files")
-
-    const entries = await scanHabitEntries(filePaths, frontmatterProperty)
-    logger.debug({ count: entries.length, frontmatterProperty }, "[habit] scanHabitEntries matched entries")
+    const entries: HabitEntry[] = notesSource === "bear"
+      ? scanHabitEntriesFromNotes(await loadBearNotes(), frontmatterProperty, createdDateProperty, dateFormats)
+      : await scanHabitEntries(await collectMarkdownFiles(notesDirectory), frontmatterProperty)
+    logger.debug({ count: entries.length, frontmatterProperty }, "[habit] matched entries")
 
     const today = new Date().toLocaleDateString("en-CA", { timeZone: timezone })
     const {

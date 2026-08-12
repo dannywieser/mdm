@@ -4,7 +4,9 @@ import { addDays } from "mdm-util"
 
 import type { HabitEntry, HabitResult } from "../habit-detail.types"
 
+import { loadBearNotes } from "../../../redis/loadBearNotes"
 import { habitDetailHandler } from "../habit-detail"
+import { scanHabitEntriesFromNotes } from "../habit-detail.bear"
 import { scanHabitEntries } from "../habit-detail.files"
 import {
   buildHistory,
@@ -41,6 +43,14 @@ vi.mock("markdown", async (importOriginal) => {
 
 vi.mock("../habit-detail.files", () => ({
   scanHabitEntries: vi.fn(),
+}))
+
+vi.mock("../habit-detail.bear", () => ({
+  scanHabitEntriesFromNotes: vi.fn(),
+}))
+
+vi.mock("../../../redis/loadBearNotes", () => ({
+  loadBearNotes: vi.fn(),
 }))
 
 vi.mock("mdm-util", async (importOriginal) => {
@@ -1435,23 +1445,26 @@ describe("habitDetailHandler", () => {
     expect(json).toHaveBeenCalledWith({ error: "Unable to load habit" })
   })
 
-  test("skips the filesystem scan and returns a zero-entry result when notesSource is bear", async () => {
+  test("loads notes from redis instead of the filesystem when notesSource is bear", async () => {
     vi.mocked(resolveNotesConfig).mockResolvedValue({
       ...mockConfig,
       notesDirectory: "",
       notesSource: "bear",
     })
-    vi.mocked(scanHabitEntries).mockResolvedValue([])
+    const bearNotes = [{ id: "a" } as never]
+    vi.mocked(loadBearNotes).mockResolvedValue(bearNotes)
+    vi.mocked(scanHabitEntriesFromNotes).mockReturnValue(mockEntries)
 
     const { response, status, json } = makeResponse()
     await habitDetailHandler(makeRequest("exercise"), response, vi.fn())
 
     expect(collectMarkdownFiles).not.toHaveBeenCalled()
-    expect(scanHabitEntries).toHaveBeenCalledWith([], "exercise")
+    expect(scanHabitEntries).not.toHaveBeenCalled()
+    expect(loadBearNotes).toHaveBeenCalled()
+    expect(scanHabitEntriesFromNotes).toHaveBeenCalledWith(bearNotes, "exercise", "created", ["YYYY.MM.DD"])
     expect(status).toHaveBeenCalledWith(200)
     const result = getJsonResult(json)
-    expect(result.habitScore).toBe(0)
-    expect(result.history).toEqual([])
+    expect(result.history.map((h) => h.date)).toEqual(["2025-01-01", "2025-01-02", "2025-01-03"])
   })
 
   test("windowStart begins the trackingWindowDays-day window ending today", async () => {

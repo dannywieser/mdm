@@ -12,6 +12,7 @@ export { parseFrontMatter } from "./parsers/parseFrontMatter"
 export { parseMarkdownBodyDates } from "./parsers/parseMarkdownBodyDates"
 export { resolveFrontmatterImages } from "./parsers/resolveFrontmatterImages"
 export { resolveLocalImagePath } from "./parsers/resolveLocalImagePath"
+export { loadScannedNotesFromHash } from "./redis/loadScannedNotesFromHash"
 
 export type {
   FrontmatterValue,
@@ -23,3 +24,5 @@ export type {
   ParsedFrontMatter,
   ScannedNote,
 } from "./types"
+
+export type { ScannedNotesRedisClient } from "./redis/loadScannedNotesFromHash.types"

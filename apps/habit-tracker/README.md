@@ -17,7 +17,7 @@ Express-based API for tracking configurable habits scored from note frontmatter.
 - `GET /habits`
   - Purpose: list every habit configured under `habits` in `app.config.json`, each with its current score, streak, mode, tracking-window entry count, and `targetScore` — intended for rendering a lightweight overview (for example a grid of habit cards) without the per-habit cost of computing full history
   - `targetScore` is omitted from the response (rather than appearing as `null`) for habits where it isn't configured, since `JSON.stringify` drops `undefined` properties
-  - This service only scores notes scanned from a filesystem vault. When `notesSource` is `"bear"` (see `notes-api`'s `README.md`), there's no vault to scan, so every habit is returned with zeroed-out score/streak/entry values instead of erroring — habit tracking isn't yet supported against the Bear source.
+  - When `notesSource` is `"obsidian"`, notes are scanned from the filesystem vault (`NOTES_ROOT`). When `notesSource` is `"bear"`, notes are instead loaded from the `notes:bear` Redis hash that `notes-ingest` populates from `bear-sync` pushes (see `notes-api`'s `README.md`) — scoring behaves identically either way, since both paths resolve to the same frontmatter-driven entry scan.
   - `windowEntries` is the count of distinct days with a logged entry within the current `trackingWindowDays` window
   - Success response: `200`
     ```json
@@ -47,7 +47,7 @@ Express-based API for tracking configurable habits scored from note frontmatter.
     ```
 - `GET /habits/:id`
   - Purpose: load the habit configured under `habits` in `app.config.json` (matched by `id`), scan notes for the configured `frontmatterProperty` (a numeric value of at least `1`, with no upper bound so habits can track unbounded quantities like a dollar amount), and return the current score, streak, entry count, a point-in-time history for every day from the first matching note through today, a dedicated streak-period breakdown, and all-time highs
-  - Same `notesSource: "bear"` caveat as `GET /habits` above: with no vault to scan, the response is a zero-entry result (`habitScore: 0`, empty `history`/`streaks`/`scoreEntries`, etc.) rather than an error
+  - Same `notesSource` dispatch as `GET /habits` above: notes come from the filesystem vault or the `notes:bear` Redis hash depending on config
   - `mode` and `targetScore` are passed through from the habit's configuration. `targetScore` is only meaningful for `do-less` habits — it defines the score thresholds a UI can use to render a green/yellow/red status (for example a `targetScore` of `100` implies green for scores up to `50`, yellow up to `75`, and red from `75` upward) — and is omitted from the response (rather than appearing as `null`) when not configured, since `JSON.stringify` drops `undefined` properties
   - Scoring: sums frontmatter values from notes within the rolling `trackingWindowDays` window (entries from the last `recentWindowDays` days, default 14, count at a `recentMultiplier`, default 10x) to get a base total, then multiplies it by `(1 + dayMultiplier) * (1 + streakMultiplier)`. Both multipliers use the same *tiered* per-day rate, not a flat one: `baseBonusRate` (default 0.5%) for each of the first `bonusTierSize` (default 5) days/streak-days, +`bonusRateIncrement` (default 0.1%) per additional tier beyond that — so with the defaults, 5 days/streak-days contributes 2.5% (5 × 0.5%), but 10 contributes 5.5% (5 × 0.5% + 5 × 0.6%), not the 5% a flat rate would imply. `dayMultiplier` sums this tiered rate across the distinct days-with-an-entry in the window (always a positive adjustment, in both modes); `streakMultiplier` sums it across the current streak length, applied as a bonus for `do-more` habits and a penalty for `do-less` habits. Final scores are floored to whole numbers. All of these knobs are configurable per-habit via `scoring` (see Configuration below); setting a knob to `0` disables the bonus/penalty it controls, so a habit with every `scoring` field set to `0` simply reports the raw sum of its entry values with no bonuses, penalties, or minimum-streak-length threshold.
   - The top-level `streak` reflects the current streak as of the reference date. Its definition depends on mode:
@@ -144,6 +144,9 @@ Express-based API for tracking configurable habits scored from note frontmatter.
 
 ## Configuration
 
+- `notesSource` (optional, `"obsidian"` or `"bear"`, defaults to `"obsidian"`, see `packages/app-config`'s config docs): selects where habit-scoring notes are read from.
+  - `"obsidian"`: scans the filesystem vault at `NOTES_ROOT`.
+  - `"bear"`: reads notes from Redis instead — the `notes:bear` hash that `notes-ingest` populates from `bear-sync` pushes (see `apps/bear-sync/README.md` and `apps/notes-ingest/README.md`). `NOTES_ROOT` is unused in this mode. `REDIS_URL` (environment variable, default `redis://localhost:6379`) configures the connection; the service fails to start if Redis is unreachable when `notesSource` is `"bear"`.
 - `habits` (optional): array of habit configs consumed by `GET /habits` and `GET /habits/:id`. Each habit has:
   - `id`: route key used by `GET /habits/:id`
   - `name`: human-readable label returned in the response
