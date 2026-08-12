@@ -1,5 +1,25 @@
 # markdown
 
+## 3.4.0
+
+### Minor Changes
+
+- e8c02e3: A note's raw body is now also scanned for plain `[label](url)` links whose destination looks like an image file by extension (Bear's inline-image-preview format, e.g. `[3h6HmH](https://images.example.com/i/3h6HmH.jpg)`), in addition to the existing `![alt](path)` and `![[path]]` syntaxes. Matching images are added to `frontmatter.images` the same as any other image, and in `content` the link is rendered as an inline `image` node (`alt` taken from the link text) instead of a plain `link` node. A `[label](url)` link whose destination isn't recognized as an image is left as a normal `link` node.
+
+  `markdown` exports a new `isImageUrl(url)` helper for this extension-based check, plus `resolveFrontmatterImages`/`resolveLocalImagePath` (moved out of `notes-api` so `bear-sync` can share them).
+
+  Bear-sourced notes now get `frontmatter.images` populated too, previously skipped entirely for the Bear note source — this is what `apps/web`'s `NotesGallery` reads to decide which notes have a cover image, so Bear notes with images can now appear there. Only images referenced by an external URL resolve to something renderable, since Bear notes have no local attachments directory for a bare filename to resolve against.
+
+- f0f70e0: Notes now carry a first-class `tags` field, populated by scanning the note body for inline hashtags (`#foo/bar`, and Bear's closing-hash `#multi word tag#` form) — the same syntax Bear treats as first-class, previously only available in Obsidian via frontmatter. Both note sources (file scan and Bear sync) extract tags this way, so `tags` is available on every note regardless of `notesSource`.
+
+  `tags` is a plain string array, so it works with view filters exactly like any other array-valued property (for example `{"tags": "personal/daily"}` in a view's `filters`) and with `badges`/`notesGalleryFilters` the same as `frontmatter.*` array fields. A nested tag is also expanded into its individual segments alongside the full tag — `#foo/bar` produces `"foo"`, `"bar"`, and `"foo/bar"` in `tags` — so a filter can match a specific leaf or any level of the hierarchy. In rendered note content, each inline hashtag is now replaced with a `{"type": "tag", "value": "..."}` markdown node (holding the full, unsplit tag) instead of being left as plain text, and `apps/web` renders it as a small badge inline with the surrounding text.
+
+  `notes-ingest`'s `POST /notes/sync` payload validation now requires `tags` (a string array) on every synced note.
+
+### Patch Changes
+
+- mdm-util@3.4.0
+
 ## 3.3.0
 
 ### Minor Changes

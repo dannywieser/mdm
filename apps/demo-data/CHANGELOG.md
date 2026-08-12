@@ -1,5 +1,17 @@
 # demo-data
 
+## 1.2.4
+
+### Patch Changes
+
+- Updated dependencies [e8c02e3]
+- Updated dependencies [24c1aa2]
+- Updated dependencies [f0f70e0]
+  - notes-api@3.4.0
+  - habit-tracker@1.4.2
+  - stats-service@1.1.19
+  - mdm-util@3.4.0
+
 ## 1.2.3
 
 ### Patch Changes

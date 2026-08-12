@@ -1,5 +1,21 @@
 # web
 
+## 3.4.0
+
+### Minor Changes
+
+- f0f70e0: Notes now carry a first-class `tags` field, populated by scanning the note body for inline hashtags (`#foo/bar`, and Bear's closing-hash `#multi word tag#` form) — the same syntax Bear treats as first-class, previously only available in Obsidian via frontmatter. Both note sources (file scan and Bear sync) extract tags this way, so `tags` is available on every note regardless of `notesSource`.
+
+  `tags` is a plain string array, so it works with view filters exactly like any other array-valued property (for example `{"tags": "personal/daily"}` in a view's `filters`) and with `badges`/`notesGalleryFilters` the same as `frontmatter.*` array fields. A nested tag is also expanded into its individual segments alongside the full tag — `#foo/bar` produces `"foo"`, `"bar"`, and `"foo/bar"` in `tags` — so a filter can match a specific leaf or any level of the hierarchy. In rendered note content, each inline hashtag is now replaced with a `{"type": "tag", "value": "..."}` markdown node (holding the full, unsplit tag) instead of being left as plain text, and `apps/web` renders it as a small badge inline with the surrounding text.
+
+  `notes-ingest`'s `POST /notes/sync` payload validation now requires `tags` (a string array) on every synced note.
+
+### Patch Changes
+
+- 2f2e5c1: Fixed the notes review screen showing a note's title twice for Bear-sourced notes: Bear embeds the title as an H1 in the note body, which was rendered directly beneath the page's own title heading. The page-level title is now hidden whenever a note's content already opens with an H1.
+  - services@2.3.5
+  - mdm-util@3.4.0
+
 ## 3.3.0
 
 ### Patch Changes

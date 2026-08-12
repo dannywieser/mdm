@@ -1,6 +1,6 @@
 {
   "name": "app-config",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "private": true,
   "license": "MIT",
   "main": "dist/index.js",
@@ -22,6 +22,6 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "mdm-util": "3.3.0"
+    "mdm-util": "3.4.0"
   }
 }
