@@ -1,6 +1,12 @@
 import type { ScannedNote } from "markdown"
 
-import { extractNoteDates, extractTags, parseFrontMatter, resolveOldestDate } from "markdown"
+import {
+  extractNoteDates,
+  extractTags,
+  parseFrontMatter,
+  resolveFrontmatterImages,
+  resolveOldestDate,
+} from "markdown"
 
 import type { BearNoteRow } from "../db/db.types"
 
@@ -9,9 +15,12 @@ import { coreDataTimestampToISOString } from "./coreDataDate"
 
 /**
  * Converts a raw Bear note row into a ScannedNote, the same shape notes-api
- * gets from scanning an Obsidian file. Bear notes have no folder or
+ * gets from scanning an Obsidian file. Bear notes have no folder or local
  * attachments concept (out of scope for the text sync pipeline), so those
- * fields are left empty.
+ * fields are left empty — resolveFrontmatterImages is still called so images
+ * referenced by external URL (the only kind Bear notes carry) end up in
+ * frontmatter.images; a bare local filename just resolves to itself, since
+ * there's no attachments directory to root it in.
  */
 export const convertBearNoteToScannedNote = (
   row: BearNoteRow,
@@ -34,7 +43,7 @@ export const convertBearNoteToScannedNote = (
     dates,
     createdDate: resolveOldestDate(dates, dateFormats)?.toISOString() ?? null,
     folder: "",
-    frontmatter,
+    frontmatter: resolveFrontmatterImages(frontmatter, body, "", ""),
     fullPath: row.ZUNIQUEIDENTIFIER,
     fullText: body,
     id: row.ZUNIQUEIDENTIFIER,

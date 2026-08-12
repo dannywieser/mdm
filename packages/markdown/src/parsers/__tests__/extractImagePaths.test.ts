@@ -63,10 +63,26 @@ describe("extractImagePaths", () => {
     ).toEqual(["photo.png"])
   })
 
-  test("ignores non-image links", () => {
-    expect(extractImagePaths("[not an image](file.png)\n\n![alt](actual-image.png)")).toEqual([
+  test("ignores links to non-image files", () => {
+    expect(extractImagePaths("[not an image](file.html)\n\n![alt](actual-image.png)")).toEqual([
       "actual-image.png",
     ])
+  })
+
+  test("extracts a plain link pointing at an image file", () => {
+    expect(extractImagePaths("[3h6HmH](https://images.dgwlab.net/i/3h6HmH.jpg)")).toEqual([
+      "https://images.dgwlab.net/i/3h6HmH.jpg",
+    ])
+  })
+
+  test("ignores a plain link with no recognizable image extension", () => {
+    expect(extractImagePaths("[my site](https://example.com/about)")).toEqual([])
+  })
+
+  test("deduplicates a plain image link that repeats a markdown image", () => {
+    expect(
+      extractImagePaths("![alt](photo.png)\n\n[photo](photo.png)"),
+    ).toEqual(["photo.png"])
   })
 
   test("returns an empty array for an empty string", () => {

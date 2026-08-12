@@ -6,9 +6,12 @@ export { collectMarkdownFiles } from "./files/collectMarkdownFiles"
 export { BEAR_NOTES_HASH_KEY } from "./noteSync"
 export { extractImagePaths } from "./parsers/extractImagePaths"
 export { extractTags, TAG_PATTERN } from "./parsers/extractTags"
+export { isImageUrl } from "./parsers/isImageUrl"
 export { parseDateString } from "./parsers/parseDateString"
 export { parseFrontMatter } from "./parsers/parseFrontMatter"
 export { parseMarkdownBodyDates } from "./parsers/parseMarkdownBodyDates"
+export { resolveFrontmatterImages } from "./parsers/resolveFrontmatterImages"
+export { resolveLocalImagePath } from "./parsers/resolveLocalImagePath"
 
 export type {
   FrontmatterValue,

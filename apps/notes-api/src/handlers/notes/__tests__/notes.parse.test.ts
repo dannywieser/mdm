@@ -199,6 +199,50 @@ describe("notes parse helpers", () => {
     expect(image.url).toBe("https://example.com/image.png")
   })
 
+  test("parseMarkdownFile renders a plain link to an image url as an inline image", async () => {
+    const note = await parseMarkdownFile(
+      createScannedNote({
+        fullPath: "/notes/topic/note.md",
+        fullText: "[3h6HmH](https://images.dgwlab.net/i/3h6HmH.jpg)",
+      }),
+    )
+
+    expect(findNodesByType(note.content, "link")).toEqual([])
+    const image = findNodesByType(note.content, "image")[0]
+    expect(image.url).toBe("https://images.dgwlab.net/i/3h6HmH.jpg")
+    expect(image.alt).toBe("3h6HmH")
+  })
+
+  test("parseMarkdownFile rewrites a plain link to a local image url through the image server", async () => {
+    const note = await parseMarkdownFile(
+      createScannedNote({
+        basename: "journal.md",
+        folder: "daily",
+        fullPath: "/notes/daily/journal.md",
+        fullText: "[Cover](attachments/daily/journal/cover.jpg)",
+        title: "journal",
+      }),
+    )
+
+    expect(findNodesByType(note.content, "link")).toEqual([])
+    const image = findNodesByType(note.content, "image")[0]
+    expect(image.url).toBe("/images?path=attachments%2Fdaily%2Fjournal%2Fcover.jpg")
+  })
+
+  test("parseMarkdownFile leaves a plain link to a non-image url as a link", async () => {
+    const note = await parseMarkdownFile(
+      createScannedNote({
+        fullPath: "/notes/topic/note.md",
+        fullText: "[my site](https://example.com/about)",
+      }),
+    )
+
+    expect(findNodesByType(note.content, "image")).toEqual([])
+    const linkNode = findNodesByType(note.content, "link")[0]
+    expect(linkNode.url).toBe("https://example.com/about")
+    expect(extractNodeText(linkNode)).toBe("my site")
+  })
+
   test("parseMarkdownFile replaces unmatched wikilink with unmatched wikilink text node", async () => {
     const note = await parseMarkdownFile(
       createScannedNote({
