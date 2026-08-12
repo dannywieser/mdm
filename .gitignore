@@ -7,3 +7,6 @@ coverage
 app.config.json
 .vault
 apps/web/public/demo-data
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm

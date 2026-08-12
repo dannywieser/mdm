@@ -2,14 +2,14 @@ import type { ResolvedNotesConfig } from "app-config"
 import type { RequestHandler, Request } from "express"
 
 import { resolveNotesConfig } from "app-config"
-import { collectMarkdownFiles } from "markdown"
 import { toLoggableError } from "mdm-util"
 
 import { logger } from "../../logger"
 import { applyViewFilter } from "./filters/notes.filters"
 import { createNotesScanCache } from "./notes.cache"
 import { EMPTY_MARKDOWN_NODE, parseMarkdownFile } from "./notes.parse"
-import { scanMarkdownFile } from "./notes.scan"
+import { getNotesRedisClient } from "./sources/notesRedisClient"
+import { resolveNoteSource } from "./sources/resolveNoteSource"
 
 const CACHE_TTL_MS = 30 * 1000
 
@@ -39,19 +39,7 @@ export const notesHandler: RequestHandler = async (request, response) => {
   try {
     const scannedNotes = await notesScanCache.get(async () => {
       notesConfig = await resolveNotesConfig()
-      const { notesDirectory } = notesConfig
-
-      const markdownFiles = (await collectMarkdownFiles(notesDirectory)).toSorted(
-        (a, b) => a.localeCompare(b),
-      )
-      logger.debug(
-        { count: markdownFiles.length, notesDirectory },
-        "[notes] collectMarkdownFiles found files",
-      )
-
-      return Promise.all(
-        markdownFiles.map((filePath) => scanMarkdownFile(filePath)),
-      )
+      return resolveNoteSource(notesConfig, getNotesRedisClient()).listNotes()
     })
 
     logger.debug(

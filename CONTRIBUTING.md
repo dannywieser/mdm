@@ -18,11 +18,13 @@ This repository is a Turborepo monorepo with:
 - `apps/image-server`: Express-based image proxy for note image assets backed by imgproxy. See [`apps/image-server/README.md`](apps/image-server/README.md).
 - `apps/stats-service`: Express-based API for aggregate vault statistics. See [`apps/stats-service/README.md`](apps/stats-service/README.md).
 - `apps/habit-tracker`: Express-based API for tracking configurable habits scored from note frontmatter. See [`apps/habit-tracker/README.md`](apps/habit-tracker/README.md).
+- `apps/notes-ingest`: Express-based, unauthenticated endpoint that receives note sync payloads (pushed from `bear-sync`) and stores them in Redis for `notes-api` to serve when `notesSource: "bear"` is configured. See [`apps/notes-ingest/README.md`](apps/notes-ingest/README.md).
+- `apps/bear-sync`: scheduled Mac-side script (not a server, not part of the Docker stack) that reads notes out of Bear's local sqlite database and pushes them to `notes-ingest`. See [`apps/bear-sync/README.md`](apps/bear-sync/README.md).
 
 ### Packages
 
 - `packages/app-config`: reads, validates, and caches `app.config.json` + `NOTES_ROOT` into the resolved config every backend service consumes. See [`packages/app-config/README.md`](packages/app-config/README.md).
-- `packages/markdown`: frontmatter parsing, date extraction, and vault file collection; owns the `Note` type. See [`packages/markdown/README.md`](packages/markdown/README.md).
+- `packages/markdown`: frontmatter parsing, date extraction, and vault file collection; owns the `Note` type and the `ScannedNote`/`NoteSyncPayload` shapes shared by the Bear sync path. See [`packages/markdown/README.md`](packages/markdown/README.md).
 - `packages/util` (`mdm-util`): dependency-free pure-function helpers (dates, strings, objects, promises, regex, IDs) shared across the repo, plus `./node` and `./redis` subpath exports. See [`packages/util/README.md`](packages/util/README.md).
 - `packages/logger` (`mdm-logger`): shared `pino`-based structured logger factory used by every backend service. See [`packages/logger/README.md`](packages/logger/README.md).
 - `packages/services`: shared TypeScript types and React Query hooks for the backend services, consumed by `apps/web`. See [`packages/services/README.md`](packages/services/README.md).
@@ -45,6 +47,7 @@ This repository is a Turborepo monorepo with:
   - `attachmentsDirectory` (optional): folder name (relative to `NOTES_ROOT`) where Obsidian stores attachments.
   - `createdDateProperty` (optional, defaults to `"created"`): frontmatter key treated as a note's created-date source.
   - `timezone` (optional, defaults to `"UTC"`): IANA timezone used for date-relative filters (`$today`/`$onThisDay`) and habit scoring.
+  - `notesSource` (optional, `"obsidian"` or `"bear"`, defaults to `"obsidian"`): selects which note source `notes-api` reads from. See [`apps/notes-api/README.md`](apps/notes-api/README.md) for what changes in `"bear"` mode, and [`apps/bear-sync/README.md`](apps/bear-sync/README.md)/[`apps/notes-ingest/README.md`](apps/notes-ingest/README.md) for how notes get into Redis in the first place.
 - See each app's README for app-specific config fields (`views`, `flags`, `habits`, etc.).
 
 ## Running with Docker Compose
@@ -58,7 +61,9 @@ This repository is a Turborepo monorepo with:
   - `image-server` as an internal service on port `3002`
   - `stats-service` as an internal service on port `3004`
   - `imgproxy` as internal image optimizer used by `image-server`
-  - `redis` as internal data storage shared by `flag-manager` and `image-server` (redirect cache)
+  - `redis` as internal data storage shared by `flag-manager` and `image-server` (redirect cache), and by `notes-api`/`notes-ingest` (Bear-sourced notes, only used when `notesSource: "bear"`)
+  - `notes-ingest` on port `3005`, published to the host (not loopback-only like `redis`/`imgproxy`) so `bear-sync`, running on a separate Mac on the LAN, can reach it directly — sits idle unless you're using the Bear note source
+  - `redisinsight` (official Redis Insight UI) on port `5540`, published to the host so you can browse `redis`'s contents (including the `notes:bear` hash) from a browser anywhere on the LAN — pre-configured to connect to the `redis` service via `RI_REDIS_HOST`/`RI_REDIS_PORT`/`RI_REDIS_ALIAS` env vars, no manual connection setup needed. No auth, same as `notes-ingest`.
 - nginx routes:
   - `/api/*` → `notes-api:3000/*` (includes `/api/notes` and `/api/views`)
   - `/flags/*` → `flag-manager:3001/flags/*`

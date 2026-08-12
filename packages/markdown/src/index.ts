@@ -3,6 +3,7 @@ export { resolveDateFromFrontmatterOrTitle } from "./dates/resolveDateFromFrontm
 export { resolveOldestDate } from "./dates/resolveOldestDate"
 export { buildObsidianUrl } from "./files/buildObsidianUrl"
 export { collectMarkdownFiles } from "./files/collectMarkdownFiles"
+export { BEAR_NOTES_HASH_KEY } from "./noteSync"
 export { extractImagePaths } from "./parsers/extractImagePaths"
 export { parseDateString } from "./parsers/parseDateString"
 export { parseFrontMatter } from "./parsers/parseFrontMatter"
@@ -13,6 +14,8 @@ export type {
   MarkdownNode,
   Note,
   NoteFrontmatter,
+  NoteSyncPayload,
   ParsedDate,
   ParsedFrontMatter,
+  ScannedNote,
 } from "./types"

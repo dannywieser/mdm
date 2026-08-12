@@ -94,4 +94,20 @@ describe("validateAppConfig", () => {
       "app.config.json timezone must be a valid IANA timezone identifier",
     )
   })
+
+  test("returns undefined notesSource when omitted", () => {
+    expect(validateAppConfig(VALID_RAW)).toMatchObject({ notesSource: undefined })
+  })
+
+  test("returns validated notesSource when provided", () => {
+    expect(
+      validateAppConfig({ ...VALID_RAW, notesSource: "bear" }),
+    ).toMatchObject({ notesSource: "bear" })
+  })
+
+  test("throws when notesSource is not a recognized value", () => {
+    expect(() =>
+      validateAppConfig({ ...VALID_RAW, notesSource: "notion" }),
+    ).toThrow("app.config.json notesSource must be one of: bear, obsidian")
+  })
 })

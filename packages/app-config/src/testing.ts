@@ -6,6 +6,7 @@ export const createMockNotesConfig = (overrides: Partial<ResolvedNotesConfig> = 
   dateFormats: [],
   habits: [],
   notesDirectory: "/notes",
+  notesSource: "obsidian",
   obsidianVault: "vault",
   timezone: "UTC",
   views: [],

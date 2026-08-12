@@ -11,6 +11,9 @@ describe("createRedisClient", () => {
     close: vi.fn(),
     connect: vi.fn(),
     get: vi.fn(),
+    hDel: vi.fn(),
+    hGetAll: vi.fn(),
+    hSet: vi.fn(),
     on: vi.fn(),
     ping: vi.fn(),
     set: vi.fn(),
@@ -50,6 +53,36 @@ describe("createRedisClient", () => {
     await client.set("key", "value", { EX: 60 })
 
     expect(mockClient.set).toHaveBeenCalledWith("key", "value", { EX: 60 })
+  })
+
+  test("hSet delegates to the underlying client", async () => {
+    mockClient.hSet.mockResolvedValue(1)
+
+    const client = createRedisClient("redis://localhost:6379")
+    const result = await client.hSet("key", "field", "value")
+
+    expect(mockClient.hSet).toHaveBeenCalledWith("key", "field", "value")
+    expect(result).toBe(1)
+  })
+
+  test("hGetAll delegates to the underlying client", async () => {
+    mockClient.hGetAll.mockResolvedValue({ field: "value" })
+
+    const client = createRedisClient("redis://localhost:6379")
+    const result = await client.hGetAll("key")
+
+    expect(mockClient.hGetAll).toHaveBeenCalledWith("key")
+    expect(result).toEqual({ field: "value" })
+  })
+
+  test("hDel delegates to the underlying client", async () => {
+    mockClient.hDel.mockResolvedValue(2)
+
+    const client = createRedisClient("redis://localhost:6379")
+    const result = await client.hDel("key", ["field1", "field2"])
+
+    expect(mockClient.hDel).toHaveBeenCalledWith("key", ["field1", "field2"])
+    expect(result).toBe(2)
   })
 
   test("on registers an error listener with the underlying client", () => {

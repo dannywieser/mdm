@@ -30,12 +30,15 @@ export interface NotesView {
   name: string
 }
 
+export type NotesSource = "bear" | "obsidian"
+
 export interface ResolvedNotesConfig {
   attachmentsDirectory: string
   createdDateProperty: string
   dateFormats: string[]
   habits: HabitConfig[]
   notesDirectory: string
+  notesSource: NotesSource
   obsidianVault: string
   timezone: string
   views: NotesView[]
@@ -45,6 +48,7 @@ export interface AppConfig {
   attachmentsDirectory?: string
   dateFormats?: string[]
   habits?: HabitConfig[]
+  notesSource?: NotesSource
   obsidianVault: string
   timezone?: string
   views?: AppConfigView[]
