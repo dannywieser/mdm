@@ -1,5 +1,11 @@
 # app-config
 
+## 3.5.0
+
+### Patch Changes
+
+- mdm-util@3.5.0
+
 ## 3.4.0
 
 ### Patch Changes

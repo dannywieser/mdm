@@ -1,5 +1,13 @@
 # bear-sync
 
+## 0.3.1
+
+### Patch Changes
+
+- Updated dependencies [32e2a3d]
+  - markdown@3.5.0
+  - mdm-util@3.5.0
+
 ## 0.3.0
 
 ### Minor Changes
