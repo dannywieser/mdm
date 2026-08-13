@@ -9,6 +9,7 @@ import { promises as fs } from "node:fs"
 import path from "node:path"
 
 import { logger } from "../../logger"
+import { loadBearNotes } from "../../redis/loadBearNotes"
 import { createStatsMetaCache } from "./meta.cache"
 import { countDistinctFolders, resolveNoteFolder, sumWordCounts } from "./meta.util"
 
@@ -25,16 +26,24 @@ export const metaHandler: RequestHandler = async (_request, response) => {
       notesConfig = await resolveNotesConfig()
       const { attachmentsDirectory, notesDirectory, notesSource } = notesConfig
 
-      // stats-service only knows how to scan a filesystem vault; the Bear source has no
-      // local files to count, so it degrades to zeroed-out stats instead of erroring.
-      const markdownFiles = notesSource === "obsidian" ? await collectMarkdownFiles(notesDirectory) : []
+      if (notesSource === "bear") {
+        const notes = await loadBearNotes()
+        return {
+          totalAttachments: {},
+          totalFolders: countDistinctFolders(notes.map((note) => note.folder)),
+          totalNotes: notes.length,
+          totalWords: sumWordCounts(notes.map((note) => note.fullText)),
+        }
+      }
+
+      const markdownFiles = await collectMarkdownFiles(notesDirectory)
       const bodies = await mapWithConcurrency(markdownFiles, READ_CONCURRENCY, async (filePath) => {
         const source = await fs.readFile(filePath, "utf8")
         return parseFrontMatter(source).body
       })
       const folders = markdownFiles.map((filePath) => resolveNoteFolder(notesDirectory, filePath))
 
-      const absoluteAttachmentsDir = notesSource === "obsidian" && attachmentsDirectory
+      const absoluteAttachmentsDir = attachmentsDirectory
         ? path.join(notesDirectory, attachmentsDirectory)
         : ""
       const totalAttachments = absoluteAttachmentsDir

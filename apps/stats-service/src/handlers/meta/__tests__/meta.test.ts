@@ -1,3 +1,5 @@
+import type { ScannedNote } from "markdown"
+
 import { resolveNotesConfig } from "app-config"
 import { createMockNotesConfig } from "app-config/testing"
 import express from "express"
@@ -9,6 +11,7 @@ import request from "supertest"
 
 import type { StatsMetaResponse } from "../meta.types"
 
+import { loadBearNotes } from "../../../redis/loadBearNotes"
 import { metaHandler } from "../meta"
 
 vi.mock("app-config", async () => {
@@ -46,6 +49,10 @@ vi.mock("../meta.cache", () => ({
   createStatsMetaCache: vi.fn(() => ({
     get: (compute: () => Promise<StatsMetaResponse>) => compute(),
   })),
+}))
+
+vi.mock("../../../redis/loadBearNotes", () => ({
+  loadBearNotes: vi.fn(),
 }))
 
 const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
@@ -109,7 +116,7 @@ describe("metaHandler", () => {
     expect(response.body).toMatchObject({ totalAttachments: {} })
   })
 
-  test("skips the filesystem scan and returns zeroed stats when notesSource is bear", async () => {
+  test("loads notes from redis instead of the filesystem when notesSource is bear", async () => {
     resolveNotesConfigMock.mockResolvedValue(
       createMockNotesConfig({
         attachmentsDirectory: "attachments",
@@ -117,6 +124,11 @@ describe("metaHandler", () => {
         notesSource: "bear",
       }),
     )
+    const bearNotes = [
+      { folder: "", fullText: "one two three" },
+      { folder: "", fullText: "four five" },
+    ] as ScannedNote[]
+    vi.mocked(loadBearNotes).mockResolvedValue(bearNotes)
     const app = express()
     app.get("/meta", metaHandler)
 
@@ -124,12 +136,13 @@ describe("metaHandler", () => {
 
     expect(collectMarkdownFilesMock).not.toHaveBeenCalled()
     expect(countFilesByExtensionMock).not.toHaveBeenCalled()
+    expect(loadBearNotes).toHaveBeenCalled()
     expect(response.status).toBe(200)
     expect(response.body).toEqual({
       totalAttachments: {},
-      totalFolders: 0,
-      totalNotes: 0,
-      totalWords: 0,
+      totalFolders: 1,
+      totalNotes: 2,
+      totalWords: 5,
     })
   })
 

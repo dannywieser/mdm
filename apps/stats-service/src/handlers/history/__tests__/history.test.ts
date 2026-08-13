@@ -1,3 +1,5 @@
+import type { ScannedNote } from "markdown"
+
 import { resolveNotesConfig } from "app-config"
 import { createMockNotesConfig } from "app-config/testing"
 import express from "express"
@@ -6,6 +8,7 @@ import { toLoggableError } from "mdm-util"
 import { promises as fs } from "node:fs"
 import request from "supertest"
 
+import { loadBearNotes } from "../../../redis/loadBearNotes"
 import { historyHandler } from "../history"
 
 vi.mock("app-config", async () => {
@@ -43,6 +46,10 @@ vi.mock("../history.cache", () => ({
   createStatsHistoryCache: vi.fn(() => ({
     get: (compute: () => Promise<unknown>) => compute(),
   })),
+}))
+
+vi.mock("../../../redis/loadBearNotes", () => ({
+  loadBearNotes: vi.fn(),
 }))
 
 const resolveNotesConfigMock = vi.mocked(resolveNotesConfig)
@@ -96,18 +103,30 @@ describe("historyHandler", () => {
     expect(entryForBCreatedDate).toMatchObject({ foldersTouched: 1 })
   })
 
-  test("skips the filesystem scan and returns empty history when notesSource is bear", async () => {
+  test("loads notes from redis instead of the filesystem when notesSource is bear", async () => {
     resolveNotesConfigMock.mockResolvedValue(
       createMockNotesConfig({ notesDirectory: "", notesSource: "bear" }),
     )
+    const bearNotes = [
+      {
+        createdDate: "2026-04-01T00:00:00.000Z",
+        folder: "",
+        modifiedDate: "2026-05-01T00:00:00.000Z",
+      },
+    ] as ScannedNote[]
+    vi.mocked(loadBearNotes).mockResolvedValue(bearNotes)
     const app = express()
     app.get("/history", historyHandler)
 
     const response = await request(app).get("/history")
 
     expect(collectMarkdownFilesMock).not.toHaveBeenCalled()
+    expect(loadBearNotes).toHaveBeenCalled()
     expect(response.status).toBe(200)
-    expect(response.body).toEqual([])
+    expect(response.body).toEqual([
+      { date: "2026-04-01", entriesCreated: 1, entriesModified: 0, foldersTouched: 1 },
+      { date: "2026-05-01", entriesCreated: 0, entriesModified: 1, foldersTouched: 1 },
+    ])
   })
 
   test("returns a generic 500 for unexpected errors", async () => {

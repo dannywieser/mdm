@@ -1,7 +1,4 @@
-import type { ScannedNote } from "markdown"
-
-import { BEAR_NOTES_HASH_KEY } from "markdown"
-import { toLoggableError } from "mdm-util"
+import { loadScannedNotesFromHash } from "markdown"
 
 import type { NoteSource, NotesRedisClient } from "./sources.types"
 
@@ -14,27 +11,10 @@ import { logger } from "../../../logger"
  */
 export const createRedisNoteSource = (redisClient: NotesRedisClient): NoteSource => ({
   listNotes: async () => {
-    const rawNotesById = await redisClient.hGetAll(BEAR_NOTES_HASH_KEY)
-    const noteIds = Object.keys(rawNotesById)
+    const notes = await loadScannedNotesFromHash(redisClient)
 
-    logger.debug({ count: noteIds.length }, "[notes] redis note source loaded notes")
+    logger.debug({ count: notes.length }, "[notes] redis note source loaded notes")
 
-    return noteIds
-      .map((id) => parseScannedNote(id, rawNotesById[id]))
-      .filter((note): note is ScannedNote => note !== null)
+    return notes
   },
 })
-
-const parseScannedNote = (id: string, raw: string | undefined): ScannedNote | null => {
-  if (raw === undefined) return null
-
-  try {
-    return JSON.parse(raw) as ScannedNote
-  } catch (error) {
-    logger.error(
-      { error: toLoggableError(error), id },
-      "[notes] failed to parse note from redis, skipping",
-    )
-    return null
-  }
-}

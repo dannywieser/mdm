@@ -5,13 +5,14 @@ Low-level parsing utilities for Obsidian-flavored markdown notes: YAML-ish front
 ## Usage
 
 ```ts
-import { collectMarkdownFiles, parseFrontMatter, parseMarkdownBodyDates, extractNoteDates, resolveDateFromFrontmatterOrTitle, resolveOldestDate, buildObsidianUrl, parseDateString, extractImagePaths, isImageUrl, resolveFrontmatterImages, resolveLocalImagePath, extractTags, TAG_PATTERN, BEAR_NOTES_HASH_KEY } from "markdown"
-import type { Note, NoteFrontmatter, MarkdownNode, ScannedNote, NoteSyncPayload } from "markdown"
+import { collectMarkdownFiles, parseFrontMatter, parseMarkdownBodyDates, extractNoteDates, resolveDateFromFrontmatterOrTitle, resolveOldestDate, buildObsidianUrl, parseDateString, extractImagePaths, isImageUrl, resolveFrontmatterImages, resolveLocalImagePath, extractTags, TAG_PATTERN, BEAR_NOTES_HASH_KEY, loadScannedNotesFromHash } from "markdown"
+import type { Note, NoteFrontmatter, MarkdownNode, ScannedNote, NoteSyncPayload, ScannedNotesRedisClient } from "markdown"
 ```
 
 - `ScannedNote` (`Omit<Note, "content">`) is a note with frontmatter/dates/metadata parsed but before the expensive markdown AST parse + wikilink resolution step — the shape both the Obsidian file-scan path and the Bear sync path produce.
 - `NoteSyncPayload` (`{ upserts: ScannedNote[], deletedIds: string[] }`) is the request body `notes-ingest`'s `POST /notes/sync` accepts.
-- `BEAR_NOTES_HASH_KEY` is the Redis hash key `notes-ingest` writes Bear-sourced notes to and `notes-api`'s Bear note source reads from — kept here as the one shared constant so the two services can't drift on it independently.
+- `BEAR_NOTES_HASH_KEY` is the Redis hash key `notes-ingest` writes Bear-sourced notes to and every Bear-mode consumer (`notes-api`, `habit-tracker`, `stats-service`) reads from — kept here as the one shared constant so those services can't drift on it independently.
+- `loadScannedNotesFromHash(redisClient)` reads every note out of the `notes:bear` hash via `redisClient.hGetAll` and JSON-parses each value into a `ScannedNote`, silently skipping any value that fails to parse. `redisClient` only needs to satisfy the narrow `ScannedNotesRedisClient` interface (`hGetAll`), so callers can pass `mdm-util/redis`'s `createRedisClient()` result (or any structurally-compatible client) without an extra dependency. This is the one piece of Bear-Redis reading logic shared by every consumer of the `notes:bear` hash — each service still wires up its own Redis connection lifecycle (see `notes-api`, `habit-tracker`, or `stats-service`'s `server.ts` for the connect-only-in-bear-mode pattern).
 
 ## Structure
 
@@ -30,3 +31,4 @@ import type { Note, NoteFrontmatter, MarkdownNode, ScannedNote, NoteSyncPayload 
 - `dates/resolveOldestDate.ts` — resolves the earliest of a list of date strings, parsing each against the configured formats and then as ISO 8601.
 - `types.ts` — `Note`, `NoteFrontmatter`, `FrontmatterValue`, `MarkdownNode`, `ParsedFrontMatter`, `ParsedDate`, `ScannedNote`, `NoteSyncPayload`. `Note.tags` is a plain `string[]` populated by `extractTags`, distinct from any `frontmatter.tags` a note's frontmatter block might separately define.
 - `noteSync.ts` — `BEAR_NOTES_HASH_KEY`.
+- `redis/loadScannedNotesFromHash.ts` — `loadScannedNotesFromHash`, and the `ScannedNotesRedisClient` type (in the colocated `.types.ts` file) it accepts.

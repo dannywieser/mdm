@@ -2,12 +2,14 @@ import { resolveNotesConfig } from "app-config"
 import express from "express"
 import { toLoggableError } from "mdm-util"
 import { startServer } from "mdm-util/node"
+import { createRedisClient } from "mdm-util/redis"
 import pinoHttp from "pino-http"
 
 import { healthHandler } from "./handlers/health/health"
 import { historyHandler } from "./handlers/history/history"
 import { metaHandler } from "./handlers/meta/meta"
 import { logger } from "./logger"
+import { setNotesRedisClient } from "./redis/notesRedisClient"
 
 export const createApp = () => {
   const app = express()
@@ -25,10 +27,23 @@ const bootstrap = async (): Promise<void> => {
   const notesConfig = await resolveNotesConfig()
   logger.info({ notesConfig }, "Resolved notes config")
 
+  let onShutdown: (() => Promise<void>) | undefined
+
+  if (notesConfig.notesSource === "bear") {
+    const redisClient = createRedisClient(process.env.REDIS_URL ?? "redis://localhost:6379")
+    redisClient.on("error", (error) => {
+      logger.error({ error: toLoggableError(error) }, "Redis client error")
+    })
+    await redisClient.connect()
+    setNotesRedisClient(redisClient)
+    onShutdown = () => redisClient.disconnect()
+  }
+
   const app = createApp()
 
   startServer(app, {
     logger,
+    onShutdown,
     port: Number(process.env.PORT ?? 3004),
     serviceName: "stats-service",
   })

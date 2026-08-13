@@ -10,6 +10,7 @@ import path from "node:path"
 import type { HistoryNoteDates } from "./history.types"
 
 import { logger } from "../../logger"
+import { loadBearNotes } from "../../redis/loadBearNotes"
 import { resolveNoteFolder } from "../meta/meta.util"
 import { createStatsHistoryCache } from "./history.cache"
 import { buildHistoryEntries, resolveCreatedDate } from "./history.util"
@@ -53,9 +54,17 @@ export const historyHandler: RequestHandler = async (_request, response) => {
       notesConfig = await resolveNotesConfig()
       const { dateFormats, notesDirectory, notesSource, timezone } = notesConfig
 
-      // stats-service only knows how to scan a filesystem vault; the Bear source has no
-      // local files to build history from, so it degrades to an empty history instead of erroring.
-      const markdownFiles = notesSource === "obsidian" ? await collectMarkdownFiles(notesDirectory) : []
+      if (notesSource === "bear") {
+        const bearNotes = await loadBearNotes()
+        const notes: HistoryNoteDates[] = bearNotes.map(({ createdDate, folder, modifiedDate }) => ({
+          createdDate,
+          folder,
+          modifiedDate,
+        }))
+        return buildHistoryEntries(notes, timezone)
+      }
+
+      const markdownFiles = await collectMarkdownFiles(notesDirectory)
       const notes = await mapWithConcurrency(markdownFiles, READ_CONCURRENCY, (filePath) =>
         scanHistoryNote(filePath, notesDirectory, dateFormats),
       )
