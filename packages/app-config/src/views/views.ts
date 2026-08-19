@@ -27,6 +27,7 @@ const isAppConfigView = (value: unknown): value is AppConfigView => {
     isNonEmptyString(obj.name) &&
     isNonEmptyString(obj.component) &&
     (obj.badges === undefined || isStringArray(obj.badges)) &&
+    (obj.dashboardPreview === undefined || typeof obj.dashboardPreview === "boolean") &&
     (obj.notesGalleryFilters === undefined || isStringArray(obj.notesGalleryFilters)) &&
     (obj.group === undefined || isNonEmptyString(obj.group)) &&
     Array.isArray(obj.filters) &&
@@ -35,7 +36,7 @@ const isAppConfigView = (value: unknown): value is AppConfigView => {
 }
 
 const VIEWS_ERROR =
-  "app.config.json views must be an array of objects with non-empty id, name, component, optional string arrays badges/notesGalleryFilters, optional string group, and filters as string records or $exclude objects"
+  "app.config.json views must be an array of objects with non-empty id, name, component, optional string arrays badges/notesGalleryFilters, optional string group, optional boolean dashboardPreview, and filters as string records or $exclude objects"
 
 export const validateViews = (value: unknown): AppConfigView[] => {
   if (value === undefined) return []
