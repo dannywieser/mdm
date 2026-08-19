@@ -1,6 +1,6 @@
 {
   "name": "notes-ingest",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "license": "MIT",
   "main": "dist/server.js",
@@ -16,9 +16,9 @@
   },
   "dependencies": {
     "express": "5.2.1",
-    "markdown": "3.5.0",
+    "markdown": "3.6.0",
     "mdm-logger": "1.0.0",
-    "mdm-util": "3.5.0",
+    "mdm-util": "3.6.0",
     "pino-http": "11.0.0",
     "redis": "5.10.0"
   }

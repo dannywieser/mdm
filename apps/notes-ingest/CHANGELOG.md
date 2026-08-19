@@ -1,5 +1,12 @@
 # notes-ingest
 
+## 0.3.2
+
+### Patch Changes
+
+- markdown@3.6.0
+- mdm-util@3.6.0
+
 ## 0.3.1
 
 ### Patch Changes

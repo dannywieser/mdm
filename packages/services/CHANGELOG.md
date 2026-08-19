@@ -1,5 +1,17 @@
 # services
 
+## 2.4.0
+
+### Minor Changes
+
+- bfb408d: Views using the `NotesGallery` component can now set `"dashboardPreview": true` in `app.config.json` to render on the home dashboard as a full-width preview card — the view name and count above a masonry grid of up to 10 thumbnail covers from the view's most recent notes with images — instead of the compact name/count stat card.
+
+### Patch Changes
+
+- Updated dependencies [bfb408d]
+  - app-config@3.6.0
+  - markdown@3.6.0
+
 ## 2.3.6
 
 ### Patch Changes

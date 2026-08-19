@@ -1,6 +1,6 @@
 {
   "name": "demo-data",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "private": true,
   "license": "MIT",
   "main": "dist/cli.js",
@@ -15,9 +15,9 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "habit-tracker": "1.5.0",
-    "mdm-util": "3.5.0",
-    "notes-api": "3.5.0",
-    "stats-service": "1.2.0"
+    "habit-tracker": "1.5.1",
+    "mdm-util": "3.6.0",
+    "notes-api": "3.6.0",
+    "stats-service": "1.2.1"
   }
 }
