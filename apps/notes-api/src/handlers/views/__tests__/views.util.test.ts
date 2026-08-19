@@ -91,6 +91,26 @@ describe("views util", () => {
       expect(applyViewFilterMock).toHaveBeenCalledWith(notes, "games")
     })
 
+    test("passes dashboardPreview through to the view summary", async () => {
+      const noteA = createNote({ id: "a" })
+      const views = [
+        {
+          component: "NotesGallery",
+          dashboardPreview: true,
+          filters: [{ "frontmatter.type": "film" }],
+          id: "films",
+          name: "Films",
+        },
+      ]
+
+      resolveNotesConfigMock.mockResolvedValue({ ...defaultConfig, views })
+      applyViewFilterMock.mockResolvedValueOnce([noteA])
+
+      const [summary] = await buildViews([noteA])
+
+      expect(summary.dashboardPreview).toBe(true)
+    })
+
     test("returns an empty array when there are no views", async () => {
       const notes = [createNote({ id: "a" })]
 

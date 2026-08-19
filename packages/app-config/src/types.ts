@@ -23,6 +23,7 @@ export type ViewFilter = ExcludeViewFilter | Record<string, string>
 export interface NotesView {
   badges?: string[]
   component: string
+  dashboardPreview?: boolean
   filters: ViewFilter[]
   notesGalleryFilters?: string[]
   group?: string
@@ -57,6 +58,7 @@ export interface AppConfig {
 export interface AppConfigView {
   badges?: string[]
   component: string
+  dashboardPreview?: boolean
   filters: ViewFilter[]
   notesGalleryFilters?: string[]
   group?: string

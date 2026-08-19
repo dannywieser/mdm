@@ -7,7 +7,12 @@ import { NoteBadges } from "../NoteBadges"
 import { NoteLink } from "../NoteLink"
 
 import type { GalleryCardProps, NoteCoverGridProps } from "./NoteCoverGrid.types"
-import { getImageSrc, getNoteImagePaths } from "./NoteCoverGrid.util"
+import {
+  buildGridTemplateColumns,
+  getImageSrc,
+  getMasonryLayout,
+  getNoteImagePaths,
+} from "./NoteCoverGrid.util"
 
 const CARD_FOCUS_STYLE = {
   outlineWidth: "2px",
@@ -16,12 +21,9 @@ const CARD_FOCUS_STYLE = {
   outlineOffset: "2px",
 }
 
-const MASONRY_GAP_PX = 16
-const MASONRY_ROW_HEIGHT_PX = 8
-const MASONRY_COLUMNS = { base: 1, md: 3, lg: 4, xl: 5, "2xl": 8 }
 const DEFAULT_ASPECT_RATIO = "3/4"
 
-const GalleryCard = ({ note, badges }: GalleryCardProps) => {
+const GalleryCard = ({ badges, layout, note }: GalleryCardProps) => {
   const images = getNoteImagePaths(note)
 
   return (
@@ -53,7 +55,7 @@ const GalleryCard = ({ note, badges }: GalleryCardProps) => {
         >
           <Text
             color="white"
-            fontSize="sm"
+            fontSize={layout.titleFontSize}
             fontWeight="medium"
             lineClamp={2}
             mb={badges.length ? 2 : 0}
@@ -67,8 +69,11 @@ const GalleryCard = ({ note, badges }: GalleryCardProps) => {
   )
 }
 
-const MasonryGalleryCard = ({ badges, note }: GalleryCardProps) => {
-  const { ref, rowSpan } = useMasonryRowSpan({ gapPx: MASONRY_GAP_PX, rowHeightPx: MASONRY_ROW_HEIGHT_PX })
+const MasonryGalleryCard = ({ badges, layout, note }: GalleryCardProps) => {
+  const { ref, rowSpan } = useMasonryRowSpan({
+    gapPx: layout.gapPx,
+    rowHeightPx: layout.rowHeightPx,
+  })
 
   return (
     <Box
@@ -76,32 +81,39 @@ const MasonryGalleryCard = ({ badges, note }: GalleryCardProps) => {
       alignSelf="start"
       borderRadius="md"
       className="group"
-      style={{ gridRowEnd: `span ${rowSpan}` }}
+      style={{ gridRowEnd: `span ${String(rowSpan)}` }}
       _focusWithin={CARD_FOCUS_STYLE}
     >
-      <GalleryCard badges={badges} note={note} />
+      <GalleryCard badges={badges} layout={layout} note={note} />
     </Box>
   )
 }
 
-export const NoteCoverGrid = ({ badges = [], notes }: NoteCoverGridProps) => (
-  <Box
-    data-testid="gallery-grid"
-    display="grid"
-    gap={`${MASONRY_GAP_PX}px`}
-    gridAutoFlow="dense"
-    gridAutoRows={`${MASONRY_ROW_HEIGHT_PX}px`}
-    gridTemplateColumns={{
-      base: `repeat(${MASONRY_COLUMNS.base}, 1fr)`,
-      md: `repeat(${MASONRY_COLUMNS.md}, 1fr)`,
-      lg: `repeat(${MASONRY_COLUMNS.lg}, 1fr)`,
-      xl: `repeat(${MASONRY_COLUMNS.xl}, 1fr)`,
-      "2xl": `repeat(${MASONRY_COLUMNS["2xl"]}, 1fr)`,
-    }}
-    p={6}
-  >
-    {notes.map((note) => (
-      <MasonryGalleryCard key={note.id} badges={badges} note={note} />
-    ))}
-  </Box>
-)
+export const NoteCoverGrid = ({
+  badges = [],
+  notes,
+  variant = "default",
+}: NoteCoverGridProps) => {
+  const layout = getMasonryLayout(variant)
+
+  return (
+    <Box
+      data-testid="gallery-grid"
+      display="grid"
+      gap={`${String(layout.gapPx)}px`}
+      gridAutoFlow="dense"
+      gridAutoRows={`${String(layout.rowHeightPx)}px`}
+      gridTemplateColumns={buildGridTemplateColumns(layout)}
+      p={layout.padding}
+    >
+      {notes.map((note) => (
+        <MasonryGalleryCard
+          key={note.id}
+          badges={badges}
+          layout={layout}
+          note={note}
+        />
+      ))}
+    </Box>
+  )
+}

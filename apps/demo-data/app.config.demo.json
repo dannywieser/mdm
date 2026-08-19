@@ -25,6 +25,7 @@
       "name": "photo wall",
       "group": "photos",
       "component": "NotesGallery",
+      "dashboardPreview": true,
       "filters": [{ "folder": "photos" }],
       "badges": ["frontmatter.location", "frontmatter.tags", "frontmatter.source"],
       "notesGalleryFilters": ["location", "tags"]

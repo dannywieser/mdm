@@ -16,7 +16,13 @@ vi.mock("../../NoteBadges", () => ({
 }))
 
 import { NoteCoverGrid } from "../NoteCoverGrid"
-import { filterNotesWithImages, getImageSrc, getNoteImagePaths } from "../NoteCoverGrid.util"
+import {
+  buildGridTemplateColumns,
+  filterNotesWithImages,
+  getImageSrc,
+  getMasonryLayout,
+  getNoteImagePaths,
+} from "../NoteCoverGrid.util"
 
 const noteWithCover = {
   id: "1",
@@ -202,5 +208,31 @@ describe("filterNotesWithImages", () => {
 
   test("excludes notes with an empty string image value", () => {
     expect(filterNotesWithImages([note("")])).toHaveLength(0)
+  })
+})
+
+describe("getMasonryLayout", () => {
+  test("returns tighter metrics and more columns for the compact variant", () => {
+    const compact = getMasonryLayout("compact")
+    const standard = getMasonryLayout("default")
+
+    expect(compact.gapPx).toBeLessThan(standard.gapPx)
+    expect(compact.rowHeightPx).toBeLessThan(standard.rowHeightPx)
+    expect(compact.padding).toBe(0)
+    expect(compact.columns.base).toBeGreaterThan(standard.columns.base)
+  })
+})
+
+describe("buildGridTemplateColumns", () => {
+  test("maps each breakpoint to a repeat() track list", () => {
+    expect(
+      buildGridTemplateColumns({
+        columns: { base: 2, md: 4 },
+        gapPx: 8,
+        padding: 0,
+        rowHeightPx: 4,
+        titleFontSize: "xs",
+      }),
+    ).toEqual({ base: "repeat(2, 1fr)", md: "repeat(4, 1fr)" })
   })
 })

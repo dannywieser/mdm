@@ -8,7 +8,7 @@ const VALID_VIEW = {
 }
 
 const ERROR =
-  "app.config.json views must be an array of objects with non-empty id, name, component, optional string arrays badges/notesGalleryFilters, optional string group, and filters as string records or $exclude objects"
+  "app.config.json views must be an array of objects with non-empty id, name, component, optional string arrays badges/notesGalleryFilters, optional string group, optional boolean dashboardPreview, and filters as string records or $exclude objects"
 
 describe("validateViews", () => {
   test("returns empty array when value is undefined", () => {
@@ -22,6 +22,15 @@ describe("validateViews", () => {
   test("accepts optional badges array", () => {
     const view = { ...VALID_VIEW, badges: ["folder", "frontmatter.type"] }
     expect(validateViews([view])).toEqual([view])
+  })
+
+  test("accepts optional dashboardPreview boolean", () => {
+    const view = { ...VALID_VIEW, dashboardPreview: true }
+    expect(validateViews([view])).toEqual([view])
+  })
+
+  test("throws when dashboardPreview is not a boolean", () => {
+    expect(() => validateViews([{ ...VALID_VIEW, dashboardPreview: "true" }])).toThrow(ERROR)
   })
 
   test("accepts optional notesGalleryFilters array", () => {

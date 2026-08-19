@@ -23,6 +23,6 @@ const { notesDirectory, obsidianVault, dateFormats, timezone, createdDatePropert
 - `readAppConfigFile.ts` — reads and JSON-parses the config file, translating filesystem/parse errors into the messages above.
 - `validateAppConfig/validateAppConfig.ts` — validates the top-level shape (`obsidianVault`, `attachmentsDirectory`, `dateFormats`, `timezone`, `notesSource`) and delegates to the habits/views validators.
 - `habits/habits.ts` — validates the `habits` array (`id`, `name`, `mode`, `frontmatterProperty`, positive-integer `trackingWindowDays`, optional positive `targetScore`).
-- `views/views.ts` — validates the `views` array (`id`, `name`, `component`, optional `badges`/`notesGalleryFilters`/`group`, and `filters` as string-record or `$exclude` objects).
+- `views/views.ts` — validates the `views` array (`id`, `name`, `component`, optional `badges`/`notesGalleryFilters`/`group`, optional boolean `dashboardPreview`, and `filters` as string-record or `$exclude` objects).
 - `testing.ts` — `createMockNotesConfig`, exposed via the `./testing` subpath.
 - `types.ts` — `AppConfig`, `AppConfigView`, `ResolvedNotesConfig`, `NotesSource`, `HabitConfig`, `HabitMode`, `NotesView`, `ViewFilter`, `ExcludeViewFilter`.
