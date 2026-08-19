@@ -1,5 +1,15 @@
 # habit-tracker
 
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies [bfb408d]
+  - app-config@3.6.0
+  - services@2.4.0
+  - markdown@3.6.0
+  - mdm-util@3.6.0
+
 ## 1.5.0
 
 ### Minor Changes

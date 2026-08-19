@@ -1,6 +1,6 @@
 {
   "name": "stats-service",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "license": "MIT",
   "main": "dist/server.js",
@@ -15,11 +15,11 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "app-config": "3.5.0",
+    "app-config": "3.6.0",
     "express": "5.2.1",
-    "markdown": "3.5.0",
+    "markdown": "3.6.0",
     "mdm-logger": "1.0.0",
-    "mdm-util": "3.5.0",
+    "mdm-util": "3.6.0",
     "pino-http": "11.0.0"
   }
 }

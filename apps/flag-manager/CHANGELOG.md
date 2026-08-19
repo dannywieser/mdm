@@ -1,5 +1,14 @@
 # flag-manager
 
+## 1.1.26
+
+### Patch Changes
+
+- Updated dependencies [bfb408d]
+  - app-config@3.6.0
+  - services@2.4.0
+  - mdm-util@3.6.0
+
 ## 1.1.25
 
 ### Patch Changes

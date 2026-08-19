@@ -1,6 +1,6 @@
 {
   "name": "bear-sync",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "license": "MIT",
   "main": "dist/cli.js",
@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "better-sqlite3": "13.0.3",
-    "markdown": "3.5.0",
-    "mdm-util": "3.5.0"
+    "markdown": "3.6.0",
+    "mdm-util": "3.6.0"
   }
 }

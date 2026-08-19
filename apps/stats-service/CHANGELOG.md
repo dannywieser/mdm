@@ -1,5 +1,14 @@
 # stats-service
 
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [bfb408d]
+  - app-config@3.6.0
+  - markdown@3.6.0
+  - mdm-util@3.6.0
+
 ## 1.2.0
 
 ### Minor Changes
