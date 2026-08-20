@@ -1,5 +1,12 @@
 # image-server
 
+## 1.2.27
+
+### Patch Changes
+
+- Updated dependencies [a0ca574]
+  - mdm-util@3.7.0
+
 ## 1.2.26
 
 ### Patch Changes

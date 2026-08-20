@@ -1,5 +1,13 @@
 # bear-sync
 
+## 0.3.3
+
+### Patch Changes
+
+- Updated dependencies [a0ca574]
+  - mdm-util@3.7.0
+  - markdown@3.7.0
+
 ## 0.3.2
 
 ### Patch Changes

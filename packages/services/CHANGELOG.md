@@ -1,5 +1,12 @@
 # services
 
+## 2.4.1
+
+### Patch Changes
+
+- app-config@3.7.0
+- markdown@3.7.0
+
 ## 2.4.0
 
 ### Minor Changes

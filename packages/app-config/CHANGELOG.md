@@ -1,5 +1,12 @@
 # app-config
 
+## 3.7.0
+
+### Patch Changes
+
+- Updated dependencies [a0ca574]
+  - mdm-util@3.7.0
+
 ## 3.6.0
 
 ### Minor Changes
