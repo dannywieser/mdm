@@ -25,11 +25,9 @@ vi.mock("../HomeViewPreviewCard.util", () => ({
   selectPreviewNotes: vi.fn(),
 }))
 
-vi.mock("../../NoteCoverGrid", () => ({
-  NoteCoverGrid: ({ notes, variant }: { notes: Note[]; variant?: string }) => (
-    <div data-testid="cover-grid" data-variant={variant}>
-      {notes.map(({ id }) => id).join(",")}
-    </div>
+vi.mock("../../NotePhotoPile", () => ({
+  NotePhotoPile: ({ notes }: { notes: Note[] }) => (
+    <div data-testid="photo-pile">{notes.map(({ id }) => id).join(",")}</div>
   ),
 }))
 
@@ -52,17 +50,15 @@ const renderCard = () =>
   )
 
 describe("HomeViewPreviewCard", () => {
-  test("renders the notes chosen by selectPreviewNotes in a compact cover grid", () => {
+  test("renders the notes chosen by selectPreviewNotes as a photo pile", () => {
     const notes = [{ id: "1" }, { id: "2" }] as Note[]
     useNotesQueryMock.mockReturnValue({ data: { notes } })
     vi.mocked(selectPreviewNotes).mockReturnValue(notes)
 
     renderCard()
 
-    const grid = screen.getByTestId("cover-grid")
     expect(vi.mocked(selectPreviewNotes)).toHaveBeenCalledWith(notes)
-    expect(grid.textContent).toBe("1,2")
-    expect(grid.getAttribute("data-variant")).toBe("compact")
+    expect(screen.getByTestId("photo-pile").textContent).toBe("1,2")
   })
 
   test("requests the view's notes without content", () => {

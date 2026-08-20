@@ -16,7 +16,7 @@ Two additional subpath exports isolate dependencies that don't belong in every c
 ## Structure
 
 - `date/` — `addDays`, `daysBetween`, `daysToSeconds`, `buildDateRange`, `getDateWindowStart`, `formatDate`, `getDateComponents`, `toISODateString`, `isValidTimezone`, `parseDateFromFormats`. Before writing new date logic anywhere in the repo, check here first (see the root `CLAUDE.md` util package guidelines).
-- `strings/` — `countWords`, `isExternalUrl` (URL scheme, protocol-relative, or fragment detection), `isHttpUrl` (narrower: only true for http(s) or protocol-relative — safe to render directly, e.g. as an `<img src>`), `isNonEmptyString`, `isStringArray`, `isStringRecord`.
+- `strings/` — `countWords`, `hashString` (stable non-negative 32-bit FNV-1a hash, for deriving deterministic pseudo-random values from an identifier), `isExternalUrl` (URL scheme, protocol-relative, or fragment detection), `isHttpUrl` (narrower: only true for http(s) or protocol-relative — safe to render directly, e.g. as an `<img src>`), `isNonEmptyString`, `isStringArray`, `isStringRecord`.
 - `objects/` — `getObjectValue`, `getValueByPath` (dot-path property access used by the notes view filters).
 - `promises/` — `mapWithConcurrency`, a bounded-concurrency async map that preserves input order regardless of completion order.
 - `regex/` — `buildCapturingPattern`, builds a full-string regex + token list from a tokenized format string (backs date format parsing).
