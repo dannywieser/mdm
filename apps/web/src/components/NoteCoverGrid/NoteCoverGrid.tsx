@@ -89,12 +89,8 @@ const MasonryGalleryCard = ({ badges, layout, note }: GalleryCardProps) => {
   )
 }
 
-export const NoteCoverGrid = ({
-  badges = [],
-  notes,
-  variant = "default",
-}: NoteCoverGridProps) => {
-  const layout = getMasonryLayout(variant)
+export const NoteCoverGrid = ({ badges = [], notes }: NoteCoverGridProps) => {
+  const layout = getMasonryLayout()
 
   return (
     <Box

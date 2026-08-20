@@ -212,14 +212,12 @@ describe("filterNotesWithImages", () => {
 })
 
 describe("getMasonryLayout", () => {
-  test("returns tighter metrics and more columns for the compact variant", () => {
-    const compact = getMasonryLayout("compact")
-    const standard = getMasonryLayout("default")
+  test("returns the gallery's grid metrics", () => {
+    const layout = getMasonryLayout()
 
-    expect(compact.gapPx).toBeLessThan(standard.gapPx)
-    expect(compact.rowHeightPx).toBeLessThan(standard.rowHeightPx)
-    expect(compact.padding).toBe(0)
-    expect(compact.columns.base).toBeGreaterThan(standard.columns.base)
+    expect(layout.gapPx).toBeGreaterThan(0)
+    expect(layout.rowHeightPx).toBeGreaterThan(0)
+    expect(layout.columns.base).toBe(1)
   })
 })
 

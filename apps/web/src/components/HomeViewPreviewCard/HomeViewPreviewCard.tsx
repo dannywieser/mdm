@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 
 import { useNotesQuery } from "services"
 
-import { NoteCoverGrid } from "../NoteCoverGrid"
+import { NotePhotoPile } from "../NotePhotoPile"
 
 import type { HomeViewPreviewCardProps } from "./HomeViewPreviewCard.types"
 import { selectPreviewNotes } from "./HomeViewPreviewCard.util"
@@ -46,7 +46,7 @@ export function HomeViewPreviewCard({ view }: Readonly<HomeViewPreviewCardProps>
           </Text>
         </HStack>
       </Link>
-      <NoteCoverGrid notes={previewNotes} variant="compact" />
+      <NotePhotoPile notes={previewNotes} />
     </Box>
   )
 }
