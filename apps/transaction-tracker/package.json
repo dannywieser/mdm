@@ -1,0 +1,26 @@
+{
+  "name": "transaction-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "main": "dist/server.js",
+  "scripts": {
+    "prebuild": "turbo run build --filter=transaction-tracker^...",
+    "predev": "turbo run build --filter=transaction-tracker^...",
+    "pretest": "turbo run build --filter=transaction-tracker^...",
+    "dev": "tsx watch --env-file=../../.env src/server.ts | pino-pretty",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "app-config": "3.7.0",
+    "express": "5.2.1",
+    "markdown": "3.7.0",
+    "mdm-logger": "1.0.0",
+    "mdm-util": "3.7.0",
+    "pino-http": "11.0.0",
+    "services": "2.4.1"
+  }
+}

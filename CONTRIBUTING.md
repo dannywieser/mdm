@@ -14,10 +14,11 @@ This repository is a Turborepo monorepo with:
 - `apps/notes-api`: Express-based Node service with request logging via `pino-http`. See [`apps/notes-api/README.md`](apps/notes-api/README.md).
 - `apps/flag-manager`: Express-based Redis-backed API for per-ID feature flags. See [`apps/flag-manager/README.md`](apps/flag-manager/README.md).
 - `apps/web`: React + TypeScript client using Chakra UI, TanStack Query, and React Router. See [`apps/web/README.md`](apps/web/README.md).
-- `apps/demo-data`: generator for the static demo dataset. See [`apps/demo-data/README.md`](apps/demo-data/README.md). Builds a deterministic 1500+ note demo vault, then snapshots the real `notes-api` and `habit-tracker` responses into `apps/web/public/demo-data` for the GitHub Pages demo.
+- `apps/demo-data`: generator for the static demo dataset. See [`apps/demo-data/README.md`](apps/demo-data/README.md). Builds a deterministic 1500+ note demo vault, then snapshots the real `notes-api`, `habit-tracker`, `stats-service`, and `transaction-tracker` responses into `apps/web/public/demo-data` for the GitHub Pages demo.
 - `apps/image-server`: Express-based image proxy for note image assets backed by imgproxy. See [`apps/image-server/README.md`](apps/image-server/README.md).
 - `apps/stats-service`: Express-based API for aggregate vault statistics. See [`apps/stats-service/README.md`](apps/stats-service/README.md).
 - `apps/habit-tracker`: Express-based API for tracking configurable habits scored from note frontmatter. See [`apps/habit-tracker/README.md`](apps/habit-tracker/README.md).
+- `apps/transaction-tracker`: Express-based API returning logged and scheduled transactions read from note frontmatter, with recurring schedules projected into any requested window with no end horizon. See [`apps/transaction-tracker/README.md`](apps/transaction-tracker/README.md).
 - `apps/notes-ingest`: Express-based, unauthenticated endpoint that receives note sync payloads (pushed from `bear-sync`) and stores them in Redis for `notes-api` to serve when `notesSource: "bear"` is configured. See [`apps/notes-ingest/README.md`](apps/notes-ingest/README.md).
 - `apps/bear-sync`: scheduled Mac-side script (not a server, not part of the Docker stack) that reads notes out of Bear's local sqlite database and pushes them to `notes-ingest`. See [`apps/bear-sync/README.md`](apps/bear-sync/README.md).
 
@@ -48,7 +49,7 @@ This repository is a Turborepo monorepo with:
   - `createdDateProperty` (optional, defaults to `"created"`): frontmatter key treated as a note's created-date source.
   - `timezone` (optional, defaults to `"UTC"`): IANA timezone used for date-relative filters (`$today`/`$onThisDay`) and habit scoring.
   - `notesSource` (optional, `"obsidian"` or `"bear"`, defaults to `"obsidian"`): selects which note source `notes-api` reads from. See [`apps/notes-api/README.md`](apps/notes-api/README.md) for what changes in `"bear"` mode, and [`apps/bear-sync/README.md`](apps/bear-sync/README.md)/[`apps/notes-ingest/README.md`](apps/notes-ingest/README.md) for how notes get into Redis in the first place.
-- See each app's README for app-specific config fields (`views`, `flags`, `habits`, etc.).
+- See each app's README for app-specific config fields (`views`, `flags`, `habits`, `transactions`, etc.).
 
 ## Running with Docker Compose
 
@@ -60,6 +61,7 @@ This repository is a Turborepo monorepo with:
   - `habit-tracker` as an internal service on port `3003`
   - `image-server` as an internal service on port `3002`
   - `stats-service` as an internal service on port `3004`
+  - `transaction-tracker` as an internal service on port `3006`
   - `imgproxy` as internal image optimizer used by `image-server`
   - `redis` as internal data storage shared by `flag-manager` and `image-server` (redirect cache), and by `notes-api`/`notes-ingest` (Bear-sourced notes, only used when `notesSource: "bear"`)
   - `notes-ingest` on port `3005`, published to the host (not loopback-only like `redis`/`imgproxy`) so `bear-sync`, running on a separate Mac on the LAN, can reach it directly — sits idle unless you're using the Bear note source
@@ -70,18 +72,19 @@ This repository is a Turborepo monorepo with:
   - `/habits*` → `habit-tracker:3003/habits*` (covers both `GET /habits` and `GET /habits/:id`)
   - `/images*` → `image-server:3002/images*`
   - `/stats/*` → `stats-service:3004/stats/*`
+  - `/transactions*` → `transaction-tracker:3006/transactions*`
   - `/imgproxy/*` → `imgproxy:8080/*` (used by `image-server` redirects)
   - nginx config also defines an `/habit/*` route to `habit-tracker:3003/habit/*`, but no endpoint at that singular path exists anymore (the API is `/habits/:id`) — this route is currently dead and unused by the web app
 - nginx caching: `/assets/*` (Vite's content-hashed JS/CSS) is served with `Cache-Control: public, max-age=31536000, immutable`; everything else — `index.html` and SPA routes falling back to it — is served with `Cache-Control: no-cache` so browsers always revalidate and pick up a new deploy without a manual cache clear.
-- `app.config.json` is mounted (read-only) into all 5 backend containers as `/app/app.config.json`: `notes-api`, `flag-manager`, `habit-tracker`, `stats-service`, and `image-server`. `image-server` doesn't currently read this file (it's configured entirely by environment variables — see `apps/image-server/README.md`), so the mount is a no-op for it today.
-- The vault is mounted with `NOTES_ROOT` into the services that read notes directly: `notes-api`, `habit-tracker`, `stats-service`, `image-server`, and `imgproxy`. `flag-manager` (no vault access needed) and `web`/`redis` don't get this mount.
+- `app.config.json` is mounted (read-only) into all 6 backend containers as `/app/app.config.json`: `notes-api`, `flag-manager`, `habit-tracker`, `stats-service`, `transaction-tracker`, and `image-server`. `image-server` doesn't currently read this file (it's configured entirely by environment variables — see `apps/image-server/README.md`), so the mount is a no-op for it today.
+- The vault is mounted with `NOTES_ROOT` into the services that read notes directly: `notes-api`, `habit-tracker`, `stats-service`, `transaction-tracker`, `image-server`, and `imgproxy`. `flag-manager` (no vault access needed) and `web`/`redis` don't get this mount.
   - default: `./notes` on the host maps to `/data/notes`
   - override: `NOTES_ROOT=/absolute/path/on/host docker compose up --build`
 - Each of those services also gets `NOTES_ROOT=/data/notes` set as an environment variable — that's how the container-side path is resolved (there's no `noteRootDirectory` field in `app.config.json` anymore).
 - Set `attachmentsDirectory` in `app.config.json` to the folder name (relative to `NOTES_ROOT`) where Obsidian stores attachments (e.g. `"attachments"`). Bare-filename images in notes resolve to `<attachmentsDirectory>/<noteDir>/<noteStem>/<filename>`.
 - Notes markdown image paths resolve through `/images?path=<encoded-relative-path>`, proxied by `image-server` to imgproxy for optimization.
 - If local and container config values differ, create a separate Docker-specific config file and mount it to `/app/app.config.json`.
-- Every image defines its own `HEALTHCHECK` (`notes-api`, `flag-manager`, `habit-tracker`, `image-server`, and `stats-service` poll their `/health` endpoint; `web` polls a static `/health` route added to the nginx config) so health status works the same whether the container is started via this compose file or run standalone. `web` waits for the 5 backend services to report healthy before starting.
+- Every image defines its own `HEALTHCHECK` (`notes-api`, `flag-manager`, `habit-tracker`, `image-server`, `stats-service`, and `transaction-tracker` poll their `/health` endpoint; `web` polls a static `/health` route added to the nginx config) so health status works the same whether the container is started via this compose file or run standalone. `web` waits for the 5 backend services it depends on to report healthy before starting.
 - Each backend Dockerfile (`infra/docker/*.Dockerfile`) uses a multi-stage build with `turbo prune <app> --docker` so the image only contains that app's own workspace dependency subgraph, not the whole monorepo, and runs as the non-root `node` user. The runner stage also applies `apk upgrade` for the latest available OS package patches and removes the base image's bundled `npm`/`npx`/`corepack` (unused at runtime — the container only ever runs `node dist/server.js`), since Trivy's default library scan flags CVEs in npm's own bundled dependencies just as readily as the app's.
 - Images are published to `ghcr.io/dannywieser/mdm-<app>` once per release — `.github/workflows/docker-publish.yml` is a reusable workflow invoked by `.github/workflows/release.yml`'s `docker-publish` job only when the changesets release step actually publishes (i.e. when the "chore: version packages" PR is merged), not on every push to `main` — tagged `latest`, `sha-<short-sha>`, and the app's `package.json` version. `docker-compose.yml` references these images directly (`image: ghcr.io/dannywieser/mdm-<app>:${MDM_IMAGE_TAG:-latest}`) alongside the local `build:` config, so `docker compose up --build` still builds from source, while `docker compose pull && docker compose up -d --no-build` runs the published images without needing the source checked out at all (`--no-build` matters here since the `build:` stanzas reference `infra/docker/*.Dockerfile`, which won't exist without a repo checkout).
 - Before publishing, each image is scanned with Trivy and the workflow fails (no push) if it finds a HIGH or CRITICAL vulnerability with a known fix.

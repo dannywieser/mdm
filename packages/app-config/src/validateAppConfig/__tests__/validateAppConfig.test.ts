@@ -17,6 +17,16 @@ describe("validateAppConfig", () => {
       habits: [],
       obsidianVault: "vault",
       timezone: undefined,
+      transactions: {
+        amountProperty: "amount",
+        categoryProperty: "category",
+        currency: "USD",
+        dateProperty: "date",
+        descriptionProperty: "description",
+        folder: "",
+        recurrenceEndProperty: "recurrenceEnd",
+        recurrenceProperty: "recurrence",
+      },
       views: [],
     })
   })

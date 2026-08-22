@@ -9,6 +9,7 @@ const DEMO_SEED = 1337
 const NOTES_API_PORT = 4310
 const HABIT_TRACKER_PORT = 4311
 const STATS_SERVICE_PORT = 4312
+const TRANSACTION_TRACKER_PORT = 4313
 
 const PACKAGE_ROOT = path.resolve(__dirname, "..")
 const VAULT_DIRECTORY = path.join(PACKAGE_ROOT, ".vault")
@@ -44,6 +45,11 @@ const main = async (): Promise<void> => {
     port: STATS_SERVICE_PORT,
     serverPath: require.resolve("stats-service"),
   })
+  const transactionTracker = await startService({
+    env: serviceEnv,
+    port: TRANSACTION_TRACKER_PORT,
+    serverPath: require.resolve("transaction-tracker"),
+  })
 
   try {
     const summary = await buildSnapshot({
@@ -52,14 +58,16 @@ const main = async (): Promise<void> => {
       notesBaseUrl: notesApi.baseUrl,
       outputDirectory: OUTPUT_DIRECTORY,
       statsBaseUrl: statsService.baseUrl,
+      transactionsBaseUrl: transactionTracker.baseUrl,
     })
     console.info(
-      `[demo-data] snapshot complete: ${String(summary.viewCount)} views, ${String(summary.habitCount)} habits, ${String(summary.noteCount)} note sources -> ${OUTPUT_DIRECTORY}`,
+      `[demo-data] snapshot complete: ${String(summary.viewCount)} views, ${String(summary.habitCount)} habits, ${String(summary.transactionCount)} transactions, ${String(summary.noteCount)} note sources -> ${OUTPUT_DIRECTORY}`,
     )
   } finally {
     notesApi.stop()
     habitTracker.stop()
     statsService.stop()
+    transactionTracker.stop()
   }
 }
 

@@ -15,7 +15,7 @@ Two additional subpath exports isolate dependencies that don't belong in every c
 
 ## Structure
 
-- `date/` — `addDays`, `daysBetween`, `daysToSeconds`, `buildDateRange`, `getDateWindowStart`, `formatDate`, `getDateComponents`, `toISODateString`, `isValidTimezone`, `parseDateFromFormats`. Before writing new date logic anywhere in the repo, check here first (see the root `CLAUDE.md` util package guidelines).
+- `date/` — `addDays`, `addMonths`, `addMonthsToDate`, `daysBetween`, `monthsBetween`, `daysToSeconds`, `buildDateRange`, `buildMonthRange`, `getDateWindowStart`, `getDayOfWeek`, `getMonthKey`, `getMonthStart`, `getMonthEnd`, `formatDate`, `getDateComponents`, `toISODateString`, `isValidTimezone`, `parseDateFromFormats`. `addMonthsToDate` clamps to the end of a shorter month (adding a month to the 31st gives Feb 28, not a rolled-over March date); `toISODateString`'s timezone argument is optional and defaults to the runtime's, which is what a browser needs for "today". Before writing new date logic anywhere in the repo, check here first (see the root `CLAUDE.md` util package guidelines).
 - `strings/` — `countWords`, `hashString` (stable non-negative 32-bit FNV-1a hash, for deriving deterministic pseudo-random values from an identifier), `isExternalUrl` (URL scheme, protocol-relative, or fragment detection), `isHttpUrl` (narrower: only true for http(s) or protocol-relative — safe to render directly, e.g. as an `<img src>`), `isNonEmptyString`, `isStringArray`, `isStringRecord`.
 - `objects/` — `getObjectValue`, `getValueByPath` (dot-path property access used by the notes view filters).
 - `promises/` — `mapWithConcurrency`, a bounded-concurrency async map that preserves input order regardless of completion order.

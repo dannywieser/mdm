@@ -20,6 +20,14 @@ export const buildDemoHabitsUrl = (): string => `${getDemoDataBasePath()}/habits
 export const buildDemoHabitUrl = (habitId: string): string =>
   `${getDemoDataBasePath()}/habit.${encodeURIComponent(habitId)}.json`
 
+/**
+ * Every transaction occurrence the snapshot covers, in one file. Unlike the
+ * live service the demo cannot project recurrences on demand, so the
+ * snapshot spans a fixed window and the hook narrows it per month.
+ */
+export const buildDemoTransactionsUrl = (): string =>
+  `${getDemoDataBasePath()}/transactions.json`
+
 /** Raw markdown source captured per note id by the demo snapshot. */
 export const buildDemoNoteSourceUrl = (noteId: string): string =>
   `${getDemoDataBasePath()}/source/${encodeURIComponent(noteId)}.md`

@@ -11,6 +11,7 @@ import { LoadingScreen } from "./components/LoadingScreen"
 import { NoteSource } from "./components/NoteSource"
 import { NotesView } from "./components/NotesView"
 import { PaletteView } from "./components/PaletteView"
+import { TransactionCalendar } from "./components/TransactionCalendar"
 
 function LoadingLayout() {
   return (
@@ -59,6 +60,8 @@ function App() {
         <Route path="/tracking/:habitId" element={<HabitDetail />} />
         <Route path="/notes/:view" element={<NotesView />} />
         <Route path="/source/:noteId" element={<NoteSource />} />
+        <Route path="/calendar" element={<TransactionCalendar />} />
+        <Route path="/calendar/:month" element={<TransactionCalendar />} />
         <Route path="/stats" element={<HomeStats />} />
         <Route path="/colors" element={<PaletteView />} />
       </Route>

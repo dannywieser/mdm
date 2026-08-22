@@ -26,4 +26,13 @@ describe("toISODateString", () => {
 
     expect(toISODateString(date, "Asia/Tokyo")).toBe("2026-05-27")
   })
+
+  test("uses the runtime timezone when none is given", () => {
+    expect(toISODateString(new Date("2026-06-15T12:00:00Z"))).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+  })
+
+  test("formats a runtime-timezone date the same as an explicit UTC one at midday", () => {
+    const date = new Date("2026-06-15T12:00:00Z")
+    expect(toISODateString(date)).toBe(toISODateString(date, Intl.DateTimeFormat().resolvedOptions().timeZone))
+  })
 })

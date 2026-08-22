@@ -31,12 +31,19 @@ export interface BuildSnapshotOptions {
   outputDirectory: string
   /** Base URL of a running stats-service instance. */
   statsBaseUrl: string
+  /** Base URL of a running transaction-tracker instance. */
+  transactionsBaseUrl: string
 }
 
 export interface SnapshotSummary {
   habitCount: number
   noteCount: number
+  transactionCount: number
   viewCount: number
+}
+
+export interface SnapshotTransactionsPayload {
+  transactions: unknown[]
 }
 
 export interface StartServiceOptions {

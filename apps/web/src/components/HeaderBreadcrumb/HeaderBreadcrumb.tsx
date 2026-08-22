@@ -18,6 +18,7 @@ export function HeaderBreadcrumb() {
   const { view } = useParams<{ view?: string }>()
   const isStatsPage = useMatch("/stats")
   const isColorsPage = useMatch("/colors")
+  const isCalendarPage = useMatch("/calendar/*")
   const habitMatch = useMatch("/tracking/:habitId")
   const { data } = useViewsQuery({})
   const currentView = view ? data.views.find(({ id }) => id === view) : undefined
@@ -25,6 +26,7 @@ export function HeaderBreadcrumb() {
   const currentPageLabel = resolveCurrentPageLabel([
     { match: !!isStatsPage, label: t("header.stats") },
     { match: !!isColorsPage, label: t("header.colors") },
+    { match: !!isCalendarPage, label: t("header.calendar") },
     { match: !!currentView, label: currentView?.name },
     { match: !!habitMatch, label: habitMatch?.params.habitId },
   ])

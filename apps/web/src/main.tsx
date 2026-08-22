@@ -9,6 +9,7 @@ import {
   setHabitsBaseUrl,
   setImagesBaseUrl,
   setStatsBaseUrl,
+  setTransactionsBaseUrl,
 } from 'services'
 
 import './index.css'
@@ -27,6 +28,7 @@ if (import.meta.env.VITE_DEMO_MODE === 'true') {
   setFlagsBaseUrl(import.meta.env.VITE_FLAGS_BASE_URL ?? '/flags')
   setImagesBaseUrl(import.meta.env.VITE_IMAGES_BASE_URL ?? '')
   setStatsBaseUrl(import.meta.env.VITE_STATS_BASE_URL ?? '/stats')
+  setTransactionsBaseUrl(import.meta.env.VITE_TRANSACTIONS_BASE_URL ?? '')
 }
 
 const queryClient = new QueryClient()

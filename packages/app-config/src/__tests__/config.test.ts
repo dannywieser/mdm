@@ -110,6 +110,16 @@ describe("config", () => {
       notesSource: "obsidian",
       obsidianVault: "vault",
       timezone: "UTC",
+      transactions: {
+        amountProperty: "amount",
+        categoryProperty: "category",
+        currency: "USD",
+        dateProperty: "date",
+        descriptionProperty: "description",
+        folder: "",
+        recurrenceEndProperty: "recurrenceEnd",
+        recurrenceProperty: "recurrence",
+      },
       views: [
         {
           badges: ["folder", "frontmatter.type"],
@@ -149,6 +159,16 @@ describe("config", () => {
       notesSource: "obsidian",
       obsidianVault: "vault",
       timezone: "UTC",
+      transactions: {
+        amountProperty: "amount",
+        categoryProperty: "category",
+        currency: "USD",
+        dateProperty: "date",
+        descriptionProperty: "description",
+        folder: "",
+        recurrenceEndProperty: "recurrenceEnd",
+        recurrenceProperty: "recurrence",
+      },
       views: [],
     })
   })

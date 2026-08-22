@@ -15,6 +15,8 @@ Wikilinks between notes resolve automatically (so a view can surface a note's li
 
 The other feature currently included in mdm is habit tracking. This takes a simple frontmatter property in your notes and provides an interface for allowing you to track habits more effectively through your markdown. Each habit gets a running score with streak and consistency multipliers — bonuses for `do-more` habits, penalties for `do-less` ones — plus a full day-by-day history to plot and a breakdown of exactly which days and streaks moved the score.
 
+There is also a **transaction calendar**. Notes carrying an `amount` in their frontmatter become transactions, and a month-at-a-time calendar lists them on the day they fall — what you actually spent, alongside what's coming. A note with a `recurrence` (`monthly`, `every 2 weeks`, `quarterly`, and so on) becomes a schedule, and its occurrences are projected forward indefinitely: page ahead as far as you like and next year's rent, insurance and paycheques are already there, with running in/out/net totals for whichever month you're looking at.
+
 Rounding it out, a stats page gives you aggregate counts across the vault (notes, folders, words, attachments) alongside a GitHub-style activity graph — one square per day, shaded by how much you wrote or edited, with outlier days called out.
 
 See it in action in the demo: [demo.markdownmemory.com](https://demo.markdownmemory.com)
@@ -33,7 +35,7 @@ This downloads `docker-compose.yml` and an example config into `./mdm`, prompts 
 2. Edit `mdm/app.config.json`:
    - set `obsidianVault` — needed for links to open notes in Obsidian to work correctly.
    - update `dateFormats` to match how dates appear in your notes — this is key to mdm's date filtering.
-   - see [CONTRIBUTING.md](CONTRIBUTING.md#configuration) for the full field list (`views`, `habits`, `flags`, etc.).
+   - see [CONTRIBUTING.md](CONTRIBUTING.md#configuration) for the full field list (`views`, `habits`, `transactions`, `flags`, etc.).
 3. `cd mdm && docker compose pull && docker compose up -d --no-build`
 4. Open http://localhost
 

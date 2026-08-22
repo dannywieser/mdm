@@ -5,7 +5,7 @@ Low-level parsing utilities for Obsidian-flavored markdown notes: YAML-ish front
 ## Usage
 
 ```ts
-import { collectMarkdownFiles, parseFrontMatter, parseMarkdownBodyDates, extractNoteDates, resolveDateFromFrontmatterOrTitle, resolveOldestDate, buildObsidianUrl, parseDateString, extractImagePaths, isImageUrl, resolveFrontmatterImages, resolveLocalImagePath, extractTags, TAG_PATTERN, BEAR_NOTES_HASH_KEY, loadScannedNotesFromHash } from "markdown"
+import { collectMarkdownFiles, FILE_ID_NAMESPACE, parseFrontMatter, parseMarkdownBodyDates, extractNoteDates, resolveDateFromFrontmatterOrTitle, resolveOldestDate, buildObsidianUrl, parseDateString, extractImagePaths, isImageUrl, resolveFrontmatterImages, resolveLocalImagePath, extractTags, TAG_PATTERN, BEAR_NOTES_HASH_KEY, loadScannedNotesFromHash } from "markdown"
 import type { Note, NoteFrontmatter, MarkdownNode, ScannedNote, NoteSyncPayload, ScannedNotesRedisClient } from "markdown"
 ```
 
@@ -18,6 +18,7 @@ import type { Note, NoteFrontmatter, MarkdownNode, ScannedNote, NoteSyncPayload,
 
 - `files/collectMarkdownFiles.ts` — recursively collects absolute paths of every `.md`/`.markdown` file under a directory.
 - `files/buildObsidianUrl.ts` — builds an `obsidian://open` deep link for a file relative to the vault root.
+- `files/fileIdNamespace.ts` — `FILE_ID_NAMESPACE`, the UUIDv5 namespace every note source seeds `createFileID` with. Shared so services that scan the same vault independently (`notes-api` and `transaction-tracker`) resolve a given note to the same `id`, which is what makes cross-service note links work.
 - `parsers/parseFrontMatter.ts` — splits a raw file's `---`-delimited YAML frontmatter block from its body, resolving Obsidian `[[wikilink]]`/`[[wikilink|alias]]` frontmatter values to their plain target string.
 - `parsers/parseMarkdownBodyDates.ts` — scans arbitrary text for every substring matching a set of tokenized date formats (`YYYY`, `YY`, `MM`, `DD`), returning matches in the order first found.
 - `parsers/parseDateString.ts` — parses a single string against a set of date formats into a `Date`.

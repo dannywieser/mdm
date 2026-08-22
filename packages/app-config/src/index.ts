@@ -5,6 +5,7 @@ import type { NotesSource, ResolvedNotesConfig } from "./types"
 
 import { DEFAULT_HABIT_SCORING } from "./habits/habitScoring"
 import { readAppConfigFile } from "./readAppConfigFile"
+import { DEFAULT_TRANSACTIONS_CONFIG } from "./transactions/transactions"
 import { validateAppConfig } from "./validateAppConfig/validateAppConfig"
 
 export type {
@@ -17,10 +18,13 @@ export type {
   NotesSource,
   NotesView,
   ResolvedNotesConfig,
+  TransactionsConfig,
   ViewFilter,
 } from "./types"
 
 export { DEFAULT_HABIT_SCORING }
+
+export { DEFAULT_TRANSACTIONS_CONFIG }
 
 export { readAppConfigFile } from "./readAppConfigFile"
 
@@ -66,6 +70,7 @@ export const resolveNotesConfig = async (): Promise<ResolvedNotesConfig> => {
     notesSource,
     obsidianVault: appConfig.obsidianVault,
     timezone: appConfig.timezone ?? "UTC",
+    transactions: appConfig.transactions ?? { ...DEFAULT_TRANSACTIONS_CONFIG },
     views: appConfig.views ?? [],
   }
 

@@ -6,6 +6,7 @@ import { useLocation, useMatch, useNavigate } from "react-router-dom"
 import { useI18n } from "../../i18n"
 import { focusRing } from "../../theme/focusRing"
 import { HeaderBreadcrumb } from "../HeaderBreadcrumb"
+import { HeaderCalendarLink } from "../HeaderCalendarLink"
 import { HeaderShell } from "../HeaderShell"
 import { HeaderStatsLink } from "../HeaderStatsLink"
 import { HeaderPaletteSelector } from "../HeaderPaletteSelector"
@@ -30,7 +31,8 @@ export function Header() {
   const navigate = useNavigate()
   const isStatsPage = useMatch("/stats")
   const isColorsPage = useMatch("/colors")
-  const isSecondaryPage = !!(isStatsPage ?? isColorsPage)
+  const isCalendarPage = useMatch("/calendar/*")
+  const isSecondaryPage = !!(isStatsPage ?? isColorsPage ?? isCalendarPage)
 
   return (
     <HeaderShell
@@ -62,6 +64,7 @@ export function Header() {
             <Text fontSize="sm" color="app.text" fontWeight="bold">
               {formatDate(new Date())}
             </Text>
+            <HeaderCalendarLink />
             <HeaderStatsLink />
             <HeaderPaletteSelector />
           </Flex>

@@ -9,12 +9,13 @@ import { buildPhotoNotes } from "./builders/photos"
 import { buildProjectNotes } from "./builders/projects"
 import { buildQuoteNotes } from "./builders/quotes"
 import { buildRecipeNotes } from "./builders/recipes"
+import { buildTransactionNotes } from "./builders/transactions"
 import { createRandom } from "./random/random"
 
 /**
  * Generates the full demo vault: a multi-year journal plus photo, library,
- * quotes, ideas, projects, recipes, and people notes. Deterministic for a
- * given seed and end date.
+ * quotes, ideas, projects, recipes, people, and finance transaction notes.
+ * Deterministic for a given seed and end date.
  */
 export const generateVault = async (endDate: string, seed: number): Promise<GeneratedVault> => {
   const random = createRandom(seed)
@@ -42,6 +43,7 @@ export const generateVault = async (endDate: string, seed: number): Promise<Gene
       ...buildProjectNotes(options),
       ...recipes.notes,
       ...buildPeopleNotes(options),
+      ...buildTransactionNotes(options),
     ],
   }
 }

@@ -1,4 +1,4 @@
-import { DEFAULT_HABIT_SCORING, resolveNotesConfig } from "app-config"
+import { DEFAULT_HABIT_SCORING, DEFAULT_TRANSACTIONS_CONFIG, resolveNotesConfig } from "app-config"
 import { collectMarkdownFiles } from "markdown"
 import { addDays } from "mdm-util"
 
@@ -100,6 +100,7 @@ const BASE_CONFIG = {
   obsidianVault: "vault",
   timezone: "UTC",
   attachmentsDirectory: "/images",
+  transactions: DEFAULT_TRANSACTIONS_CONFIG,
   views: [],
 }
 

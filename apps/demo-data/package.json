@@ -18,6 +18,7 @@
     "habit-tracker": "1.5.2",
     "mdm-util": "3.7.0",
     "notes-api": "3.7.0",
-    "stats-service": "1.2.2"
+    "stats-service": "1.2.2",
+    "transaction-tracker": "1.0.0"
   }
 }
