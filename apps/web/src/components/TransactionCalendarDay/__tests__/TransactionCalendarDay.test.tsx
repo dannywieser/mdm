@@ -16,13 +16,11 @@ vi.mock("../../../i18n", () => ({
 }))
 
 vi.mock("../../TransactionAmount", () => ({
-  TransactionAmount: ({ amount }: { amount: number }) => <span>total:{amount}</span>,
+  TransactionAmount: ({ amount }: { amount: number }) => <span>amount:{amount}</span>,
 }))
 
-vi.mock("../../TransactionCalendarEntry", () => ({
-  TransactionCalendarEntry: ({ transaction }: { transaction: TransactionOccurrence }) => (
-    <span>entry:{transaction.description}</span>
-  ),
+vi.mock("../../TransactionDayDetail", () => ({
+  TransactionDayDetail: ({ day }: { day: CalendarDay }) => <div>detail:{day.date}</div>,
 }))
 
 afterEach(cleanup)
@@ -43,9 +41,12 @@ const occurrence = (overrides: Partial<TransactionOccurrence> = {}): Transaction
 const day = (overrides: Partial<CalendarDay> = {}): CalendarDay => ({
   date: "2026-03-04",
   dayOfMonth: 4,
+  expenseCount: 1,
+  incomeCount: 0,
   isCurrentMonth: true,
   isToday: false,
-  total: -42.5,
+  loggedTotal: -42.5,
+  scheduledTotal: 0,
   transactions: [occurrence()],
   ...overrides,
 })
@@ -66,32 +67,85 @@ describe("TransactionCalendarDay", () => {
     expect(screen.getByText("4")).toBeTruthy()
   })
 
-  test("renders one entry per transaction", () => {
+  test("renders the logged total", () => {
+    renderDay()
+
+    expect(screen.getByText("amount:-42.5")).toBeTruthy()
+  })
+
+  test("renders the scheduled total alongside the logged one", () => {
+    renderDay(day({ loggedTotal: -42.5, scheduledTotal: -1650 }))
+
+    expect(screen.getByText("amount:-42.5")).toBeTruthy()
+    expect(screen.getByText("amount:-1650")).toBeTruthy()
+  })
+
+  test("omits a total for a status the day has none of", () => {
+    renderDay(day({ loggedTotal: 0, scheduledTotal: -1650 }))
+
+    expect(screen.getByText("amount:-1650")).toBeTruthy()
+    expect(screen.queryByText("amount:0")).toBeNull()
+  })
+
+  test("summarises transactions as counts rather than listing them in the cell", () => {
     renderDay(
       day({
-        transactions: [occurrence(), occurrence({ description: "Rent", id: "rent:2026-03-04" })],
+        expenseCount: 3,
+        incomeCount: 1,
+        transactions: [occurrence(), occurrence({ id: "b" }), occurrence({ id: "c" })],
       }),
     )
 
-    expect(screen.getByText("entry:Groceries")).toBeTruthy()
-    expect(screen.getByText("entry:Rent")).toBeTruthy()
+    expect(screen.getByLabelText('calendar.expenseCount {"count":3}')).toBeTruthy()
+    expect(screen.getByLabelText('calendar.incomeCount {"count":1}')).toBeTruthy()
+    expect(screen.queryByText("Groceries")).toBeNull()
   })
 
-  test("renders the day total when the day has transactions", () => {
+  test("omits the money-out count when the day has no expenses", () => {
+    renderDay(day({ expenseCount: 0, incomeCount: 2 }))
+
+    expect(screen.queryByLabelText(/calendar\.expenseCount/)).toBeNull()
+    expect(screen.getByLabelText('calendar.incomeCount {"count":2}')).toBeTruthy()
+  })
+
+  test("omits the money-in count when the day has no income", () => {
     renderDay()
 
-    expect(screen.getByText("total:-42.5")).toBeTruthy()
+    expect(screen.queryByLabelText(/calendar\.incomeCount/)).toBeNull()
   })
 
-  test("omits the day total on an empty day", () => {
-    renderDay(day({ total: 0, transactions: [] }))
+  test("renders the detail panel for a day with transactions", () => {
+    renderDay()
 
-    expect(screen.queryByText(/^total:/)).toBeNull()
+    expect(screen.getByText("detail:2026-03-04")).toBeTruthy()
+  })
+
+  test("renders no counts or detail panel on an empty day", () => {
+    renderDay(day({ expenseCount: 0, incomeCount: 0, loggedTotal: 0, transactions: [] }))
+
+    expect(screen.queryByText(/^detail:/)).toBeNull()
+    expect(screen.queryByLabelText(/calendar\.expenseCount/)).toBeNull()
   })
 
   test("marks today's cell with the today label", () => {
     renderDay(day({ isToday: true }))
 
     expect(screen.getByText('calendar.today {"day":4}')).toBeTruthy()
+  })
+
+  test("gives every cell the same fixed height regardless of how much is on it", () => {
+    const { container: busy } = renderDay(
+      day({ expenseCount: 9, transactions: Array.from({ length: 9 }, (_, i) => occurrence({ id: `t${i}` })) }),
+    )
+    const busyHeight = busy.querySelector("li")?.getAttribute("class")
+
+    cleanup()
+
+    const { container: empty } = renderDay(
+      day({ expenseCount: 0, incomeCount: 0, loggedTotal: 0, transactions: [] }),
+    )
+    const emptyHeight = empty.querySelector("li")?.getAttribute("class")
+
+    expect(busyHeight).toBe(emptyHeight)
   })
 })

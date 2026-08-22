@@ -40,9 +40,12 @@ afterEach(cleanup)
 const day = (date: string): CalendarDay => ({
   date,
   dayOfMonth: Number(date.slice(8, 10)),
+  expenseCount: 0,
+  incomeCount: 0,
   isCurrentMonth: true,
   isToday: false,
-  total: 0,
+  loggedTotal: 0,
+  scheduledTotal: 0,
   transactions: [],
 })
 

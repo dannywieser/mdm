@@ -5,11 +5,17 @@ export interface TransactionCalendarDay {
   date: string
   /** Day-of-month number shown in the cell. */
   dayOfMonth: number
+  /** How many of the day's transactions are money out. */
+  expenseCount: number
+  /** How many of the day's transactions are money in. */
+  incomeCount: number
   /** False for the padding cells that complete the first and last weeks. */
   isCurrentMonth: boolean
   isToday: boolean
-  /** Net of every amount on this day. */
-  total: number
+  /** Net of the day's logged amounts; 0 when it has none. */
+  loggedTotal: number
+  /** Net of the day's scheduled amounts; 0 when it has none. */
+  scheduledTotal: number
   transactions: TransactionOccurrence[]
 }
 

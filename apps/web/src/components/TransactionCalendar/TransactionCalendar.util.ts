@@ -40,6 +40,21 @@ const groupByDate = (
   return byDate
 }
 
+/** Guards against floating-point drift when summing decimal amounts. */
+const sumAmounts = (
+  transactions: readonly TransactionOccurrence[],
+  predicate: (transaction: TransactionOccurrence) => boolean,
+): number =>
+  Math.round(
+    transactions.reduce((sum, transaction) => (predicate(transaction) ? sum + transaction.amount : sum), 0) *
+      100,
+  ) / 100
+
+const countWhere = (
+  transactions: readonly TransactionOccurrence[],
+  predicate: (transaction: TransactionOccurrence) => boolean,
+): number => transactions.filter(predicate).length
+
 const buildDay = (
   date: string,
   monthKey: string,
@@ -51,9 +66,12 @@ const buildDay = (
   return {
     date,
     dayOfMonth: Number(date.slice(8, 10)),
+    expenseCount: countWhere(transactions, ({ amount }) => amount < 0),
+    incomeCount: countWhere(transactions, ({ amount }) => amount > 0),
     isCurrentMonth: date.startsWith(`${monthKey}-`),
     isToday: date === today,
-    total: Math.round(transactions.reduce((sum, { amount }) => sum + amount, 0) * 100) / 100,
+    loggedTotal: sumAmounts(transactions, ({ status }) => status === "logged"),
+    scheduledTotal: sumAmounts(transactions, ({ status }) => status === "scheduled"),
     transactions,
   }
 }
@@ -66,7 +84,9 @@ const buildDay = (
  *
  * Every transaction is placed on its own date; occurrences the API returned
  * for other months are ignored, so a padded cell only ever shows a
- * transaction the caller actually loaded.
+ * transaction the caller actually loaded. Each day carries its own logged and
+ * scheduled totals and money-in/out counts, so a cell can summarise itself at
+ * a fixed size no matter how many transactions fall on it.
  */
 export const buildCalendarWeeks = (
   monthKey: string,

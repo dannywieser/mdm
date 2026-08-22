@@ -60,6 +60,9 @@ describe("formatMonthLabel", () => {
   })
 })
 
+const findDay = (weeks: ReturnType<typeof buildCalendarWeeks>, date: string) =>
+  weeks.flatMap(({ days }) => days).find((day) => day.date === date)
+
 describe("buildCalendarWeeks", () => {
   test("pads the grid so every week holds seven days", () => {
     const weeks = buildCalendarWeeks("2026-03", [], "2026-03-17")
@@ -117,15 +120,25 @@ describe("buildCalendarWeeks", () => {
     expect(day?.transactions).toHaveLength(2)
   })
 
-  test("nets each day's amounts into a day total", () => {
+  test("splits a day's amounts into logged and scheduled totals", () => {
     const weeks = buildCalendarWeeks(
       "2026-03",
-      [occurrence({ amount: -10 }), occurrence({ amount: 2500, id: "pay:2026-03-04" })],
+      [
+        occurrence({ amount: -10 }),
+        occurrence({ amount: -1650, id: "rent:2026-03-04", status: "scheduled" }),
+      ],
       "2026-03-17",
     )
-    const day = weeks.flatMap(({ days }) => days).find(({ date }) => date === "2026-03-04")
+    const day = findDay(weeks, "2026-03-04")
 
-    expect(day?.total).toBe(2490)
+    expect(day?.loggedTotal).toBe(-10)
+    expect(day?.scheduledTotal).toBe(-1650)
+  })
+
+  test("reports a zero total for a status the day has none of", () => {
+    const day = findDay(buildCalendarWeeks("2026-03", [occurrence({})], "2026-03-17"), "2026-03-04")
+
+    expect(day?.scheduledTotal).toBe(0)
   })
 
   test("rounds away floating point drift in a day total", () => {
@@ -134,9 +147,41 @@ describe("buildCalendarWeeks", () => {
       [occurrence({ amount: -0.1 }), occurrence({ amount: -0.2, id: "b:2026-03-04" })],
       "2026-03-17",
     )
-    const day = weeks.flatMap(({ days }) => days).find(({ date }) => date === "2026-03-04")
 
-    expect(day?.total).toBe(-0.3)
+    expect(findDay(weeks, "2026-03-04")?.loggedTotal).toBe(-0.3)
+  })
+
+  test("counts money out and money in separately", () => {
+    const weeks = buildCalendarWeeks(
+      "2026-03",
+      [
+        occurrence({ amount: -10 }),
+        occurrence({ amount: -20, id: "b:2026-03-04" }),
+        occurrence({ amount: 2500, id: "pay:2026-03-04" }),
+      ],
+      "2026-03-17",
+    )
+    const day = findDay(weeks, "2026-03-04")
+
+    expect(day?.expenseCount).toBe(2)
+    expect(day?.incomeCount).toBe(1)
+  })
+
+  test("counts a day with nothing on it as zero of each", () => {
+    const day = findDay(buildCalendarWeeks("2026-03", [], "2026-03-17"), "2026-03-04")
+
+    expect(day?.expenseCount).toBe(0)
+    expect(day?.incomeCount).toBe(0)
+  })
+
+  test("counts regardless of status, so a scheduled expense still counts as money out", () => {
+    const weeks = buildCalendarWeeks(
+      "2026-03",
+      [occurrence({ amount: -1650, status: "scheduled" })],
+      "2026-03-17",
+    )
+
+    expect(findDay(weeks, "2026-03-04")?.expenseCount).toBe(1)
   })
 
   test("marks only today's cell as today", () => {
