@@ -3,6 +3,7 @@ import {
   buildObsidianUrl,
   extractNoteDates,
   extractTags,
+  FILE_ID_NAMESPACE,
   parseFrontMatter,
   resolveFrontmatterImages,
   resolveOldestDate,
@@ -13,7 +14,8 @@ import path from "node:path"
 
 import type { ScannedNote } from "./notes.types"
 
-export const FILE_ID_NAMESPACE = "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
+/** Re-exported for callers that already import it from this module. */
+export { FILE_ID_NAMESPACE }
 
 export const resolveCreatedDate = (
   dates: readonly string[],

@@ -3,6 +3,7 @@ import { isNonEmptyString, isStringArray, isValidTimezone } from "mdm-util"
 import type { AppConfig, NotesSource } from "../types"
 
 import { validateHabits } from "../habits/habits"
+import { resolveTransactions } from "../transactions/transactions"
 import { validateViews } from "../views/views"
 
 const NOTES_SOURCES: NotesSource[] = ["bear", "obsidian"]
@@ -62,6 +63,16 @@ export const validateAppConfig = (raw: unknown): AppConfig => {
   const habits = validateHabits(config.habits)
   const views = validateViews(config.views)
   const notesSource = validateNotesSource(config.notesSource)
+  const transactions = resolveTransactions(config.transactions)
 
-  return { attachmentsDirectory, dateFormats, habits, notesSource, obsidianVault, timezone, views }
+  return {
+    attachmentsDirectory,
+    dateFormats,
+    habits,
+    notesSource,
+    obsidianVault,
+    timezone,
+    transactions,
+    views,
+  }
 }

@@ -1,3 +1,4 @@
+import { addMonths, getMonthEnd, getMonthKey, getMonthStart } from "mdm-util"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 
@@ -6,6 +7,7 @@ import type {
   SnapshotHabitSummary,
   SnapshotNotesPayload,
   SnapshotSummary,
+  SnapshotTransactionsPayload,
   SnapshotViewsPayload,
 } from "./snapshot.types"
 
@@ -80,6 +82,35 @@ const copyNoteSources = async (
 }
 
 /**
+ * Months of transactions captured either side of today. The live service
+ * projects recurrences on demand for any month asked for, but a static
+ * snapshot has to pick a window: this one keeps the demo calendar populated
+ * for a year back and two years forward, and months outside it read as empty.
+ */
+const TRANSACTION_MONTHS_BACK = 12
+const TRANSACTION_MONTHS_FORWARD = 24
+
+/**
+ * Captures every transaction occurrence across the snapshot window as one
+ * file; the demo hook narrows it to whichever month the calendar shows.
+ */
+const snapshotTransactions = async (
+  transactionsBaseUrl: string,
+  outputDirectory: string,
+): Promise<number> => {
+  const today = new Date().toISOString().slice(0, 10)
+  const from = getMonthStart(addMonths(getMonthKey(today), -TRANSACTION_MONTHS_BACK))
+  const to = getMonthEnd(addMonths(getMonthKey(today), TRANSACTION_MONTHS_FORWARD))
+
+  const payload = await fetchJson<SnapshotTransactionsPayload>(
+    `${transactionsBaseUrl}/transactions?from=${from}&to=${to}`,
+  )
+  await writeJson(outputDirectory, "transactions.json", payload)
+
+  return payload.transactions.length
+}
+
+/**
  * Captures the responses of the running notes-api and habit-tracker services
  * as static JSON files, plus the vault attachments (cover images), producing
  * everything the web app needs to run without servers.
@@ -90,6 +121,7 @@ export const buildSnapshot = async ({
   notesBaseUrl,
   outputDirectory,
   statsBaseUrl,
+  transactionsBaseUrl,
 }: BuildSnapshotOptions): Promise<SnapshotSummary> => {
   await fs.rm(outputDirectory, { force: true, recursive: true })
   await fs.mkdir(outputDirectory, { recursive: true })
@@ -116,6 +148,8 @@ export const buildSnapshot = async ({
     await writeJson(outputDirectory, `habit.${safeHabitId}.json`, detail)
   }
 
+  const transactions = await snapshotTransactions(transactionsBaseUrl, outputDirectory)
+
   const noteCount = await copyNoteSources(notesBaseUrl, outputDirectory)
 
   await fs.cp(
@@ -124,5 +158,10 @@ export const buildSnapshot = async ({
     { recursive: true },
   )
 
-  return { habitCount: habits.length, noteCount, viewCount: viewsPayload.views.length }
+  return {
+    habitCount: habits.length,
+    noteCount,
+    transactionCount: transactions,
+    viewCount: viewsPayload.views.length,
+  }
 }

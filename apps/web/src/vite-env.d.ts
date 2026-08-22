@@ -6,6 +6,7 @@ interface ImportMetaEnv {
   readonly VITE_FLAGS_BASE_URL?: string
   readonly VITE_IMAGES_BASE_URL?: string
   readonly VITE_STATS_BASE_URL?: string
+  readonly VITE_TRANSACTIONS_BASE_URL?: string
 }
 
 interface ImportMeta {

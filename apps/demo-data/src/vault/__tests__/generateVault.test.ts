@@ -36,6 +36,7 @@ describe("generateVault", () => {
     const folders = new Set(vault.notes.map((note) => note.folder))
 
     expect([...folders].toSorted((a, b) => a.localeCompare(b))).toEqual([
+      "finance/transactions",
       "ideas",
       "journal",
       "library/books",

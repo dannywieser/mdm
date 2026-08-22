@@ -3,6 +3,7 @@ export { resolveDateFromFrontmatterOrTitle } from "./dates/resolveDateFromFrontm
 export { resolveOldestDate } from "./dates/resolveOldestDate"
 export { buildObsidianUrl } from "./files/buildObsidianUrl"
 export { collectMarkdownFiles } from "./files/collectMarkdownFiles"
+export { FILE_ID_NAMESPACE } from "./files/fileIdNamespace"
 export { BEAR_NOTES_HASH_KEY } from "./noteSync"
 export { extractImagePaths } from "./parsers/extractImagePaths"
 export { extractTags, TAG_PATTERN } from "./parsers/extractTags"

@@ -99,6 +99,10 @@
       "notesGalleryFilters": ["cuisine", "difficulty"]
     }
   ],
+  "transactions": {
+    "folder": "finance/transactions",
+    "currency": "USD"
+  },
   "habits": [
     {
       "id": "screen-time",

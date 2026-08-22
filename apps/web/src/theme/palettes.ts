@@ -10,6 +10,10 @@ export type ColorPaletteName =
 
 export interface ColorPaletteVariant {
   background: string
+  /** Foreground for money out; must contrast with `panelBackground`. */
+  negativeText: string
+  /** Foreground for money in; must contrast with `panelBackground`. */
+  positiveText: string
   border: string
   borderHover: string
   iconMuted: string
@@ -49,6 +53,8 @@ export const colorPaletteDefinitions: Record<
       successBackground: "#50fa7b",
       successHoverBackground: "#43d967",
       successText: "#1f232d",
+      negativeText: "#ff6e6e",
+      positiveText: "#50fa7b",
       iconMuted: "#8be9fd",
     },
     get light() {
@@ -69,6 +75,8 @@ export const colorPaletteDefinitions: Record<
       successBackground: "#98971a",
       successHoverBackground: "#7f801a",
       successText: "#1d2021",
+      negativeText: "#fb4934",
+      positiveText: "#b8bb26",
       iconMuted: "#83a598",
     },
     light: {
@@ -83,6 +91,8 @@ export const colorPaletteDefinitions: Record<
       successBackground: "#79740e",
       successHoverBackground: "#5f5b08",
       successText: "#fbf1c7",
+      negativeText: "#9d0006",
+      positiveText: "#79740e",
       iconMuted: "#427b58",
     },
   },
@@ -100,6 +110,8 @@ export const colorPaletteDefinitions: Record<
       successBackground: "#a3be8c",
       successHoverBackground: "#8fb07a",
       successText: "#2e3440",
+      negativeText: "#d08c8c",
+      positiveText: "#a3be8c",
       iconMuted: "#81a1c1",
     },
     light: {
@@ -114,6 +126,8 @@ export const colorPaletteDefinitions: Record<
       successBackground: "#4c7a34",
       successHoverBackground: "#3d6329",
       successText: "#eceff4",
+      negativeText: "#a03535",
+      positiveText: "#4c7a34",
       iconMuted: "#5e81ac",
     },
   },
@@ -131,6 +145,8 @@ export const colorPaletteDefinitions: Record<
       successBackground: "#a6e3a1",
       successHoverBackground: "#89d88b",
       successText: "#1e1e2e",
+      negativeText: "#f38ba8",
+      positiveText: "#a6e3a1",
       iconMuted: "#89b4fa",
     },
     light: {
@@ -145,6 +161,8 @@ export const colorPaletteDefinitions: Record<
       successBackground: "#40a02b",
       successHoverBackground: "#329021",
       successText: "#eff1f5",
+      negativeText: "#d20f39",
+      positiveText: "#40a02b",
       iconMuted: "#209fb5",
     },
   },
@@ -162,6 +180,8 @@ export const colorPaletteDefinitions: Record<
       successBackground: "#859900",
       successHoverBackground: "#6b7e00",
       successText: "#002b36",
+      negativeText: "#dc322f",
+      positiveText: "#859900",
       iconMuted: "#2aa198",
     },
     light: {
@@ -176,6 +196,8 @@ export const colorPaletteDefinitions: Record<
       successBackground: "#859900",
       successHoverBackground: "#6b7e00",
       successText: "#fdf6e3",
+      negativeText: "#dc322f",
+      positiveText: "#859900",
       iconMuted: "#2aa198",
     },
   },
@@ -193,6 +215,8 @@ export const colorPaletteDefinitions: Record<
       successBackground: "#2aa198",
       successHoverBackground: "#218f87",
       successText: "#0c1014",
+      negativeText: "#d26937",
+      positiveText: "#2aa198",
       iconMuted: "#195465",
     },
     get light() {
@@ -213,6 +237,8 @@ export const colorPaletteDefinitions: Record<
       successBackground: "#22d07a",
       successHoverBackground: "#1ab868",
       successText: "#071018",
+      negativeText: "#ff7a7a",
+      positiveText: "#22d07a",
       iconMuted: "#56c0e0",
     },
     get light() {
@@ -233,6 +259,8 @@ export const colorPaletteDefinitions: Record<
       successBackground: "#055d20",
       successHoverBackground: "#024c1a",
       successText: "#ffffff",
+      negativeText: "#a40e26",
+      positiveText: "#055d20",
       iconMuted: "#0a86b5",
     },
     get dark() {

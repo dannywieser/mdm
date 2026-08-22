@@ -15,6 +15,16 @@
       ]
     }
   ],
+  "transactions": {
+    "amountProperty": "amount",
+    "categoryProperty": "category",
+    "currency": "USD",
+    "dateProperty": "date",
+    "descriptionProperty": "description",
+    "folder": "finance",
+    "recurrenceEndProperty": "recurrenceEnd",
+    "recurrenceProperty": "recurrence"
+  },
   "flags": {
     "read": {
       "expiresInDays": 30

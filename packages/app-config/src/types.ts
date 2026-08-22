@@ -14,6 +14,25 @@ export interface HabitConfig {
   trackingWindowDays: number
 }
 
+export interface TransactionsConfig {
+  /** Frontmatter property holding the signed transaction amount. */
+  amountProperty: string
+  /** Frontmatter property holding the transaction category. */
+  categoryProperty: string
+  /** ISO 4217 currency code used to format amounts in the UI. */
+  currency: string
+  /** Frontmatter property holding the transaction (or first occurrence) date. */
+  dateProperty: string
+  /** Frontmatter property holding the human-readable description. */
+  descriptionProperty: string
+  /** Vault-relative folder to restrict the scan to; empty scans the whole vault. */
+  folder: string
+  /** Frontmatter property holding the last date a recurrence may occur on. */
+  recurrenceEndProperty: string
+  /** Frontmatter property holding the recurrence rule; absent means one-off. */
+  recurrenceProperty: string
+}
+
 export interface ExcludeViewFilter {
   $exclude: Record<string, string>
 }
@@ -42,6 +61,7 @@ export interface ResolvedNotesConfig {
   notesSource: NotesSource
   obsidianVault: string
   timezone: string
+  transactions: TransactionsConfig
   views: NotesView[]
 }
 
@@ -52,6 +72,7 @@ export interface AppConfig {
   notesSource?: NotesSource
   obsidianVault: string
   timezone?: string
+  transactions?: TransactionsConfig
   views?: AppConfigView[]
 }
 

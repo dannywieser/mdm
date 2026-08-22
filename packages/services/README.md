@@ -1,6 +1,6 @@
 # services
 
-Shared TypeScript types and React Query hooks for the mdm backend services (notes, habits, flags, images, stats). This package is the single source of truth for response shapes returned by `apps/notes-api`, `apps/habit-tracker`, `apps/flag-manager`, and `apps/stats-service`, and for the hooks `apps/web` (and any future web app) uses to fetch that data.
+Shared TypeScript types and React Query hooks for the mdm backend services (notes, habits, transactions, flags, images, stats). This package is the single source of truth for response shapes returned by `apps/notes-api`, `apps/habit-tracker`, `apps/transaction-tracker`, `apps/flag-manager`, and `apps/stats-service`, and for the hooks `apps/web` (and any future web app) uses to fetch that data.
 
 ## Usage
 
@@ -16,7 +16,7 @@ setImagesBaseUrl(import.meta.env.VITE_IMAGES_BASE_URL ?? "")
 setStatsBaseUrl(import.meta.env.VITE_STATS_BASE_URL ?? "/stats")
 ```
 
-Then use the hooks and types as normal, e.g. `useNotesQuery`, `useViewsQuery`, `useStatsMeta`, `useStatsHistory`, `useStatsPageData`, `useHabitsQuery`, `useHabitQuery`, `useIsRead`, `useToggleRead`, `buildImageUrl`.
+Then use the hooks and types as normal, e.g. `useNotesQuery`, `useViewsQuery`, `useStatsMeta`, `useStatsHistory`, `useStatsPageData`, `useHabitsQuery`, `useHabitQuery`, `useTransactionsQuery`, `useIsRead`, `useToggleRead`, `buildImageUrl`.
 
 Hooks throw `Error` objects whose `message` is an i18n key (e.g. `"errors.unableToLoadViews"`) rather than localized text, so consuming apps can translate the message themselves.
 
@@ -32,7 +32,7 @@ configureDemoMode({ dataBasePath: `${import.meta.env.BASE_URL}demo-data` })
 
 In demo mode:
 
-- The query hooks fetch pre-built static JSON files from `dataBasePath` (`views.json`, `stats.meta.json`, `stats.history.json`, `habits.json`, `habit.<id>.json`, `notes.<view>.json` / `notes.<view>.slim.json`) instead of calling the live services. The files are produced by `apps/demo-data`.
+- The query hooks fetch pre-built static JSON files from `dataBasePath` (`views.json`, `stats.meta.json`, `stats.history.json`, `habits.json`, `habit.<id>.json`, `transactions.json`, `notes.<view>.json` / `notes.<view>.slim.json`) instead of calling the live services. The files are produced by `apps/demo-data`.
 - `useIsRead` / `useToggleRead` swap the redis-backed flag-manager HTTP calls for browser `sessionStorage` (key format `mdm-demo-flag:<flag>:<noteId>`), so read-state is temporary and per-session.
 - `buildImageUrl` maps vault-relative image paths to static files under `<dataBasePath>/images/` instead of the image-server proxy.
 - `useNoteSourceQuery` (demo-only) loads a note's raw markdown from `<dataBasePath>/source/<noteId>.md`, backing the web app's in-browser note source page that replaces Obsidian deep links in demo mode.
@@ -42,6 +42,7 @@ In demo mode:
 - `notes/` — `Note`/`NotesResponse`, `ViewSummary`/`ViewsResponse` and the hooks that fetch them from `apps/notes-api`, plus the note "read" flag hooks (`useIsRead`, `useToggleRead`).
 - `stats/` — `StatsMetaResponse`/`StatsHistoryResponse` and the `useStatsMeta`/`useStatsHistory` hooks that fetch them from `apps/stats-service`, plus `useStatsPageData`, which fetches both via `useSuspenseQueries` so they start in parallel under a single Suspense boundary (calling `useStatsMeta` and `useStatsHistory` as two separate `useSuspenseQuery` hooks in the same component does not parallelize them, since React aborts the render — and never reaches the second hook call — as soon as the first one suspends).
 - `habits/` — `HabitSummary`/`HabitResult` and the hooks that fetch them from `apps/habit-tracker`.
+- `transactions/` — `TransactionOccurrence`/`TransactionTotals`/`TransactionsResponse` and `useTransactionsQuery`, which fetches one month from `apps/transaction-tracker`. In demo mode the static snapshot covers a fixed window of already-expanded occurrences, so the hook fetches it once and narrows it to the requested month; the live service instead projects recurrences on demand, with no window limit.
 - `flags/` — `ToggleFlagInput`/`ToggleFlagResult` shared with `apps/flag-manager`.
 - `images/` — `buildImageUrl` helper for the `apps/image-server` image proxy.
 - `demo/` — `configureDemoMode`/`isDemoMode`, the `mdm-demo-flag:*` sessionStorage-backed read flags, and the `buildDemo*Url` helpers that point the query hooks at the static snapshot instead of live services.

@@ -19,7 +19,8 @@
   },
   "dependencies": {
     "app-config": "3.7.0",
-    "markdown": "3.7.0"
+    "markdown": "3.7.0",
+    "mdm-util": "3.7.0"
   },
   "peerDependencies": {
     "@tanstack/react-query": "5.100.14",

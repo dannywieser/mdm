@@ -25,6 +25,11 @@ export * from "./habits/hooks/useHabitsQuery/useHabitsQuery"
 export * from "./habits/hooks/useHabitQuery/useHabitQuery"
 export * from "./habits/hooks/useHabitQuery/useHabitQuery.types"
 
+export * from "./transactions/transactions.types"
+export * from "./transactions/hooks/useTransactionsQuery/useTransactionsQuery"
+export * from "./transactions/hooks/useTransactionsQuery/useTransactionsQuery.types"
+export * from "./transactions/hooks/useTransactionsQuery/useTransactionsQuery.util"
+
 export * from "./flags/flags.types"
 export * from "./flags/flags.constants"
 export * from "./flags/hooks/useIsRead/useIsRead"

@@ -32,6 +32,9 @@ jobs:
           - name: stats-service
             dockerfile: infra/docker/stats-service.Dockerfile
             package: apps/stats-service/package.json
+          - name: transaction-tracker
+            dockerfile: infra/docker/transaction-tracker.Dockerfile
+            package: apps/transaction-tracker/package.json
           - name: web
             dockerfile: infra/docker/web.Dockerfile
             package: apps/web/package.json

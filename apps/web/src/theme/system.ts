@@ -43,6 +43,8 @@ const createPaletteSystem = (paletteName: ColorPaletteName) => {
             successBackground: { value: { base: light.successBackground, _dark: dark.successBackground } },
             successHoverBackground: { value: { base: light.successHoverBackground, _dark: dark.successHoverBackground } },
             successText: { value: { base: light.successText, _dark: dark.successText } },
+            positiveText: { value: { base: light.positiveText, _dark: dark.positiveText } },
+            negativeText: { value: { base: light.negativeText, _dark: dark.negativeText } },
           },
         },
       },

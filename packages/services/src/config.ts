@@ -3,6 +3,7 @@ let habitsBaseUrl = ""
 let flagsBaseUrl = "/flags"
 let imagesBaseUrl = ""
 let statsBaseUrl = "/stats"
+let transactionsBaseUrl = ""
 
 export const setBaseUrl = (url: string): void => {
   baseUrl = url
@@ -33,3 +34,9 @@ export const setStatsBaseUrl = (url: string): void => {
 }
 
 export const getStatsBaseUrl = (): string => statsBaseUrl
+
+export const setTransactionsBaseUrl = (url: string): void => {
+  transactionsBaseUrl = url
+}
+
+export const getTransactionsBaseUrl = (): string => transactionsBaseUrl

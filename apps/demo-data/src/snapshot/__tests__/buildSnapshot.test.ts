@@ -1,5 +1,5 @@
 import { promises as fsMock } from "node:fs"
-import { describe, expect, test, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 
 import { buildSnapshot } from "../buildSnapshot"
 
@@ -24,6 +24,15 @@ const RESPONSES: Record<string, unknown> = {
   "https://stats/stats/history": [{ date: "2026-05-01", entriesCreated: 1, entriesModified: 0, foldersTouched: 1 }],
   "https://habits/habits": [{ habitId: "exercise" }],
   "https://habits/habits/exercise": { habitId: "exercise", history: [] },
+  // The snapshot window is derived from today's date, which the fake timers
+  // below pin so this URL stays stable.
+  "https://transactions/transactions?from=2025-03-01&to=2028-03-31": {
+    currency: "USD",
+    from: "2025-03-01",
+    to: "2028-03-31",
+    totals: { expense: -10, income: 0, logged: -10, net: -10, scheduled: 0 },
+    transactions: [{ id: "note-1:2026-03-04" }],
+  },
 }
 
 const stubFetch = () => {
@@ -45,15 +54,24 @@ const runBuildSnapshot = () =>
     notesBaseUrl: "https://notes",
     outputDirectory: "/out",
     statsBaseUrl: "https://stats",
+    transactionsBaseUrl: "https://transactions",
   })
 
+beforeEach(() => {
+  vi.useFakeTimers().setSystemTime(new Date("2026-03-17T12:00:00Z"))
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
+
 describe("buildSnapshot", () => {
-  test("writes views, per-view notes (full and slim), stats, and habits", async () => {
+  test("writes views, per-view notes (full and slim), stats, habits, and transactions", async () => {
     stubFetch()
 
     const summary = await runBuildSnapshot()
 
-    expect(summary).toEqual({ habitCount: 1, noteCount: 1, viewCount: 1 })
+    expect(summary).toEqual({ habitCount: 1, noteCount: 1, transactionCount: 1, viewCount: 1 })
     const writtenFiles = vi
       .mocked(fsMock.writeFile)
       .mock.calls.map(([filePath]) => filePath)
@@ -65,8 +83,19 @@ describe("buildSnapshot", () => {
       "/out/stats.history.json",
       "/out/habits.json",
       "/out/habit.exercise.json",
+      "/out/transactions.json",
       "/out/source/note-1.md",
     ])
+  })
+
+  test("captures a transaction window spanning a year back and two years forward", async () => {
+    const fetchMock = stubFetch()
+
+    await runBuildSnapshot()
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://transactions/transactions?from=2025-03-01&to=2028-03-31",
+    )
   })
 
   test("clears the output directory and copies attachments for covers", async () => {

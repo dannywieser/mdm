@@ -16,6 +16,8 @@ services:
         condition: service_healthy
       stats-service:
         condition: service_healthy
+      transaction-tracker:
+        condition: service_healthy
     ports:
       - "80:80"
 
@@ -88,6 +90,25 @@ services:
       REDIS_URL: "redis://redis:6379"
     expose:
       - "3003"
+    volumes:
+      - ./app.config.json:/app/app.config.json:ro
+      - ${NOTES_ROOT:-./notes}:/data/notes:ro
+
+  transaction-tracker:
+    restart: unless-stopped
+    image: ghcr.io/dannywieser/mdm-transaction-tracker:${MDM_IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: infra/docker/transaction-tracker.Dockerfile
+    depends_on:
+      - redis
+    environment:
+      APP_CONFIG_PATH: "/app/app.config.json"
+      PORT: "3006"
+      NOTES_ROOT: "/data/notes"
+      REDIS_URL: "redis://redis:6379"
+    expose:
+      - "3006"
     volumes:
       - ./app.config.json:/app/app.config.json:ro
       - ${NOTES_ROOT:-./notes}:/data/notes:ro
